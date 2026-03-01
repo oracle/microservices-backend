@@ -45,10 +45,16 @@ global:
   # including a self-signed TLS certificate for accounts.google.com
   airGapped: true
 
-  # Image pull secret for private registry authentication
-  # When set, automatically applied to all subcharts via YAML anchors
-  imagePullSecrets: &imagePullSecrets 
-    - name: myregistry-secret
+  # This SHOULD be used to override all secrets for pulling an image from a private repository
+  # And when set WOULD automatically applied to all subcharts via YAML anchors
+  # BUT some of the subcharts (apisix, signoz) expect a list of strings
+  # and other charts expect a map (name: secret-name) 
+  # SO we cannot use this, and instead need to specify for each chart separately (as below)
+  # imagePullSecrets: #&imagePullSecrets 
+  #   - name: myregistry-secret
+
+  # this is used by OTMM only
+  imagePullSecretName: myregistry-secret
 
   # Utility images used by global hooks (e.g., PVC cleanup on uninstall)
   utilities:
@@ -99,6 +105,9 @@ ai-optimizer:
 
 # Eureka Service Discovery
 eureka:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
   enabled: true
   replicas: 3
   image:
@@ -109,6 +118,9 @@ eureka:
 
 # Admin Server
 admin-server:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
   enabled: true
   replicas: 1
   image:
@@ -119,6 +131,9 @@ admin-server:
 
 # Oracle Transaction Manager for Microservices (OTMM)
 otmm:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
   enabled: true
   replicas: 1
   image:
@@ -129,6 +144,9 @@ otmm:
 
 # Oracle Database Exporter (Prometheus metrics for Oracle Database)
 oracle-database-exporter:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
   enabled: true
   replicas: 1
   image:
@@ -143,6 +161,9 @@ oracle-database-exporter:
 
 # Conductor Server (Netflix Conductor - Workflow Orchestration)
 conductor-server:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
   enabled: true
   replicas: 1
   image:
@@ -160,6 +181,9 @@ conductor-server:
 # Supports SIDB-FREE, ADB-FREE, ADB-S (OCI Autonomous Database), or OTHER (external database)
 
 database:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
   enabled: true
   # Database type: SIDB-FREE, ADB-FREE, ADB-S, or OTHER
   type: "SIDB-FREE"
@@ -465,9 +489,12 @@ apisix:
 
 signoz:
   enabled: true
+  imagePullSecrets: 
+      - myregistry-secret
   global:
     # Uses global.imagePullSecrets
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: 
+      - myregistry-secret
     imageRegistry: myregistry.example.com
   # Utility images for setup jobs
   utilities:
@@ -615,7 +642,8 @@ signoz:
     image:
       registry: myregistry.example.com
       repository: clickhouse/clickhouse-server
-    imagePullSecrets: []
+    imagePullSecrets: 
+      - myregistry-secret
     initContainers:
       udf:
         image:
@@ -643,6 +671,8 @@ signoz:
         image:
           registry: myregistry.example.com
           repository: altinity/metrics-exporter
+      imagePullSecrets: 
+      - myregistry-secret
 
 k8s-infra:
   global:
@@ -650,7 +680,7 @@ k8s-infra:
     clusterName: obaas
     deploymentEnvironment: obaas
     imageRegistry: myregistry.example.com
-    imagePullSecrets: *imagePullSecrets
+    # imagePullSecrets: *imagePullSecrets
   otelCollectorEndpoint: signoz-otel-collector:4317
   otelInsecure: true
   otelAgent:
@@ -658,13 +688,15 @@ k8s-infra:
       registry: myregistry.example.com
       repository: otel/opentelemetry-collector-contrib
       tag: 0.139.0
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: 
+      - myregistry-secret
   otelDeployment:
     image:
       registry: myregistry.example.com
       repository: otel/opentelemetry-collector-contrib
       tag: 0.139.0
-    imagePullSecrets: *imagePullSecrets    
+    imagePullSecrets: 
+      - myregistry-secret
   presets:
     otlpExporter:
       enabled: true
