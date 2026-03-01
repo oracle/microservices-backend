@@ -19,3 +19,10 @@ AppVersion: 2.1.0-build.1
 - Update APISIX plugin configuration to include batch-requests
 - Update SigNoz metrics collection config to include app label (for Helidon apps)
 - Update SigNoz logs pipeline receivers config to include k8s_events
+
+# 0.0.3 - Feb 28, 2026
+
+AppVersion: 2.1.0-build.2
+
+- Adds the ability to create a Kafaka cluster as part of the obaas chart installation
+

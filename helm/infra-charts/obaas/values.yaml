@@ -595,3 +595,8 @@ k8s-infra:
       enabled: true
     loggingExporter:
       enabled: false
+
+kafka:
+  enabled: false 
+  version: 3.9.1
+  metadataVersion: 3.9-IV0
