@@ -43,7 +43,7 @@ data:
   TMM_APPNAME: {{ .Release.Name }}-otmm-tcs
   TMM_IMAGE: "{{ (index .Values "otmm").image.repository }}:{{ (index .Values "otmm").image.tag }}"
   TMM_IMAGE_PULLPOLICY: {{ (index .Values "otmm").image.pullPolicy | default "IfNotPresent" }}
-  TMM_IMAGE_PULLSECRET: {{ include "obaas.imagePullSecretName" (dict "local" (index .Values "otmm").imagePullSecrets "global" .Values.global.imagePullSecrets) }}
+  TMM_IMAGE_PULLSECRET: {{ .Values.global.imagePullSecretName }}
   TMM_REPLICA_COUNT: "{{ (index .Values "otmm").replicas }}"
   TRANSACTION_TOKEN_ENABLED: "false"
   XA_COORDINATOR_ENABLED: "true"

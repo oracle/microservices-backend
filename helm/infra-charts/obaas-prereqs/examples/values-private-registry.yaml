@@ -200,8 +200,9 @@ strimzi-kafka-operator:
   # Set to true to watch all namespaces (recommended for multi-tenant OBaaS installations)
   watchAnyNamespace: true
   # Uncomment to override the default image registry and repository
-  # defaultImageRegistry: "myregistry.example.com"  # Default: quay.io
-  # defaultImageRepository: "strimzi"  # Default: strimzi
+  defaultImageRegistry: "myregistry.example.com"  # Default: quay.io
+  defaultImageRepository: "strimzi"  # Default: strimzi
+  defaultImageTag: 0.45.1
   image:
     # Uses global.imagePullSecrets
     imagePullSecrets: *imagePullSecrets
