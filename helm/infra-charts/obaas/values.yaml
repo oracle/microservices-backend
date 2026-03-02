@@ -538,7 +538,7 @@ signoz:
         pipelines:
           logs:
             receivers:
-              - k8s_events
+              # - k8s_events
               - otlp
               - httplogreceiver/heroku
               - httplogreceiver/json
