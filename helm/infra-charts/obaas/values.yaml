@@ -18,9 +18,6 @@ global:
   # including a self-signed TLS certificate for accounts.google.com
   airGapped: false
 
-  # This overrides all secrets for pulling an image from a private repository
-  # When set, automatically applied to all subcharts via YAML anchors
-  imagePullSecrets: &imagePullSecrets []
 
   # Utility image used by hooks and jobs
   utilities:
@@ -56,20 +53,8 @@ ai-optimizer:
     baseUrlPath: "/ai-optimizer"
   server:
     replicaCount: 1
-    # -- Image details: Required for BYO Infra
-    # imagePullSecrets: []
-    # image:
-    #   repository: localhost/ai-optimizer-server
-    #   tag: latest
-    #   pullPolicy: IfNotPresent
   client:
     enabled: true
-    # -- Image details: Required for BYO Infra
-    # imagePullSecrets: []
-    # image:
-    #   repository: localhost/ai-optimizer-client
-    #   tag: latest
-    #   pullPolicy: IfNotPresent
 
 # Eureka Service Discovery
 eureka:
@@ -77,13 +62,12 @@ eureka:
   replicas: 3
   image:
     repository: container-registry.oracle.com/obaas/service-registry
-    tag: "2.0.0"
+    tag: {{ .Chart.AppVersion }}
   # Override default resources if needed (defaults: cpu 250m-500m, memory 1Gi-1200Mi)
   resources: {}
 
 ingress-nginx:
   enabled: true
-  imagePullSecrets: *imagePullSecrets
   controller:
     metrics:
       enabled: true
@@ -101,9 +85,6 @@ ingress-nginx:
 
 apisix:
   enabled: true
-  # Uses global.imagePullSecrets
-  global:
-    imagePullSecrets: *imagePullSecrets
 
   # RBAC required for Kubernetes service discovery
   rbac:
@@ -276,7 +257,7 @@ admin-server:
   replicas: 1
   image:
     repository: container-registry.oracle.com/obaas/admin-server
-    tag: "2.0.0"
+    tag: {{ .Chart.AppVersion }}
   # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
   # resources: {}
 
@@ -407,9 +388,6 @@ database:
 
 signoz:
   enabled: true
-  global:
-    # Uses global.imagePullSecrets
-    imagePullSecrets: *imagePullSecrets
   # Utility images for setup jobs
   utilities:
     curlJq:
@@ -554,7 +532,6 @@ signoz:
     image:
       registry: docker.io
       repository: clickhouse/clickhouse-server
-    imagePullSecrets: []
     initContainers:
       udf:
         image:
