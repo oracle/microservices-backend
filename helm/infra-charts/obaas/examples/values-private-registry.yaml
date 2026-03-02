@@ -147,6 +147,8 @@ oracle-database-exporter:
   global:
     imagePullSecrets: 
       - name: myregistry-secret
+  imagePullSecrets: 
+    - name: myregistry-secret       
   enabled: true
   replicas: 1
   image:
@@ -459,6 +461,9 @@ apisix:
   # etcd configuration
   etcd:
     enabled: true
+    global:
+      imagePullSecrets: 
+        - myregistry-secret
     replicaCount: 3
     # Disable pre-upgrade hook when etcd is being installed for the first time
     # (even if the parent chart is being upgraded)
@@ -702,6 +707,11 @@ k8s-infra:
       enabled: true
     loggingExporter:
       enabled: false
+
+kafka:
+  enabled: false 
+  version: 3.9.1
+  metadataVersion: 3.9-IV0
 
 # =============================================================================
 # Image Reference Summary
