@@ -1,0 +1,174 @@
+## Copyright (c) 2024, 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+
+{{- if .Values.global.airGapped }}
+
+{{- /*
+  Post-install/post-upgrade hook that patches the SigNoz StatefulSet to add:
+  1. hostAliases redirecting accounts.google.com to 127.0.0.1
+  2. An nginx sidecar serving a mock OIDC discovery endpoint over HTTPS
+  3. The mock CA cert mounted into /etc/ssl/certs/ so Go trusts it
+     alongside the existing system CA bundle
+
+  This is necessary because the SigNoz subchart does not support hostAliases
+  or sidecar containers in its StatefulSet template.
+*/ -}}
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-signoz-airgap-patch
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+imagePullSecrets:
+  - name: {{ .Values.global.imagePullSecretName | quote }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Name }}-signoz-airgap-patch
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+rules:
+- apiGroups: ["apps"]
+  resources: ["statefulsets"]
+  verbs: ["get", "patch"]
+- apiGroups: ["apps"]
+  resources: ["statefulsets/scale"]
+  verbs: ["get", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Release.Name }}-signoz-airgap-patch
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Release.Name }}-signoz-airgap-patch
+subjects:
+- kind: ServiceAccount
+  name: {{ .Release.Name }}-signoz-airgap-patch
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-signoz-airgap-patch
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 600 
+  template:
+    metadata:
+      name: {{ .Release.Name }}-signoz-airgap-patch
+    spec:
+      serviceAccountName: {{ .Release.Name }}-signoz-airgap-patch
+      restartPolicy: Never
+      containers:
+      - name: patch
+        image: {{ .Values.global.utilities.kubectl.image.registry }}/{{ .Values.global.utilities.kubectl.image.repository }}:{{ .Values.global.utilities.kubectl.image.tag }}
+        command:
+        - sh
+        - -c
+        - |
+          set -e
+          echo "=== SigNoz Air-Gap OIDC Mock Patch ==="
+
+          NGINX_IMAGE="{{ .Values.global.utilities.nginx.image.registry }}/{{ .Values.global.utilities.nginx.image.repository }}:{{ .Values.global.utilities.nginx.image.tag }}"
+
+          echo "Patching StatefulSet {{ include "obaas.signoz.fullname" . }}..."
+          kubectl patch statefulset {{ include "obaas.signoz.fullname" . }} \
+            -n {{ .Release.Namespace }} \
+            --type strategic \
+            -p "{
+              \"spec\": {
+                \"template\": {
+                  \"spec\": {
+                    \"hostAliases\": [
+                      {
+                        \"ip\": \"127.0.0.1\",
+                        \"hostnames\": [\"accounts.google.com\"]
+                      }
+                    ],
+                    \"containers\": [
+                      {
+                        \"name\": \"signoz\",
+                        \"env\": [
+                          {
+                            \"name\": \"SSL_CERT_FILE\",
+                            \"value\": \"/etc/ssl/certs/mock-ca.crt\"
+                          }
+                        ],
+                        \"volumeMounts\": [
+                          {
+                            \"name\": \"cert-vol\",
+                            \"mountPath\": \"/etc/ssl/certs/mock-ca.crt\",
+                            \"subPath\": \"tls.crt\"
+                          }
+                        ]
+                      },
+                      {
+                        \"name\": \"oidc-mock\",
+                        \"image\": \"${NGINX_IMAGE}\",
+                        \"volumeMounts\": [
+                          {
+                            \"name\": \"mock-config\",
+                            \"mountPath\": \"/etc/nginx/nginx.conf\",
+                            \"subPath\": \"nginx.conf\"
+                          },
+                          {
+                            \"name\": \"mock-config\",
+                            \"mountPath\": \"/etc/nginx/conf.d/oidc.json\",
+                            \"subPath\": \"oidc.json\"
+                          },
+                          {
+                            \"name\": \"cert-vol\",
+                            \"mountPath\": \"/etc/nginx/certs/\"
+                          }
+                        ]
+                      }
+                    ],
+                    \"volumes\": [
+                      {
+                        \"name\": \"mock-config\",
+                        \"configMap\": {
+                          \"name\": \"signoz-oidc-mock\"
+                        }
+                      },
+                      {
+                        \"name\": \"cert-vol\",
+                        \"secret\": {
+                          \"secretName\": \"mock-google-cert\"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }"
+
+          echo "=== Patch applied successfully, forcing a restart ==="
+
+          kubectl scale statefulset {{ include "obaas.signoz.fullname" . }} --replicas=0 -n {{ .Release.Namespace }}
+          sleep 5
+          kubectl scale statefulset {{ include "obaas.signoz.fullname" . }} --replicas=1 -n {{ .Release.Namespace }}
+
+          echo "=== All done! ==="
+
+{{- end }}

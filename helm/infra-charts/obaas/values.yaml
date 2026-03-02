@@ -14,6 +14,10 @@ global:
   # This ensures a clean reinstall but destroys all persistent data
   cleanupPVCs: true
 
+  # When true, creates resources needed for air-gapped (disconnected) environments
+  # including a self-signed TLS certificate for accounts.google.com
+  airGapped: false
+
   # This overrides all secrets for pulling an image from a private repository
   # When set, automatically applied to all subcharts via YAML anchors
   imagePullSecrets: &imagePullSecrets []
@@ -25,6 +29,11 @@ global:
         registry: docker.io
         repository: alpine/k8s
         tag: "1.28.13"
+    nginx:
+      image:
+        registry: docker.io
+        repository: nginx
+        tag: "alpine"        
 
 # -----------------------
 # -- OBaaS Configuration
@@ -108,90 +117,91 @@ apisix:
     # (prometheus is in APISIX defaults, but opentelemetry is not)
     plugins:
       # Required
+      - api-breaker
+      - authz-keycloak
+      - basic-auth
+      - batch-requests
+      - consumer-restriction
       - opentelemetry
       - prometheus
       # Need Evaluation
-      - real-ip
       - ai
-      - client-control
-      - proxy-control
-      - request-id
-      - zipkin
-      - ext-plugin-pre-req
-      - fault-injection
-      - mocking
-      - serverless-pre-function
-      - cors
-      - ip-restriction
-      - ua-restriction
-      - referer-restriction
-      - csrf
-      - uri-blocker
-      - request-validation
-      - chaitin-waf
-      - multi-auth
-      - openid-connect
-      - cas-auth
       - authz-casbin
       - authz-casdoor
-      - wolf-rbac
-      - ldap-auth
-      - hmac-auth
-      - basic-auth
-      - jwt-auth
-      - jwe-decrypt
-      - key-auth
-      - consumer-restriction
-      - forward-auth
-      - opa
-      - authz-keycloak
-      - proxy-cache
+      - aws-lambda
+      - azure-functions
       - body-transformer
-      - proxy-mirror
-      - proxy-rewrite
-      - workflow
-      - api-breaker
+      - cas-auth
+      - chaitin-waf
+      - clickhouse-logger
+      - client-control
+      - cors
+      - csrf
+      - datadog
+      - degraphql
+      - echo
+      - elasticsearch-logger
+      - example-plugin
+      - ext-plugin-post-req
+      - ext-plugin-post-resp
+      - ext-plugin-pre-req
+      - fault-injection
+      - file-logger
+      - forward-auth
+      - google-cloud-logging
+      - grpc-transcode
+      - grpc-web
+      - gzip
+      - hmac-auth
+      - http-dubbo
+      - http-logger
+      - inspect
+      - ip-restriction
+      - jwe-decrypt
+      - jwt-auth
+      - kafka-logger
+      - kafka-proxy
+      - key-auth
+      - ldap-auth
       - limit-conn
       - limit-count
       - limit-req
-      - gzip
-      - server-info
-      - traffic-split
-      - redirect
-      - response-rewrite
-      - degraphql
-      - kafka-proxy
-      - grpc-transcode
-      - grpc-web
-      - http-dubbo
-      - public-api
-      - datadog
-      - loki-logger
-      - elasticsearch-logger
-      - echo
       - loggly
-      - http-logger
-      - splunk-hec-logging
-      - skywalking-logger
-      - google-cloud-logging
-      - sls-logger
-      - tcp-logger
-      - kafka-logger
-      - rocketmq-logger
-      - syslog
-      - udp-logger
-      - file-logger
-      - clickhouse-logger
-      - tencent-cloud-cls
-      - inspect
-      - example-plugin
-      - aws-lambda
-      - azure-functions
-      - openwhisk
+      - loki-logger
+      - mocking
+      - multi-auth
+      - opa
       - openfunction
+      - openid-connect
+      - openwhisk
+      - proxy-cache
+      - proxy-control
+      - proxy-mirror
+      - proxy-rewrite
+      - public-api
+      - real-ip
+      - redirect
+      - referer-restriction
+      - request-id
+      - request-validation
+      - response-rewrite
+      - rocketmq-logger
+      - server-info
       - serverless-post-function
-      - ext-plugin-post-req
-      - ext-plugin-post-resp
+      - serverless-pre-function
+      - skywalking-logger
+      - sls-logger
+      - splunk-hec-logging
+      - syslog
+      - tcp-logger
+      - tencent-cloud-cls
+      - traffic-split
+      - ua-restriction
+      - udp-logger
+      - uri-blocker
+      - wolf-rbac
+      - workflow
+      - zipkin
 
     # Service Discovery
     discovery:
@@ -521,8 +531,17 @@ signoz:
                   - source_labels: [__meta_kubernetes_pod_name]
                     action: replace
                     target_label: kubernetes_pod_name
+                  - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+                    action: replace
+                    target_label: app
       service:
         pipelines:
+          logs:
+            receivers:
+              - k8s_events
+              - otlp
+              - httplogreceiver/heroku
+              - httplogreceiver/json
           metrics:
             receivers:
               - otlp
