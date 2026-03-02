@@ -27,14 +27,34 @@
 #
 # =============================================================================
 
+nameOverride: ""
+fullnameOverride: ""
+
 # -----------------------
 # -- Global Configuration
 # -----------------------
 global:
-  # Image pull secret for private registry authentication
-  # This is automatically propagated to all subcharts via YAML anchors
-  imagePullSecrets:
-    - name: myregistry-secret
+  # All OBaaS components install into the release namespace (specified with -n flag)
+  # There is no global namespace override - components use the namespace you provide during install
+
+  # When true, all PVCs in the namespace are deleted during helm uninstall
+  # This ensures a clean reinstall but destroys all persistent data
+  cleanupPVCs: true
+
+  # When true, creates resources needed for air-gapped (disconnected) environments
+  # including a self-signed TLS certificate for accounts.google.com
+  airGapped: true
+
+  # This SHOULD be used to override all secrets for pulling an image from a private repository
+  # And when set WOULD automatically applied to all subcharts via YAML anchors
+  # BUT some of the subcharts (apisix, signoz) expect a list of strings
+  # and other charts expect a map (name: secret-name) 
+  # SO we cannot use this, and instead need to specify for each chart separately (as below)
+  # imagePullSecrets: #&imagePullSecrets 
+  #   - name: myregistry-secret
+
+  # this is used by OTMM only
+  imagePullSecretName: myregistry-secret
 
   # Utility images used by global hooks (e.g., PVC cleanup on uninstall)
   utilities:
@@ -43,46 +63,92 @@ global:
         registry: myregistry.example.com
         repository: alpine/k8s
         tag: "1.28.13"
+    nginx:
+      image:
+        registry: myregistry.example.com
+        repository: nginx
+        tag: "alpine"
 
 # =============================================================================
-# OBaaS Custom Components
+# OBaaS Components Configuration
 # =============================================================================
-# These components use full repository paths. Replace the registry prefix.
+# Note: Cluster-singleton prerequisites must be installed via the obaas-prereqs chart before installing this chart.
+# Install obaas-prereqs once per cluster.
+#
+# Image Override Pattern:
+# All image configurations are commented out by default to use upstream defaults.
+# To use a private registry or air-gapped installation, uncomment and set the image values.
+# Example: Change "registry.k8s.io" to "myregistry.example.com" for all components.
+
+
+# AI Optimizer and Toolkit
+ai-optimizer:
+  enabled: false
+  global:
+    baseUrlPath: "/ai-optimizer"
+  server:
+    replicaCount: 1
+    # -- Image details: Required for BYO Infra
+    # imagePullSecrets: []
+    # image:
+    #   repository: localhost/ai-optimizer-server
+    #   tag: latest
+    #   pullPolicy: IfNotPresent
+  client:
+    enabled: true
+    # -- Image details: Required for BYO Infra
+    # imagePullSecrets: []
+    # image:
+    #   repository: localhost/ai-optimizer-client
+    #   tag: latest
+    #   pullPolicy: IfNotPresent
 
 # Eureka Service Discovery
 eureka:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
   enabled: true
+  replicas: 3
   image:
-    repository: myregistry.example.com/orgname/service-registry
+    repository: myregistry.example.com/obaas/service-registry
     tag: "2.0.0"
+  # Override default resources if needed (defaults: cpu 250m-500m, memory 1Gi-1200Mi)
+  resources: {}
 
 # Admin Server
 admin-server:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
   enabled: true
+  replicas: 1
   image:
-    repository: myregistry.example.com/orgname/admin-server
+    repository: myregistry.example.com/obaas/admin-server
     tag: "2.0.0"
-
-# Conductor Server (Netflix Conductor - Workflow Orchestration)
-conductor-server:
-  enabled: true
-  image:
-    repository: myregistry.example.com/orgname/conductor
-    tag: "server-2.0.0"
-  redisImage:
-    repository: myregistry.example.com/orgname/conductor
-    tag: "cache-2.0.0"
+  # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
+  # resources: {}
 
 # Oracle Transaction Manager for Microservices (OTMM)
 otmm:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
   enabled: true
+  replicas: 1
   image:
     repository: myregistry.example.com/database/otmm
     tag: "24.4.1"
+  # Override default resources if needed (defaults: cpu 250m, memory 1Gi)
+  # resources: {}
 
-# Oracle Database Exporter (Prometheus metrics)
+# Oracle Database Exporter (Prometheus metrics for Oracle Database)
 oracle-database-exporter:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
   enabled: true
+  replicas: 1
   image:
     repository: myregistry.example.com/database/observability-exporter
     tag: "2.2.0"
@@ -90,25 +156,118 @@ oracle-database-exporter:
   busybox:
     repository: myregistry.example.com/busybox
     tag: "1.36"
+  # Override default resources if needed (defaults: cpu 250m-500m, memory 64Mi-128Mi)
+  # resources: {}
+
+# Conductor Server (Netflix Conductor - Workflow Orchestration)
+conductor-server:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
+  enabled: true
+  replicas: 1
+  image:
+    repository: myregistry.example.com/obaas/conductor
+    tag: "server-2.0.0"
+  redisImage:
+    repository: myregistry.example.com/obaas/conductor
+    tag: "cache-2.0.0"
+  # Override default resources if needed (defaults: cpu 500m-1000m, memory 512Mi-1Gi)
+  # resources: {}
 
 # =============================================================================
 # Database Configuration
 # =============================================================================
-# Configure database images for SIDB-FREE or ADB-FREE deployments
+# Supports SIDB-FREE, ADB-FREE, ADB-S (OCI Autonomous Database), or OTHER (external database)
 
 database:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
   enabled: true
   # Database type: SIDB-FREE, ADB-FREE, ADB-S, or OTHER
   type: "SIDB-FREE"
-  # Container image for SIDB-FREE or ADB-FREE (not needed for ADB-S or OTHER)
-  image:
-    repository: myregistry.example.com/database/free
-    tag: "latest"
   # SQLcl image for database initialization jobs
   sqlcl:
     image:
       repository: myregistry.example.com/database/sqlcl
       tag: "25.3.0"
+
+  # For SIDB-FREE/ADB-FREE: container image configuration (exclude for ADB-S)
+  image:
+    repository: "myregistry.example.com/database/free"
+    tag: "latest"
+
+  # For ADB-S: OCI Autonomous Database OCID (exclude for SIDB-FREE/ADB-FREE/OTHER)
+  oci:
+    ocid: ""
+
+  # For OTHER: External database connectivity
+  # Either provide 'dsn' OR all of (host, port, service_name)
+  other:
+    # Full DSN string (e.g: mydbhost.com:1521/mydb_service)
+    # If provided, supersedes host/port/service_name
+    dsn: ""
+    # Database host (e.g: mydbhost.com)
+    # Required if dsn is not provided
+    host: ""
+    # Database port (e.g: 1521)
+    # Required if dsn is not provided
+    port: ""
+    # Database service name (e.g: mydb_service)
+    # Required if dsn is not provided
+    service_name: ""
+
+  # Privileged User Authentication (for database initialization)
+  # This is the ADMIN (ADB) or SYSTEM (non-ADB) user that creates the application user
+  # ADB-S and OTHER: REQUIRED for these pre-created databases
+  # SIDB-FREE, ADB-FREE: OPTIONAL; If not provided, a secret will be auto-generated with random password.
+  privAuthN:
+    # Name of Secret containing privileged user credentials
+    # secretName: ""
+    # Namespace of the privileged user secret
+    # secretNamespace: ""
+    # Override default key names in the secret (defaults: username, password, service)
+    # usernameKey: "username"
+    # passwordKey: "password"
+    # serviceKey: "service"
+
+  # Application User Authentication/Connection Details
+  authN:
+    # Namespace containing application user secret (secretName)
+    # secretNamespace: ""
+    # Name of Secret containing the authentication/connection details
+    # If not provided, a secret will be auto-generated with random password
+    # secretName: ""
+    # Override default key names in the secret (defaults: username, password, service)
+    # usernameKey: "username"
+    # passwordKey: "password"
+    # serviceKey: "service"
+
+  # OCI Configuration (for ADB-S authentication)
+  # Either use API key authentication OR Workload Identity
+  oci_config:
+    # For Workload Identity authentication:
+    # Set to true to use OKE Workload Identity (no API key needed but requires Workload Identity)
+    # oke: false
+
+    # Namespace of the configmap/secret for OCI API Authentication
+    # configNamespace: ""
+
+    # For API key authentication:
+    # Name of secret containing oci_api_key.pem
+    # keySecretName: ""
+
+    # Option 1: Reference to existing ConfigMap with OCI config
+    # If provided, tenancy/user/fingerprint/region below will be ignored
+    # configMapName: ""
+
+    # Option 2: Provide OCI config values to create a ConfigMap
+    # Only use these if configMapName is not provided
+    # tenancy: ""
+    # user: ""
+    # fingerprint: ""
+    # region: ""
 
 # =============================================================================
 # Subcharts - Ingress NGINX
@@ -117,17 +276,31 @@ database:
 
 ingress-nginx:
   enabled: true
+  imagePullSecrets: *imagePullSecrets
   controller:
+    metrics:
+      enabled: true
+    podAnnotations:
+      "signoz.io/scrape": "true"
+      "signoz.io/port": "10254"
+      "signoz.io/path": "/metrics"
+    # Scope to release namespace only (default is false - watches all namespaces)
+    scope:
+      enabled: true
+    # Uncomment to override the default image registry
     image:
-      registry: myregistry.example.com
+      registry: myregistry.example.com  # Default: registry.k8s.io
       image: ingress-nginx/controller
-      # tag: ""  # Uses chart default
+      tag: "v1.11.5"
+      digest: "sha256:a1cbad75b0a7098bf9325132794dddf9eef917e8a7fe246749a4cea7ff6f01eb"
     admissionWebhooks:
       patch:
         image:
           registry: myregistry.example.com
           image: ingress-nginx/kube-webhook-certgen
-          # tag: ""  # Uses chart default
+          tag: "v1.5.2"
+          digest: "sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea"
+
 
 # =============================================================================
 # Subcharts - APISIX
@@ -136,26 +309,177 @@ ingress-nginx:
 
 apisix:
   enabled: true
-  # Main APISIX image
-  image:
-    repository: myregistry.example.com/apache/apisix
-    tag: "3.14.1-ubuntu"
-  # Init container
-  initContainer:
-    image: myregistry.example.com/busybox
-    tag: "1.36"
-  # etcd subchart
+  # Uses global.imagePullSecrets
+  global:
+    imagePullSecrets: *imagePullSecrets
+    security: 
+      allowInsecureImages: true
+
+  # RBAC required for Kubernetes service discovery
+  rbac:
+    create: true
+  serviceAccount:
+    create: true
+
+  # APISIX configuration
+  apisix:
+    # Minimal plugins list - only what routes actually use
+    # (prometheus is in APISIX defaults, but opentelemetry is not)
+    plugins:
+      # Required
+      - api-breaker
+      - authz-keycloak
+      - basic-auth
+      - batch-requests
+      - consumer-restriction
+      - opentelemetry
+      - prometheus
+      # Need Evaluation
+      - ai
+      - authz-casbin
+      - authz-casdoor
+      - aws-lambda
+      - azure-functions
+      - body-transformer
+      - cas-auth
+      - chaitin-waf
+      - clickhouse-logger
+      - client-control
+      - cors
+      - csrf
+      - datadog
+      - degraphql
+      - echo
+      - elasticsearch-logger
+      - example-plugin
+      - ext-plugin-post-req
+      - ext-plugin-post-resp
+      - ext-plugin-pre-req
+      - fault-injection
+      - file-logger
+      - forward-auth
+      - google-cloud-logging
+      - grpc-transcode
+      - grpc-web
+      - gzip
+      - hmac-auth
+      - http-dubbo
+      - http-logger
+      - inspect
+      - ip-restriction
+      - jwe-decrypt
+      - jwt-auth
+      - kafka-logger
+      - kafka-proxy
+      - key-auth
+      - ldap-auth
+      - limit-conn
+      - limit-count
+      - limit-req
+      - loggly
+      - loki-logger
+      - mocking
+      - multi-auth
+      - opa
+      - openfunction
+      - openid-connect
+      - openwhisk
+      - proxy-cache
+      - proxy-control
+      - proxy-mirror
+      - proxy-rewrite
+      - public-api
+      - real-ip
+      - redirect
+      - referer-restriction
+      - request-id
+      - request-validation
+      - response-rewrite
+      - rocketmq-logger
+      - server-info
+      - serverless-post-function
+      - serverless-pre-function
+      - skywalking-logger
+      - sls-logger
+      - splunk-hec-logging
+      - syslog
+      - tcp-logger
+      - tencent-cloud-cls
+      - traffic-split
+      - ua-restriction
+      - udp-logger
+      - uri-blocker
+      - wolf-rbac
+      - workflow
+      - zipkin
+
+    # Service Discovery
+    discovery:
+      enabled: true
+      registry:
+        # Eureka service discovery - connects to eureka StatefulSet via alias service
+        # (see templates/eureka/service-alias.yaml)
+        eureka:
+          host:
+            - "http://eureka:8761"
+          prefix: "/eureka/"
+          fetch_interval: 30
+          timeout:
+            connect: 2000
+            send: 2000
+            read: 5000
+          weight: 100
+        # Kubernetes service discovery
+        kubernetes: {}
+
+    # OpenTelemetry - connects to SigNoz via the signoz-otel-collector alias service
+    # (see templates/observability/Service-signoz-otel-collector-alias.yaml)
+    pluginAttrs:
+      opentelemetry:
+        collector:
+          address: "http://signoz-otel-collector:4318"
+          request_timeout: 3
+        resource:
+          service.name: APISIX
+        trace_id_source: x-request-id
+      prometheus:
+        export_uri: /metrics
+        metric_prefix: apisix_
+        enable_export_server: true
+        export_addr:
+          ip: 0.0.0.0
+          port: 9091
+
+    # Environment variables required for Kubernetes service discovery
+    nginx:
+      envs:
+        - KUBERNETES_SERVICE_HOST
+        - KUBERNETES_SERVICE_PORT
+
+  # etcd configuration
   etcd:
+    enabled: true
+    replicaCount: 3
+    # Disable pre-upgrade hook when etcd is being installed for the first time
+    # (even if the parent chart is being upgraded)
+    preUpgradeHook:
+      enabled: false
     image:
       registry: myregistry.example.com
       repository: bitnamilegacy/etcd
-      # tag: ""  # Uses chart default
-  # APISIX Ingress Controller (if enabled)
-  ingress-controller:
-    enabled: false
-    image:
-      repository: myregistry.example.com/apache/apisix-ingress-controller
-      # tag: ""  # Uses chart default
+      tag: "3.6.1"
+
+  # APISIX image configuration
+  # Full registry path required for clusters with short name mode enforcing
+  image:
+    repository: "myregistry.example.com/apache/apisix"
+    tag: "3.14.1-ubuntu"
+
+  # Init container image
+  initContainer:
+    image: "myregistry.example.com/busybox"
+    tag: "1.36"
+
 
 # =============================================================================
 # Subcharts - SigNoz (Observability)
@@ -165,11 +489,14 @@ apisix:
 
 signoz:
   enabled: true
+  imagePullSecrets: 
+      - myregistry-secret
   global:
-    # Global registry for most SigNoz components
+    # Uses global.imagePullSecrets
+    imagePullSecrets: 
+      - myregistry-secret
     imageRegistry: myregistry.example.com
-
-  # Utility images used by setup jobs and hooks
+  # Utility images for setup jobs
   utilities:
     curlJq:
       image:
@@ -180,21 +507,29 @@ signoz:
       image:
         registry: myregistry.example.com
         repository: busybox
-        tag: "1.36"
-
-  # SigNoz core components (using global.imageRegistry)
+        tag: 1.36
+  # Authentication configuration for SigNoz admin user
+  auth:
+    # Existing secret configuration
+    # If existingSecret is specified, it will be used instead of creating a new one
+    # The secret must contain 'email' and 'password' keys
+    existingSecret: ""
+    # Email for the admin user (only used when existingSecret is not specified)
+    # A random password will be automatically generated
+    email: "admin@example.com"
+  # Change to override individual component images
   signoz:
     image:
       registry: myregistry.example.com
       repository: signoz/signoz
+    imagePullSecrets: 
+     - myregistry-secret
     initContainers:
       init:
         image:
           registry: myregistry.example.com
           repository: busybox
           tag: "1.36"
-
-  # Schema Migrator
   schemaMigrator:
     image:
       registry: myregistry.example.com
@@ -213,27 +548,121 @@ signoz:
         image:
           registry: myregistry.example.com
           repository: groundnuty/k8s-wait-for
-
-  # OpenTelemetry Collector
   otelCollector:
     image:
       registry: myregistry.example.com
       repository: signoz/signoz-otel-collector
-
-  # ClickHouse (SigNoz storage backend)
+    # ClusterRole rules for Kubernetes service discovery (prometheus receiver)
+    clusterRole:
+      rules:
+        - apiGroups: [""]
+          resources: ["pods", "namespaces", "nodes", "services", "endpoints"]
+          verbs: ["get", "list", "watch"]
+        - apiGroups: ["apps"]
+          resources: ["replicasets"]
+          verbs: ["get", "list", "watch"]
+        - apiGroups: ["extensions"]
+          resources: ["replicasets"]
+          verbs: ["get", "list", "watch"]
+        - apiGroups: ["batch"]
+          resources: ["jobs"]
+          verbs: ["get", "list", "watch"]
+    config:
+      receivers:
+        prometheus:
+          config:
+            global:
+              scrape_interval: 30s
+              scrape_timeout: 10s
+            scrape_configs:
+              - job_name: kube-state-metrics
+                kubernetes_sd_configs:
+                  - role: endpoints
+                relabel_configs:
+                  - source_labels: [__meta_kubernetes_service_name]
+                    action: keep
+                    regex: .*kube-state-metrics
+                  - source_labels: [__meta_kubernetes_endpoint_port_name]
+                    action: keep
+                    regex: http
+              - job_name: apisix
+                kubernetes_sd_configs:
+                  - role: pod
+                relabel_configs:
+                  - source_labels:
+                      [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+                    action: keep
+                    regex: apisix
+                  - source_labels: [__meta_kubernetes_pod_ip]
+                    target_label: __address__
+                    replacement: ${1}:9091
+              # scrape all the pods with the signoz annotations on them
+              - job_name: 'signoz-annotated-pods'
+                kubernetes_sd_configs:
+                  - role: pod
+                relabel_configs:
+                  - source_labels: [__meta_kubernetes_pod_annotation_signoz_io_scrape]
+                    action: keep
+                    regex: true
+                  - source_labels: [__meta_kubernetes_pod_annotation_signoz_io_path]
+                    action: replace
+                    target_label: __metrics_path__
+                    regex: (.+)
+                  - source_labels: [__meta_kubernetes_pod_ip, __meta_kubernetes_pod_annotation_signoz_io_port]
+                    action: replace
+                    regex: ([^;]+);([^;]+)
+                    replacement: $1:$2
+                    target_label: __address__
+                  - source_labels: [__meta_kubernetes_namespace]
+                    action: replace
+                    target_label: kubernetes_namespace
+                  - source_labels: [__meta_kubernetes_pod_name]
+                    action: replace
+                    target_label: kubernetes_pod_name
+                  - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+                    action: replace
+                    target_label: app                    
+      service:
+        pipelines:
+          logs:
+            receivers:
+              - k8s_events
+              - otlp
+              - httplogreceiver/heroku
+              - httplogreceiver/json
+          metrics:
+            receivers:
+              - otlp
+              - prometheus
   clickhouse:
-    image:
-      registry: myregistry.example.com
-      repository: clickhouse/clickhouse-server
     zookeeper:
       image:
         registry: myregistry.example.com
         repository: signoz/zookeeper
+    image:
+      registry: myregistry.example.com
+      repository: clickhouse/clickhouse-server
+    imagePullSecrets: 
+      - myregistry-secret
     initContainers:
       udf:
         image:
           registry: myregistry.example.com
-          repository: library/alpine
+          repository: obaas/dashboards
+          tag: "2.0.0"
+        command:
+          - sh
+          - -c
+          - |
+            set -e
+            node_os=$(uname -s | tr '[:upper:]' '[:lower:]')
+            node_arch=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/)
+            echo "Node detected as ${node_os}/${node_arch}"
+            src="/usr/local/bin/histogram-quantile/histogram-quantile_${node_os}_${node_arch}"
+            dst="/var/lib/clickhouse/user_scripts/histogramQuantile"
+            cp "$src" "$dst"
+            chmod +x "$dst"
+            echo "histogram-quantile installed successfully"
     clickhouseOperator:
       image:
         registry: myregistry.example.com
@@ -242,6 +671,37 @@ signoz:
         image:
           registry: myregistry.example.com
           repository: altinity/metrics-exporter
+      imagePullSecrets: 
+      - myregistry-secret
+
+k8s-infra:
+  global:
+    cloud: others
+    clusterName: obaas
+    deploymentEnvironment: obaas
+    imageRegistry: myregistry.example.com
+    # imagePullSecrets: *imagePullSecrets
+  otelCollectorEndpoint: signoz-otel-collector:4317
+  otelInsecure: true
+  otelAgent:
+    image:
+      registry: myregistry.example.com
+      repository: otel/opentelemetry-collector-contrib
+      tag: 0.139.0
+    imagePullSecrets: 
+      - myregistry-secret
+  otelDeployment:
+    image:
+      registry: myregistry.example.com
+      repository: otel/opentelemetry-collector-contrib
+      tag: 0.139.0
+    imagePullSecrets: 
+      - myregistry-secret
+  presets:
+    otlpExporter:
+      enabled: true
+    loggingExporter:
+      enabled: false
 
 # =============================================================================
 # Image Reference Summary
