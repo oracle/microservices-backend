@@ -112,7 +112,7 @@ eureka:
   replicas: 3
   image:
     repository: myregistry.example.com/obaas/service-registry
-    tag: "2.0.0"
+    tag: "2.1.0-build.4"
   # Override default resources if needed (defaults: cpu 250m-500m, memory 1Gi-1200Mi)
   resources: {}
 
@@ -125,7 +125,7 @@ admin-server:
   replicas: 1
   image:
     repository: myregistry.example.com/obaas/admin-server
-    tag: "2.0.0"
+    tag: "2.1.0-build.4"
   # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
   # resources: {}
 
