@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article" data-r-output-format="html">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.157.0">
+    <meta name="generator" content="Relearn 7.6.1+e9ef53522317877bc23c72c42c8307a62b209dfb">
+    <meta name="description" content="SigNoz provides an easy way to access the logs, traces and metrics collected in the backend and to view them in dashboards. It can be used to monitor performance, as well as to identify and analyze problems and to create alerts.
+Explore the pre-installed Spring Boot Dashboard
+Get the admin email and password for SigNoz using this command:
+$ kubectl -n observability get secret signoz-authn -o jsonpath=&#39;{.data.email}&#39; | base64 -d $ kubectl -n observability get secret signoz-authn -o jsonpath=&#39;{.data.password}&#39; | base64 -d Start the tunnel using this command. You can run this in the background if you prefer.">
+    <meta name="author" content="">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Explore SigNoz :: CloudBank AI">
+    <meta name="twitter:description" content="SigNoz provides an easy way to access the logs, traces and metrics collected in the backend and to view them in dashboards. It can be used to monitor performance, as well as to identify and analyze problems and to create alerts.
+Explore the pre-installed Spring Boot Dashboard
+Get the admin email and password for SigNoz using this command:
+$ kubectl -n observability get secret signoz-authn -o jsonpath=&#39;{.data.email}&#39; | base64 -d $ kubectl -n observability get secret signoz-authn -o jsonpath=&#39;{.data.password}&#39; | base64 -d Start the tunnel using this command. You can run this in the background if you prefer.">
+    <meta property="og:url" content="https://oracle.github.io/microservices-backend/cloudbank/backend/signoz/index.html">
+    <meta property="og:site_name" content="CloudBank AI">
+    <meta property="og:title" content="Explore SigNoz :: CloudBank AI">
+    <meta property="og:description" content="SigNoz provides an easy way to access the logs, traces and metrics collected in the backend and to view them in dashboards. It can be used to monitor performance, as well as to identify and analyze problems and to create alerts.
+Explore the pre-installed Spring Boot Dashboard
+Get the admin email and password for SigNoz using this command:
+$ kubectl -n observability get secret signoz-authn -o jsonpath=&#39;{.data.email}&#39; | base64 -d $ kubectl -n observability get secret signoz-authn -o jsonpath=&#39;{.data.password}&#39; | base64 -d Start the tunnel using this command. You can run this in the background if you prefer.">
+    <meta property="og:locale" content="en_us">
+    <meta property="og:type" content="article">
+    <meta property="article:section" content="Explore the Backend">
+    <meta itemprop="name" content="Explore SigNoz :: CloudBank AI">
+    <meta itemprop="description" content="SigNoz provides an easy way to access the logs, traces and metrics collected in the backend and to view them in dashboards. It can be used to monitor performance, as well as to identify and analyze problems and to create alerts.
+Explore the pre-installed Spring Boot Dashboard
+Get the admin email and password for SigNoz using this command:
+$ kubectl -n observability get secret signoz-authn -o jsonpath=&#39;{.data.email}&#39; | base64 -d $ kubectl -n observability get secret signoz-authn -o jsonpath=&#39;{.data.password}&#39; | base64 -d Start the tunnel using this command. You can run this in the background if you prefer.">
+    <meta itemprop="wordCount" content="212">
+    <title>Explore SigNoz :: CloudBank AI</title>
+    <link href="/microservices-backend/cloudbank/images/favicon.png?1772471396" rel="icon" type="image/png">
+    <link href="/microservices-backend/cloudbank/fonts/fontawesome/css/fontawesome-all.min.css?1772471396" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-backend/cloudbank/fonts/fontawesome/css/fontawesome-all.min.css?1772471396" rel="stylesheet"></noscript>
+    <link href="/microservices-backend/cloudbank/css/perfect-scrollbar/perfect-scrollbar.min.css?1772471396" rel="stylesheet">
+    <link href="/microservices-backend/cloudbank/css/theme.min.css?1772471396" rel="stylesheet">
+    <link href="/microservices-backend/cloudbank/css/format-html.min.css?1772471396" rel="stylesheet" id="R-format-style">
+    <link href="/microservices-backend/cloudbank/css/auto-complete/auto-complete.min.css?1772471396" rel="stylesheet">
+    <script src="/microservices-backend/cloudbank/js/auto-complete/auto-complete.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.stemmer.support.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.multi.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.en.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/search.min.js?1772471396" defer></script>
+    <script>
+      window.relearn = window.relearn || {};
+      // configuration
+      window.relearn.min = `.min`;
+      window.relearn.path='\/backend\/signoz\/index.html';
+      window.relearn.relBasePath='..\/..';
+      window.relearn.relBaseUri='..\/..\/..\/..';
+      window.relearn.absBaseUri='https:\/\/oracle.github.io\/microservices-backend\/cloudbank';
+      window.relearn.contentLangs=['en'];
+      window.relearn.index_js_url="/microservices-backend/cloudbank/searchindex.en.js?1772471396";
+      window.relearn.disableAnchorCopy=false;
+      window.relearn.disableAnchorScrolling=false;
+      window.relearn.disableInlineCopyToClipboard=false;
+      window.relearn.enableBlockCodeWrap=true;
+      // legal
+      window.relearn.getItem = (s,n) => {return s.getItem(n)};
+      window.relearn.setItem = (s,n,v) => {return s.setItem(n,v)};
+      window.relearn.removeItem = (s,n) => {return s.removeItem(n)};
+      // variant stuff
+      window.relearn.themevariants = [ 'zen-light' ];
+      window.relearn.customvariantname = "my-custom-variant";
+      window.relearn.changeVariant = function(variant) {
+        var oldVariant = document.documentElement.dataset.rThemeVariant;
+        window.relearn.setItem(window.localStorage, window.relearn.absBaseUri + "/variant", variant);
+        document.documentElement.dataset.rThemeVariant = variant;
+        if (oldVariant != variant) {
+          document.dispatchEvent( new CustomEvent('themeVariantLoaded', { detail: { variant, oldVariant } }) );
+          window.relearn.markVariant();
+        }
+      }
+      window.relearn.markVariant = function() {
+        var variant = window.relearn.getItem(window.localStorage, window.relearn.absBaseUri + "/variant");
+        document.querySelectorAll(".R-variantswitcher select").forEach((select) => {select.value = variant;});
+      }
+      window.relearn.initVariant = function() {
+        var variant = window.relearn.getItem(window.localStorage, window.relearn.absBaseUri + "/variant") ?? "";
+        if( variant == window.relearn.customvariantname ){
+        }else if( !variant || !window.relearn.themevariants.includes(variant) ){
+          variant = window.relearn.themevariants[0];
+          window.relearn.setItem(window.localStorage, window.relearn.absBaseUri + "/variant", variant);
+        }
+        document.documentElement.dataset.rThemeVariant = variant;
+      }
+      window.relearn.initVariant();
+      window.relearn.markVariant();
+      // translations
+      window.T_Copy_to_clipboard = `Copy to clipboard`;
+      window.T_Copied_to_clipboard = `Copied to clipboard!`;
+      window.T_Copy_link_to_clipboard = `Copy link to clipboard`;
+      window.T_Link_copied_to_clipboard = `Copied link to clipboard!`;
+      window.T_Reset_view = `Reset view`;
+      window.T_View_reset = `View reset!`;
+      window.T_No_results_found = `No results found for "{0}"`;
+      window.T_N_results_found = `{1} results found for "{0}"`;
+    </script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-7HWQVTJ803"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-7HWQVTJ803');
+        }
+      </script>
+  </head>
+  <body class="mobile-support html" data-url="/microservices-backend/cloudbank/backend/signoz/index.html">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar">
+        <div class="topbar-wrapper">
+          <div class="topbar-sidebar-divider"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide"><button class="topbar-control" onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)"><i class="fa-fw fas fa-bars"></i></button>
+            </div>
+            <div class="topbar-button topbar-button-toc" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show"><button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)"><i class="fa-fw fas fa-list-alt"></i></button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper"> 
+                </div>
+              </div>
+            </div>
+          </div>
+          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList">
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="/microservices-backend/cloudbank/index.html"><span itemprop="name">CloudBank AI</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li>
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="/microservices-backend/cloudbank/backend/index.html"><span itemprop="name">Explore the Backend</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li>
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><span itemprop="name">Explore SigNoz</span><meta itemprop="position" content="3"></li>
+          </ol>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-prev" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-backend/cloudbank/backend/config/index.html" title="Explore Spring Config Server (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a>
+            </div>
+            <div class="topbar-button topbar-button-next" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-backend/cloudbank/cleanup/index.html" title="Cleanup (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a>
+            </div>
+            <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show"><button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More"><i class="fa-fw fas fa-ellipsis-v"></i></button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable backend" tabindex="-1">
+        <div class="flex-block-wrapper">
+<article class="default">
+  <header class="headline">
+  </header>
+
+<h1 id="explore-signoz">Explore SigNoz</h1>
+
+<p>SigNoz provides an easy way to access the logs, traces and metrics collected in the backend and to view them in dashboards.  It can be used to monitor performance, as well as to identify and analyze problems and to create alerts.</p>
+<ol>
+<li>
+<p>Explore the pre-installed Spring Boot Dashboard</p>
+<p>Get the admin email and password for SigNoz using this command:</p>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n observability get secret signoz-authn -o jsonpath<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{.data.email}&#39;</span> | base64 -d
+</span></span><span style="display:flex;"><span>$ kubectl -n observability get secret signoz-authn -o jsonpath<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{.data.password}&#39;</span> | base64 -d</span></span></code></pre></div>
+<p>Start the tunnel using this command.  You can run this in the background if you prefer.</p>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n observability port-forward svc/obaas-signoz-frontend 3301:3301</span></span></code></pre></div>
+<p>Open a web browser to <a href="http://localhost:3301/login" rel="external" target="_blank">http://localhost:3301/login</a> to view the SigNoz web user interface.  It will appear similar to the image below.  Log in with the admin email and the password you just got.</p>
+<p><a href="#R-image-09a8e72d1b3223576b628480aba55d92" class="lightbox-link"><img alt="SigNoz Sign-in" class="lazy lightbox figure-image" loading="lazy" src="../images/obaas-signoz-signin.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-09a8e72d1b3223576b628480aba55d92"><img alt="SigNoz Sign-in" class="lazy lightbox lightbox-image" loading="lazy" src="../images/obaas-signoz-signin.png" title=" "></a></p>
+<p>After signing in you will get to the SigNoz homepage.</p>
+<p><a href="#R-image-577569d21d9810bb38b4f7232f6cb203" class="lightbox-link"><img alt="picture" class="lazy lightbox figure-image" loading="lazy" src="../images/obaas-signoz-home-page.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-577569d21d9810bb38b4f7232f6cb203"><img alt="picture" class="lazy lightbox lightbox-image" loading="lazy" src="../images/obaas-signoz-home-page.png" title=" "></a>ma</p>
+<p>On the left, click on Dashboards to set the list of pre-installed dashboards.</p>
+<p><a href="#R-image-100bc13d339d85ac37e00b340b29ccd7" class="lightbox-link"><img alt="SigNoz Dashboards" class="lazy lightbox figure-image" loading="lazy" src="../images/obaas-signoz-dashboards.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-100bc13d339d85ac37e00b340b29ccd7"><img alt="SigNoz Dashboards" class="lazy lightbox lightbox-image" loading="lazy" src="../images/obaas-signoz-dashboards.png" title=" "></a></p>
+<p>click on the link to <strong>Spring Boot 3.x Statistics</strong> to see Spring Boot information.</p>
+<p>The Spring Boot Dashboard looks like the image below.  Use the <strong>app_name</strong> selector at the top to choose which microservice you wish to view information for.</p>
+<p><a href="#R-image-028fbb9e8d2ecf0e5ac13475cb3f1bb0" class="lightbox-link"><img alt="picture" class="lazy lightbox figure-image" loading="lazy" src="../images/obaas-signoz-spring-dashboard.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-028fbb9e8d2ecf0e5ac13475cb3f1bb0"><img alt="picture" class="lazy lightbox lightbox-image" loading="lazy" src="../images/obaas-signoz-spring-dashboard.png" title=" "></a></p>
+<p>Feel free to explore the other dashboards that are preinstalled.</p>
+</li>
+</ol>
+
+  <footer class="footline">
+  </footer>
+</article>
+        </div>
+      </main>
+    </div>
+    <aside id="R-sidebar" class="default-animation">
+      <div id="R-header-topbar" class="default-animation"></div>
+      <div id="R-header-wrapper" class="default-animation">
+        <div id="R-header" class="default-animation">
+<img src="https://oracle.github.io/microservices-backend/cloudbank//cloudbank-logo.png" height="100px">
+        </div>
+        <search><form action="/microservices-backend/cloudbank/search/index.html" method="get">
+          <div class="searchbox default-animation">
+            <button class="search-detail" type="submit" title="Search (CTRL+ALT+f)"><i class="fas fa-search"></i></button>
+            <label class="a11y-only" for="R-search-by">Search</label>
+            <input data-search-input id="R-search-by" name="search-by" class="search-by" type="search" placeholder="Search...">
+            <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
+          </div>
+        </form></search>
+      </div>
+      <div id="R-homelinks" class="default-animation homelinks">
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-homelinks">
+          <ul class="space collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/index.html"><a class="padding" href="/microservices-backend/cloudbank/index.html"><i class="fa-fw fas fa-home"></i> Home</a></li>
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-headercontrols">
+          <ul class="">
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+      </div>
+      <div id="R-content-wrapper" class="highlightable">
+        <div class="R-sidebarmenu R-shortcutmenu-main">
+          <ul class="enlarge morespace collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/provision/index.html"><a class="padding" href="/microservices-backend/cloudbank/provision/index.html">Provision an Instance</a><ul id="R-subsections-d6947c2d1078796b2bfd976ebc0e0264" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/devenv/index.html"><a class="padding" href="/microservices-backend/cloudbank/devenv/index.html">Developer Environment</a><ul id="R-subsections-559c2972a719279af6301d7032063e64" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/index.html">Account Microservice</a><ul id="R-subsections-af4a17527840af40a6cda3fc650af51b" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/check/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/index.html">Check Processing</a><ul id="R-subsections-159f69b312555d5f0055ca241e6721e2" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/index.html">Manage Sagas</a><ul id="R-subsections-dfd968a77748ad1f1a28d6a9118be66e" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/springai/index.html"><a class="padding" href="/microservices-backend/cloudbank/springai/index.html">CloudBank AI Assistant</a><ul id="R-subsections-868fb0154339332ae87e7c98e3fa9bee" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-cli/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/index.html">Deploy with the CLI</a><ul id="R-subsections-b839a8f6f0f5efd1be94b7f9da9e78d1" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-ide/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-ide/index.html">Deploy with an IDE</a><ul id="R-subsections-fd584c0da8f22ebe818df94300151866" class="collapsible-menu"></ul></li>
+            <li class="parent " data-nav-id="/microservices-backend/cloudbank/backend/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/index.html">Explore the Backend</a><ul id="R-subsections-f948b454f68385a53d2483b3c80424ae" class="collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/backend/intro/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/intro/index.html">Introduction</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/backend/k8s/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/k8s/index.html">Explore Kubernetes</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/backend/database/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/database/index.html">Explore Oracle Autonomous Database</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/backend/admin/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/admin/index.html">Explore Spring Admin</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/backend/eureka/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/eureka/index.html">Explore Eureka Service Registry</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/backend/apisix/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/apisix/index.html">Explore APISIX API Gateway</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/backend/config/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/config/index.html">Explore Spring Config Server</a></li>
+            <li class="active " data-nav-id="/microservices-backend/cloudbank/backend/signoz/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/signoz/index.html">Explore SigNoz</a></li></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/cleanup/index.html"><a class="padding" href="/microservices-backend/cloudbank/cleanup/index.html">Cleanup</a><ul id="R-subsections-6d9c3a2633de07dcbf4491d943578384" class="collapsible-menu"></ul></li>
+          </ul>
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-shortcuts">
+          <div class="nav-title padding">More</div>
+          <ul class="space collapsible-menu">
+            <li class="" data-nav-id="https://github.com/oracle/microservices-backend"><a class="padding" href="https://github.com/oracle/microservices-backend" rel="external" target="_blank"><i class='fa-fw fab fa-github'></i> GitHub repo</a></li>
+            <li class="" data-nav-id="https://bit.ly/oraclespringboot"><a class="padding" href="https://bit.ly/oraclespringboot" rel="external" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Oracle Backend for Spring Boot and Microservices</a></li>
+            <li class="" data-nav-id="https://github.com/oracle/spring-cloud-oracle"><a class="padding" href="https://github.com/oracle/spring-cloud-oracle" rel="external" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Spring Cloud Oracle</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/more/credits/"><a class="padding" href="/microservices-backend/cloudbank/more/credits/"><i class='fa-fw fas fa-bullhorn'></i> Credits</a></li>
+          </ul>
+        </div>
+        <div id="R-footer-margin"></div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-footercontrols">
+          <ul class="">
+          </ul>
+        </div>
+<div id="R-footer">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://www.oracle.com/">Oracle</a></p>
+		<p>Copyright &copy; 2022, 2024, <br>Oracle and/or its affiliates</p></div>
+      </div>
+    </aside>
+    <script src="/microservices-backend/cloudbank/js/clipboard/clipboard.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/perfect-scrollbar/perfect-scrollbar.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/theme.min.js?1772471396" defer></script>
+  </body>
+</html>

@@ -2,87 +2,87 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Manage Sagas :: CloudBank AI</title>
-    <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/index.html</link>
+    <link>https://oracle.github.io/microservices-backend/cloudbank/saga/index.html</link>
     <description>This module introduces the Saga pattern, a very important pattern that helps us manage data consistency across microservices. We will explore the Long Running Action specification, one implementation of the Saga pattern, and then build a Transfer microservice that will manage funds transfers using a saga.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <atom:link href="https://oracle.github.io/microservices-datadriven/cloudbank/saga/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://oracle.github.io/microservices-backend/cloudbank/saga/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Introduction</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/intro/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/saga/intro/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/saga/intro/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/saga/intro/index.html</guid>
       <description>This module walks you through implementing the Saga pattern using a Long Running Action to manage transactions across microservices.&#xA;Watch this short introduction video to get an idea of what you will be building: Estimated Time: 30 minutes&#xA;Quick walk through on how to manage saga transactions across microservices.&#xA;Objectives In this module, you will:&#xA;Learn about the Saga pattern Learn about the Long Running Action specification Add new endpoints to the Account service for deposits and withdrawals that act as LRA participants Create a Transfer service that will initiate the LRA Prerequisites This module assumes you have:</description>
     </item>
     <item>
       <title>Learn about the Saga pattern</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/learn/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/saga/learn/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/saga/learn/index.html</guid>
-      <description>When you adopt microservices architecture and start to apply the patterns, you rapidly run into a situation where you have a business transaction that spans across multiple services.&#xA;Database per service The Database per service pattern is a generally accepted best practice which dictates that each service must have its own “database” and that the only way other services can access its data is through its public API. This helps to create loose coupling between services, which in turn makes it easier to evolve them independently and prevents the creation of a web of dependencies that make application changes increasingly difficult over time.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/saga/learn/index.html</guid>
+      <description>When you adopt microservices architecture and start to apply the patterns, you rapidly run into a situation where you have a business transaction that spans across multiple services.&#xA;Database per service The Database per service pattern is a generally accepted best practice which dictates that each service must have its own “database” and that the only way other services can access its data is through its public API. This helps to create loose coupling between services, which in turn makes it easier to evolve them independently and prevents the creation of a web of dependencies that make application changes increasingly difficult over time. In reality, this pattern may be implemented with database containers, or even schema within one database with strong security isolation, to prevent the proliferation of database instances and the associated management and maintenance cost explosion.</description>
     </item>
     <item>
       <title>Learn about Long Running Actions</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/learn-lra/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/saga/learn-lra/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/saga/learn-lra/index.html</guid>
-      <description>There are different models that can be used to coordinate transactions across services. Three of the most common are XA (Extended Architecture) which focuses on strong consistency, LRA (Long Running Action) which provides eventual consistency, and TCC (Try-Confirm/Cancel) which uses a reservation model. Oracle Backend for Microservices and AI includes Oracle Transaction Manager for Microservices which supports all three of these options.&#xA;In this module, you will explore the Long Running Action model.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/saga/learn-lra/index.html</guid>
+      <description>There are different models that can be used to coordinate transactions across services. Three of the most common are XA (Extended Architecture) which focuses on strong consistency, LRA (Long Running Action) which provides eventual consistency, and TCC (Try-Confirm/Cancel) which uses a reservation model. Oracle Backend for Microservices and AI includes Oracle Transaction Manager for Microservices which supports all three of these options.&#xA;In this module, you will explore the Long Running Action model. In this model there is a logical coordinator and a number of participants. Each participant is responsible for performing work and being able to compensate if necessary. The coordinator essentially manages the lifecycle of the LRA, for example by telling participants when to cancel or complete.</description>
     </item>
     <item>
       <title>Prepare the Account service</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/prepare/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/saga/prepare/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/saga/prepare/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/saga/prepare/index.html</guid>
       <description>You will update the Account service that you built in the previous module to add some new endpoints to perform deposits and withdrawals. These new endpoints will be LRA participants.&#xA;Add new dependencies to the Maven POM&#xA;Open the pom.xml in your accounts project and add these new dependency to the list. It will add support for the LRA client libraries.&#xA;&lt;dependency&gt; &lt;groupId&gt;com.oracle.microtx.lra&lt;/groupId&gt; &lt;artifactId&gt;microtx-lra-spring-boot-starter&lt;/artifactId&gt; &lt;version&gt;24.2.1&lt;/version&gt; &lt;/dependency&gt; Update the Spring Boot application configuration file</description>
     </item>
     <item>
       <title>Create the Deposit service</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/deposit/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/saga/deposit/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/saga/deposit/index.html</guid>
-      <description>The Deposit service will process deposits into bank accounts. In this task, you will create the basic structure for this service and learn about the endpoints required for an LRA participant, what HTTP Methods they process, the annotations used to define them and so on. You will implement the actual business logic in a later task.&#xA;Create the Deposit service and scaffold methods&#xA;Create a new directory in src/main/java/com/example/accounts called services and in that directory create a new Java file called DepositService.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/saga/deposit/index.html</guid>
+      <description>The Deposit service will process deposits into bank accounts. In this task, you will create the basic structure for this service and learn about the endpoints required for an LRA participant, what HTTP Methods they process, the annotations used to define them and so on. You will implement the actual business logic in a later task.&#xA;Create the Deposit service and scaffold methods&#xA;Create a new directory in src/main/java/com/example/accounts called services and in that directory create a new Java file called DepositService.java. This will be a Spring Boot component where you will implement the deposit operations. Since the LRA library we are using only works with JAX-RS, you will be using JAX-RS annotations in this service, as opposed to the Spring Boot “web” REST annotations that you used in the previous module. You can mix and match these styles in a single Spring Boot microservice application.</description>
     </item>
     <item>
       <title>Create a Data Access Object</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/dao/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/saga/dao/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/saga/dao/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/saga/dao/index.html</guid>
       <description>The Data Access Object pattern is considered a best practice, and it allows separation of business logic from the persistence layer. In this task, you will create an Account Data Access Object (DAO) that hides the complexity of the persistence layer logic from the business layer services. Additionally, it establishes methods that can be reused by each business layer service that needs to operate on accounts - in this module there will be two such services - deposit and withdraw.</description>
     </item>
     <item>
       <title>Implement business logic</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/business-logic/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/saga/business-logic/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/saga/business-logic/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/saga/business-logic/index.html</guid>
       <description>In this secion, you will implement the deposit service’s business logic.&#xA;The deposit service will be responsible for depositing funds into accounts. It will be an LRA participant, and so it will need to implement the LRA lifecycle actions like complete, compensate, and so on. A significant amount of the logic will be shared with the withdrawal service, so you will also create a separate class for that shared logic, following the Data Access Object pattern, to keep the business layer separate from the persistence layer.</description>
     </item>
     <item>
       <title>Create the Withdrawal service</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/withdraw-service/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/saga/withdraw-service/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/saga/withdraw-service/index.html</guid>
-      <description>Next, you need to implement the withdraw service, which will be the second participant in the transfer LRA.&#xA;Implement the withdraw service&#xA;Create a new Java file called WithdrawService.java in src/main/java/com/example/accounts/services. This service is very similar to the deposit service, and no new concepts are introduced here. Here is the code for this service:&#xA;package com.example.accounts.services; import com.example.accounts.model.Account; import com.example.accounts.model.Journal; import com.oracle.microtx.springboot.lra.annotation.AfterLRA; import com.oracle.microtx.springboot.lra.annotation.Compensate; import com.oracle.microtx.springboot.lra.annotation.Complete; import com.oracle.microtx.springboot.lra.annotation.LRA; import com.oracle.microtx.springboot.lra.annotation.ParticipantStatus; import com.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/saga/withdraw-service/index.html</guid>
+      <description>Next, you need to implement the withdraw service, which will be the second participant in the transfer LRA.&#xA;Implement the withdraw service&#xA;Create a new Java file called WithdrawService.java in src/main/java/com/example/accounts/services. This service is very similar to the deposit service, and no new concepts are introduced here. Here is the code for this service:&#xA;package com.example.accounts.services; import com.example.accounts.model.Account; import com.example.accounts.model.Journal; import com.oracle.microtx.springboot.lra.annotation.AfterLRA; import com.oracle.microtx.springboot.lra.annotation.Compensate; import com.oracle.microtx.springboot.lra.annotation.Complete; import com.oracle.microtx.springboot.lra.annotation.LRA; import com.oracle.microtx.springboot.lra.annotation.ParticipantStatus; import com.oracle.microtx.springboot.lra.annotation.Status; import lombok.extern.slf4j.Slf4j; import org.springframework.http.ResponseEntity; import org.springframework.web.bind.annotation.PostMapping; import org.springframework.web.bind.annotation.PutMapping; import org.springframework.web.bind.annotation.RequestHeader; import org.springframework.web.bind.annotation.RequestMapping; import org.springframework.web.bind.annotation.RequestParam; import org.springframework.web.bind.annotation.RestController; import static com.oracle.microtx.springboot.lra.annotation.LRA.LRA_HTTP_CONTEXT_HEADER; import static com.oracle.microtx.springboot.lra.annotation.LRA.LRA_HTTP_ENDED_CONTEXT_HEADER; import static com.oracle.microtx.springboot.lra.annotation.LRA.LRA_HTTP_PARENT_CONTEXT_HEADER; @RestController @RequestMapping(&#34;/withdraw&#34;) @Slf4j public class WithdrawService { public static final String WITHDRAW = &#34;WITHDRAW&#34;; /** * Reduce account balance by given amount and write journal entry re the same. * Both actions in same local tx */ @PostMapping @LRA(value = LRA.Type.MANDATORY, end = false) public ResponseEntity&lt;String&gt; withdraw(@RequestHeader(LRA_HTTP_CONTEXT_HEADER) String lraId, @RequestParam(&#34;accountId&#34;) long accountId, @RequestParam(&#34;amount&#34;) long withdrawAmount) { log.info(&#34;withdraw &#34; + withdrawAmount + &#34; in account:&#34; + accountId + &#34; (lraId:&#34; + lraId + &#34;)...&#34;); Account account = AccountTransferDAO.instance().getAccountForAccountId(accountId); if (account == null) { log.info(&#34;withdraw failed: account does not exist&#34;); AccountTransferDAO.instance().saveJournal( new Journal( WITHDRAW, accountId, 0, lraId, AccountTransferDAO.getStatusString(ParticipantStatus.Active))); return ResponseEntity.ok(&#34;withdraw failed: account does not exist&#34;); } if (account.getAccountBalance() &lt; withdrawAmount) { log.info(&#34;withdraw failed: insufficient funds&#34;); AccountTransferDAO.instance().saveJournal( new Journal( WITHDRAW, accountId, 0, lraId, AccountTransferDAO.getStatusString(ParticipantStatus.Active))); return ResponseEntity.ok(&#34;withdraw failed: insufficient funds&#34;); } log.info(&#34;withdraw current balance:&#34; + account.getAccountBalance() + &#34; new balance:&#34; + (account.getAccountBalance() - withdrawAmount)); account.setAccountBalance(account.getAccountBalance() - withdrawAmount); AccountTransferDAO.instance().saveAccount(account); AccountTransferDAO.instance().saveJournal( new Journal( WITHDRAW, accountId, withdrawAmount, lraId, AccountTransferDAO.getStatusString(ParticipantStatus.Active))); return ResponseEntity.ok(&#34;withdraw succeeded&#34;); } /** * Update LRA state. Do nothing else. */ @PutMapping(&#34;/complete&#34;) @Complete public ResponseEntity&lt;String&gt; completeWork(@RequestHeader(LRA_HTTP_CONTEXT_HEADER) String lraId) throws Exception { log.info(&#34;withdraw complete called for LRA : &#34; + lraId); Journal journal = AccountTransferDAO.instance().getJournalForLRAid(lraId, WITHDRAW); journal.setLraState(AccountTransferDAO.getStatusString(ParticipantStatus.Completed)); AccountTransferDAO.instance().saveJournal(journal); return ResponseEntity.ok(ParticipantStatus.Completed.name()); } /** * Read the journal and increase the balance by the previous withdraw amount. * before the LRA */ @PutMapping(&#34;/compensate&#34;) @Compensate public ResponseEntity&lt;String&gt; compensateWork(@RequestHeader(LRA_HTTP_CONTEXT_HEADER) String lraId) throws Exception { log.info(&#34;Account withdraw compensate() called for LRA : &#34; + lraId); Journal journal = AccountTransferDAO.instance().getJournalForLRAid(lraId, WITHDRAW); journal.setLraState(AccountTransferDAO.getStatusString(ParticipantStatus.Compensating)); Account account = AccountTransferDAO.instance().getAccountForAccountId(journal.getAccountId()); if (account != null) { account.setAccountBalance(account.getAccountBalance() + journal.getJournalAmount()); AccountTransferDAO.instance().saveAccount(account); } journal.setLraState(AccountTransferDAO.getStatusString(ParticipantStatus.Compensated)); AccountTransferDAO.instance().saveJournal(journal); return ResponseEntity.ok(ParticipantStatus.Compensated.name()); } @Status public ResponseEntity&lt;ParticipantStatus&gt; status(@RequestHeader(LRA_HTTP_CONTEXT_HEADER) String lraId, @RequestHeader(LRA_HTTP_PARENT_CONTEXT_HEADER) String parentLRA) throws Exception { return AccountTransferDAO.instance().status(lraId, WITHDRAW); } /** * Delete journal entry for LRA. */ @PutMapping(value = &#34;/after&#34;, consumes = &#34;text/plain&#34;) @AfterLRA public ResponseEntity&lt;String&gt; afterLRA(@RequestHeader(LRA_HTTP_ENDED_CONTEXT_HEADER) String lraId, String status) throws Exception { log.info(&#34;After LRA Called : &#34; + lraId); AccountTransferDAO.instance().afterLRA(lraId, status, WITHDRAW); return ResponseEntity.ok(&#34;&#34;); } } That completes the implementation of the deposit service, and with that you are also done with the modifications for the Account Spring Boot microservice application to allow it to participate int he LRA. Next, you will create the Transfer Spring Boot microservice application.</description>
     </item>
     <item>
       <title>Create the Transfer service</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/transfer-service/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/saga/transfer-service/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/saga/transfer-service/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/saga/transfer-service/index.html</guid>
       <description>Now, you will create another new Spring Boot microservice application and implement the Transfer Service. This service will initiate the LRA and act as the logical coordinator - it will call the deposit and withdraw services you just implemented to effect the transfer to process the Cloud Cash Payment.&#xA;Create a new Java Project for the transfer service.&#xA;In the Explorer of VS Code open Java Project and click the plus sign to add a Java Project to your workspace.</description>
     </item>
     <item>
       <title>Deploy services</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/deploy/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/saga/deploy/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/saga/deploy/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/saga/deploy/index.html</guid>
       <description>The services are now completed, and you are ready to deploy them to the Oracle Backend for Microservices and AI.&#xA;Note: You already created the Kubernetes secrets necessary for the account service to access the Oracle Autonomous Database in a previous module, and the transfer service does not need access to the database. You also created the journal table that is needed by the update account application in the previous module.</description>
     </item>
     <item>
       <title>Run LRA test cases</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/test/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/saga/test/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/saga/test/index.html</guid>
-      <description>Now you can test your LRA to verify it performs correctly under various circumstances.&#xA;Start a tunnel to access the transfer service&#xA;Since the transfer service is not exposed outside the Kubernetes cluster, you will need to start a kubectl port forwarding tunnel to access its endpoints.&#xA;Note: If you prefer, you can create a route in the APISIX API Gateway to expose the service. The service will normally only be invoked from within the cluster, so you did not create a route for it.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/saga/test/index.html</guid>
+      <description>Now you can test your LRA to verify it performs correctly under various circumstances.&#xA;Start a tunnel to access the transfer service&#xA;Since the transfer service is not exposed outside the Kubernetes cluster, you will need to start a kubectl port forwarding tunnel to access its endpoints.&#xA;Note: If you prefer, you can create a route in the APISIX API Gateway to expose the service. The service will normally only be invoked from within the cluster, so you did not create a route for it. However, you have learned how to create routes, so you may do that if you prefer.</description>
     </item>
   </channel>
 </rss>

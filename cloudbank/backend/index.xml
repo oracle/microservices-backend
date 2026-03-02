@@ -2,73 +2,66 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Explore the Backend :: CloudBank AI</title>
-    <link>https://oracle.github.io/microservices-datadriven/cloudbank/backend/index.html</link>
+    <link>https://oracle.github.io/microservices-backend/cloudbank/backend/index.html</link>
     <description>This module will take you on a guided tour through the Oracle Backend for Spring Boot and Microservices platform. You will learn about the platform services and observability tools that are provided out-of-the-box.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <atom:link href="https://oracle.github.io/microservices-datadriven/cloudbank/backend/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://oracle.github.io/microservices-backend/cloudbank/backend/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Introduction</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/backend/intro/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/backend/intro/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/backend/intro/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/backend/intro/index.html</guid>
       <description>This module walks you through various features of Oracle Backend for Microservices and AI, and shows you how to use them.&#xA;Estimated Time: 20 minutes&#xA;Quick walk through on how to explore backend platform.&#xA;Objectives In this module, you will:&#xA;Review the components of the Oracle Backend for Microservices and AI Explore how microservice data is stored in the Oracle Autonomous Database Learn about the Spring Admin user interface Learn about Spring Eureka Service Registry Learn about APISIX API Gateway Learn about Spring Config Server Learn about the observability tools included in Oracle Backend for Microservices and AI Learn about the tracing tools included in Oracle Backend for Microservices and AI Prerequisites This module assumes you have:</description>
     </item>
     <item>
       <title>Explore Kubernetes</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/backend/k8s/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/backend/k8s/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/backend/k8s/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/backend/k8s/index.html</guid>
       <description>Oracle Backend for Microservices and AI includes a number of platform services which are deployed into the Oracle Container Engine for Kubernetes cluster. You configured kubectl to access your cluster in an earlier module. In this task, you will explore the services deployed in the Kubernetes cluster. A detailed explanation of Kubernetes concepts is beyond the scope of this course.&#xA;Explore namespaces&#xA;Kubernetes resources are grouped into namespaces. To see a list of the namespaces in your cluster, use this command, your output will be slightly different:</description>
     </item>
     <item>
       <title>Explore Oracle Autonomous Database</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/backend/database/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/backend/database/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/backend/database/index.html</guid>
-      <description>Oracle Backend for Microservices and AI includes an Oracle Autonomous Database instance. You can manage and access the database from the OCI Console.&#xA;View details of the Oracle Autonomous Database&#xA;In the OCI Console, in the main (“hamburger”) menu navigate to the Oracle Database category and then Oracle Autonomous Database. Make sure you have the correct region selected (in the top right corner) and the compartment where you installed Oracle Backend for Microservices and AI (on the left hand side pull down list).</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/backend/database/index.html</guid>
+      <description>Oracle Backend for Microservices and AI includes an Oracle Autonomous Database instance. You can manage and access the database from the OCI Console.&#xA;View details of the Oracle Autonomous Database&#xA;In the OCI Console, in the main (“hamburger”) menu navigate to the Oracle Database category and then Oracle Autonomous Database. Make sure you have the correct region selected (in the top right corner) and the compartment where you installed Oracle Backend for Microservices and AI (on the left hand side pull down list). You will a list of Oracle Autonomous Database instances (you will probably only have one):</description>
     </item>
     <item>
       <title>Explore Spring Admin</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/backend/admin/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/backend/admin/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/backend/admin/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/backend/admin/index.html</guid>
       <description>Oracle Backend for Microservices and AI includes Spring Admin which provides a web user interface for managing and monitoring Spring applications.&#xA;Connect to Spring Admin&#xA;Oracle Backend for Microservices and AI does not expose management interfaces outside the Kubernetes cluster for improved security. Oracle recommends you access these interfaces using kubectl port forwarding, which creates an encrypted tunnel from your client machine to the cluster to access a specific service in the cluster.</description>
     </item>
     <item>
       <title>Explore Eureka Service Registry</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/backend/eureka/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/backend/eureka/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/backend/eureka/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/backend/eureka/index.html</guid>
       <description>Spring Eureka Service Registry is an application that holds information about what microservices are running in your environment, how many instances of each are running, and on which addresses and ports. Spring Boot microservices register with Eureka at startup, and it regularly checks the health of all registered services. Services can use Eureka to make calls to other services, thereby eliminating the need to hard code service addresses into other services.</description>
     </item>
     <item>
       <title>Explore APISIX API Gateway</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/backend/apisix/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/backend/apisix/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/backend/apisix/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/backend/apisix/index.html</guid>
       <description>Oracle Backend for Microservices and AI includes APISIX API Gateway to manage which services are made available outside the Kubernetes cluster. APISIX allows you to manage many aspects of the services’ APIs including authentication, logging, which HTTP methods are accepted, what URL paths are exposed, and also includes capabilities like rewriting, filtering, traffic management and has a rich plugin ecosystem to enhance it with additional capabilities. You can manage the APISIX API Gateway using the APISIX Dashboard.</description>
     </item>
     <item>
       <title>Explore Spring Config Server</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/backend/config/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/backend/config/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/backend/config/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/backend/config/index.html</guid>
       <description>The Spring Config Server can be used to store configuration information for Spring Boot applications, so that the configuration can be injected at runtime. It organized the configuration into properties, which are essentially key/value pairs. Each property can be assigned to an application, a moduleel, and a profile. This allows a running application to be configured based on metadata which it will send to the Spring Config Server to obtain the right configuration data.</description>
     </item>
     <item>
-      <title>Explore Grafana</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/backend/grafana/index.html</link>
+      <title>Explore SigNoz</title>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/backend/signoz/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/backend/grafana/index.html</guid>
-      <description>Grafana provides an easy way to access the metrics collected in the backend and to view them in dashboards. It can be used to monitor performance, as well as to identify and analyze problems and to create alerts.&#xA;Explore the pre-installed Spring Boot Dashboard&#xA;Get the password for the Grafana admin user using this command (your output will be different):&#xA;$ kubectl -n grafana get secret grafana -o jsonpath=&#39;{.data.admin-password}&#39; | base64 -d fusHDM7xdwJXyUM2bLmydmN1V6b3IyPVRUxDtqu7 Start the tunnel using this command.</description>
-    </item>
-    <item>
-      <title>Explore Jaeger</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/backend/jaeger/index.html</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/backend/jaeger/index.html</guid>
-      <description>Jaeger provides a way to view the distributed tracing information that is automatically collected by the backend. This allows you to follow requests from the entry point of the platform (the API Gateway) through any number of microservices, including database and messaging operations those services may perform.&#xA;View a trace&#xA;Start the tunnel using this command. You can run this in the background if you prefer.&#xA;$ kubectl -n observability port-forward svc/jaegertracing-query 16686 Open a web browser to http://localhost:16686 to view the Jaeger web user interface.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/backend/signoz/index.html</guid>
+      <description>SigNoz provides an easy way to access the logs, traces and metrics collected in the backend and to view them in dashboards. It can be used to monitor performance, as well as to identify and analyze problems and to create alerts.&#xA;Explore the pre-installed Spring Boot Dashboard&#xA;Get the admin email and password for SigNoz using this command:&#xA;$ kubectl -n observability get secret signoz-authn -o jsonpath=&#39;{.data.email}&#39; | base64 -d $ kubectl -n observability get secret signoz-authn -o jsonpath=&#39;{.data.password}&#39; | base64 -d Start the tunnel using this command. You can run this in the background if you prefer.</description>
     </item>
   </channel>
 </rss>

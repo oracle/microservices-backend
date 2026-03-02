@@ -2,37 +2,37 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Provision an Instance :: CloudBank AI</title>
-    <link>https://oracle.github.io/microservices-datadriven/cloudbank/provision/index.html</link>
+    <link>https://oracle.github.io/microservices-backend/cloudbank/provision/index.html</link>
     <description>This module guides you through provisioning an Oracle Backend for Microservices and AI environment either on your local machine, in the Oracle Cloud Free Tier, or in a commercial Oracle Cloud Tenancy.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <atom:link href="https://oracle.github.io/microservices-datadriven/cloudbank/provision/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://oracle.github.io/microservices-backend/cloudbank/provision/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Introduction</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/provision/intro/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/provision/intro/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/provision/intro/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/provision/intro/index.html</guid>
       <description>This module walks you through the steps to provision an instance of the Oracle Backend for Microservices and AI.&#xA;Estimated Time: 30 minutes&#xA;About Oracle Backend for Microservices and AI Oracle Backend for Microservices and AI allows developers to build microservices in Spring Boot and provision a backend as a service with the Oracle Database and other infrastructure components that operate on multiple clouds. This service vastly simplifies the task of building, testing, and operating microservices platforms for reliable, secure, and scalable enterprise applications.</description>
     </item>
     <item>
       <title>Install locally</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/provision/install-local/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/provision/install-local/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/provision/install-local/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/provision/install-local/index.html</guid>
       <description>This option allows you to run Oracle Backend for Microservices and AI in a containerized environment on your local machine. This option is recommended if you do have enough free capacity on your local machine to run the environment, a minimum of 64GB RAM and 80GB free disk are recommended. This option provides an environment with adequate resources for development and testing, but is not suitable for a production-sized deployment or performance testing.</description>
     </item>
     <item>
       <title>Install in OCI Free Tier</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/provision/install-free-trial/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/provision/install-free-trial/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/provision/install-free-trial/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/provision/install-free-trial/index.html</guid>
       <description>This option allows you to run Oracle Backend for Microservices and AI in a containerized environment inside a single OCI Compute Instance. This option is good if you do not have enough free capacity on your local machine to run the environment, and if you do not have or want to use the resources required for a full production-sized deployment. This option provides an environment with adequate resources for development and testing, but minimizes the resource usage and costs.</description>
     </item>
     <item>
       <title>Install from OCI Marketplace</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/provision/install-mp/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/provision/install-mp/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/provision/install-mp/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/provision/install-mp/index.html</guid>
       <description>The Oracle Backend for Microservices and AI can be installed from OCI Marketplace.&#xA;Note: You only need to choose one of the three deployment options - local, OCI Free Tier or OCI Marketplace.&#xA;This option installs a “production-sized” environment which includes an Oracle Compute Engine for Kubernetes (“OKE”) cluster and an Oracle Autonomous Database instance. If you want to use a smaller, development/test-sized environment that only requires a single OCI Compute Instance, please use the “Free Tier” option instead.</description>
     </item>
   </channel>

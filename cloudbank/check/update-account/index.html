@@ -1,54 +1,91 @@
 <!DOCTYPE html>
-<html lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article">
+<html lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article" data-r-output-format="html">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <meta name="generator" content="Hugo 0.133.1">
-    <meta name="generator" content="Relearn 7.1.1+ab4197f3113afa9a7d17bed69dbef6c0e75a4921">
+    <meta name="generator" content="Hugo 0.157.0">
+    <meta name="generator" content="Relearn 7.6.1+e9ef53522317877bc23c72c42c8307a62b209dfb">
     <meta name="description" content="Starting with the account service that you built in the previous lab, you will the JPA model and repository for the journal and some new endpoints.
 Create the Journal model
-Create a new Java file in src/main/java/com/example/accounts/model called Journal.java. In this class you can define the fields that make up the journal. Note that you created the Journal table in the previous lab. You will not use the lraId and lraState fields until a later lab.">
+Create a new Java file in src/main/java/com/example/accounts/model called Journal.java. In this class you can define the fields that make up the journal. Note that you created the Journal table in the previous lab. You will not use the lraId and lraState fields until a later lab. To simplify this lab, create an additional constructor that defaults those fields to suitable values. Your new class should look like this:">
     <meta name="author" content="">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Add Journal to the Account service :: CloudBank AI">
     <meta name="twitter:description" content="Starting with the account service that you built in the previous lab, you will the JPA model and repository for the journal and some new endpoints.
 Create the Journal model
-Create a new Java file in src/main/java/com/example/accounts/model called Journal.java. In this class you can define the fields that make up the journal. Note that you created the Journal table in the previous lab. You will not use the lraId and lraState fields until a later lab.">
-    <meta property="og:url" content="https://oracle.github.io/microservices-datadriven/cloudbank/check/update-account/index.html">
+Create a new Java file in src/main/java/com/example/accounts/model called Journal.java. In this class you can define the fields that make up the journal. Note that you created the Journal table in the previous lab. You will not use the lraId and lraState fields until a later lab. To simplify this lab, create an additional constructor that defaults those fields to suitable values. Your new class should look like this:">
+    <meta property="og:url" content="https://oracle.github.io/microservices-backend/cloudbank/check/update-account/index.html">
     <meta property="og:site_name" content="CloudBank AI">
     <meta property="og:title" content="Add Journal to the Account service :: CloudBank AI">
     <meta property="og:description" content="Starting with the account service that you built in the previous lab, you will the JPA model and repository for the journal and some new endpoints.
 Create the Journal model
-Create a new Java file in src/main/java/com/example/accounts/model called Journal.java. In this class you can define the fields that make up the journal. Note that you created the Journal table in the previous lab. You will not use the lraId and lraState fields until a later lab.">
+Create a new Java file in src/main/java/com/example/accounts/model called Journal.java. In this class you can define the fields that make up the journal. Note that you created the Journal table in the previous lab. You will not use the lraId and lraState fields until a later lab. To simplify this lab, create an additional constructor that defaults those fields to suitable values. Your new class should look like this:">
     <meta property="og:locale" content="en_us">
     <meta property="og:type" content="article">
     <meta property="article:section" content="Check Processing">
     <meta itemprop="name" content="Add Journal to the Account service :: CloudBank AI">
     <meta itemprop="description" content="Starting with the account service that you built in the previous lab, you will the JPA model and repository for the journal and some new endpoints.
 Create the Journal model
-Create a new Java file in src/main/java/com/example/accounts/model called Journal.java. In this class you can define the fields that make up the journal. Note that you created the Journal table in the previous lab. You will not use the lraId and lraState fields until a later lab.">
+Create a new Java file in src/main/java/com/example/accounts/model called Journal.java. In this class you can define the fields that make up the journal. Note that you created the Journal table in the previous lab. You will not use the lraId and lraState fields until a later lab. To simplify this lab, create an additional constructor that defaults those fields to suitable values. Your new class should look like this:">
     <meta itemprop="wordCount" content="1223">
     <title>Add Journal to the Account service :: CloudBank AI</title>
-    <link href="/microservices-datadriven/cloudbank/images/favicon.png?1747144443" rel="icon" type="image/png">
-    <link href="/microservices-datadriven/cloudbank/css/fontawesome-all.min.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/fontawesome-all.min.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/nucleus.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/auto-complete.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/auto-complete.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/perfect-scrollbar.min.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/fonts.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/fonts.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/theme.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/theme-zen-light.css?1747144443" rel="stylesheet" id="R-variant-style">
-    <link href="/microservices-datadriven/cloudbank/css/chroma-relearn-light.css?1747144443" rel="stylesheet" id="R-variant-chroma-style">
-    <link href="/microservices-datadriven/cloudbank/css/print.css?1747144443" rel="stylesheet" media="print">
-    <script src="/microservices-datadriven/cloudbank/js/variant.js?1747144443"></script>
+    <link href="/microservices-backend/cloudbank/images/favicon.png?1772471396" rel="icon" type="image/png">
+    <link href="/microservices-backend/cloudbank/fonts/fontawesome/css/fontawesome-all.min.css?1772471396" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-backend/cloudbank/fonts/fontawesome/css/fontawesome-all.min.css?1772471396" rel="stylesheet"></noscript>
+    <link href="/microservices-backend/cloudbank/css/perfect-scrollbar/perfect-scrollbar.min.css?1772471396" rel="stylesheet">
+    <link href="/microservices-backend/cloudbank/css/theme.min.css?1772471396" rel="stylesheet">
+    <link href="/microservices-backend/cloudbank/css/format-html.min.css?1772471396" rel="stylesheet" id="R-format-style">
+    <link href="/microservices-backend/cloudbank/css/auto-complete/auto-complete.min.css?1772471396" rel="stylesheet">
+    <script src="/microservices-backend/cloudbank/js/auto-complete/auto-complete.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.stemmer.support.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.multi.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.en.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/search.min.js?1772471396" defer></script>
     <script>
       window.relearn = window.relearn || {};
+      // configuration
+      window.relearn.min = `.min`;
+      window.relearn.path='\/check\/update-account\/index.html';
       window.relearn.relBasePath='..\/..';
       window.relearn.relBaseUri='..\/..\/..\/..';
-      window.relearn.absBaseUri='https:\/\/oracle.github.io\/microservices-datadriven\/cloudbank';
+      window.relearn.absBaseUri='https:\/\/oracle.github.io\/microservices-backend\/cloudbank';
+      window.relearn.contentLangs=['en'];
+      window.relearn.index_js_url="/microservices-backend/cloudbank/searchindex.en.js?1772471396";
       window.relearn.disableAnchorCopy=false;
       window.relearn.disableAnchorScrolling=false;
+      window.relearn.disableInlineCopyToClipboard=false;
+      window.relearn.enableBlockCodeWrap=true;
+      // legal
+      window.relearn.getItem = (s,n) => {return s.getItem(n)};
+      window.relearn.setItem = (s,n,v) => {return s.setItem(n,v)};
+      window.relearn.removeItem = (s,n) => {return s.removeItem(n)};
       // variant stuff
-      window.variants && variants.init( [ 'zen-light' ] );
+      window.relearn.themevariants = [ 'zen-light' ];
+      window.relearn.customvariantname = "my-custom-variant";
+      window.relearn.changeVariant = function(variant) {
+        var oldVariant = document.documentElement.dataset.rThemeVariant;
+        window.relearn.setItem(window.localStorage, window.relearn.absBaseUri + "/variant", variant);
+        document.documentElement.dataset.rThemeVariant = variant;
+        if (oldVariant != variant) {
+          document.dispatchEvent( new CustomEvent('themeVariantLoaded', { detail: { variant, oldVariant } }) );
+          window.relearn.markVariant();
+        }
+      }
+      window.relearn.markVariant = function() {
+        var variant = window.relearn.getItem(window.localStorage, window.relearn.absBaseUri + "/variant");
+        document.querySelectorAll(".R-variantswitcher select").forEach((select) => {select.value = variant;});
+      }
+      window.relearn.initVariant = function() {
+        var variant = window.relearn.getItem(window.localStorage, window.relearn.absBaseUri + "/variant") ?? "";
+        if( variant == window.relearn.customvariantname ){
+        }else if( !variant || !window.relearn.themevariants.includes(variant) ){
+          variant = window.relearn.themevariants[0];
+          window.relearn.setItem(window.localStorage, window.relearn.absBaseUri + "/variant", variant);
+        }
+        document.documentElement.dataset.rThemeVariant = variant;
+      }
+      window.relearn.initVariant();
+      window.relearn.markVariant();
       // translations
       window.T_Copy_to_clipboard = `Copy to clipboard`;
       window.T_Copied_to_clipboard = `Copied to clipboard!`;
@@ -59,12 +96,10 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
       window.T_No_results_found = `No results found for "{0}"`;
       window.T_N_results_found = `{1} results found for "{0}"`;
     </script>
-  
-    
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-7HWQVTJ803"></script>
       <script>
         var doNotTrack = false;
-        if ( false ) {
+        if ( true ) {
           var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
           var doNotTrack = (dnt == "1" || dnt == "yes");
         }
@@ -75,12 +110,8 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
           gtag('config', 'G-7HWQVTJ803');
         }
       </script>
-    
-  
-
-
   </head>
-  <body class="mobile-support html" data-url="/microservices-datadriven/cloudbank/check/update-account/index.html">
+  <body class="mobile-support html" data-url="/microservices-backend/cloudbank/check/update-account/index.html">
     <div id="R-body" class="default-animation">
       <div id="R-body-overlay"></div>
       <nav id="R-topbar">
@@ -96,15 +127,15 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
               </div>
             </div>
           </div>
-          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList"><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><a itemprop="item" href="/microservices-datadriven/cloudbank/index.html"><span itemprop="name">CloudBank AI</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><a itemprop="item" href="/microservices-datadriven/cloudbank/check/index.html"><span itemprop="name">Check Processing</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><span itemprop="name">Add Journal to the Account service</span><meta itemprop="position" content="3"></li>
+          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList">
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="/microservices-backend/cloudbank/index.html"><span itemprop="name">CloudBank AI</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li>
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="/microservices-backend/cloudbank/check/index.html"><span itemprop="name">Check Processing</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li>
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><span itemprop="name">Add Journal to the Account service</span><meta itemprop="position" content="3"></li>
           </ol>
           <div class="topbar-area topbar-area-end" data-area="end">
-            <div class="topbar-button topbar-button-prev" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-datadriven/cloudbank/check/learn/index.html" title="Learn about the scenario (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a>
+            <div class="topbar-button topbar-button-prev" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-backend/cloudbank/check/learn/index.html" title="Learn about the scenario (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a>
             </div>
-            <div class="topbar-button topbar-button-next" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-datadriven/cloudbank/check/create-queues/index.html" title="Create Queues in the Database (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a>
+            <div class="topbar-button topbar-button-next" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-backend/cloudbank/check/create-queues/index.html" title="Create Queues in the Database (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a>
             </div>
             <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show"><button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More"><i class="fa-fw fas fa-ellipsis-v"></i></button>
               <div class="topbar-content">
@@ -131,7 +162,7 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
 <li>
 <p>Create the Journal model</p>
 <p>Create a new Java file in <code>src/main/java/com/example/accounts/model</code> called <code>Journal.java</code>. In this class you can define the fields that make up the journal.  Note that you created the Journal table in the previous lab. You will not use the <code>lraId</code> and <code>lraState</code> fields until a later lab. To simplify this lab, create an additional constructor that defaults those fields to suitable values. Your new class should look like this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.example.account.model;
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.example.account.model;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> jakarta.persistence.Column;
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> jakarta.persistence.Entity;
@@ -188,7 +219,7 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
 <li>
 <p>Create the Journal repository</p>
 <p>Create a new Java file in <code>src/main/java/com/example/account/repository</code> called <code>JournalRepository.java</code>. This should be an interface that extends <code>JpaRepository</code> and you will need to define a method to find journal entries by <code>accountId</code>. Your interface should look like this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.example.account.repository;
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.example.account.repository;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.List;
 </span></span><span style="display:flex;"><span>
@@ -203,7 +234,7 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
 <li>
 <p>Update the <code>AccountController</code> constructor</p>
 <p>Update the constructor for <code>AccountController</code> so that both the repositories are injected.  You will need to create a variable to hold each.  Your updated constructor should look like this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.example.repository.JournalRepository;
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.example.repository.JournalRepository;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// ...</span>
 </span></span><span style="display:flex;"><span>
@@ -218,7 +249,7 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
 <li>
 <p>Add new method to POST entries to the journal</p>
 <p>Add a new HTTP POST endpoint in the <code>AccountController.java</code> class. The method accepts a journal entry in the request body and saves it into the database. Your new method should look like this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.example.model.Journal;
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.example.model.Journal;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// ...</span>
 </span></span><span style="display:flex;"><span>
@@ -240,7 +271,7 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
 <li>
 <p>Add new method to get journal entries</p>
 <p>Add a new HTTP GET endpoint in the <code>AccountController.java</code> class to get a list of journal entries for a given <code>accountId</code>. Your new method should look like this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.example.account.repository.JournalRepository;
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.example.account.repository.JournalRepository;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">@GetMapping</span>(<span style="color:#e6db74">&#34;/account/{accountId}/journal&#34;</span>)
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> List<span style="color:#f92672">&lt;</span>Journal<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">getJournalEntriesForAccount</span>(<span style="color:#a6e22e">@PathVariable</span>(<span style="color:#e6db74">&#34;accountId&#34;</span>) <span style="color:#66d9ef">long</span> accountId) {
@@ -250,7 +281,7 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
 <li>
 <p>Add new method to update an existing journal entry</p>
 <p>Add a new HTTP POST endpoint to update and existing journal entry to a cleared deposit.  To do this, you set the <code>journalType</code> field to <code>DEPOSIT</code>.  Your method should accept the <code>journalId</code> as a path variable.  If the specified journal entry does not exist, return a 202 (Accepted) to indicate the message was received but there was nothing to do.  Returning a 404 (Not found) would cause an error and the message would get requeued and reprocessed, which we don&rsquo;t want.  Your new method should look like this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@PostMapping</span>(<span style="color:#e6db74">&#34;/account/journal/{journalId}/clear&#34;</span>)
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@PostMapping</span>(<span style="color:#e6db74">&#34;/account/journal/{journalId}/clear&#34;</span>)
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> ResponseEntity<span style="color:#f92672">&lt;</span>Journal<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">clearJournalEntry</span>(<span style="color:#a6e22e">@PathVariable</span> <span style="color:#66d9ef">long</span> journalId) {
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
 </span></span><span style="display:flex;"><span>        Optional<span style="color:#f92672">&lt;</span>Journal<span style="color:#f92672">&gt;</span> data <span style="color:#f92672">=</span> journalRepository.<span style="color:#a6e22e">findById</span>(journalId);
@@ -270,21 +301,21 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
 <li>
 <p>Build a JAR file for deployment</p>
 <p>Run the following command to build the JAR file.  Note that you will need to skip tests now, since you updated the <code>application.yaml</code> and it no longer points to your local test database instance.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ mvn clean package -DskipTests</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ mvn clean package -DskipTests</span></span></code></pre></div>
 <p>The service is now ready to deploy to the backend.</p>
 </li>
 <li>
 <p>Get the password for the <code>obaas-admin</code> user. The <code>obaas-admin</code> user is the equivalent of the admin or root user in the Oracle Backend for Microservices and AI backend.</p>
 <p>Execute the following command to get the password:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl get secret -n azn-server  oractl-passwords -o jsonpath<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{.data.admin}&#39;</span> | base64 -d</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl get secret -n azn-server  oractl-passwords -o jsonpath<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{.data.admin}&#39;</span> | base64 -d</span></span></code></pre></div>
 </li>
 <li>
 <p>Prepare the backend for deployment</p>
 <p>The Oracle Backend for Microservices and AI admin service is not exposed outside the Kubernetes cluster by default. Oracle recommends using a <strong>kubectl</strong> port forwarding tunnel to establish a secure connection to the admin service.</p>
 <p>Start a tunnel (unless you already have the tunnel running from previous labs) using this command:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n obaas-admin port-forward svc/obaas-admin <span style="color:#ae81ff">8080</span></span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n obaas-admin port-forward svc/obaas-admin <span style="color:#ae81ff">8080</span></span></span></code></pre></div>
 <p>Start the Oracle Backend for Microservices and AI CLI (<em>oractl</em>) using this command:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ oractl
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ oractl
 </span></span><span style="display:flex;"><span> _   _           __    _    ___
 </span></span><span style="display:flex;"><span>/ <span style="color:#ae81ff">\ </span>|_<span style="color:#f92672">)</span>  _.  _. <span style="color:#f92672">(</span>_    /  |   |
 </span></span><span style="display:flex;"><span><span style="color:#ae81ff">\_</span>/ |_<span style="color:#f92672">)</span> <span style="color:#f92672">(</span>_| <span style="color:#f92672">(</span>_| __<span style="color:#f92672">)</span>   <span style="color:#ae81ff">\_</span> |_ _|_
@@ -299,7 +330,7 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  oractl:&gt;</span></span></code></pre></div>
 <p>Connect to the Oracle Backend for Microservices and AI admin service using the <code>connect</code> command. Enter <code>obaas-admin</code> and the username and use the password you collected earlier.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>oractl:&gt;connect
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>oractl:&gt;connect
 </span></span><span style="display:flex;"><span>? username obaas-admin
 </span></span><span style="display:flex;"><span>? password *************
 </span></span><span style="display:flex;"><span>Credentials successfully authenticated! obaas-admin -&gt; welcome to OBaaS CLI.
@@ -308,7 +339,7 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
 <li>
 <p>Deploy the account service</p>
 <p>You will now deploy your account service to the Oracle Backend for Microservices and AI using the CLI. Run this command to redeploy your service, make sure you provide the correct path to your JAR file. <strong>Note</strong> that this command may take 1-3 minutes to complete:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>oractl:&gt; deploy --app-name application --service-name account --artifact-path /path/to/account-0.0.1-SNAPSHOT.jar --image-version 0.0.1 --java-version ghcr.io/oracle/graalvm-native-image-obaas:21
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>oractl:&gt; deploy --app-name application --service-name account --artifact-path /path/to/account-0.0.1-SNAPSHOT.jar --image-version 0.0.1 --java-version ghcr.io/oracle/graalvm-native-image-obaas:21
 </span></span><span style="display:flex;"><span>uploading: account/target/account-0.0.1-SNAPSHOT.jarbuilding and pushing image...
 </span></span><span style="display:flex;"><span>creating deployment and service... successfully deployed
 </span></span><span style="display:flex;"><span>oractl:&gt;</span></span></code></pre></div>
@@ -316,14 +347,14 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
 <li>
 <p>Verify the new endpoints in the account service</p>
 <p>In the next three commands, you need to provide the correct IP address for the API Gateway in your backend environment.  You can find the IP address using this command, you need the one listed in the <strong><code>EXTERNAL-IP</code></strong> column:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n ingress-nginx get service ingress-nginx-controller
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n ingress-nginx get service ingress-nginx-controller
 </span></span><span style="display:flex;"><span>NAME                       TYPE           CLUSTER-IP      EXTERNAL-IP   PORT<span style="color:#f92672">(</span>S<span style="color:#f92672">)</span>                      AGE
 </span></span><span style="display:flex;"><span>ingress-nginx-controller   LoadBalancer   10.123.10.127   100.20.30.40  80:30389/TCP,443:30458/TCP   13d</span></span></code></pre></div>
 <p>Test the create journal entry endpoint (make sure you use an <code>accountId</code> that exits in your database) with this command, use the IP address for your API Gateway.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i -X POST <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>      -H <span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span> <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>      -d <span style="color:#e6db74">&#39;{&#34;journalType&#34;: &#34;PENDING&#34;, &#34;accountId&#34;: 2, &#34;journalAmount&#34;: 100.00, &#34;lraId&#34;: &#34;0&#34;, &#34;lraState&#34;: &#34;&#34;}&#39;</span> <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>      http://<span style="color:#f92672">[</span>EXTERNAL-IP<span style="color:#f92672">]</span>/api/v1/account/journal
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i -X POST <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>      -H <span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>      -d <span style="color:#e6db74">&#39;{&#34;journalType&#34;: &#34;PENDING&#34;, &#34;accountId&#34;: 2, &#34;journalAmount&#34;: 100.00, &#34;lraId&#34;: &#34;0&#34;, &#34;lraState&#34;: &#34;&#34;}&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>      http://<span style="color:#f92672">[</span>EXTERNAL-IP<span style="color:#f92672">]</span>/api/v1/account/journal
 </span></span><span style="display:flex;"><span>HTTP/1.1 <span style="color:#ae81ff">201</span>
 </span></span><span style="display:flex;"><span>Date: Wed, <span style="color:#ae81ff">31</span> May <span style="color:#ae81ff">2023</span> 13:02:10 GMT
 </span></span><span style="display:flex;"><span>Content-Type: application/json
@@ -333,7 +364,7 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span><span style="color:#e6db74">&#34;journalId&#34;</span>:1,<span style="color:#e6db74">&#34;journalType&#34;</span>:<span style="color:#e6db74">&#34;PENDING&#34;</span>,<span style="color:#e6db74">&#34;accountId&#34;</span>:2,<span style="color:#e6db74">&#34;lraId&#34;</span>:<span style="color:#e6db74">&#34;0&#34;</span>,<span style="color:#e6db74">&#34;lraState&#34;</span>:<span style="color:#e6db74">&#34;&#34;</span>,<span style="color:#e6db74">&#34;journalAmount&#34;</span>:100<span style="color:#f92672">}</span></span></span></code></pre></div>
 <p>Notice that the response contains a <code>journalId</code> which you will need in a later command, and that the <code>journalType</code> is <code>PENDING</code>.</p>
 <p>Test the get journal entries endpoint with this command, use the IP address for your API Gateway and the same <code>accountId</code> as in the previous step. Your output may be different:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i http://<span style="color:#f92672">[</span>EXTERNAL-IP<span style="color:#f92672">]</span>/api/v1/account/<span style="color:#f92672">[</span>accountId<span style="color:#f92672">]</span>/journal
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i http://<span style="color:#f92672">[</span>EXTERNAL-IP<span style="color:#f92672">]</span>/api/v1/account/<span style="color:#f92672">[</span>accountId<span style="color:#f92672">]</span>/journal
 </span></span><span style="display:flex;"><span>HTTP/1.1 <span style="color:#ae81ff">200</span>
 </span></span><span style="display:flex;"><span>Date: Wed, <span style="color:#ae81ff">31</span> May <span style="color:#ae81ff">2023</span> 13:03:22 GMT
 </span></span><span style="display:flex;"><span>Content-Type: application/json
@@ -341,7 +372,7 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
 </span></span><span style="display:flex;"><span>Connection: keep-alive
 </span></span><span style="display:flex;"><span><span style="color:#f92672">[{</span><span style="color:#e6db74">&#34;journalId&#34;</span>:1,<span style="color:#e6db74">&#34;journalType&#34;</span>:<span style="color:#e6db74">&#34;PENDING&#34;</span>,<span style="color:#e6db74">&#34;accountId&#34;</span>:2,<span style="color:#e6db74">&#34;lraId&#34;</span>:<span style="color:#e6db74">&#34;0&#34;</span>,<span style="color:#e6db74">&#34;lraState&#34;</span>:null,<span style="color:#e6db74">&#34;journalAmount&#34;</span>:100<span style="color:#f92672">}]</span></span></span></code></pre></div>
 <p>Test the update/clear journal entry endpoint with this command, use the IP address for your API Gateway and the <code>journalId</code> from the first command&rsquo;s response:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i -X POST http://<span style="color:#f92672">[</span>EXTERNAL-IP<span style="color:#f92672">]</span>/api/v1/account/journal/<span style="color:#f92672">[</span>journalId<span style="color:#f92672">]</span>/clear
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i -X POST http://<span style="color:#f92672">[</span>EXTERNAL-IP<span style="color:#f92672">]</span>/api/v1/account/journal/<span style="color:#f92672">[</span>journalId<span style="color:#f92672">]</span>/clear
 </span></span><span style="display:flex;"><span>HTTP/1.1 <span style="color:#ae81ff">200</span>
 </span></span><span style="display:flex;"><span>Date: Wed, <span style="color:#ae81ff">31</span> May <span style="color:#ae81ff">2023</span> 13:04:36 GMT
 </span></span><span style="display:flex;"><span>Content-Type: application/json
@@ -363,12 +394,9 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
       <div id="R-header-topbar" class="default-animation"></div>
       <div id="R-header-wrapper" class="default-animation">
         <div id="R-header" class="default-animation">
-<img src="https://oracle.github.io/microservices-datadriven/cloudbank//cloudbank-logo.png" height="100px">
+<img src="https://oracle.github.io/microservices-backend/cloudbank//cloudbank-logo.png" height="100px">
         </div>
-        <script>
-          window.index_js_url="/microservices-datadriven/cloudbank/searchindex.en.js?1747144443";
-        </script>
-        <search><form action="/microservices-datadriven/cloudbank/search/index.html" method="get">
+        <search><form action="/microservices-backend/cloudbank/search/index.html" method="get">
           <div class="searchbox default-animation">
             <button class="search-detail" type="submit" title="Search (CTRL+ALT+f)"><i class="fas fa-search"></i></button>
             <label class="a11y-only" for="R-search-by">Search</label>
@@ -376,106 +404,73 @@ Create a new Java file in src/main/java/com/example/accounts/model called Journa
             <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
           </div>
         </form></search>
-        <script>
-          var contentLangs=['en'];
-        </script>
-        <script src="/microservices-datadriven/cloudbank/js/auto-complete.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.stemmer.support.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.multi.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.en.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/search.js?1747144443" defer></script>
       </div>
       <div id="R-homelinks" class="default-animation homelinks">
-        <ul>
-          <li><a class="padding" href="/microservices-datadriven/cloudbank/index.html"><i class="fa-fw fas fa-home"></i> Home</a></li>
-        </ul>
-        <hr class="padding">
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-homelinks">
+          <ul class="space collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/index.html"><a class="padding" href="/microservices-backend/cloudbank/index.html"><i class="fa-fw fas fa-home"></i> Home</a></li>
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-headercontrols">
+          <ul class="">
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
       </div>
       <div id="R-content-wrapper" class="highlightable">
-        <div id="R-shortcutmenu-home" class="R-sidebarmenu">
+        <div class="R-sidebarmenu R-shortcutmenu-main">
           <ul class="enlarge morespace collapsible-menu">
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/provision/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/provision/index.html">Provision an Instance</a><ul id="R-subsections-d6947c2d1078796b2bfd976ebc0e0264" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/devenv/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/devenv/index.html">Developer Environment</a><ul id="R-subsections-559c2972a719279af6301d7032063e64" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/account/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/index.html">Account Microservice</a><ul id="R-subsections-af4a17527840af40a6cda3fc650af51b" class="collapsible-menu"></ul></li>
-            <li class="parent " data-nav-id="/microservices-datadriven/cloudbank/check/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/check/index.html">Check Processing</a><ul id="R-subsections-159f69b312555d5f0055ca241e6721e2" class="collapsible-menu">
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/check/intro/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/check/intro/index.html">Introduction</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/check/learn/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/check/learn/index.html">Learn about the scenario</a></li>
-            <li class="active " data-nav-id="/microservices-datadriven/cloudbank/check/update-account/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/check/update-account/index.html">Add Journal to the Account service</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/check/create-queues/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/check/create-queues/index.html">Create Queues in the Database</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/check/create-testrunner/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/check/create-testrunner/index.html">Create the Test Runner Microservice</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/check/check-processing/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/check/check-processing/index.html">Create the Check Processing Microservice</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/check/test/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/check/test/index.html">Test the end-to-end flow</a></li></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/index.html">Manage Sagas</a><ul id="R-subsections-dfd968a77748ad1f1a28d6a9118be66e" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/springai/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/springai/index.html">CloudBank AI Assistant</a><ul id="R-subsections-868fb0154339332ae87e7c98e3fa9bee" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-cli/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-cli/index.html">Deploy with the CLI</a><ul id="R-subsections-b839a8f6f0f5efd1be94b7f9da9e78d1" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-ide/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-ide/index.html">Deploy with an IDE</a><ul id="R-subsections-fd584c0da8f22ebe818df94300151866" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/backend/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/backend/index.html">Explore the Backend</a><ul id="R-subsections-f948b454f68385a53d2483b3c80424ae" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/cleanup/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/cleanup/index.html">Cleanup</a><ul id="R-subsections-6d9c3a2633de07dcbf4491d943578384" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/provision/index.html"><a class="padding" href="/microservices-backend/cloudbank/provision/index.html">Provision an Instance</a><ul id="R-subsections-d6947c2d1078796b2bfd976ebc0e0264" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/devenv/index.html"><a class="padding" href="/microservices-backend/cloudbank/devenv/index.html">Developer Environment</a><ul id="R-subsections-559c2972a719279af6301d7032063e64" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/index.html">Account Microservice</a><ul id="R-subsections-af4a17527840af40a6cda3fc650af51b" class="collapsible-menu"></ul></li>
+            <li class="parent " data-nav-id="/microservices-backend/cloudbank/check/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/index.html">Check Processing</a><ul id="R-subsections-159f69b312555d5f0055ca241e6721e2" class="collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/check/intro/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/intro/index.html">Introduction</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/check/learn/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/learn/index.html">Learn about the scenario</a></li>
+            <li class="active " data-nav-id="/microservices-backend/cloudbank/check/update-account/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/update-account/index.html">Add Journal to the Account service</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/check/create-queues/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/create-queues/index.html">Create Queues in the Database</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/check/create-testrunner/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/create-testrunner/index.html">Create the Test Runner Microservice</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/check/check-processing/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/check-processing/index.html">Create the Check Processing Microservice</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/check/test/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/test/index.html">Test the end-to-end flow</a></li></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/index.html">Manage Sagas</a><ul id="R-subsections-dfd968a77748ad1f1a28d6a9118be66e" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/springai/index.html"><a class="padding" href="/microservices-backend/cloudbank/springai/index.html">CloudBank AI Assistant</a><ul id="R-subsections-868fb0154339332ae87e7c98e3fa9bee" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-cli/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/index.html">Deploy with the CLI</a><ul id="R-subsections-b839a8f6f0f5efd1be94b7f9da9e78d1" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-ide/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-ide/index.html">Deploy with an IDE</a><ul id="R-subsections-fd584c0da8f22ebe818df94300151866" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/backend/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/index.html">Explore the Backend</a><ul id="R-subsections-f948b454f68385a53d2483b3c80424ae" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/cleanup/index.html"><a class="padding" href="/microservices-backend/cloudbank/cleanup/index.html">Cleanup</a><ul id="R-subsections-6d9c3a2633de07dcbf4491d943578384" class="collapsible-menu"></ul></li>
           </ul>
         </div>
-        <div id="R-shortcutmenu-shortcuts" class="R-sidebarmenu">
+        <div class="R-sidebarmenu R-shortcutmenu-shortcuts">
           <div class="nav-title padding">More</div>
           <ul class="space collapsible-menu">
-            <li class="" data-nav-id="https://github.com/oracle/microservices-datadriven"><a class="padding" href="https://github.com/oracle/microservices-datadriven" target="_blank"><i class='fa-fw fab fa-github'></i> GitHub repo</a></li>
-            <li class="" data-nav-id="https://bit.ly/oraclespringboot"><a class="padding" href="https://bit.ly/oraclespringboot" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Oracle Backend for Spring Boot and Microservices</a></li>
-            <li class="" data-nav-id="https://github.com/oracle/spring-cloud-oracle"><a class="padding" href="https://github.com/oracle/spring-cloud-oracle" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Spring Cloud Oracle</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/more/credits/"><a class="padding" href="/microservices-datadriven/cloudbank/more/credits/"><i class='fa-fw fas fa-bullhorn'></i> Credits</a></li>
+            <li class="" data-nav-id="https://github.com/oracle/microservices-backend"><a class="padding" href="https://github.com/oracle/microservices-backend" rel="external" target="_blank"><i class='fa-fw fab fa-github'></i> GitHub repo</a></li>
+            <li class="" data-nav-id="https://bit.ly/oraclespringboot"><a class="padding" href="https://bit.ly/oraclespringboot" rel="external" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Oracle Backend for Spring Boot and Microservices</a></li>
+            <li class="" data-nav-id="https://github.com/oracle/spring-cloud-oracle"><a class="padding" href="https://github.com/oracle/spring-cloud-oracle" rel="external" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Spring Cloud Oracle</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/more/credits/"><a class="padding" href="/microservices-backend/cloudbank/more/credits/"><i class='fa-fw fas fa-bullhorn'></i> Credits</a></li>
           </ul>
         </div>
-        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showFooter"></div>
-        <div id="R-menu-footer">
-          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showFooter">
-          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks">
-            <ul>
-              <li id="R-select-language-container" class="footerLangSwitch">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-language"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <label class="a11y-only" for="R-select-language">Language</label>
-                    <select id="R-select-language" onchange="location = this.querySelector( this.value ).dataset.url;">
-                      <option id="R-select-language-en" value="#R-select-language-en" data-url="/microservices-datadriven/cloudbank/check/update-account/index.html" lang="en-us" selected></option>
-                    </select>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-              </li>
-              <li id="R-select-variant-container" class="footerVariantSwitch">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-paint-brush"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <label class="a11y-only" for="R-select-variant">Theme</label>
-                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
-                      <option id="R-select-variant-zen-light" value="zen-light" selected>Zen Light</option>
-                    </select>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-                <script>window.variants && variants.markSelectedVariant();</script>
-              </li>
-              <li class="footerVisitedLinks">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-history"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <button onclick="clearHistory();">Clear History</button>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div id="R-footer" class="footerFooter showFooter">
-	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://www.oracle.com/">Oracle</a></p>
-		<p>Copyright &copy; 2022, 2024, <br>Oracle and/or its affiliates</p>
-          </div>
+        <div id="R-footer-margin"></div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
         </div>
+        <div class="R-sidebarmenu R-shortcutmenu-footercontrols">
+          <ul class="">
+          </ul>
+        </div>
+<div id="R-footer">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://www.oracle.com/">Oracle</a></p>
+		<p>Copyright &copy; 2022, 2024, <br>Oracle and/or its affiliates</p></div>
       </div>
     </aside>
-    <script src="/microservices-datadriven/cloudbank/js/clipboard.min.js?1747144443" defer></script>
-    <script src="/microservices-datadriven/cloudbank/js/perfect-scrollbar.min.js?1747144443" defer></script>
-    <script src="/microservices-datadriven/cloudbank/js/theme.js?1747144443" defer></script>
+    <script src="/microservices-backend/cloudbank/js/clipboard/clipboard.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/perfect-scrollbar/perfect-scrollbar.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/theme.min.js?1772471396" defer></script>
   </body>
 </html>

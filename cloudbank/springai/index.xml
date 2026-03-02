@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>CloudBank AI Assistant :: CloudBank AI</title>
-    <link>https://oracle.github.io/microservices-datadriven/cloudbank/springai/index.html</link>
+    <link>https://oracle.github.io/microservices-backend/cloudbank/springai/index.html</link>
     <description>This modules introduces Spring AI and explores how it can be used to build a CloudBank AI Assistant (chatbot) that will allow users to interact with CloudBank using a chat-based interface.&#xA;Coming Soon: We will be updating this module to help you learn about Retrieval Augmented Generation, Vector Database and AI Agents.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <atom:link href="https://oracle.github.io/microservices-datadriven/cloudbank/springai/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://oracle.github.io/microservices-backend/cloudbank/springai/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>A simple ChatBot</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/springai/simple-chat/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/springai/simple-chat/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/springai/simple-chat/index.html</guid>
-      <description>In this module, you will learn how to build a simple chatbot using Spring AI and Ollama.&#xA;Note: The example below can also be run on a regular CPU if you are using an environment where a GPU is not available, it will just be slower.&#xA;Oracle Backend for Microservices and AI provides an option during installation to provision a set of Kubernetes nodes with NVIDIA A10 GPUs that are suitable for running AI workloads.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/springai/simple-chat/index.html</guid>
+      <description>In this module, you will learn how to build a simple chatbot using Spring AI and Ollama.&#xA;Note: The example below can also be run on a regular CPU if you are using an environment where a GPU is not available, it will just be slower.&#xA;Oracle Backend for Microservices and AI provides an option during installation to provision a set of Kubernetes nodes with NVIDIA A10 GPUs that are suitable for running AI workloads. If you choose that option during installation, you may also specify how many nodes are provisioned. The GPU nodes will be in a separate Node Pool to the normal CPU nodes, which allows you to scale it independently of the CPU nodes. They are also labeled so that you can target appropriate workloads to them using node selectors and/or affinity rules.</description>
     </item>
   </channel>
 </rss>

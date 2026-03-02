@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article">
+<html lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article" data-r-output-format="html">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <meta name="generator" content="Hugo 0.133.1">
-    <meta name="generator" content="Relearn 7.1.1+ab4197f3113afa9a7d17bed69dbef6c0e75a4921">
+    <meta name="generator" content="Hugo 0.157.0">
+    <meta name="generator" content="Relearn 7.6.1+e9ef53522317877bc23c72c42c8307a62b209dfb">
     <meta name="description" content="The Data Access Object pattern is considered a best practice, and it allows separation of business logic from the persistence layer. In this task, you will create an Account Data Access Object (DAO) that hides the complexity of the persistence layer logic from the business layer services. Additionally, it establishes methods that can be reused by each business layer service that needs to operate on accounts - in this module there will be two such services - deposit and withdraw.">
     <meta name="author" content="">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Create a Data Access Object :: CloudBank AI">
     <meta name="twitter:description" content="The Data Access Object pattern is considered a best practice, and it allows separation of business logic from the persistence layer. In this task, you will create an Account Data Access Object (DAO) that hides the complexity of the persistence layer logic from the business layer services. Additionally, it establishes methods that can be reused by each business layer service that needs to operate on accounts - in this module there will be two such services - deposit and withdraw.">
-    <meta property="og:url" content="https://oracle.github.io/microservices-datadriven/cloudbank/saga/dao/index.html">
+    <meta property="og:url" content="https://oracle.github.io/microservices-backend/cloudbank/saga/dao/index.html">
     <meta property="og:site_name" content="CloudBank AI">
     <meta property="og:title" content="Create a Data Access Object :: CloudBank AI">
     <meta property="og:description" content="The Data Access Object pattern is considered a best practice, and it allows separation of business logic from the persistence layer. In this task, you will create an Account Data Access Object (DAO) that hides the complexity of the persistence layer logic from the business layer services. Additionally, it establishes methods that can be reused by each business layer service that needs to operate on accounts - in this module there will be two such services - deposit and withdraw.">
@@ -21,26 +21,63 @@
     <meta itemprop="description" content="The Data Access Object pattern is considered a best practice, and it allows separation of business logic from the persistence layer. In this task, you will create an Account Data Access Object (DAO) that hides the complexity of the persistence layer logic from the business layer services. Additionally, it establishes methods that can be reused by each business layer service that needs to operate on accounts - in this module there will be two such services - deposit and withdraw.">
     <meta itemprop="wordCount" content="806">
     <title>Create a Data Access Object :: CloudBank AI</title>
-    <link href="/microservices-datadriven/cloudbank/images/favicon.png?1747144443" rel="icon" type="image/png">
-    <link href="/microservices-datadriven/cloudbank/css/fontawesome-all.min.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/fontawesome-all.min.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/nucleus.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/auto-complete.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/auto-complete.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/perfect-scrollbar.min.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/fonts.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/fonts.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/theme.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/theme-zen-light.css?1747144443" rel="stylesheet" id="R-variant-style">
-    <link href="/microservices-datadriven/cloudbank/css/chroma-relearn-light.css?1747144443" rel="stylesheet" id="R-variant-chroma-style">
-    <link href="/microservices-datadriven/cloudbank/css/print.css?1747144443" rel="stylesheet" media="print">
-    <script src="/microservices-datadriven/cloudbank/js/variant.js?1747144443"></script>
+    <link href="/microservices-backend/cloudbank/images/favicon.png?1772471396" rel="icon" type="image/png">
+    <link href="/microservices-backend/cloudbank/fonts/fontawesome/css/fontawesome-all.min.css?1772471396" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-backend/cloudbank/fonts/fontawesome/css/fontawesome-all.min.css?1772471396" rel="stylesheet"></noscript>
+    <link href="/microservices-backend/cloudbank/css/perfect-scrollbar/perfect-scrollbar.min.css?1772471396" rel="stylesheet">
+    <link href="/microservices-backend/cloudbank/css/theme.min.css?1772471396" rel="stylesheet">
+    <link href="/microservices-backend/cloudbank/css/format-html.min.css?1772471396" rel="stylesheet" id="R-format-style">
+    <link href="/microservices-backend/cloudbank/css/auto-complete/auto-complete.min.css?1772471396" rel="stylesheet">
+    <script src="/microservices-backend/cloudbank/js/auto-complete/auto-complete.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.stemmer.support.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.multi.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.en.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/search.min.js?1772471396" defer></script>
     <script>
       window.relearn = window.relearn || {};
+      // configuration
+      window.relearn.min = `.min`;
+      window.relearn.path='\/saga\/dao\/index.html';
       window.relearn.relBasePath='..\/..';
       window.relearn.relBaseUri='..\/..\/..\/..';
-      window.relearn.absBaseUri='https:\/\/oracle.github.io\/microservices-datadriven\/cloudbank';
+      window.relearn.absBaseUri='https:\/\/oracle.github.io\/microservices-backend\/cloudbank';
+      window.relearn.contentLangs=['en'];
+      window.relearn.index_js_url="/microservices-backend/cloudbank/searchindex.en.js?1772471396";
       window.relearn.disableAnchorCopy=false;
       window.relearn.disableAnchorScrolling=false;
+      window.relearn.disableInlineCopyToClipboard=false;
+      window.relearn.enableBlockCodeWrap=true;
+      // legal
+      window.relearn.getItem = (s,n) => {return s.getItem(n)};
+      window.relearn.setItem = (s,n,v) => {return s.setItem(n,v)};
+      window.relearn.removeItem = (s,n) => {return s.removeItem(n)};
       // variant stuff
-      window.variants && variants.init( [ 'zen-light' ] );
+      window.relearn.themevariants = [ 'zen-light' ];
+      window.relearn.customvariantname = "my-custom-variant";
+      window.relearn.changeVariant = function(variant) {
+        var oldVariant = document.documentElement.dataset.rThemeVariant;
+        window.relearn.setItem(window.localStorage, window.relearn.absBaseUri + "/variant", variant);
+        document.documentElement.dataset.rThemeVariant = variant;
+        if (oldVariant != variant) {
+          document.dispatchEvent( new CustomEvent('themeVariantLoaded', { detail: { variant, oldVariant } }) );
+          window.relearn.markVariant();
+        }
+      }
+      window.relearn.markVariant = function() {
+        var variant = window.relearn.getItem(window.localStorage, window.relearn.absBaseUri + "/variant");
+        document.querySelectorAll(".R-variantswitcher select").forEach((select) => {select.value = variant;});
+      }
+      window.relearn.initVariant = function() {
+        var variant = window.relearn.getItem(window.localStorage, window.relearn.absBaseUri + "/variant") ?? "";
+        if( variant == window.relearn.customvariantname ){
+        }else if( !variant || !window.relearn.themevariants.includes(variant) ){
+          variant = window.relearn.themevariants[0];
+          window.relearn.setItem(window.localStorage, window.relearn.absBaseUri + "/variant", variant);
+        }
+        document.documentElement.dataset.rThemeVariant = variant;
+      }
+      window.relearn.initVariant();
+      window.relearn.markVariant();
       // translations
       window.T_Copy_to_clipboard = `Copy to clipboard`;
       window.T_Copied_to_clipboard = `Copied to clipboard!`;
@@ -51,12 +88,10 @@
       window.T_No_results_found = `No results found for "{0}"`;
       window.T_N_results_found = `{1} results found for "{0}"`;
     </script>
-  
-    
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-7HWQVTJ803"></script>
       <script>
         var doNotTrack = false;
-        if ( false ) {
+        if ( true ) {
           var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
           var doNotTrack = (dnt == "1" || dnt == "yes");
         }
@@ -67,12 +102,8 @@
           gtag('config', 'G-7HWQVTJ803');
         }
       </script>
-    
-  
-
-
   </head>
-  <body class="mobile-support html" data-url="/microservices-datadriven/cloudbank/saga/dao/index.html">
+  <body class="mobile-support html" data-url="/microservices-backend/cloudbank/saga/dao/index.html">
     <div id="R-body" class="default-animation">
       <div id="R-body-overlay"></div>
       <nav id="R-topbar">
@@ -88,15 +119,15 @@
               </div>
             </div>
           </div>
-          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList"><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><a itemprop="item" href="/microservices-datadriven/cloudbank/index.html"><span itemprop="name">CloudBank AI</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><a itemprop="item" href="/microservices-datadriven/cloudbank/saga/index.html"><span itemprop="name">Manage Sagas</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><span itemprop="name">Create a Data Access Object</span><meta itemprop="position" content="3"></li>
+          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList">
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="/microservices-backend/cloudbank/index.html"><span itemprop="name">CloudBank AI</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li>
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="/microservices-backend/cloudbank/saga/index.html"><span itemprop="name">Manage Sagas</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li>
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><span itemprop="name">Create a Data Access Object</span><meta itemprop="position" content="3"></li>
           </ol>
           <div class="topbar-area topbar-area-end" data-area="end">
-            <div class="topbar-button topbar-button-prev" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-datadriven/cloudbank/saga/deposit/index.html" title="Create the Deposit service (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a>
+            <div class="topbar-button topbar-button-prev" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-backend/cloudbank/saga/deposit/index.html" title="Create the Deposit service (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a>
             </div>
-            <div class="topbar-button topbar-button-next" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-datadriven/cloudbank/saga/business-logic/index.html" title="Implement business logic (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a>
+            <div class="topbar-button topbar-button-next" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-backend/cloudbank/saga/business-logic/index.html" title="Implement business logic (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a>
             </div>
             <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show"><button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More"><i class="fa-fw fas fa-ellipsis-v"></i></button>
               <div class="topbar-content">
@@ -124,7 +155,7 @@
 <p>Create the DAO class</p>
 <p>Create a new Java file called <code>AccountTransferDAO.java</code> in <code>src/main/java/com/example/accounts/services</code>.  This class will contain common data access methods that are needed by multiple participants.  You will implement this class using the singleton pattern so that there will only be one instance of this class.</p>
 <p>Here is the code to set up the class and implement the singleton pattern:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.example.accounts.services;
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.example.accounts.services;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.example.accounts.model.Account;
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.example.accounts.model.Journal;
@@ -166,7 +197,7 @@
 <li>
 <p>Create a method to get the LRA status as a String</p>
 <p>Create a <code>getStatusString</code> method which can be used to get a String representation of the LRA participant status.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">/**
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">/**
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Get status od LRA participant.
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param status Status code
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @return Returns status code
@@ -187,7 +218,7 @@
 <li>
 <p>Create a method to get the LRA status from a String</p>
 <p>Create a <code>getStatusFromString</code> method to convert back from the String to the enum.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">/**
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">/**
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Get LRA Status from a string.
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param statusString Status
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @return Participant Status
@@ -208,12 +239,12 @@
 <li>
 <p>Create a method to save an account</p>
 <p>Create a method to save an account in the account repository.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">saveAccount</span>(Account account) {
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">saveAccount</span>(Account account) {
 </span></span><span style="display:flex;"><span>    log.<span style="color:#a6e22e">info</span>(<span style="color:#e6db74">&#34;saveAccount account&#34;</span> <span style="color:#f92672">+</span> account.<span style="color:#a6e22e">getAccountId</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; account&#34;</span> <span style="color:#f92672">+</span> account.<span style="color:#a6e22e">getAccountBalance</span>());
 </span></span><span style="display:flex;"><span>    accountRepository.<span style="color:#a6e22e">save</span>(account);
 </span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <p>Create a method to return the correct HTTP Status Code for an LRA status.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">/**
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">/**
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Return the correct HTTP Status Code for an LRA status
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param lraId LRA Id
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param journalType Journal Type
@@ -232,7 +263,7 @@
 <li>
 <p>Create a method to update the LRA status in the journal</p>
 <p>Create a method to update the LRA status in the journal table during the &ldquo;after LRA&rdquo; phase.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">/**
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">/**
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Update the LRA status in the journal table during the &#34;after LRA&#34; phase.
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param lraId LRA Id
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param status Status
@@ -248,20 +279,20 @@
 <li>
 <p>Create methods to manage accounts</p>
 <p>Create a method to get the account for a given account ID.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Account <span style="color:#a6e22e">getAccountForAccountId</span>(<span style="color:#66d9ef">long</span> accountId) {
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Account <span style="color:#a6e22e">getAccountForAccountId</span>(<span style="color:#66d9ef">long</span> accountId) {
 </span></span><span style="display:flex;"><span>    Account account <span style="color:#f92672">=</span> accountRepository.<span style="color:#a6e22e">findByAccountId</span>(accountId);
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (account <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>)
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> account;
 </span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <p>Create a method to get the account that is related to a journal entry.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Account <span style="color:#a6e22e">getAccountForJournal</span>(Journal journal) <span style="color:#66d9ef">throws</span> Exception {
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Account <span style="color:#a6e22e">getAccountForJournal</span>(Journal journal) <span style="color:#66d9ef">throws</span> Exception {
 </span></span><span style="display:flex;"><span>    Account account <span style="color:#f92672">=</span> accountRepository.<span style="color:#a6e22e">findByAccountId</span>(journal.<span style="color:#a6e22e">getAccountId</span>());
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (account <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Exception(<span style="color:#e6db74">&#34;Invalid accountName:&#34;</span> <span style="color:#f92672">+</span> journal.<span style="color:#a6e22e">getAccountId</span>());
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> account;
 </span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <p>Update <code>AccountRepository.java</code> in <code>src/main/java/com/example/accounts/repositories</code> to add these extra JPA methods.  Your updated file should look like this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.example.accounts.repository;
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.example.accounts.repository;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.List;
 </span></span><span style="display:flex;"><span>
@@ -278,7 +309,7 @@
 <li>
 <p>Create methods to manage the journal</p>
 <p>Back in the <code>AccountTransferDAO</code>, create a method to get the journal entry for a given LRA.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Journal <span style="color:#a6e22e">getJournalForLRAid</span>(String lraId, String journalType) <span style="color:#66d9ef">throws</span> Exception {
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Journal <span style="color:#a6e22e">getJournalForLRAid</span>(String lraId, String journalType) <span style="color:#66d9ef">throws</span> Exception {
 </span></span><span style="display:flex;"><span>    Journal journal <span style="color:#f92672">=</span> journalRepository.<span style="color:#a6e22e">findJournalByLraIdAndJournalType</span>(lraId, journalType);
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (journal <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>) {
 </span></span><span style="display:flex;"><span>        journalRepository.<span style="color:#a6e22e">save</span>(<span style="color:#66d9ef">new</span> Journal(<span style="color:#e6db74">&#34;unknown&#34;</span>, <span style="color:#f92672">-</span>1, 0, lraId,
@@ -288,7 +319,7 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> journal;
 </span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <p>Create a method to save a journal entry.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">saveJournal</span>(Journal journal) {
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">saveJournal</span>(Journal journal) {
 </span></span><span style="display:flex;"><span>    journalRepository.<span style="color:#a6e22e">save</span>(journal);
 </span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <p>This completes the Data Access Object, now you can start implementing the actual business logic for the services.</p>
@@ -305,12 +336,9 @@
       <div id="R-header-topbar" class="default-animation"></div>
       <div id="R-header-wrapper" class="default-animation">
         <div id="R-header" class="default-animation">
-<img src="https://oracle.github.io/microservices-datadriven/cloudbank//cloudbank-logo.png" height="100px">
+<img src="https://oracle.github.io/microservices-backend/cloudbank//cloudbank-logo.png" height="100px">
         </div>
-        <script>
-          window.index_js_url="/microservices-datadriven/cloudbank/searchindex.en.js?1747144443";
-        </script>
-        <search><form action="/microservices-datadriven/cloudbank/search/index.html" method="get">
+        <search><form action="/microservices-backend/cloudbank/search/index.html" method="get">
           <div class="searchbox default-animation">
             <button class="search-detail" type="submit" title="Search (CTRL+ALT+f)"><i class="fas fa-search"></i></button>
             <label class="a11y-only" for="R-search-by">Search</label>
@@ -318,110 +346,77 @@
             <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
           </div>
         </form></search>
-        <script>
-          var contentLangs=['en'];
-        </script>
-        <script src="/microservices-datadriven/cloudbank/js/auto-complete.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.stemmer.support.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.multi.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.en.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/search.js?1747144443" defer></script>
       </div>
       <div id="R-homelinks" class="default-animation homelinks">
-        <ul>
-          <li><a class="padding" href="/microservices-datadriven/cloudbank/index.html"><i class="fa-fw fas fa-home"></i> Home</a></li>
-        </ul>
-        <hr class="padding">
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-homelinks">
+          <ul class="space collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/index.html"><a class="padding" href="/microservices-backend/cloudbank/index.html"><i class="fa-fw fas fa-home"></i> Home</a></li>
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-headercontrols">
+          <ul class="">
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
       </div>
       <div id="R-content-wrapper" class="highlightable">
-        <div id="R-shortcutmenu-home" class="R-sidebarmenu">
+        <div class="R-sidebarmenu R-shortcutmenu-main">
           <ul class="enlarge morespace collapsible-menu">
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/provision/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/provision/index.html">Provision an Instance</a><ul id="R-subsections-d6947c2d1078796b2bfd976ebc0e0264" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/devenv/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/devenv/index.html">Developer Environment</a><ul id="R-subsections-559c2972a719279af6301d7032063e64" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/account/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/index.html">Account Microservice</a><ul id="R-subsections-af4a17527840af40a6cda3fc650af51b" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/check/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/check/index.html">Check Processing</a><ul id="R-subsections-159f69b312555d5f0055ca241e6721e2" class="collapsible-menu"></ul></li>
-            <li class="parent " data-nav-id="/microservices-datadriven/cloudbank/saga/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/index.html">Manage Sagas</a><ul id="R-subsections-dfd968a77748ad1f1a28d6a9118be66e" class="collapsible-menu">
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/intro/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/intro/index.html">Introduction</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/learn/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/learn/index.html">Learn about the Saga pattern</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/learn-lra/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/learn-lra/index.html">Learn about Long Running Actions</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/prepare/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/prepare/index.html">Prepare the Account service</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/deposit/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/deposit/index.html">Create the Deposit service</a></li>
-            <li class="active " data-nav-id="/microservices-datadriven/cloudbank/saga/dao/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/dao/index.html">Create a Data Access Object</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/business-logic/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/business-logic/index.html">Implement business logic</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/withdraw-service/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/withdraw-service/index.html">Create the Withdrawal service</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/transfer-service/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/transfer-service/index.html">Create the Transfer service</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/deploy/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/deploy/index.html">Deploy services</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/test/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/test/index.html">Run LRA test cases</a></li></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/springai/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/springai/index.html">CloudBank AI Assistant</a><ul id="R-subsections-868fb0154339332ae87e7c98e3fa9bee" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-cli/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-cli/index.html">Deploy with the CLI</a><ul id="R-subsections-b839a8f6f0f5efd1be94b7f9da9e78d1" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-ide/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-ide/index.html">Deploy with an IDE</a><ul id="R-subsections-fd584c0da8f22ebe818df94300151866" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/backend/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/backend/index.html">Explore the Backend</a><ul id="R-subsections-f948b454f68385a53d2483b3c80424ae" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/cleanup/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/cleanup/index.html">Cleanup</a><ul id="R-subsections-6d9c3a2633de07dcbf4491d943578384" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/provision/index.html"><a class="padding" href="/microservices-backend/cloudbank/provision/index.html">Provision an Instance</a><ul id="R-subsections-d6947c2d1078796b2bfd976ebc0e0264" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/devenv/index.html"><a class="padding" href="/microservices-backend/cloudbank/devenv/index.html">Developer Environment</a><ul id="R-subsections-559c2972a719279af6301d7032063e64" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/index.html">Account Microservice</a><ul id="R-subsections-af4a17527840af40a6cda3fc650af51b" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/check/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/index.html">Check Processing</a><ul id="R-subsections-159f69b312555d5f0055ca241e6721e2" class="collapsible-menu"></ul></li>
+            <li class="parent " data-nav-id="/microservices-backend/cloudbank/saga/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/index.html">Manage Sagas</a><ul id="R-subsections-dfd968a77748ad1f1a28d6a9118be66e" class="collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/intro/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/intro/index.html">Introduction</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/learn/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/learn/index.html">Learn about the Saga pattern</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/learn-lra/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/learn-lra/index.html">Learn about Long Running Actions</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/prepare/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/prepare/index.html">Prepare the Account service</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/deposit/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/deposit/index.html">Create the Deposit service</a></li>
+            <li class="active " data-nav-id="/microservices-backend/cloudbank/saga/dao/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/dao/index.html">Create a Data Access Object</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/business-logic/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/business-logic/index.html">Implement business logic</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/withdraw-service/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/withdraw-service/index.html">Create the Withdrawal service</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/transfer-service/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/transfer-service/index.html">Create the Transfer service</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/deploy/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/deploy/index.html">Deploy services</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/test/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/test/index.html">Run LRA test cases</a></li></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/springai/index.html"><a class="padding" href="/microservices-backend/cloudbank/springai/index.html">CloudBank AI Assistant</a><ul id="R-subsections-868fb0154339332ae87e7c98e3fa9bee" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-cli/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/index.html">Deploy with the CLI</a><ul id="R-subsections-b839a8f6f0f5efd1be94b7f9da9e78d1" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-ide/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-ide/index.html">Deploy with an IDE</a><ul id="R-subsections-fd584c0da8f22ebe818df94300151866" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/backend/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/index.html">Explore the Backend</a><ul id="R-subsections-f948b454f68385a53d2483b3c80424ae" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/cleanup/index.html"><a class="padding" href="/microservices-backend/cloudbank/cleanup/index.html">Cleanup</a><ul id="R-subsections-6d9c3a2633de07dcbf4491d943578384" class="collapsible-menu"></ul></li>
           </ul>
         </div>
-        <div id="R-shortcutmenu-shortcuts" class="R-sidebarmenu">
+        <div class="R-sidebarmenu R-shortcutmenu-shortcuts">
           <div class="nav-title padding">More</div>
           <ul class="space collapsible-menu">
-            <li class="" data-nav-id="https://github.com/oracle/microservices-datadriven"><a class="padding" href="https://github.com/oracle/microservices-datadriven" target="_blank"><i class='fa-fw fab fa-github'></i> GitHub repo</a></li>
-            <li class="" data-nav-id="https://bit.ly/oraclespringboot"><a class="padding" href="https://bit.ly/oraclespringboot" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Oracle Backend for Spring Boot and Microservices</a></li>
-            <li class="" data-nav-id="https://github.com/oracle/spring-cloud-oracle"><a class="padding" href="https://github.com/oracle/spring-cloud-oracle" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Spring Cloud Oracle</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/more/credits/"><a class="padding" href="/microservices-datadriven/cloudbank/more/credits/"><i class='fa-fw fas fa-bullhorn'></i> Credits</a></li>
+            <li class="" data-nav-id="https://github.com/oracle/microservices-backend"><a class="padding" href="https://github.com/oracle/microservices-backend" rel="external" target="_blank"><i class='fa-fw fab fa-github'></i> GitHub repo</a></li>
+            <li class="" data-nav-id="https://bit.ly/oraclespringboot"><a class="padding" href="https://bit.ly/oraclespringboot" rel="external" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Oracle Backend for Spring Boot and Microservices</a></li>
+            <li class="" data-nav-id="https://github.com/oracle/spring-cloud-oracle"><a class="padding" href="https://github.com/oracle/spring-cloud-oracle" rel="external" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Spring Cloud Oracle</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/more/credits/"><a class="padding" href="/microservices-backend/cloudbank/more/credits/"><i class='fa-fw fas fa-bullhorn'></i> Credits</a></li>
           </ul>
         </div>
-        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showFooter"></div>
-        <div id="R-menu-footer">
-          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showFooter">
-          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks">
-            <ul>
-              <li id="R-select-language-container" class="footerLangSwitch">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-language"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <label class="a11y-only" for="R-select-language">Language</label>
-                    <select id="R-select-language" onchange="location = this.querySelector( this.value ).dataset.url;">
-                      <option id="R-select-language-en" value="#R-select-language-en" data-url="/microservices-datadriven/cloudbank/saga/dao/index.html" lang="en-us" selected></option>
-                    </select>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-              </li>
-              <li id="R-select-variant-container" class="footerVariantSwitch">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-paint-brush"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <label class="a11y-only" for="R-select-variant">Theme</label>
-                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
-                      <option id="R-select-variant-zen-light" value="zen-light" selected>Zen Light</option>
-                    </select>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-                <script>window.variants && variants.markSelectedVariant();</script>
-              </li>
-              <li class="footerVisitedLinks">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-history"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <button onclick="clearHistory();">Clear History</button>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div id="R-footer" class="footerFooter showFooter">
-	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://www.oracle.com/">Oracle</a></p>
-		<p>Copyright &copy; 2022, 2024, <br>Oracle and/or its affiliates</p>
-          </div>
+        <div id="R-footer-margin"></div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
         </div>
+        <div class="R-sidebarmenu R-shortcutmenu-footercontrols">
+          <ul class="">
+          </ul>
+        </div>
+<div id="R-footer">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://www.oracle.com/">Oracle</a></p>
+		<p>Copyright &copy; 2022, 2024, <br>Oracle and/or its affiliates</p></div>
       </div>
     </aside>
-    <script src="/microservices-datadriven/cloudbank/js/clipboard.min.js?1747144443" defer></script>
-    <script src="/microservices-datadriven/cloudbank/js/perfect-scrollbar.min.js?1747144443" defer></script>
-    <script src="/microservices-datadriven/cloudbank/js/theme.js?1747144443" defer></script>
+    <script src="/microservices-backend/cloudbank/js/clipboard/clipboard.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/perfect-scrollbar/perfect-scrollbar.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/theme.min.js?1772471396" defer></script>
   </body>
 </html>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article">
+<html lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article" data-r-output-format="html">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <meta name="generator" content="Hugo 0.133.1">
-    <meta name="generator" content="Relearn 7.1.1+ab4197f3113afa9a7d17bed69dbef6c0e75a4921">
+    <meta name="generator" content="Hugo 0.157.0">
+    <meta name="generator" content="Relearn 7.6.1+e9ef53522317877bc23c72c42c8307a62b209dfb">
     <meta name="description" content="Create a service to list all accounts
 Open your AccountsController.java file and add a final field in the class of type AccountRepository. And update the constructor to accept an argument of this type and set the field to that value. This tells Spring Boot to inject the JPA repository class we just created into this class. That will make it available to use in our services. The updated parts of your class should look like this:">
     <meta name="author" content="">
@@ -12,7 +12,7 @@ Open your AccountsController.java file and add a final field in the class of typ
     <meta name="twitter:title" content="Query and Create Accounts :: CloudBank AI">
     <meta name="twitter:description" content="Create a service to list all accounts
 Open your AccountsController.java file and add a final field in the class of type AccountRepository. And update the constructor to accept an argument of this type and set the field to that value. This tells Spring Boot to inject the JPA repository class we just created into this class. That will make it available to use in our services. The updated parts of your class should look like this:">
-    <meta property="og:url" content="https://oracle.github.io/microservices-datadriven/cloudbank/account/cr-accounts/index.html">
+    <meta property="og:url" content="https://oracle.github.io/microservices-backend/cloudbank/account/cr-accounts/index.html">
     <meta property="og:site_name" content="CloudBank AI">
     <meta property="og:title" content="Query and Create Accounts :: CloudBank AI">
     <meta property="og:description" content="Create a service to list all accounts
@@ -25,26 +25,63 @@ Open your AccountsController.java file and add a final field in the class of typ
 Open your AccountsController.java file and add a final field in the class of type AccountRepository. And update the constructor to accept an argument of this type and set the field to that value. This tells Spring Boot to inject the JPA repository class we just created into this class. That will make it available to use in our services. The updated parts of your class should look like this:">
     <meta itemprop="wordCount" content="1241">
     <title>Query and Create Accounts :: CloudBank AI</title>
-    <link href="/microservices-datadriven/cloudbank/images/favicon.png?1747144443" rel="icon" type="image/png">
-    <link href="/microservices-datadriven/cloudbank/css/fontawesome-all.min.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/fontawesome-all.min.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/nucleus.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/auto-complete.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/auto-complete.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/perfect-scrollbar.min.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/fonts.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/fonts.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/theme.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/theme-zen-light.css?1747144443" rel="stylesheet" id="R-variant-style">
-    <link href="/microservices-datadriven/cloudbank/css/chroma-relearn-light.css?1747144443" rel="stylesheet" id="R-variant-chroma-style">
-    <link href="/microservices-datadriven/cloudbank/css/print.css?1747144443" rel="stylesheet" media="print">
-    <script src="/microservices-datadriven/cloudbank/js/variant.js?1747144443"></script>
+    <link href="/microservices-backend/cloudbank/images/favicon.png?1772471396" rel="icon" type="image/png">
+    <link href="/microservices-backend/cloudbank/fonts/fontawesome/css/fontawesome-all.min.css?1772471396" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-backend/cloudbank/fonts/fontawesome/css/fontawesome-all.min.css?1772471396" rel="stylesheet"></noscript>
+    <link href="/microservices-backend/cloudbank/css/perfect-scrollbar/perfect-scrollbar.min.css?1772471396" rel="stylesheet">
+    <link href="/microservices-backend/cloudbank/css/theme.min.css?1772471396" rel="stylesheet">
+    <link href="/microservices-backend/cloudbank/css/format-html.min.css?1772471396" rel="stylesheet" id="R-format-style">
+    <link href="/microservices-backend/cloudbank/css/auto-complete/auto-complete.min.css?1772471396" rel="stylesheet">
+    <script src="/microservices-backend/cloudbank/js/auto-complete/auto-complete.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.stemmer.support.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.multi.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.en.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/search.min.js?1772471396" defer></script>
     <script>
       window.relearn = window.relearn || {};
+      // configuration
+      window.relearn.min = `.min`;
+      window.relearn.path='\/account\/cr-accounts\/index.html';
       window.relearn.relBasePath='..\/..';
       window.relearn.relBaseUri='..\/..\/..\/..';
-      window.relearn.absBaseUri='https:\/\/oracle.github.io\/microservices-datadriven\/cloudbank';
+      window.relearn.absBaseUri='https:\/\/oracle.github.io\/microservices-backend\/cloudbank';
+      window.relearn.contentLangs=['en'];
+      window.relearn.index_js_url="/microservices-backend/cloudbank/searchindex.en.js?1772471396";
       window.relearn.disableAnchorCopy=false;
       window.relearn.disableAnchorScrolling=false;
+      window.relearn.disableInlineCopyToClipboard=false;
+      window.relearn.enableBlockCodeWrap=true;
+      // legal
+      window.relearn.getItem = (s,n) => {return s.getItem(n)};
+      window.relearn.setItem = (s,n,v) => {return s.setItem(n,v)};
+      window.relearn.removeItem = (s,n) => {return s.removeItem(n)};
       // variant stuff
-      window.variants && variants.init( [ 'zen-light' ] );
+      window.relearn.themevariants = [ 'zen-light' ];
+      window.relearn.customvariantname = "my-custom-variant";
+      window.relearn.changeVariant = function(variant) {
+        var oldVariant = document.documentElement.dataset.rThemeVariant;
+        window.relearn.setItem(window.localStorage, window.relearn.absBaseUri + "/variant", variant);
+        document.documentElement.dataset.rThemeVariant = variant;
+        if (oldVariant != variant) {
+          document.dispatchEvent( new CustomEvent('themeVariantLoaded', { detail: { variant, oldVariant } }) );
+          window.relearn.markVariant();
+        }
+      }
+      window.relearn.markVariant = function() {
+        var variant = window.relearn.getItem(window.localStorage, window.relearn.absBaseUri + "/variant");
+        document.querySelectorAll(".R-variantswitcher select").forEach((select) => {select.value = variant;});
+      }
+      window.relearn.initVariant = function() {
+        var variant = window.relearn.getItem(window.localStorage, window.relearn.absBaseUri + "/variant") ?? "";
+        if( variant == window.relearn.customvariantname ){
+        }else if( !variant || !window.relearn.themevariants.includes(variant) ){
+          variant = window.relearn.themevariants[0];
+          window.relearn.setItem(window.localStorage, window.relearn.absBaseUri + "/variant", variant);
+        }
+        document.documentElement.dataset.rThemeVariant = variant;
+      }
+      window.relearn.initVariant();
+      window.relearn.markVariant();
       // translations
       window.T_Copy_to_clipboard = `Copy to clipboard`;
       window.T_Copied_to_clipboard = `Copied to clipboard!`;
@@ -55,12 +92,10 @@ Open your AccountsController.java file and add a final field in the class of typ
       window.T_No_results_found = `No results found for "{0}"`;
       window.T_N_results_found = `{1} results found for "{0}"`;
     </script>
-  
-    
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-7HWQVTJ803"></script>
       <script>
         var doNotTrack = false;
-        if ( false ) {
+        if ( true ) {
           var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
           var doNotTrack = (dnt == "1" || dnt == "yes");
         }
@@ -71,12 +106,8 @@ Open your AccountsController.java file and add a final field in the class of typ
           gtag('config', 'G-7HWQVTJ803');
         }
       </script>
-    
-  
-
-
   </head>
-  <body class="mobile-support html" data-url="/microservices-datadriven/cloudbank/account/cr-accounts/index.html">
+  <body class="mobile-support html" data-url="/microservices-backend/cloudbank/account/cr-accounts/index.html">
     <div id="R-body" class="default-animation">
       <div id="R-body-overlay"></div>
       <nav id="R-topbar">
@@ -92,15 +123,15 @@ Open your AccountsController.java file and add a final field in the class of typ
               </div>
             </div>
           </div>
-          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList"><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><a itemprop="item" href="/microservices-datadriven/cloudbank/index.html"><span itemprop="name">CloudBank AI</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><a itemprop="item" href="/microservices-datadriven/cloudbank/account/index.html"><span itemprop="name">Account Microservice</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><span itemprop="name">Query and Create Accounts</span><meta itemprop="position" content="3"></li>
+          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList">
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="/microservices-backend/cloudbank/index.html"><span itemprop="name">CloudBank AI</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li>
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="/microservices-backend/cloudbank/account/index.html"><span itemprop="name">Account Microservice</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li>
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><span itemprop="name">Query and Create Accounts</span><meta itemprop="position" content="3"></li>
           </ol>
           <div class="topbar-area topbar-area-end" data-area="end">
-            <div class="topbar-button topbar-button-prev" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-datadriven/cloudbank/account/jpa/index.html" title="Use Spring Data JPA (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a>
+            <div class="topbar-button topbar-button-prev" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-backend/cloudbank/account/jpa/index.html" title="Use Spring Data JPA (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a>
             </div>
-            <div class="topbar-button topbar-button-next" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-datadriven/cloudbank/account/extra-endpoints/index.html" title="Extra Account Endpoints (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a>
+            <div class="topbar-button topbar-button-next" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-backend/cloudbank/account/extra-endpoints/index.html" title="Extra Account Endpoints (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a>
             </div>
             <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show"><button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More"><i class="fa-fw fas fa-ellipsis-v"></i></button>
               <div class="topbar-content">
@@ -126,7 +157,7 @@ Open your AccountsController.java file and add a final field in the class of typ
 <li>
 <p>Create a service to list all accounts</p>
 <p>Open your <code>AccountsController.java</code> file and add a final field in the class of type <code>AccountRepository</code>.  And update the constructor to accept an argument of this type and set the field to that value.  This tells Spring Boot to inject the JPA repository class we just created into this class.  That will make it available to use in our services.  The updated parts of your class should look like this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.example.accounts.repository.AccountRepository;
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.example.accounts.repository.AccountRepository;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// ...</span>
 </span></span><span style="display:flex;"><span>
@@ -136,7 +167,7 @@ Open your AccountsController.java file and add a final field in the class of typ
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">accountRepository</span> <span style="color:#f92672">=</span> accountRepository;
 </span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <p>Now, add a method to get all the accounts from the database and return them.  This method should respond to the HTTP GET method.  You can use the built-in <code>findAll</code> method on <code>JpaRepository</code> to get the data.  Your new additions to your class should look like this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.List;
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.List;
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.example.accounts.model.Account;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// ...</span>
@@ -149,16 +180,16 @@ Open your AccountsController.java file and add a final field in the class of typ
 <li>
 <p>Rebuild and restart your application and test your new endpoint</p>
 <p>If your application is still running, stop it with Ctrl+C (or equivalent) and then rebuild and restart it with this command:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ mvn spring-boot:run</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ mvn spring-boot:run</span></span></code></pre></div>
 <p>This time, when it starts up you will see some new log messages that were not there before.  These tell you that it connected to the database successfully.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>2023-02-25 15:58:16.852  INFO 29041 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>2023-02-25 15:58:16.852  INFO 29041 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
 </span></span><span style="display:flex;"><span>2023-02-25 15:58:16.872  INFO 29041 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.15.Final
 </span></span><span style="display:flex;"><span>2023-02-25 15:58:16.936  INFO 29041 --- [           main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
 </span></span><span style="display:flex;"><span>2023-02-25 15:58:17.658  INFO 29041 --- [           main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.Oracle12cDialect
 </span></span><span style="display:flex;"><span>2023-02-25 15:58:17.972  INFO 29041 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
 </span></span><span style="display:flex;"><span>2023-02-25 15:58:17.977  INFO 29041 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit &#39;default&#39;</span></span></code></pre></div>
 <p>Now you can test the new service with this command. It will not return any data as we haven&rsquo;t loaded any data yet.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl http://localhost:8080/api/v1/accounts
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl http://localhost:8080/api/v1/accounts
 </span></span><span style="display:flex;"><span>HTTP/1.1 <span style="color:#ae81ff">200</span> 
 </span></span><span style="display:flex;"><span>Content-Type: application/json
 </span></span><span style="display:flex;"><span>Transfer-Encoding: chunked
@@ -169,7 +200,7 @@ Open your AccountsController.java file and add a final field in the class of typ
 <li>
 <p>Add data to <code>ACCOUNTS</code> table</p>
 <p>Notice that Spring Boot automatically set the <code>Content-Type</code> to <code>application/json</code> for us.  The result is an empty JSON array <code>[]</code> as you might expect.  Add some accounts to the database using these SQL statements (run these in your SQLcl terminal):</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> account.accounts (account_name,account_type,customer_id,account_other_details,account_balance)
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> account.accounts (account_name,account_type,customer_id,account_other_details,account_balance)
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">values</span> (<span style="color:#e6db74">&#39;Andy&#39;&#39;s checking&#39;</span>,<span style="color:#e6db74">&#39;CH&#39;</span>,<span style="color:#e6db74">&#39;abcDe7ged&#39;</span>,<span style="color:#e6db74">&#39;Account Info&#39;</span>,<span style="color:#f92672">-</span><span style="color:#ae81ff">20</span>);
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> account.accounts (account_name,account_type,customer_id,account_other_details,account_balance)
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">values</span> (<span style="color:#e6db74">&#39;Mark&#39;&#39;s CCard&#39;</span>,<span style="color:#e6db74">&#39;CC&#39;</span>,<span style="color:#e6db74">&#39;bkzLp8cozi&#39;</span>,<span style="color:#e6db74">&#39;Mastercard account&#39;</span>,<span style="color:#ae81ff">1000</span>);
@@ -178,7 +209,7 @@ Open your AccountsController.java file and add a final field in the class of typ
 <li>
 <p>Test the <code>/accounts</code> service</p>
 <p>Now, test the service again.  You may want to send the output to <code>jq</code> if you have it installed, so that it will be formatted for easier reading:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -s http://localhost:8080/api/v1/accounts | jq .
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -s http://localhost:8080/api/v1/accounts | jq .
 </span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">{</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;accountId&#34;</span>: 1,
@@ -206,7 +237,7 @@ Open your AccountsController.java file and add a final field in the class of typ
 <p>Now we want to create an endpoint to create a new account.  Open <code>AccountController.java</code> and add a new <code>createAccount</code> method.  This method should return <code>ResponseEntity&lt;Account&gt;</code> this will allow you to return the account object, but also gives you access to set headers, status code and so on.  The method needs to take an <code>Account</code> as an argument.  Add the <code>RequestBody</code> annotation to the argument to tell Spring Boot that the input data will be in the HTTP request&rsquo;s body.</p>
 <p>Inside the method, you should use the <code>saveAndFlush</code> method on the JPA Repository to save a new instance of <code>Account</code> in the database.  The <code>saveAndFlush</code> method returns the created object.  If the save was successful, return the URI to the created object and set the HTTP Status Code to 201 (Created). If the object already exists set the HTTP Status code to 409 (Conflict). If there is an error, set the HTTP Status Code to 500 (Internal Server Error).</p>
 <p>Here&rsquo;s what the new method (and imports) should look like:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.net.URI;
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.net.URI;
 </span></span><span style="display:flex;"><span>...
 </span></span><span style="display:flex;"><span>...
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.web.bind.annotation.PostMapping;
@@ -242,10 +273,10 @@ Open your AccountsController.java file and add a final field in the class of typ
 <p>Test the <code>/account</code> endpoint</p>
 <p>Rebuild and restart the application as you have previously.  Then test the new endpoint.  You will need to make an HTTP POST request, and you will need to set the <code>Content-Type</code> header to <code>application/json</code>.  Pass the data in as JSON in the HTTP request body.  Note that Spring Boot Web will handle mapping the JSON to the right fields in the type annotated with the <code>RequestBody</code> annotation.  So a JSON field called <code>accountName</code> will map to the <code>accountName</code> field in the JSON, and so on.</p>
 <p>Here is an example request and the expected output (yours will be slightly different):</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i -X POST <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>      -H <span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span> <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>      -d <span style="color:#e6db74">&#39;{&#34;accountName&#34;: &#34;Dave&#34;, &#34;accountType&#34;: &#34;CH&#34;, &#34;accountOtherDetail&#34;: &#34;&#34;, &#34;accountCustomerId&#34;: &#34;abc123xyz&#34;}&#39;</span> <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>      http://localhost:8080/api/v1/account
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i -X POST <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>      -H <span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>      -d <span style="color:#e6db74">&#39;{&#34;accountName&#34;: &#34;Dave&#34;, &#34;accountType&#34;: &#34;CH&#34;, &#34;accountOtherDetail&#34;: &#34;&#34;, &#34;accountCustomerId&#34;: &#34;abc123xyz&#34;}&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>      http://localhost:8080/api/v1/account
 </span></span><span style="display:flex;"><span>HTTP/1.1 <span style="color:#ae81ff">201</span> 
 </span></span><span style="display:flex;"><span>Location: http://localhost:8080/api/v1/account/3
 </span></span><span style="display:flex;"><span>Content-Length: <span style="color:#ae81ff">0</span>
@@ -255,7 +286,7 @@ Open your AccountsController.java file and add a final field in the class of typ
 <li>
 <p>Test endpoint <code>/account</code> with bad data</p>
 <p>Now try a request with bad data that will not be able to be parsed and observe that the HTTP Status Code is 400 (Bad Request).  If there happened to be an exception thrown during the <code>save()</code> method, you would get back a 500 (Internal Server Error):</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i -X POST -H <span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span> -d <span style="color:#e6db74">&#39;{&#34;bad&#34;: &#34;data&#34;}&#39;</span>  http://localhost:8080/api/v1/account
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i -X POST -H <span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span> -d <span style="color:#e6db74">&#39;{&#34;bad&#34;: &#34;data&#34;}&#39;</span>  http://localhost:8080/api/v1/account
 </span></span><span style="display:flex;"><span>HTTP/1.1 <span style="color:#ae81ff">400</span> 
 </span></span><span style="display:flex;"><span>Content-Type: application/json
 </span></span><span style="display:flex;"><span>Transfer-Encoding: chunked
@@ -268,7 +299,7 @@ Open your AccountsController.java file and add a final field in the class of typ
 <p>Implement Get Account by Account ID endpoint</p>
 <p>Add new method to your <code>AccountController.java</code> class that responds to the HTTP GET method.  This method should accept the account ID as a path variable.  To accept a path variable, you place the variable name in braces in the URL path in the <code>@GetMapping</code> annotation and then reference it in the method&rsquo;s arguments using the <code>@PathVariable</code> annotation.  This will map it to the annotated method argument.  If an account is found, you should return that account and set the HTTP Status Code to 200 (OK).  If an account is not found, return an empty body and set the HTTP Status Code to 404 (Not Found).</p>
 <p>Here is the code to implement this endpoint:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.http.HttpStatus;
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.http.HttpStatus;
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.http.ResponseEntity;
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.web.bind.annotation.PathVariable;
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.Optional;
@@ -289,7 +320,7 @@ Open your AccountsController.java file and add a final field in the class of typ
 <li>
 <p>Restart and test <code>/account/{accountId}</code> endpoint</p>
 <p>Restart the application and test this new endpoint with this command (note that you created account with ID 2 earlier):</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -s http://localhost:8080/api/v1/account/2 | jq .
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -s http://localhost:8080/api/v1/account/2 | jq .
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;accountId&#34;</span>: 2,
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;accountName&#34;</span>: <span style="color:#e6db74">&#34;Mark&#39;s CCard&#34;</span>,
@@ -313,12 +344,9 @@ Open your AccountsController.java file and add a final field in the class of typ
       <div id="R-header-topbar" class="default-animation"></div>
       <div id="R-header-wrapper" class="default-animation">
         <div id="R-header" class="default-animation">
-<img src="https://oracle.github.io/microservices-datadriven/cloudbank//cloudbank-logo.png" height="100px">
+<img src="https://oracle.github.io/microservices-backend/cloudbank//cloudbank-logo.png" height="100px">
         </div>
-        <script>
-          window.index_js_url="/microservices-datadriven/cloudbank/searchindex.en.js?1747144443";
-        </script>
-        <search><form action="/microservices-datadriven/cloudbank/search/index.html" method="get">
+        <search><form action="/microservices-backend/cloudbank/search/index.html" method="get">
           <div class="searchbox default-animation">
             <button class="search-detail" type="submit" title="Search (CTRL+ALT+f)"><i class="fas fa-search"></i></button>
             <label class="a11y-only" for="R-search-by">Search</label>
@@ -326,108 +354,75 @@ Open your AccountsController.java file and add a final field in the class of typ
             <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
           </div>
         </form></search>
-        <script>
-          var contentLangs=['en'];
-        </script>
-        <script src="/microservices-datadriven/cloudbank/js/auto-complete.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.stemmer.support.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.multi.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.en.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/search.js?1747144443" defer></script>
       </div>
       <div id="R-homelinks" class="default-animation homelinks">
-        <ul>
-          <li><a class="padding" href="/microservices-datadriven/cloudbank/index.html"><i class="fa-fw fas fa-home"></i> Home</a></li>
-        </ul>
-        <hr class="padding">
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-homelinks">
+          <ul class="space collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/index.html"><a class="padding" href="/microservices-backend/cloudbank/index.html"><i class="fa-fw fas fa-home"></i> Home</a></li>
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-headercontrols">
+          <ul class="">
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
       </div>
       <div id="R-content-wrapper" class="highlightable">
-        <div id="R-shortcutmenu-home" class="R-sidebarmenu">
+        <div class="R-sidebarmenu R-shortcutmenu-main">
           <ul class="enlarge morespace collapsible-menu">
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/provision/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/provision/index.html">Provision an Instance</a><ul id="R-subsections-d6947c2d1078796b2bfd976ebc0e0264" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/devenv/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/devenv/index.html">Developer Environment</a><ul id="R-subsections-559c2972a719279af6301d7032063e64" class="collapsible-menu"></ul></li>
-            <li class="parent " data-nav-id="/microservices-datadriven/cloudbank/account/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/index.html">Account Microservice</a><ul id="R-subsections-af4a17527840af40a6cda3fc650af51b" class="collapsible-menu">
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/account/intro/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/intro/index.html">Introduction</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/account/create-project/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/create-project/index.html">Create Project</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/account/first-service/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/first-service/index.html">Implement First Service</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/account/prepare-database/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/prepare-database/index.html">Prepare Database Objects</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/account/jpa/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/jpa/index.html">Use Spring Data JPA</a></li>
-            <li class="active " data-nav-id="/microservices-datadriven/cloudbank/account/cr-accounts/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/cr-accounts/index.html">Query and Create Accounts</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/account/extra-endpoints/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/extra-endpoints/index.html">Extra Account Endpoints</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/account/deploy/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/deploy/index.html">Deploy Account Service</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/account/expose/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/expose/index.html">Expose using APISIX</a></li></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/check/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/check/index.html">Check Processing</a><ul id="R-subsections-159f69b312555d5f0055ca241e6721e2" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/index.html">Manage Sagas</a><ul id="R-subsections-dfd968a77748ad1f1a28d6a9118be66e" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/springai/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/springai/index.html">CloudBank AI Assistant</a><ul id="R-subsections-868fb0154339332ae87e7c98e3fa9bee" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-cli/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-cli/index.html">Deploy with the CLI</a><ul id="R-subsections-b839a8f6f0f5efd1be94b7f9da9e78d1" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-ide/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-ide/index.html">Deploy with an IDE</a><ul id="R-subsections-fd584c0da8f22ebe818df94300151866" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/backend/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/backend/index.html">Explore the Backend</a><ul id="R-subsections-f948b454f68385a53d2483b3c80424ae" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/cleanup/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/cleanup/index.html">Cleanup</a><ul id="R-subsections-6d9c3a2633de07dcbf4491d943578384" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/provision/index.html"><a class="padding" href="/microservices-backend/cloudbank/provision/index.html">Provision an Instance</a><ul id="R-subsections-d6947c2d1078796b2bfd976ebc0e0264" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/devenv/index.html"><a class="padding" href="/microservices-backend/cloudbank/devenv/index.html">Developer Environment</a><ul id="R-subsections-559c2972a719279af6301d7032063e64" class="collapsible-menu"></ul></li>
+            <li class="parent " data-nav-id="/microservices-backend/cloudbank/account/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/index.html">Account Microservice</a><ul id="R-subsections-af4a17527840af40a6cda3fc650af51b" class="collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/intro/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/intro/index.html">Introduction</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/create-project/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/create-project/index.html">Create Project</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/first-service/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/first-service/index.html">Implement First Service</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/prepare-database/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/prepare-database/index.html">Prepare Database Objects</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/jpa/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/jpa/index.html">Use Spring Data JPA</a></li>
+            <li class="active " data-nav-id="/microservices-backend/cloudbank/account/cr-accounts/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/cr-accounts/index.html">Query and Create Accounts</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/extra-endpoints/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/extra-endpoints/index.html">Extra Account Endpoints</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/deploy/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/deploy/index.html">Deploy Account Service</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/expose/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/expose/index.html">Expose using APISIX</a></li></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/check/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/index.html">Check Processing</a><ul id="R-subsections-159f69b312555d5f0055ca241e6721e2" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/index.html">Manage Sagas</a><ul id="R-subsections-dfd968a77748ad1f1a28d6a9118be66e" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/springai/index.html"><a class="padding" href="/microservices-backend/cloudbank/springai/index.html">CloudBank AI Assistant</a><ul id="R-subsections-868fb0154339332ae87e7c98e3fa9bee" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-cli/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/index.html">Deploy with the CLI</a><ul id="R-subsections-b839a8f6f0f5efd1be94b7f9da9e78d1" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-ide/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-ide/index.html">Deploy with an IDE</a><ul id="R-subsections-fd584c0da8f22ebe818df94300151866" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/backend/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/index.html">Explore the Backend</a><ul id="R-subsections-f948b454f68385a53d2483b3c80424ae" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/cleanup/index.html"><a class="padding" href="/microservices-backend/cloudbank/cleanup/index.html">Cleanup</a><ul id="R-subsections-6d9c3a2633de07dcbf4491d943578384" class="collapsible-menu"></ul></li>
           </ul>
         </div>
-        <div id="R-shortcutmenu-shortcuts" class="R-sidebarmenu">
+        <div class="R-sidebarmenu R-shortcutmenu-shortcuts">
           <div class="nav-title padding">More</div>
           <ul class="space collapsible-menu">
-            <li class="" data-nav-id="https://github.com/oracle/microservices-datadriven"><a class="padding" href="https://github.com/oracle/microservices-datadriven" target="_blank"><i class='fa-fw fab fa-github'></i> GitHub repo</a></li>
-            <li class="" data-nav-id="https://bit.ly/oraclespringboot"><a class="padding" href="https://bit.ly/oraclespringboot" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Oracle Backend for Spring Boot and Microservices</a></li>
-            <li class="" data-nav-id="https://github.com/oracle/spring-cloud-oracle"><a class="padding" href="https://github.com/oracle/spring-cloud-oracle" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Spring Cloud Oracle</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/more/credits/"><a class="padding" href="/microservices-datadriven/cloudbank/more/credits/"><i class='fa-fw fas fa-bullhorn'></i> Credits</a></li>
+            <li class="" data-nav-id="https://github.com/oracle/microservices-backend"><a class="padding" href="https://github.com/oracle/microservices-backend" rel="external" target="_blank"><i class='fa-fw fab fa-github'></i> GitHub repo</a></li>
+            <li class="" data-nav-id="https://bit.ly/oraclespringboot"><a class="padding" href="https://bit.ly/oraclespringboot" rel="external" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Oracle Backend for Spring Boot and Microservices</a></li>
+            <li class="" data-nav-id="https://github.com/oracle/spring-cloud-oracle"><a class="padding" href="https://github.com/oracle/spring-cloud-oracle" rel="external" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Spring Cloud Oracle</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/more/credits/"><a class="padding" href="/microservices-backend/cloudbank/more/credits/"><i class='fa-fw fas fa-bullhorn'></i> Credits</a></li>
           </ul>
         </div>
-        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showFooter"></div>
-        <div id="R-menu-footer">
-          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showFooter">
-          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks">
-            <ul>
-              <li id="R-select-language-container" class="footerLangSwitch">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-language"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <label class="a11y-only" for="R-select-language">Language</label>
-                    <select id="R-select-language" onchange="location = this.querySelector( this.value ).dataset.url;">
-                      <option id="R-select-language-en" value="#R-select-language-en" data-url="/microservices-datadriven/cloudbank/account/cr-accounts/index.html" lang="en-us" selected></option>
-                    </select>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-              </li>
-              <li id="R-select-variant-container" class="footerVariantSwitch">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-paint-brush"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <label class="a11y-only" for="R-select-variant">Theme</label>
-                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
-                      <option id="R-select-variant-zen-light" value="zen-light" selected>Zen Light</option>
-                    </select>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-                <script>window.variants && variants.markSelectedVariant();</script>
-              </li>
-              <li class="footerVisitedLinks">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-history"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <button onclick="clearHistory();">Clear History</button>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div id="R-footer" class="footerFooter showFooter">
-	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://www.oracle.com/">Oracle</a></p>
-		<p>Copyright &copy; 2022, 2024, <br>Oracle and/or its affiliates</p>
-          </div>
+        <div id="R-footer-margin"></div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
         </div>
+        <div class="R-sidebarmenu R-shortcutmenu-footercontrols">
+          <ul class="">
+          </ul>
+        </div>
+<div id="R-footer">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://www.oracle.com/">Oracle</a></p>
+		<p>Copyright &copy; 2022, 2024, <br>Oracle and/or its affiliates</p></div>
       </div>
     </aside>
-    <script src="/microservices-datadriven/cloudbank/js/clipboard.min.js?1747144443" defer></script>
-    <script src="/microservices-datadriven/cloudbank/js/perfect-scrollbar.min.js?1747144443" defer></script>
-    <script src="/microservices-datadriven/cloudbank/js/theme.js?1747144443" defer></script>
+    <script src="/microservices-backend/cloudbank/js/clipboard/clipboard.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/perfect-scrollbar/perfect-scrollbar.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/theme.min.js?1772471396" defer></script>
   </body>
 </html>

@@ -2,79 +2,79 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>CloudBank AI</title>
-    <link>https://oracle.github.io/microservices-datadriven/cloudbank/index.html</link>
-    <description>Welcome to CloudBank AI - an on-demand, self-paced learning resource you can use to learn about developing microservices with Spring Boot and Spring Cloud Oracle and deploying, running and managing them with Oracle Backend for Microservices and AI.&#xA;You can follow through from beginning to end, or you can start at any module that you are interested in.&#xA;What you will need To complete the modules you will somewhere to run Oracle Backend for Microservices and AI.</description>
+    <link>https://oracle.github.io/microservices-backend/cloudbank/index.html</link>
+    <description>Welcome to CloudBank AI - an on-demand, self-paced learning resource you can use to learn about developing microservices with Spring Boot and Spring Cloud Oracle and deploying, running and managing them with Oracle Backend for Microservices and AI.&#xA;You can follow through from beginning to end, or you can start at any module that you are interested in.&#xA;What you will need To complete the modules you will somewhere to run Oracle Backend for Microservices and AI. The instructions in the Module 1 provide three alternatives:</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <atom:link href="https://oracle.github.io/microservices-datadriven/cloudbank/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://oracle.github.io/microservices-backend/cloudbank/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Provision an Instance</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/provision/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/provision/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/provision/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/provision/index.html</guid>
       <description>This module guides you through provisioning an Oracle Backend for Microservices and AI environment either on your local machine, in the Oracle Cloud Free Tier, or in a commercial Oracle Cloud Tenancy.</description>
     </item>
     <item>
       <title>Developer Environment</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/devenv/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/devenv/index.html</guid>
       <description>This module guides you through setting up the tools required for a Spring Boot developer.</description>
     </item>
     <item>
       <title>Account Microservice</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/account/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/account/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/account/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/account/index.html</guid>
       <description>This module walks you through building your very first microservice using Spring Boot. It assumes no prior knowledge of Spring Boot, so its a great place to start if you have not used Spring Boot before. This module demonstrates how to build a service with a synchronous API implemented as REST endpoints using Spring Web MVC, and how to store data in Oracle Database using Spring Data JPA.</description>
     </item>
     <item>
       <title>Check Processing</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/check/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/check/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/check/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/check/index.html</guid>
       <description>In this module, you will build microservices that use asynchronous messaging to communicate using Spring JMS and Oracle Transactional Event Queues. It introduces service discovery using Eureka Service Registry (part of Spring Cloud Netflix) and Spring Cloud OpenFeign.</description>
     </item>
     <item>
       <title>Manage Sagas</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/saga/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/saga/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/saga/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/saga/index.html</guid>
       <description>This module introduces the Saga pattern, a very important pattern that helps us manage data consistency across microservices. We will explore the Long Running Action specification, one implementation of the Saga pattern, and then build a Transfer microservice that will manage funds transfers using a saga.</description>
     </item>
     <item>
       <title>CloudBank AI Assistant</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/springai/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/springai/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/springai/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/springai/index.html</guid>
       <description>This modules introduces Spring AI and explores how it can be used to build a CloudBank AI Assistant (chatbot) that will allow users to interact with CloudBank using a chat-based interface.&#xA;Coming Soon: We will be updating this module to help you learn about Retrieval Augmented Generation, Vector Database and AI Agents.</description>
     </item>
     <item>
       <title>Deploy with the CLI</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/index.html</guid>
       <description>In this module, you will learn how to deploy the full CloudBank application to Oracle Backend for Microservices and AI using the CLI. If you prefer to use an IDE, skip this module and go to the next module instead.</description>
     </item>
     <item>
       <title>Deploy with an IDE</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-ide/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-ide/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-ide/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-ide/index.html</guid>
       <description>In this module, you will learn how to deploy the full CloudBank application to Oracle Backend for Microservices and AI using one of the IDE plugins - for Visual Studio Code or IntelliJ.</description>
     </item>
     <item>
       <title>Explore the Backend</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/backend/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/backend/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/backend/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/backend/index.html</guid>
       <description>This module will take you on a guided tour through the Oracle Backend for Spring Boot and Microservices platform. You will learn about the platform services and observability tools that are provided out-of-the-box.</description>
     </item>
     <item>
       <title>Cleanup</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/cleanup/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/cleanup/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/cleanup/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/cleanup/index.html</guid>
       <description>This module demonstrates how to clean up any resources created when you provisioned an instance of Oracle Backend for Microservices and AI on Oracle Cloud Infrastructure (OCI) or on your local machine in containers.</description>
     </item>
   </channel>
