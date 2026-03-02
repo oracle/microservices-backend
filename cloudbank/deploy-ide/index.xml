@@ -2,38 +2,38 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Deploy with an IDE :: CloudBank AI</title>
-    <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-ide/index.html</link>
+    <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-ide/index.html</link>
     <description>In this module, you will learn how to deploy the full CloudBank application to Oracle Backend for Microservices and AI using one of the IDE plugins - for Visual Studio Code or IntelliJ.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <atom:link href="https://oracle.github.io/microservices-datadriven/cloudbank/deploy-ide/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://oracle.github.io/microservices-backend/cloudbank/deploy-ide/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Introduction</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-ide/intro/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-ide/intro/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-ide/intro/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-ide/intro/index.html</guid>
       <description>Deploy the full CloudBank Application using the VS Code Extension Introduction Now that you know how to build a Spring Boot microservice and deploy it to the Oracle Backend for Microservices and AI, this module will guide you through deploying the rest of the Cloud Bank services that we have already built for you and exploring the runtime and management capabilities of the platform.&#xA;If you already have completed the module Deploy the full CloudBank Application using the CLI You can skip Task 1 and Task 2.</description>
     </item>
     <item>
       <title>Get the sample code</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-ide/get-code/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-ide/get-code/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-ide/get-code/index.html</guid>
-      <description>Download a copy of the CloudBank sample application.&#xA;Clone the source repository&#xA;Create a local clone of the CloudBank source repository using this command.&#xA;git https://github.com/oracle/microservices-datadriven.git Note: If you do not have git installed on your machine, you can download a zip file of the source code from GitHub and unzip it on your machine instead.&#xA;The source code for the CloudBank application will be in the microservices-datadriven directory you just created, in the cloudbank-v32 subdirectory.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-ide/get-code/index.html</guid>
+      <description>Download a copy of the CloudBank sample application.&#xA;Clone the source repository&#xA;Create a local clone of the CloudBank source repository using this command.&#xA;git https://github.com/oracle/microservices-backend.git Note: If you do not have git installed on your machine, you can download a zip file of the source code from GitHub and unzip it on your machine instead.&#xA;The source code for the CloudBank application will be in the microservices-backend directory you just created, in the cloudbank-v32 subdirectory.</description>
     </item>
     <item>
       <title>Build CloudBank</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-ide/build/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-ide/build/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-ide/build/index.html</guid>
-      <description>Create application JAR files&#xA;In the directory where you cloned (or unzipped) the application and build the application JARs using the following command:&#xA;&lt;copy&gt;mvn clean package&lt;/copy&gt; The output should be similar to this:&#xA;[INFO] ------------------------------------------------------------------------ [INFO] Reactor Summary for cloudbank 0.0.1-SNAPSHOT: [INFO] [INFO] cloudbank .......................................... SUCCESS [ 0.972 s] [INFO] account ............................................ SUCCESS [ 2.877 s] [INFO] chatbot ............................................ SUCCESS [ 0.997 s] [INFO] customer ........................................... SUCCESS [ 1.064 s] [INFO] creditscore .</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-ide/build/index.html</guid>
+      <description>Create application JAR files&#xA;In the directory where you cloned (or unzipped) the application and build the application JARs using the following command:&#xA;&lt;copy&gt;mvn clean package&lt;/copy&gt; The output should be similar to this:&#xA;[INFO] ------------------------------------------------------------------------ [INFO] Reactor Summary for cloudbank 0.0.1-SNAPSHOT: [INFO] [INFO] cloudbank .......................................... SUCCESS [ 0.972 s] [INFO] account ............................................ SUCCESS [ 2.877 s] [INFO] chatbot ............................................ SUCCESS [ 0.997 s] [INFO] customer ........................................... SUCCESS [ 1.064 s] [INFO] creditscore ........................................ SUCCESS [ 0.922 s] [INFO] transfer ........................................... SUCCESS [ 0.465 s] [INFO] testrunner ......................................... SUCCESS [ 0.931 s] [INFO] checks ............................................. SUCCESS [ 0.948 s] [INFO] ------------------------------------------------------------------------ [INFO] BUILD SUCCESS [INFO] ------------------------------------------------------------------------ [INFO] Total time: 12.439 s [INFO] Finished at: 2024-10-10T15:29:41-05:00 [INFO] ------------------------------------------------------------------------</description>
     </item>
     <item>
       <title>Using the VS Code plugin</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-ide/using-vscode/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-ide/using-vscode/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-ide/using-vscode/index.html</guid>
-      <description>If you have done the optional Task 11 of Lab. 2, you could proceed doing the activities from Task 3 to Task 5 using Oracle Backend for Microservices and AI VS Code plugin. If you don’t see the plugin in the left bar, with the Oracle logo, as shown here:&#xA;click on Additional Views menu to select the Oracle Backend fo Spring Boot and Microservices.&#xA;The Oracle Backend fo Spring Boot and Microservices VS Code plugin will ask to specify the Kubernetes config file full path as shown here:</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-ide/using-vscode/index.html</guid>
+      <description>If you have done the optional Task 11 of Lab. 2, you could proceed doing the activities from Task 3 to Task 5 using Oracle Backend for Microservices and AI VS Code plugin. If you don’t see the plugin in the left bar, with the Oracle logo, as shown here:&#xA;click on Additional Views menu to select the Oracle Backend fo Spring Boot and Microservices.</description>
     </item>
   </channel>
 </rss>

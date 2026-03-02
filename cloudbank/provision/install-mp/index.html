@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article">
+<html lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article" data-r-output-format="html">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <meta name="generator" content="Hugo 0.133.1">
-    <meta name="generator" content="Relearn 7.1.1+ab4197f3113afa9a7d17bed69dbef6c0e75a4921">
+    <meta name="generator" content="Hugo 0.157.0">
+    <meta name="generator" content="Relearn 7.6.1+e9ef53522317877bc23c72c42c8307a62b209dfb">
     <meta name="description" content="The Oracle Backend for Microservices and AI can be installed from OCI Marketplace.
 Note: You only need to choose one of the three deployment options - local, OCI Free Tier or OCI Marketplace.
 This option installs a “production-sized” environment which includes an Oracle Compute Engine for Kubernetes (“OKE”) cluster and an Oracle Autonomous Database instance. If you want to use a smaller, development/test-sized environment that only requires a single OCI Compute Instance, please use the “Free Tier” option instead.">
@@ -14,7 +14,7 @@ This option installs a “production-sized” environment which includes an Orac
     <meta name="twitter:description" content="The Oracle Backend for Microservices and AI can be installed from OCI Marketplace.
 Note: You only need to choose one of the three deployment options - local, OCI Free Tier or OCI Marketplace.
 This option installs a “production-sized” environment which includes an Oracle Compute Engine for Kubernetes (“OKE”) cluster and an Oracle Autonomous Database instance. If you want to use a smaller, development/test-sized environment that only requires a single OCI Compute Instance, please use the “Free Tier” option instead.">
-    <meta property="og:url" content="https://oracle.github.io/microservices-datadriven/cloudbank/provision/install-mp/index.html">
+    <meta property="og:url" content="https://oracle.github.io/microservices-backend/cloudbank/provision/install-mp/index.html">
     <meta property="og:site_name" content="CloudBank AI">
     <meta property="og:title" content="Install from OCI Marketplace :: CloudBank AI">
     <meta property="og:description" content="The Oracle Backend for Microservices and AI can be installed from OCI Marketplace.
@@ -29,26 +29,63 @@ Note: You only need to choose one of the three deployment options - local, OCI F
 This option installs a “production-sized” environment which includes an Oracle Compute Engine for Kubernetes (“OKE”) cluster and an Oracle Autonomous Database instance. If you want to use a smaller, development/test-sized environment that only requires a single OCI Compute Instance, please use the “Free Tier” option instead.">
     <meta itemprop="wordCount" content="1554">
     <title>Install from OCI Marketplace :: CloudBank AI</title>
-    <link href="/microservices-datadriven/cloudbank/images/favicon.png?1747144443" rel="icon" type="image/png">
-    <link href="/microservices-datadriven/cloudbank/css/fontawesome-all.min.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/fontawesome-all.min.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/nucleus.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/auto-complete.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/auto-complete.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/perfect-scrollbar.min.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/fonts.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/fonts.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/theme.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/theme-zen-light.css?1747144443" rel="stylesheet" id="R-variant-style">
-    <link href="/microservices-datadriven/cloudbank/css/chroma-relearn-light.css?1747144443" rel="stylesheet" id="R-variant-chroma-style">
-    <link href="/microservices-datadriven/cloudbank/css/print.css?1747144443" rel="stylesheet" media="print">
-    <script src="/microservices-datadriven/cloudbank/js/variant.js?1747144443"></script>
+    <link href="/microservices-backend/cloudbank/images/favicon.png?1772471396" rel="icon" type="image/png">
+    <link href="/microservices-backend/cloudbank/fonts/fontawesome/css/fontawesome-all.min.css?1772471396" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-backend/cloudbank/fonts/fontawesome/css/fontawesome-all.min.css?1772471396" rel="stylesheet"></noscript>
+    <link href="/microservices-backend/cloudbank/css/perfect-scrollbar/perfect-scrollbar.min.css?1772471396" rel="stylesheet">
+    <link href="/microservices-backend/cloudbank/css/theme.min.css?1772471396" rel="stylesheet">
+    <link href="/microservices-backend/cloudbank/css/format-html.min.css?1772471396" rel="stylesheet" id="R-format-style">
+    <link href="/microservices-backend/cloudbank/css/auto-complete/auto-complete.min.css?1772471396" rel="stylesheet">
+    <script src="/microservices-backend/cloudbank/js/auto-complete/auto-complete.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.stemmer.support.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.multi.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.en.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/search.min.js?1772471396" defer></script>
     <script>
       window.relearn = window.relearn || {};
+      // configuration
+      window.relearn.min = `.min`;
+      window.relearn.path='\/provision\/install-mp\/index.html';
       window.relearn.relBasePath='..\/..';
       window.relearn.relBaseUri='..\/..\/..\/..';
-      window.relearn.absBaseUri='https:\/\/oracle.github.io\/microservices-datadriven\/cloudbank';
+      window.relearn.absBaseUri='https:\/\/oracle.github.io\/microservices-backend\/cloudbank';
+      window.relearn.contentLangs=['en'];
+      window.relearn.index_js_url="/microservices-backend/cloudbank/searchindex.en.js?1772471396";
       window.relearn.disableAnchorCopy=false;
       window.relearn.disableAnchorScrolling=false;
+      window.relearn.disableInlineCopyToClipboard=false;
+      window.relearn.enableBlockCodeWrap=true;
+      // legal
+      window.relearn.getItem = (s,n) => {return s.getItem(n)};
+      window.relearn.setItem = (s,n,v) => {return s.setItem(n,v)};
+      window.relearn.removeItem = (s,n) => {return s.removeItem(n)};
       // variant stuff
-      window.variants && variants.init( [ 'zen-light' ] );
+      window.relearn.themevariants = [ 'zen-light' ];
+      window.relearn.customvariantname = "my-custom-variant";
+      window.relearn.changeVariant = function(variant) {
+        var oldVariant = document.documentElement.dataset.rThemeVariant;
+        window.relearn.setItem(window.localStorage, window.relearn.absBaseUri + "/variant", variant);
+        document.documentElement.dataset.rThemeVariant = variant;
+        if (oldVariant != variant) {
+          document.dispatchEvent( new CustomEvent('themeVariantLoaded', { detail: { variant, oldVariant } }) );
+          window.relearn.markVariant();
+        }
+      }
+      window.relearn.markVariant = function() {
+        var variant = window.relearn.getItem(window.localStorage, window.relearn.absBaseUri + "/variant");
+        document.querySelectorAll(".R-variantswitcher select").forEach((select) => {select.value = variant;});
+      }
+      window.relearn.initVariant = function() {
+        var variant = window.relearn.getItem(window.localStorage, window.relearn.absBaseUri + "/variant") ?? "";
+        if( variant == window.relearn.customvariantname ){
+        }else if( !variant || !window.relearn.themevariants.includes(variant) ){
+          variant = window.relearn.themevariants[0];
+          window.relearn.setItem(window.localStorage, window.relearn.absBaseUri + "/variant", variant);
+        }
+        document.documentElement.dataset.rThemeVariant = variant;
+      }
+      window.relearn.initVariant();
+      window.relearn.markVariant();
       // translations
       window.T_Copy_to_clipboard = `Copy to clipboard`;
       window.T_Copied_to_clipboard = `Copied to clipboard!`;
@@ -59,12 +96,10 @@ This option installs a “production-sized” environment which includes an Orac
       window.T_No_results_found = `No results found for "{0}"`;
       window.T_N_results_found = `{1} results found for "{0}"`;
     </script>
-  
-    
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-7HWQVTJ803"></script>
       <script>
         var doNotTrack = false;
-        if ( false ) {
+        if ( true ) {
           var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
           var doNotTrack = (dnt == "1" || dnt == "yes");
         }
@@ -75,12 +110,8 @@ This option installs a “production-sized” environment which includes an Orac
           gtag('config', 'G-7HWQVTJ803');
         }
       </script>
-    
-  
-
-
   </head>
-  <body class="mobile-support html" data-url="/microservices-datadriven/cloudbank/provision/install-mp/index.html">
+  <body class="mobile-support html" data-url="/microservices-backend/cloudbank/provision/install-mp/index.html">
     <div id="R-body" class="default-animation">
       <div id="R-body-overlay"></div>
       <nav id="R-topbar">
@@ -105,15 +136,15 @@ This option installs a “production-sized” environment which includes an Orac
               </div>
             </div>
           </div>
-          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList"><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><a itemprop="item" href="/microservices-datadriven/cloudbank/index.html"><span itemprop="name">CloudBank AI</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><a itemprop="item" href="/microservices-datadriven/cloudbank/provision/index.html"><span itemprop="name">Provision an Instance</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><span itemprop="name">Install from OCI Marketplace</span><meta itemprop="position" content="3"></li>
+          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList">
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="/microservices-backend/cloudbank/index.html"><span itemprop="name">CloudBank AI</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li>
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="/microservices-backend/cloudbank/provision/index.html"><span itemprop="name">Provision an Instance</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li>
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><span itemprop="name">Install from OCI Marketplace</span><meta itemprop="position" content="3"></li>
           </ol>
           <div class="topbar-area topbar-area-end" data-area="end">
-            <div class="topbar-button topbar-button-prev" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-datadriven/cloudbank/provision/install-free-trial/index.html" title="Install in OCI Free Tier (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a>
+            <div class="topbar-button topbar-button-prev" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-backend/cloudbank/provision/install-free-trial/index.html" title="Install in OCI Free Tier (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a>
             </div>
-            <div class="topbar-button topbar-button-next" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-datadriven/cloudbank/devenv/index.html" title="Developer Environment (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a>
+            <div class="topbar-button topbar-button-next" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-backend/cloudbank/devenv/index.html" title="Developer Environment (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a>
             </div>
             <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show"><button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More"><i class="fa-fw fas fa-ellipsis-v"></i></button>
               <div class="topbar-content">
@@ -146,22 +177,22 @@ that only requires a single OCI Compute Instance, please use the &ldquo;Free Tie
 <li>
 <p>Access the Oracle Cloud Infrastructure Marketplace listing</p>
 <p>Open the <a href="https://cloudmarketplace.oracle.com/marketplace/en_US/listing/138899911" rel="external" target="_blank">OCI Marketplace listing</a>, as shown in the image below:</p>
-<p><a href="#R-image-61771f06e03f67096a0eb43e18eb6fdf" class="lightbox-link"><img alt="OCI Marketplace listing" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/obaas-mp-listing.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-61771f06e03f67096a0eb43e18eb6fdf"><img alt="OCI Marketplace listing" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/obaas-mp-listing.png" title=" "></a></p>
+<p><a href="#R-image-aebda615a303fc4f7b6b367bd4582e67" class="lightbox-link"><img alt="OCI Marketplace listing" class="lazy lightbox figure-image" loading="lazy" src="../images/obaas-mp-listing.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-aebda615a303fc4f7b6b367bd4582e67"><img alt="OCI Marketplace listing" class="lazy lightbox lightbox-image" loading="lazy" src="../images/obaas-mp-listing.png" title=" "></a></p>
 <p>Click on the <strong>Get App</strong> button.</p>
 </li>
 <li>
 <p>Log into your Oracle Cloud Infrastructure account</p>
 <p>You will be taken to a Sign-In page. Choose they type of account you have and click on the <strong>Sign In</strong> button. If you did not create an account in the <strong>Get Started</strong> lab, you can do so now using the <strong>Sign Up</strong> button.</p>
-<p><a href="#R-image-46bf83ad946b43ebe162a5a9e1ea3390" class="lightbox-link"><img alt="Sign In page" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/obaas-install-app.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-46bf83ad946b43ebe162a5a9e1ea3390"><img alt="Sign In page" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/obaas-install-app.png" title=" "></a></p>
+<p><a href="#R-image-6560f7aecdb84e12fc4dc972a3c95f87" class="lightbox-link"><img alt="Sign In page" class="lazy lightbox figure-image" loading="lazy" src="../images/obaas-install-app.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-6560f7aecdb84e12fc4dc972a3c95f87"><img alt="Sign In page" class="lazy lightbox lightbox-image" loading="lazy" src="../images/obaas-install-app.png" title=" "></a></p>
 <p>Sign in to your account as you normally do, using Single Sign-On or Direct Sign-In.</p>
 </li>
 <li>
 <p>Choose the region and compartment</p>
 <p>In the next screen you can choose the region using the pull down in the top right hand corner, and then choose the compartment you want to install into.</p>
-<p><a href="#R-image-5809d0e441816662bf62316e9486b47c" class="lightbox-link"><img alt="Install screen" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/obaas-install-2.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-5809d0e441816662bf62316e9486b47c"><img alt="Install screen" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/obaas-install-2.png" title=" "></a></p>
+<p><a href="#R-image-b314866b67fef323b8463f2dbec53308" class="lightbox-link"><img alt="Install screen" class="lazy lightbox figure-image" loading="lazy" src="../images/obaas-install-2.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-b314866b67fef323b8463f2dbec53308"><img alt="Install screen" class="lazy lightbox lightbox-image" loading="lazy" src="../images/obaas-install-2.png" title=" "></a></p>
 <p>Review the terms and restrictions, and then click on the checkbox to accept them. Then, click on <strong>Launch Stack</strong>,</p>
 <blockquote>
 <p><strong>Note:</strong> This version of CloudBank is tested with <strong>version 1.3.0</strong>. Earlier versions may not contain all features used and you may see errors.</p>
@@ -170,8 +201,8 @@ that only requires a single OCI Compute Instance, please use the &ldquo;Free Tie
 <li>
 <p>Review the <strong>Create Stack</strong> page</p>
 <p>Review the details on the <strong>Create Stack</strong> page. You may wish to update the <strong>Name</strong> or add tags. When you are ready, click on <strong>Next</strong>.</p>
-<p><a href="#R-image-bfffe3c9511de067879734e3d5197c42" class="lightbox-link"><img alt="Create stack screen" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/obaas-create-stack.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-bfffe3c9511de067879734e3d5197c42"><img alt="Create stack screen" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/obaas-create-stack.png" title=" "></a></p>
+<p><a href="#R-image-dadd8db59ef15637b7f861e659390a4b" class="lightbox-link"><img alt="Create stack screen" class="lazy lightbox figure-image" loading="lazy" src="../images/obaas-create-stack.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-dadd8db59ef15637b7f861e659390a4b"><img alt="Create stack screen" class="lazy lightbox lightbox-image" loading="lazy" src="../images/obaas-create-stack.png" title=" "></a></p>
 </li>
 <li>
 <p>In the <strong>Backend as A Service</strong> Section, fill in the following configuration variables as needed and select <strong>Next</strong>:</p>
@@ -181,19 +212,19 @@ that only requires a single OCI Compute Instance, please use the &ldquo;Free Tie
 <li><code>Edition</code> : Select <em>COMMUNITY</em> Edition. Standard edition will give more options for the installation but those are not required or used in this LiveLab.</li>
 <li><code>Existing Authorization Token</code> : Leave blank.</li>
 </ul>
-<p><a href="#R-image-bc7db4e6bb54a9c7e31f30e2d6934422" class="lightbox-link"><img alt="Backend as A Service" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/oci-stack-app-name.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-bc7db4e6bb54a9c7e31f30e2d6934422"><img alt="Backend as A Service" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/oci-stack-app-name.png" title=" "></a></p>
+<p><a href="#R-image-0569e8c1f09b1f18c35eff5743f1e250" class="lightbox-link"><img alt="Backend as A Service" class="lazy lightbox figure-image" loading="lazy" src="../images/oci-stack-app-name.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-0569e8c1f09b1f18c35eff5743f1e250"><img alt="Backend as A Service" class="lazy lightbox lightbox-image" loading="lazy" src="../images/oci-stack-app-name.png" title=" "></a></p>
 </li>
 <li>
 <p>If you check the checkbox <em>Set Administrator Passwords</em> in the <strong>Administrator Passwords</strong> section you have the option to fill in the following passwords (if not they are autogenerated):</p>
 <ul>
 <li><code>APISIX Administrator Password</code> (optional) : Leave blank to auto-generate.</li>
-<li><code>Grafana Administrator Password</code> (optional) : Leave blank to auto-generate.</li>
+<li><code>SigNoz Administrator Password</code> (optional) : Leave blank to auto-generate.</li>
 <li><code>ORACTL Administrator Password</code> (optional) : Leave blank to auto-generate. This is the password for the <code>obaas-admin</code> user.</li>
 <li><code>ORACTL User Password</code> (optional) : Leave blank to auto-generate. This is the password for the <code>obaas-user</code> user.</li>
 </ul>
-<p><a href="#R-image-bf2ae19f56adf66fa7ef0cfd4c907896" class="lightbox-link"><img alt="Passwords" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/oci-stack-passwords.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-bf2ae19f56adf66fa7ef0cfd4c907896"><img alt="Passwords" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/oci-stack-passwords.png" title=" "></a></p>
+<p><a href="#R-image-b80f08cbafa3d1c52ed740a69dab1e44" class="lightbox-link"><img alt="Passwords" class="lazy lightbox figure-image" loading="lazy" src="../images/oci-stack-passwords.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-b80f08cbafa3d1c52ed740a69dab1e44"><img alt="Passwords" class="lazy lightbox lightbox-image" loading="lazy" src="../images/oci-stack-passwords.png" title=" "></a></p>
 </li>
 <li>
 <p>In the <strong>Kubernetes Cluster Options</strong>. fill in the following for the OKE Clusters Options:</p>
@@ -207,8 +238,8 @@ that only requires a single OCI Compute Instance, please use the &ldquo;Free Tie
 <blockquote>
 <p><strong>NOTE:</strong> Oracle recommends that you set <code>Control Plane Access Control</code> to be as restrictive as possible</p>
 </blockquote>
-<p><a href="#R-image-d4d4826935b89e03a4ff7a62b4cf105c" class="lightbox-link"><img alt="Public Control Plane" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/oci-stack-k8s-options.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-d4d4826935b89e03a4ff7a62b4cf105c"><img alt="Public Control Plane" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/oci-stack-k8s-options.png" title=" "></a></p>
+<p><a href="#R-image-4d5360f92e9ae5d68b49a7eee604d403" class="lightbox-link"><img alt="Public Control Plane" class="lazy lightbox figure-image" loading="lazy" src="../images/oci-stack-k8s-options.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-4d5360f92e9ae5d68b49a7eee604d403"><img alt="Public Control Plane" class="lazy lightbox lightbox-image" loading="lazy" src="../images/oci-stack-k8s-options.png" title=" "></a></p>
 </li>
 <li>
 <p>In the <strong>Load Balancers Options</strong> section, leave the default values.</p>
@@ -223,8 +254,8 @@ selected, access can only be from a private VCN.</li>
 <blockquote>
 <p><strong>NOTE:</strong> Oracle recommends that you set <code>Public Load Balancer Access Control</code> to be as restrictive as possible.</p>
 </blockquote>
-<p><a href="#R-image-b38e32cc38f695af48107dbb8e14cbae" class="lightbox-link"><img alt="Load Balancer" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/oci-stack-lb-options.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-b38e32cc38f695af48107dbb8e14cbae"><img alt="Load Balancer" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/oci-stack-lb-options.png" title=" "></a></p>
+<p><a href="#R-image-44c194a7d5fc9bfde0bdafa5ad20cc75" class="lightbox-link"><img alt="Load Balancer" class="lazy lightbox figure-image" loading="lazy" src="../images/oci-stack-lb-options.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-44c194a7d5fc9bfde0bdafa5ad20cc75"><img alt="Load Balancer" class="lazy lightbox lightbox-image" loading="lazy" src="../images/oci-stack-lb-options.png" title=" "></a></p>
 </li>
 <li>
 <p>In the <strong>Database Options</strong> section, leave the default values.</p>
@@ -241,8 +272,8 @@ selected, access can only be from a private VCN.</li>
 <blockquote>
 <p><strong>NOTE:</strong> Oracle recommends that you restrict by IP or CIDR addresses to be as restrictive as possible.</p>
 </blockquote>
-<p><a href="#R-image-b605d57558936556328c55fcf09abc05" class="lightbox-link"><img alt="Database Options" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/oci-stack-db-options.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-b605d57558936556328c55fcf09abc05"><img alt="Database Options" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/oci-stack-db-options.png" title=" "></a></p>
+<p><a href="#R-image-636d422a7e11508733f9dca0ce3788e6" class="lightbox-link"><img alt="Database Options" class="lazy lightbox figure-image" loading="lazy" src="../images/oci-stack-db-options.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-636d422a7e11508733f9dca0ce3788e6"><img alt="Database Options" class="lazy lightbox lightbox-image" loading="lazy" src="../images/oci-stack-db-options.png" title=" "></a></p>
 </li>
 <li>
 <p>Click <strong>Next</strong> to review your choices.</p>
@@ -250,14 +281,14 @@ selected, access can only be from a private VCN.</li>
 <li>
 <p>Complete the <strong>Review</strong> page</p>
 <p>Review the details on the <strong>Review</strong> page. Check the box next to <strong>Run Apply</strong>. When you are ready, click on <strong>Create</strong>.</p>
-<p><a href="#R-image-f80c03b8f61f625c2e9be2cf8a764255" class="lightbox-link"><img alt="Review screen" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/obaas-create-stack-3.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-f80c03b8f61f625c2e9be2cf8a764255"><img alt="Review screen" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/obaas-create-stack-3.png" title=" "></a></p>
+<p><a href="#R-image-d07e39c1c63eea298c160e8dd9e30040" class="lightbox-link"><img alt="Review screen" class="lazy lightbox figure-image" loading="lazy" src="../images/obaas-create-stack-3.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-d07e39c1c63eea298c160e8dd9e30040"><img alt="Review screen" class="lazy lightbox lightbox-image" loading="lazy" src="../images/obaas-create-stack-3.png" title=" "></a></p>
 </li>
 <li>
 <p>Review the apply screen</p>
 <p>The stack will now be applied. On the <strong>Apply</strong> screen (see below) you can monitor the progress of the installation in the <strong>Logs</strong> box. The installation should take about 30 minutes to complete. This includes the time needed to create your Oracle Autonomous Database instance, your Oracle Container Engine for Kubernetes cluster and install the various components of the stack into the Kubernetes cluster.</p>
-<p><a href="#R-image-cbdb733a2a94238b20bc23d4d186d89e" class="lightbox-link"><img alt="Stack apply screen" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/obaas-apply.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-cbdb733a2a94238b20bc23d4d186d89e"><img alt="Stack apply screen" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/obaas-apply.png" title=" "></a></p>
+<p><a href="#R-image-aaac2135e6302f303c504d52cfe244b4" class="lightbox-link"><img alt="Stack apply screen" class="lazy lightbox figure-image" loading="lazy" src="../images/obaas-apply.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-aaac2135e6302f303c504d52cfe244b4"><img alt="Stack apply screen" class="lazy lightbox lightbox-image" loading="lazy" src="../images/obaas-apply.png" title=" "></a></p>
 <blockquote>
 <p><strong>Note</strong>: While you are waiting for the installation to complete is a great time to start setting up your development environment (see the next lab). You can come back here where you are done to check the installation completed successfully.</p>
 </blockquote>
@@ -269,19 +300,19 @@ selected, access can only be from a private VCN.</li>
 <p>Check the logs for errors</p>
 <p>Scroll down to the bottom of the log to see the outcome. If there was an error during installation, details will be included at the end of the log. The most common errors are due to insufficient quota for some resource. If you get an error about insufficient quota, you may need to clean up unused resources or request a quota increase for the affected resource. Once you have done that, navigate back to the stack details (for example, using the breadcrumbs) and click on the <strong>Apply</strong> to try again.</p>
 <p>When the installation completes normally, the end of the log should look something like this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Apply complete! Resources: 77 added, 0 changed, 0 destroyed.
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Apply complete! Resources: 77 added, 0 changed, 0 destroyed.
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Outputs:
 </span></span><span style="display:flex;"><span>adb_ip = &#34;Secured Access&#34;
 </span></span><span style="display:flex;"><span>adb_name = &#34;KATYDIDDB&#34;
 </span></span><span style="display:flex;"><span>apisix_admin_password = &lt;sensitive&gt;
-</span></span><span style="display:flex;"><span>grafana_admin_password = &lt;sensitive&gt;
+</span></span><span style="display:flex;"><span>signoz_admin_password = &lt;sensitive&gt;
 </span></span><span style="display:flex;"><span>kubeconfig_cmd = &#34;oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1... --region us-ashburn-1 --token-version 2.0.0 --kube-endpoint PUBLIC_ENDPOINT --file $HOME/.kube/config&#34;
 </span></span><span style="display:flex;"><span>oractl_admin_password = &lt;sensitive&gt;
 </span></span><span style="display:flex;"><span>oractl_user_password = &lt;sensitive&gt;</span></span></code></pre></div>
 <p>To get the sensitive information you need to click on the <strong>Application Information</strong> tab, and click on <em>unlock</em> or <em>show</em> to display the values:</p>
-<p><a href="#R-image-1d26e976828a437acb3ba0070d8ac202" class="lightbox-link"><img alt="Output screen" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/obaas-outputs.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-1d26e976828a437acb3ba0070d8ac202"><img alt="Output screen" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/obaas-outputs.png" title=" "></a></p>
+<p><a href="#R-image-95313a192b6654ad737309fc75cb25c4" class="lightbox-link"><img alt="Output screen" class="lazy lightbox figure-image" loading="lazy" src="../images/obaas-outputs.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-95313a192b6654ad737309fc75cb25c4"><img alt="Output screen" class="lazy lightbox lightbox-image" loading="lazy" src="../images/obaas-outputs.png" title=" "></a></p>
 <blockquote>
 <p><strong>Note</strong>: Keep a copy of the values, you will need these in later labs.</p>
 </blockquote>
@@ -290,12 +321,12 @@ selected, access can only be from a private VCN.</li>
 <p>Verify you can access the Kubernetes cluster</p>
 <p>In later labs, you will look at various resources in Kubernetes. You will need a Kubernetes configuration file to access the cluster. For now, accessing the cluster from OCI Cloud Shell will be sufficient to verify the installation.</p>
 <p>Open the OCI Cloud Shell by clicking on the icon next to the region in the top right corner of the console and then clicking on <strong>Cloud Shell</strong>.</p>
-<p><a href="#R-image-3f3b06153362cebb12ae7fa5364e9881" class="lightbox-link"><img alt="Open OCI CLoud Shell" class="noborder lazy lightbox noshadow figure-image" loading="lazy" src="../images/obaas-cloud-shell.png" style=" height: auto; width: auto;" title=" "></a>
-<a href="javascript:history.back();" class="lightbox-back" id="R-image-3f3b06153362cebb12ae7fa5364e9881"><img alt="Open OCI CLoud Shell" class="noborder lazy lightbox noshadow lightbox-image" loading="lazy" src="../images/obaas-cloud-shell.png" title=" "></a></p>
+<p><a href="#R-image-308a714ab4ad65001532ecf43fb7fa2c" class="lightbox-link"><img alt="Open OCI CLoud Shell" class="lazy lightbox figure-image" loading="lazy" src="../images/obaas-cloud-shell.png" style=" height: auto; width: auto;" title=" "></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-308a714ab4ad65001532ecf43fb7fa2c"><img alt="Open OCI CLoud Shell" class="lazy lightbox lightbox-image" loading="lazy" src="../images/obaas-cloud-shell.png" title=" "></a></p>
 <p>Run the command provided at the end of your installation log or the information from the <strong>Application Information</strong> tab,to obtain the Kubernetes configuration file.  The command will be similar to this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.i..... --region us-ashburn-1 --token-version 2.0.0 --kube-endpoint PUBLIC_ENDPOINT --file $HOME/.kube/config</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.i..... --region us-ashburn-1 --token-version 2.0.0 --kube-endpoint PUBLIC_ENDPOINT --file $HOME/.kube/config</span></span></code></pre></div>
 <p>Check that you can access the cluster using this command:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl get pods -n obaas-admin
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl get pods -n obaas-admin
 </span></span><span style="display:flex;"><span>NAME                                READY   STATUS             RESTARTS   AGE
 </span></span><span style="display:flex;"><span>graalvm-compiler-79988b886c-hgw68   1/1     Running            <span style="color:#ae81ff">0</span>          10m
 </span></span><span style="display:flex;"><span>obaas-admin-66599b65-vb662          1/1     Running            <span style="color:#ae81ff">0</span>          10m
@@ -305,11 +336,11 @@ selected, access can only be from a private VCN.</li>
 <li>
 <p>Verify you can connect to the APISIX API Gateway</p>
 <p>You will need to provide the correct IP address for the API Gateway in your backend environment.  You can find the IP address using this command, you need the one listed in the <code>EXTERNAL-IP</code> column:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n ingress-nginx get service ingress-nginx-controller
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n ingress-nginx get service ingress-nginx-controller
 </span></span><span style="display:flex;"><span>NAME                       TYPE           CLUSTER-IP      EXTERNAL-IP   PORT<span style="color:#f92672">(</span>S<span style="color:#f92672">)</span>                      AGE
 </span></span><span style="display:flex;"><span>ingress-nginx-controller   LoadBalancer   10.123.10.127   EXTERNAL-IP   80:30389/TCP,443:30458/TCP   13d</span></span></code></pre></div>
 <p>Now use this command (with your IP address in the column <strong>EXTERNAL-IP</strong>) to make a request to the API Gateway.  You should receive a response with an HTTP Status Code 404 (Not Found) and an error message in JSON format as shown below.  Don&rsquo;t worry about the 404, you will deploy some services soon, but this test is enough to know the API Gateway started up successfully:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i http://&lt;EXTERNAL-IP&gt;&gt;
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i http://&lt;EXTERNAL-IP&gt;&gt;
 </span></span><span style="display:flex;"><span>HTTP/1.1 <span style="color:#ae81ff">404</span>
 </span></span><span style="display:flex;"><span>Date: Wed, <span style="color:#ae81ff">01</span> Mar <span style="color:#ae81ff">2023</span> 19:21:08 GMT
 </span></span><span style="display:flex;"><span>Content-Type: application/json
@@ -333,12 +364,9 @@ selected, access can only be from a private VCN.</li>
       <div id="R-header-topbar" class="default-animation"></div>
       <div id="R-header-wrapper" class="default-animation">
         <div id="R-header" class="default-animation">
-<img src="https://oracle.github.io/microservices-datadriven/cloudbank//cloudbank-logo.png" height="100px">
+<img src="https://oracle.github.io/microservices-backend/cloudbank//cloudbank-logo.png" height="100px">
         </div>
-        <script>
-          window.index_js_url="/microservices-datadriven/cloudbank/searchindex.en.js?1747144443";
-        </script>
-        <search><form action="/microservices-datadriven/cloudbank/search/index.html" method="get">
+        <search><form action="/microservices-backend/cloudbank/search/index.html" method="get">
           <div class="searchbox default-animation">
             <button class="search-detail" type="submit" title="Search (CTRL+ALT+f)"><i class="fas fa-search"></i></button>
             <label class="a11y-only" for="R-search-by">Search</label>
@@ -346,103 +374,70 @@ selected, access can only be from a private VCN.</li>
             <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
           </div>
         </form></search>
-        <script>
-          var contentLangs=['en'];
-        </script>
-        <script src="/microservices-datadriven/cloudbank/js/auto-complete.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.stemmer.support.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.multi.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.en.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/search.js?1747144443" defer></script>
       </div>
       <div id="R-homelinks" class="default-animation homelinks">
-        <ul>
-          <li><a class="padding" href="/microservices-datadriven/cloudbank/index.html"><i class="fa-fw fas fa-home"></i> Home</a></li>
-        </ul>
-        <hr class="padding">
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-homelinks">
+          <ul class="space collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/index.html"><a class="padding" href="/microservices-backend/cloudbank/index.html"><i class="fa-fw fas fa-home"></i> Home</a></li>
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-headercontrols">
+          <ul class="">
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
       </div>
       <div id="R-content-wrapper" class="highlightable">
-        <div id="R-shortcutmenu-home" class="R-sidebarmenu">
+        <div class="R-sidebarmenu R-shortcutmenu-main">
           <ul class="enlarge morespace collapsible-menu">
-            <li class="parent " data-nav-id="/microservices-datadriven/cloudbank/provision/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/provision/index.html">Provision an Instance</a><ul id="R-subsections-d6947c2d1078796b2bfd976ebc0e0264" class="collapsible-menu">
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/provision/intro/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/provision/intro/index.html">Introduction</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/provision/install-local/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/provision/install-local/index.html">Install locally</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/provision/install-free-trial/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/provision/install-free-trial/index.html">Install in OCI Free Tier</a></li>
-            <li class="active " data-nav-id="/microservices-datadriven/cloudbank/provision/install-mp/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/provision/install-mp/index.html">Install from OCI Marketplace</a></li></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/devenv/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/devenv/index.html">Developer Environment</a><ul id="R-subsections-559c2972a719279af6301d7032063e64" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/account/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/index.html">Account Microservice</a><ul id="R-subsections-af4a17527840af40a6cda3fc650af51b" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/check/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/check/index.html">Check Processing</a><ul id="R-subsections-159f69b312555d5f0055ca241e6721e2" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/index.html">Manage Sagas</a><ul id="R-subsections-dfd968a77748ad1f1a28d6a9118be66e" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/springai/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/springai/index.html">CloudBank AI Assistant</a><ul id="R-subsections-868fb0154339332ae87e7c98e3fa9bee" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-cli/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-cli/index.html">Deploy with the CLI</a><ul id="R-subsections-b839a8f6f0f5efd1be94b7f9da9e78d1" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-ide/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-ide/index.html">Deploy with an IDE</a><ul id="R-subsections-fd584c0da8f22ebe818df94300151866" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/backend/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/backend/index.html">Explore the Backend</a><ul id="R-subsections-f948b454f68385a53d2483b3c80424ae" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/cleanup/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/cleanup/index.html">Cleanup</a><ul id="R-subsections-6d9c3a2633de07dcbf4491d943578384" class="collapsible-menu"></ul></li>
+            <li class="parent " data-nav-id="/microservices-backend/cloudbank/provision/index.html"><a class="padding" href="/microservices-backend/cloudbank/provision/index.html">Provision an Instance</a><ul id="R-subsections-d6947c2d1078796b2bfd976ebc0e0264" class="collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/provision/intro/index.html"><a class="padding" href="/microservices-backend/cloudbank/provision/intro/index.html">Introduction</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/provision/install-local/index.html"><a class="padding" href="/microservices-backend/cloudbank/provision/install-local/index.html">Install locally</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/provision/install-free-trial/index.html"><a class="padding" href="/microservices-backend/cloudbank/provision/install-free-trial/index.html">Install in OCI Free Tier</a></li>
+            <li class="active " data-nav-id="/microservices-backend/cloudbank/provision/install-mp/index.html"><a class="padding" href="/microservices-backend/cloudbank/provision/install-mp/index.html">Install from OCI Marketplace</a></li></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/devenv/index.html"><a class="padding" href="/microservices-backend/cloudbank/devenv/index.html">Developer Environment</a><ul id="R-subsections-559c2972a719279af6301d7032063e64" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/index.html">Account Microservice</a><ul id="R-subsections-af4a17527840af40a6cda3fc650af51b" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/check/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/index.html">Check Processing</a><ul id="R-subsections-159f69b312555d5f0055ca241e6721e2" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/index.html">Manage Sagas</a><ul id="R-subsections-dfd968a77748ad1f1a28d6a9118be66e" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/springai/index.html"><a class="padding" href="/microservices-backend/cloudbank/springai/index.html">CloudBank AI Assistant</a><ul id="R-subsections-868fb0154339332ae87e7c98e3fa9bee" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-cli/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/index.html">Deploy with the CLI</a><ul id="R-subsections-b839a8f6f0f5efd1be94b7f9da9e78d1" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-ide/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-ide/index.html">Deploy with an IDE</a><ul id="R-subsections-fd584c0da8f22ebe818df94300151866" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/backend/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/index.html">Explore the Backend</a><ul id="R-subsections-f948b454f68385a53d2483b3c80424ae" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/cleanup/index.html"><a class="padding" href="/microservices-backend/cloudbank/cleanup/index.html">Cleanup</a><ul id="R-subsections-6d9c3a2633de07dcbf4491d943578384" class="collapsible-menu"></ul></li>
           </ul>
         </div>
-        <div id="R-shortcutmenu-shortcuts" class="R-sidebarmenu">
+        <div class="R-sidebarmenu R-shortcutmenu-shortcuts">
           <div class="nav-title padding">More</div>
           <ul class="space collapsible-menu">
-            <li class="" data-nav-id="https://github.com/oracle/microservices-datadriven"><a class="padding" href="https://github.com/oracle/microservices-datadriven" target="_blank"><i class='fa-fw fab fa-github'></i> GitHub repo</a></li>
-            <li class="" data-nav-id="https://bit.ly/oraclespringboot"><a class="padding" href="https://bit.ly/oraclespringboot" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Oracle Backend for Spring Boot and Microservices</a></li>
-            <li class="" data-nav-id="https://github.com/oracle/spring-cloud-oracle"><a class="padding" href="https://github.com/oracle/spring-cloud-oracle" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Spring Cloud Oracle</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/more/credits/"><a class="padding" href="/microservices-datadriven/cloudbank/more/credits/"><i class='fa-fw fas fa-bullhorn'></i> Credits</a></li>
+            <li class="" data-nav-id="https://github.com/oracle/microservices-backend"><a class="padding" href="https://github.com/oracle/microservices-backend" rel="external" target="_blank"><i class='fa-fw fab fa-github'></i> GitHub repo</a></li>
+            <li class="" data-nav-id="https://bit.ly/oraclespringboot"><a class="padding" href="https://bit.ly/oraclespringboot" rel="external" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Oracle Backend for Spring Boot and Microservices</a></li>
+            <li class="" data-nav-id="https://github.com/oracle/spring-cloud-oracle"><a class="padding" href="https://github.com/oracle/spring-cloud-oracle" rel="external" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Spring Cloud Oracle</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/more/credits/"><a class="padding" href="/microservices-backend/cloudbank/more/credits/"><i class='fa-fw fas fa-bullhorn'></i> Credits</a></li>
           </ul>
         </div>
-        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showFooter"></div>
-        <div id="R-menu-footer">
-          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showFooter">
-          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks">
-            <ul>
-              <li id="R-select-language-container" class="footerLangSwitch">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-language"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <label class="a11y-only" for="R-select-language">Language</label>
-                    <select id="R-select-language" onchange="location = this.querySelector( this.value ).dataset.url;">
-                      <option id="R-select-language-en" value="#R-select-language-en" data-url="/microservices-datadriven/cloudbank/provision/install-mp/index.html" lang="en-us" selected></option>
-                    </select>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-              </li>
-              <li id="R-select-variant-container" class="footerVariantSwitch">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-paint-brush"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <label class="a11y-only" for="R-select-variant">Theme</label>
-                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
-                      <option id="R-select-variant-zen-light" value="zen-light" selected>Zen Light</option>
-                    </select>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-                <script>window.variants && variants.markSelectedVariant();</script>
-              </li>
-              <li class="footerVisitedLinks">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-history"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <button onclick="clearHistory();">Clear History</button>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div id="R-footer" class="footerFooter showFooter">
-	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://www.oracle.com/">Oracle</a></p>
-		<p>Copyright &copy; 2022, 2024, <br>Oracle and/or its affiliates</p>
-          </div>
+        <div id="R-footer-margin"></div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
         </div>
+        <div class="R-sidebarmenu R-shortcutmenu-footercontrols">
+          <ul class="">
+          </ul>
+        </div>
+<div id="R-footer">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://www.oracle.com/">Oracle</a></p>
+		<p>Copyright &copy; 2022, 2024, <br>Oracle and/or its affiliates</p></div>
       </div>
     </aside>
-    <script src="/microservices-datadriven/cloudbank/js/clipboard.min.js?1747144443" defer></script>
-    <script src="/microservices-datadriven/cloudbank/js/perfect-scrollbar.min.js?1747144443" defer></script>
-    <script src="/microservices-datadriven/cloudbank/js/theme.js?1747144443" defer></script>
+    <script src="/microservices-backend/cloudbank/js/clipboard/clipboard.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/perfect-scrollbar/perfect-scrollbar.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/theme.min.js?1772471396" defer></script>
   </body>
 </html>

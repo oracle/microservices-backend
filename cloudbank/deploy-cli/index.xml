@@ -2,58 +2,58 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Deploy with the CLI :: CloudBank AI</title>
-    <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/index.html</link>
+    <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/index.html</link>
     <description>In this module, you will learn how to deploy the full CloudBank application to Oracle Backend for Microservices and AI using the CLI. If you prefer to use an IDE, skip this module and go to the next module instead.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <atom:link href="https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Introduction</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/intro/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/intro/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/intro/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/intro/index.html</guid>
       <description>Now that you know how to build a Spring Boot microservice and deploy it to the Oracle Backend for Microservices and AI, this module will guide you through deploying all the CloudBank services and exploring the runtime and management capabilities of the platform. NOTE: The full CloudBank leverages more features than you have built so far such as monitoring, tracing etc. You will see those features in the module “Explore The Backend Platform”.</description>
     </item>
     <item>
       <title>Get the sample code</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/get-code/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/get-code/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/get-code/index.html</guid>
-      <description>Download a copy of the CloudBank sample application.&#xA;Clone the source repository&#xA;Create a local clone of the CloudBank source repository using this command.&#xA;git clone --depth 1 https://github.com/oracle/microservices-datadriven.git --tags cbv4-1.3.1 --single-branch Note: If you do not have git installed on your machine, you can download a zip file of the source code from GitHub and unzip it on your machine instead.&#xA;The source code for the CloudBank application will be in the microservices-datadriven directory you just created, in the cloudbank-v4 subdirectory.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/get-code/index.html</guid>
+      <description>Download a copy of the CloudBank sample application.&#xA;Clone the source repository&#xA;Create a local clone of the CloudBank source repository using this command.&#xA;git clone --depth 1 https://github.com/oracle/microservices-backend.git --tags cbv4-1.3.1 --single-branch Note: If you do not have git installed on your machine, you can download a zip file of the source code from GitHub and unzip it on your machine instead.&#xA;The source code for the CloudBank application will be in the microservices-backend directory you just created, in the cloudbank-v4 subdirectory.</description>
     </item>
     <item>
       <title>Build CloudBank</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/build/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/build/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/build/index.html</guid>
-      <description>Create application JAR files&#xA;In the directory (root) where you cloned (or unzipped) the application and build the application JARs using the following command:&#xA;mvn clean package The output should be similar to this:&#xA;[INFO] ------------------------------------------------------------------------ [INFO] Reactor Summary for CloudBank 0.0.1-SNAPSHOT: [INFO] [INFO] CloudBank .......................................... SUCCESS [ 1.212 s] [INFO] account ............................................ SUCCESS [ 3.881 s] [INFO] chatbot ............................................ SUCCESS [ 0.997 s] [INFO] checks ............................................. SUCCESS [ 1.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/build/index.html</guid>
+      <description>Create application JAR files&#xA;In the directory (root) where you cloned (or unzipped) the application and build the application JARs using the following command:&#xA;mvn clean package The output should be similar to this:&#xA;[INFO] ------------------------------------------------------------------------ [INFO] Reactor Summary for CloudBank 0.0.1-SNAPSHOT: [INFO] [INFO] CloudBank .......................................... SUCCESS [ 1.212 s] [INFO] account ............................................ SUCCESS [ 3.881 s] [INFO] chatbot ............................................ SUCCESS [ 0.997 s] [INFO] checks ............................................. SUCCESS [ 1.697 s] [INFO] customer ........................................... SUCCESS [ 1.393 s] [INFO] creditscore ........................................ SUCCESS [ 1.134 s] [INFO] transfer ........................................... SUCCESS [ 0.589 s] [INFO] testrunner ......................................... SUCCESS [ 1.179 s] [INFO] ------------------------------------------------------------------------ [INFO] BUILD SUCCESS [INFO] ------------------------------------------------------------------------ [INFO] Total time: 12.439 s [INFO] Finished at: 2024-10-10T15:29:41-05:00 [INFO] ------------------------------------------------------------------------</description>
     </item>
     <item>
       <title>Deploy CloudBank</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/deploy/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/deploy/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/deploy/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/deploy/index.html</guid>
       <description>Obtain the obaas-admin password.&#xA;Execute the following command to get the obaas-admin password:&#xA;kubectl get secret -n azn-server oractl-passwords -o jsonpath=&#39;{.data.admin}&#39; | base64 -d Start a tunnel to the backend service.&#xA;The Oracle Backend for Microservices and AI admin service is not exposed outside the Kubernetes cluster by default. Use kubectl to start a port forwarding tunnel to establish a secure connection to the admin service.&#xA;Start a tunnel using this command:</description>
     </item>
     <item>
       <title>Create APISIX routes</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/create-routes/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/create-routes/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/create-routes/index.html</guid>
-      <description>To be able to access the CLoudBank services from the public internet we need expose the services via the Apache APISIX gateway. We’re going to do that using scripts.&#xA;Get APISIX Gateway Admin Key&#xA;You are going to need the Admin Key for the APISIX Gateway to configure the route. It is stored in a k8s ConfigMap. Run the command and make a note of the admin key.&#xA;kubectl -n apisix get configmap apisix -o yaml Look for the key: information in the admin_key section and save it.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/create-routes/index.html</guid>
+      <description>To be able to access the CLoudBank services from the public internet we need expose the services via the Apache APISIX gateway. We’re going to do that using scripts.&#xA;Get APISIX Gateway Admin Key&#xA;You are going to need the Admin Key for the APISIX Gateway to configure the route. It is stored in a k8s ConfigMap. Run the command and make a note of the admin key.&#xA;kubectl -n apisix get configmap apisix -o yaml Look for the key: information in the admin_key section and save it. You’ll be needing it later in this module.</description>
     </item>
     <item>
       <title>Verify the deployment</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/verify/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/verify/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/verify/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/verify/index.html</guid>
       <description>Verification of the services deployment&#xA;Verify that the services are running properly by executing this command:&#xA;kubectl get pods -n application The output should be similar to this, all pods should have STATUS as Running. If not then you need to look at the logs for the pods/service to determine what is wrong for example kubectl logs -n application svc/customer.&#xA;NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s checks-78c988bdcf-n59qz 1/1 Running 0 42m creditscore-7b89d567cd-nm4p6 1/1 Running 0 38m customer-6f4dc67985-nf5kz 1/1 Running 0 41s testrunner-78d679575f-ch4k7 1/1 Running 0 33m transfer-869d796755-gn9lf 1/1 Running 0 27m Verify the all the Cloud Bank services deployed</description>
     </item>
     <item>
       <title>Deploy the optional chatbot</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/chatbot/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/chatbot/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/chatbot/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/chatbot/index.html</guid>
       <description>In this section, you will learn how to deploy the optional chatbot application. NOTE: this requires that you have provisioned an Oracle Backend for Microservices and AI with a GPU cluster and are running Ollama in that cluster. The lab CloudBank AI Assistant outlines the steps.&#xA;Note if you already have a running session with oractl you can skip step 1-3.&#xA;Start the tunnel&#xA;kubectl port-forward -n obaas-admin svc/obaas-admin 8080 Get the password for the obaas-admin user</description>
     </item>
   </channel>

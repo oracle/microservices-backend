@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article">
+<html lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article" data-r-output-format="html">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <meta name="generator" content="Hugo 0.133.1">
-    <meta name="generator" content="Relearn 7.1.1+ab4197f3113afa9a7d17bed69dbef6c0e75a4921">
+    <meta name="generator" content="Hugo 0.157.0">
+    <meta name="generator" content="Relearn 7.6.1+e9ef53522317877bc23c72c42c8307a62b209dfb">
     <meta name="description" content="Verification of the services deployment
 Verify that the services are running properly by executing this command:
 kubectl get pods -n application The output should be similar to this, all pods should have STATUS as Running. If not then you need to look at the logs for the pods/service to determine what is wrong for example kubectl logs -n application svc/customer.
@@ -16,7 +16,7 @@ NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s check
 Verify that the services are running properly by executing this command:
 kubectl get pods -n application The output should be similar to this, all pods should have STATUS as Running. If not then you need to look at the logs for the pods/service to determine what is wrong for example kubectl logs -n application svc/customer.
 NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s checks-78c988bdcf-n59qz 1/1 Running 0 42m creditscore-7b89d567cd-nm4p6 1/1 Running 0 38m customer-6f4dc67985-nf5kz 1/1 Running 0 41s testrunner-78d679575f-ch4k7 1/1 Running 0 33m transfer-869d796755-gn9lf 1/1 Running 0 27m Verify the all the Cloud Bank services deployed">
-    <meta property="og:url" content="https://oracle.github.io/microservices-datadriven/cloudbank/deploy-cli/verify/index.html">
+    <meta property="og:url" content="https://oracle.github.io/microservices-backend/cloudbank/deploy-cli/verify/index.html">
     <meta property="og:site_name" content="CloudBank AI">
     <meta property="og:title" content="Verify the deployment :: CloudBank AI">
     <meta property="og:description" content="Verification of the services deployment
@@ -33,26 +33,63 @@ kubectl get pods -n application The output should be similar to this, all pods s
 NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s checks-78c988bdcf-n59qz 1/1 Running 0 42m creditscore-7b89d567cd-nm4p6 1/1 Running 0 38m customer-6f4dc67985-nf5kz 1/1 Running 0 41s testrunner-78d679575f-ch4k7 1/1 Running 0 33m transfer-869d796755-gn9lf 1/1 Running 0 27m Verify the all the Cloud Bank services deployed">
     <meta itemprop="wordCount" content="957">
     <title>Verify the deployment :: CloudBank AI</title>
-    <link href="/microservices-datadriven/cloudbank/images/favicon.png?1747144443" rel="icon" type="image/png">
-    <link href="/microservices-datadriven/cloudbank/css/fontawesome-all.min.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/fontawesome-all.min.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/nucleus.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/auto-complete.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/auto-complete.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/perfect-scrollbar.min.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/fonts.css?1747144443" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-datadriven/cloudbank/css/fonts.css?1747144443" rel="stylesheet"></noscript>
-    <link href="/microservices-datadriven/cloudbank/css/theme.css?1747144443" rel="stylesheet">
-    <link href="/microservices-datadriven/cloudbank/css/theme-zen-light.css?1747144443" rel="stylesheet" id="R-variant-style">
-    <link href="/microservices-datadriven/cloudbank/css/chroma-relearn-light.css?1747144443" rel="stylesheet" id="R-variant-chroma-style">
-    <link href="/microservices-datadriven/cloudbank/css/print.css?1747144443" rel="stylesheet" media="print">
-    <script src="/microservices-datadriven/cloudbank/js/variant.js?1747144443"></script>
+    <link href="/microservices-backend/cloudbank/images/favicon.png?1772471396" rel="icon" type="image/png">
+    <link href="/microservices-backend/cloudbank/fonts/fontawesome/css/fontawesome-all.min.css?1772471396" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/microservices-backend/cloudbank/fonts/fontawesome/css/fontawesome-all.min.css?1772471396" rel="stylesheet"></noscript>
+    <link href="/microservices-backend/cloudbank/css/perfect-scrollbar/perfect-scrollbar.min.css?1772471396" rel="stylesheet">
+    <link href="/microservices-backend/cloudbank/css/theme.min.css?1772471396" rel="stylesheet">
+    <link href="/microservices-backend/cloudbank/css/format-html.min.css?1772471396" rel="stylesheet" id="R-format-style">
+    <link href="/microservices-backend/cloudbank/css/auto-complete/auto-complete.min.css?1772471396" rel="stylesheet">
+    <script src="/microservices-backend/cloudbank/js/auto-complete/auto-complete.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.stemmer.support.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.multi.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/lunr/lunr.en.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/search.min.js?1772471396" defer></script>
     <script>
       window.relearn = window.relearn || {};
+      // configuration
+      window.relearn.min = `.min`;
+      window.relearn.path='\/deploy-cli\/verify\/index.html';
       window.relearn.relBasePath='..\/..';
       window.relearn.relBaseUri='..\/..\/..\/..';
-      window.relearn.absBaseUri='https:\/\/oracle.github.io\/microservices-datadriven\/cloudbank';
+      window.relearn.absBaseUri='https:\/\/oracle.github.io\/microservices-backend\/cloudbank';
+      window.relearn.contentLangs=['en'];
+      window.relearn.index_js_url="/microservices-backend/cloudbank/searchindex.en.js?1772471396";
       window.relearn.disableAnchorCopy=false;
       window.relearn.disableAnchorScrolling=false;
+      window.relearn.disableInlineCopyToClipboard=false;
+      window.relearn.enableBlockCodeWrap=true;
+      // legal
+      window.relearn.getItem = (s,n) => {return s.getItem(n)};
+      window.relearn.setItem = (s,n,v) => {return s.setItem(n,v)};
+      window.relearn.removeItem = (s,n) => {return s.removeItem(n)};
       // variant stuff
-      window.variants && variants.init( [ 'zen-light' ] );
+      window.relearn.themevariants = [ 'zen-light' ];
+      window.relearn.customvariantname = "my-custom-variant";
+      window.relearn.changeVariant = function(variant) {
+        var oldVariant = document.documentElement.dataset.rThemeVariant;
+        window.relearn.setItem(window.localStorage, window.relearn.absBaseUri + "/variant", variant);
+        document.documentElement.dataset.rThemeVariant = variant;
+        if (oldVariant != variant) {
+          document.dispatchEvent( new CustomEvent('themeVariantLoaded', { detail: { variant, oldVariant } }) );
+          window.relearn.markVariant();
+        }
+      }
+      window.relearn.markVariant = function() {
+        var variant = window.relearn.getItem(window.localStorage, window.relearn.absBaseUri + "/variant");
+        document.querySelectorAll(".R-variantswitcher select").forEach((select) => {select.value = variant;});
+      }
+      window.relearn.initVariant = function() {
+        var variant = window.relearn.getItem(window.localStorage, window.relearn.absBaseUri + "/variant") ?? "";
+        if( variant == window.relearn.customvariantname ){
+        }else if( !variant || !window.relearn.themevariants.includes(variant) ){
+          variant = window.relearn.themevariants[0];
+          window.relearn.setItem(window.localStorage, window.relearn.absBaseUri + "/variant", variant);
+        }
+        document.documentElement.dataset.rThemeVariant = variant;
+      }
+      window.relearn.initVariant();
+      window.relearn.markVariant();
       // translations
       window.T_Copy_to_clipboard = `Copy to clipboard`;
       window.T_Copied_to_clipboard = `Copied to clipboard!`;
@@ -63,12 +100,10 @@ NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s check
       window.T_No_results_found = `No results found for "{0}"`;
       window.T_N_results_found = `{1} results found for "{0}"`;
     </script>
-  
-    
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-7HWQVTJ803"></script>
       <script>
         var doNotTrack = false;
-        if ( false ) {
+        if ( true ) {
           var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
           var doNotTrack = (dnt == "1" || dnt == "yes");
         }
@@ -79,12 +114,8 @@ NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s check
           gtag('config', 'G-7HWQVTJ803');
         }
       </script>
-    
-  
-
-
   </head>
-  <body class="mobile-support html" data-url="/microservices-datadriven/cloudbank/deploy-cli/verify/index.html">
+  <body class="mobile-support html" data-url="/microservices-backend/cloudbank/deploy-cli/verify/index.html">
     <div id="R-body" class="default-animation">
       <div id="R-body-overlay"></div>
       <nav id="R-topbar">
@@ -100,15 +131,15 @@ NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s check
               </div>
             </div>
           </div>
-          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList"><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><a itemprop="item" href="/microservices-datadriven/cloudbank/index.html"><span itemprop="name">CloudBank AI</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><a itemprop="item" href="/microservices-datadriven/cloudbank/deploy-cli/index.html"><span itemprop="name">Deploy with the CLI</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li><li
-            itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement"><span itemprop="name">Verify the deployment</span><meta itemprop="position" content="3"></li>
+          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList">
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="/microservices-backend/cloudbank/index.html"><span itemprop="name">CloudBank AI</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li>
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="/microservices-backend/cloudbank/deploy-cli/index.html"><span itemprop="name">Deploy with the CLI</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li>
+            <li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><span itemprop="name">Verify the deployment</span><meta itemprop="position" content="3"></li>
           </ol>
           <div class="topbar-area topbar-area-end" data-area="end">
-            <div class="topbar-button topbar-button-prev" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-datadriven/cloudbank/deploy-cli/create-routes/index.html" title="Create APISIX routes (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a>
+            <div class="topbar-button topbar-button-prev" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-backend/cloudbank/deploy-cli/create-routes/index.html" title="Create APISIX routes (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a>
             </div>
-            <div class="topbar-button topbar-button-next" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-datadriven/cloudbank/deploy-cli/chatbot/index.html" title="Deploy the optional chatbot (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a>
+            <div class="topbar-button topbar-button-next" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show"><a class="topbar-control" href="/microservices-backend/cloudbank/deploy-cli/chatbot/index.html" title="Deploy the optional chatbot (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a>
             </div>
             <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show"><button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More"><i class="fa-fw fas fa-ellipsis-v"></i></button>
               <div class="topbar-content">
@@ -134,9 +165,9 @@ NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s check
 <li>
 <p>Verification of the services deployment</p>
 <p>Verify that the services are running properly by executing this command:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>kubectl get pods -n application</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>kubectl get pods -n application</span></span></code></pre></div>
 <p>The output should be similar to this, all pods should have <code>STATUS</code> as <code>Running</code>. If not then you need to look at the logs for the pods/service to determine what is wrong for example <code>kubectl logs -n application svc/customer</code>.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>NAME                           READY   STATUS    RESTARTS   AGE
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>NAME                           READY   STATUS    RESTARTS   AGE
 </span></span><span style="display:flex;"><span>account-65cdc68dd7-k5ntz       1/1     Running   0          8m2s
 </span></span><span style="display:flex;"><span>checks-78c988bdcf-n59qz        1/1     Running   0          42m
 </span></span><span style="display:flex;"><span>creditscore-7b89d567cd-nm4p6   1/1     Running   0          38m
@@ -151,16 +182,16 @@ NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s check
 <li>
 <p>Get external IP Address</p>
 <p>You can find the IP address using this command, you need the one listed in the <code>EXTERNAL-IP</code> column. In the example below the IP address is <code>100.20.30.40</code></p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n ingress-nginx get service ingress-nginx-controller
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n ingress-nginx get service ingress-nginx-controller
 </span></span><span style="display:flex;"><span>NAME                       TYPE           CLUSTER-IP      EXTERNAL-IP   PORT<span style="color:#f92672">(</span>S<span style="color:#f92672">)</span>                      AGE
 </span></span><span style="display:flex;"><span>ingress-nginx-controller   LoadBalancer   10.123.10.127   100.20.30.40  80:30389/TCP,443:30458/TCP   13d</span></span></code></pre></div>
 </li>
 <li>
 <p>Test the create account REST endpoint with this command, use the external IP address for your API Gateway. Make a note of the <code>accountID</code> in the output:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i -X POST <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>-H <span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span> <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>-d <span style="color:#e6db74">&#39;{&#34;accountName&#34;: &#34;Sanjay&#39;&#39;s Savings&#34;, &#34;accountType&#34;: &#34;SA&#34;, &#34;accountCustomerId&#34;: &#34;bkzLp8cozi&#34;, &#34;accountOtherDetails&#34;: &#34;Savings Account&#34;}&#39;</span> <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>http://API-ADDRESS-OF-API-GW/api/v1/account
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i -X POST <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>-H <span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>-d <span style="color:#e6db74">&#39;{&#34;accountName&#34;: &#34;Sanjay&#39;&#39;s Savings&#34;, &#34;accountType&#34;: &#34;SA&#34;, &#34;accountCustomerId&#34;: &#34;bkzLp8cozi&#34;, &#34;accountOtherDetails&#34;: &#34;Savings Account&#34;}&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>http://API-ADDRESS-OF-API-GW/api/v1/account
 </span></span><span style="display:flex;"><span>HTTP/1.1 <span style="color:#ae81ff">201</span>
 </span></span><span style="display:flex;"><span>Date: Wed, <span style="color:#ae81ff">01</span> Mar <span style="color:#ae81ff">2023</span> 18:35:31 GMT
 </span></span><span style="display:flex;"><span>Content-Type: application/json
@@ -171,9 +202,9 @@ NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s check
 </li>
 <li>
 <p>Test the get account REST endpoint with this command, use the IP address for your API Gateway and the <code>accountId</code> that was returned in the previous command:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -s http://API-ADDRESS-OF-API-GW/api/v1/account/&lt;accountId&gt; | jq .</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -s http://API-ADDRESS-OF-API-GW/api/v1/account/&lt;accountId&gt; | jq .</span></span></code></pre></div>
 <p>Output should be similar to this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;accountId&#34;</span>: <span style="color:#ae81ff">24</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;accountName&#34;</span>: <span style="color:#e6db74">&#34;Sanjay&#39;s Savings&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;accountType&#34;</span>: <span style="color:#e6db74">&#34;SA&#34;</span>,
@@ -185,9 +216,9 @@ NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s check
 </li>
 <li>
 <p>Test on of the customer REST endpoints with this command, use the IP Address for your API Gateway.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -s http://API-ADDRESS-OF-API-GW/api/v1/customer | jq</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -s http://API-ADDRESS-OF-API-GW/api/v1/customer | jq</span></span></code></pre></div>
 <p>Output should be similar to this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
 </span></span><span style="display:flex;"><span>    {
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;customerId&#34;</span>: <span style="color:#e6db74">&#34;qwertysdwr&#34;</span>,
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;customerName&#34;</span>: <span style="color:#e6db74">&#34;Andy&#34;</span>,
@@ -216,9 +247,9 @@ NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s check
 </li>
 <li>
 <p>Test the creditscore REST endpoint with this command</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -s http://API-ADDRESS-OF-API-GW/api/v1/creditscore | jq</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -s http://API-ADDRESS-OF-API-GW/api/v1/creditscore | jq</span></span></code></pre></div>
 <p>Output should be similar to this:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;Date&#34;</span>: <span style="color:#e6db74">&#34;2023-11-06&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;Credit Score&#34;</span>: <span style="color:#e6db74">&#34;686&#34;</span>
 </span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
@@ -228,14 +259,14 @@ NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s check
 <ol>
 <li>
 <p>Start a tunnel to the testrunner service.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n application port-forward svc/testrunner 8084:8080
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n application port-forward svc/testrunner 8084:8080
 </span></span><span style="display:flex;"><span>Forwarding from 127.0.0.1:8084 -&gt; <span style="color:#ae81ff">8080</span>
 </span></span><span style="display:flex;"><span>Forwarding from <span style="color:#f92672">[</span>::1<span style="color:#f92672">]</span>:8084 -&gt; <span style="color:#ae81ff">8080</span></span></span></code></pre></div>
 </li>
 <li>
 <p>Deposit a check using the <em>deposit</em> REST endpoint</p>
 <p>Run this command to deposit a check, make sure you use the <em>accountId</em> from the account you created earlier.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i -X POST -H <span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span> -d <span style="color:#e6db74">&#39;{&#34;accountId&#34;: 2, &#34;amount&#34;: 256}&#39;</span> http://localhost:8084/api/v1/testrunner/deposit
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -i -X POST -H <span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span> -d <span style="color:#e6db74">&#39;{&#34;accountId&#34;: 2, &#34;amount&#34;: 256}&#39;</span> http://localhost:8084/api/v1/testrunner/deposit
 </span></span><span style="display:flex;"><span>HTTP/1.1 <span style="color:#ae81ff">201</span>
 </span></span><span style="display:flex;"><span>Content-Type: application/json
 </span></span><span style="display:flex;"><span>Transfer-Encoding: chunked
@@ -246,15 +277,15 @@ NAME READY STATUS RESTARTS AGE account-65cdc68dd7-k5ntz 1/1 Running 0 8m2s check
 <li>
 <p>Check the log of the <em>check</em> service</p>
 <p>Execute this command to check the log file of the <em>check</em> service:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>kubectl -n application logs svc/checks</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>kubectl -n application logs svc/checks</span></span></code></pre></div>
 <p>The log file should contain something similar to this (with your accountId):</p>
-<div class="highlight wrap-code"><pre tabindex="0"><code class="language-log" data-lang="log">Received deposit &lt;CheckDeposit(accountId=2, amount=256)&gt;</code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0"><code class="language-log" data-lang="log">Received deposit &lt;CheckDeposit(accountId=2, amount=256)&gt;</code></pre></div>
 </li>
 <li>
 <p>Check the Journal entries using the <em>journal</em> REST endpoint. Replace <code>API-ADDRESS-OF-API-GW</code> with your external IP Address.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -i http://API-ADDRESS-OF-API-GW/api/v1/account/2/journal</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -i http://API-ADDRESS-OF-API-GW/api/v1/account/2/journal</span></span></code></pre></div>
 <p>The output should be similar to this (with your AccountId). Note the <em>journalId</em>, you&rsquo;re going to need it in the next step.</p>
-<div class="highlight wrap-code"><pre tabindex="0"><code class="language-log" data-lang="log">HTTP/1.1 200 
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0"><code class="language-log" data-lang="log">HTTP/1.1 200 
 Content-Type: application/json
 Transfer-Encoding: chunked
 Date: Thu, 02 Nov 2023 18:06:45 GMT
@@ -263,8 +294,8 @@ Date: Thu, 02 Nov 2023 18:06:45 GMT
 </li>
 <li>
 <p>Clearance of a check using the <em>clear</em> REST endpoint using your <em>journalId</em>:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -i -X POST -H <span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span> -d <span style="color:#e6db74">&#39;{&#34;journalId&#34;: 1}&#39;</span> http://localhost:8084/api/v1/testrunner/clear</span></span></code></pre></div>
-<div class="highlight wrap-code"><pre tabindex="0"><code class="language-logs" data-lang="logs">HTTP/1.1 201 
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -i -X POST -H <span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span> -d <span style="color:#e6db74">&#39;{&#34;journalId&#34;: 1}&#39;</span> http://localhost:8084/api/v1/testrunner/clear</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0"><code class="language-logs" data-lang="logs">HTTP/1.1 201 
 Content-Type: application/json
 Transfer-Encoding: chunked
 Date: Thu, 02 Nov 2023 18:09:17 GMT
@@ -274,16 +305,16 @@ Date: Thu, 02 Nov 2023 18:09:17 GMT
 <li>
 <p>Check the logs of the <em>checks</em> service</p>
 <p>Execute this command to check the log file of the <em>check</em> service:</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>kubectl -n application logs svc/checks</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>kubectl -n application logs svc/checks</span></span></code></pre></div>
 <p>The log file should contain something similar to this (with your journalId):</p>
-<div class="highlight wrap-code"><pre tabindex="0"><code class="language-log" data-lang="log">Received clearance &lt;Clearance(journalId=1)&gt;</code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0"><code class="language-log" data-lang="log">Received clearance &lt;Clearance(journalId=1)&gt;</code></pre></div>
 </li>
 <li>
 <p>Check the <em>journal</em> REST endpoint</p>
 <p>Execute this command to check the Journal. Replace <code>API-ADDRESS-OF-API-GW</code> with your External IP Address and <code>ACCOUNT-ID</code> with your account id.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -i http://API-ADDRESS-OF-API-GW/api/v1/account/ACCOUNT-ID/journal</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -i http://API-ADDRESS-OF-API-GW/api/v1/account/ACCOUNT-ID/journal</span></span></code></pre></div>
 <p>The output should look like this (with your accountId):</p>
-<div class="highlight wrap-code"><pre tabindex="0"><code class="language-log" data-lang="log">HTTP/1.1 200
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0"><code class="language-log" data-lang="log">HTTP/1.1 200
 Content-Type: application/json
 Transfer-Encoding: chunked
 Date: Thu, 02 Nov 2023 18:36:31 GMT
@@ -297,15 +328,15 @@ Date: Thu, 02 Nov 2023 18:36:31 GMT
 <ol>
 <li>
 <p>Start a tunnel to the testrunner service.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n application port-forward svc/transfer 8085:8080
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ kubectl -n application port-forward svc/transfer 8085:8080
 </span></span><span style="display:flex;"><span>Forwarding from 127.0.0.1:8085 -&gt; <span style="color:#ae81ff">8080</span>
 </span></span><span style="display:flex;"><span>Forwarding from <span style="color:#f92672">[</span>::1<span style="color:#f92672">]</span>:8085 -&gt; <span style="color:#ae81ff">8080</span></span></span></code></pre></div>
 </li>
 <li>
 <p>Check the account balances for two accounts, in this example the account numbers are 1 and 2. Replace <code>API-ADDRESS-OF-API-GW</code> with your External IP Address</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -s http://API-ADDRESS-OF-API-GW/api/v1/account/1 | jq ; curl -s http://API-ADDRESS-OF-API-GW/api/v1/account/2 | jq</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -s http://API-ADDRESS-OF-API-GW/api/v1/account/1 | jq ; curl -s http://API-ADDRESS-OF-API-GW/api/v1/account/2 | jq</span></span></code></pre></div>
 <p>The output should be similar to this. Make a note of the <code>accountBalance</code> values.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;accountId&#34;</span>: <span style="color:#ae81ff">1</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;accountName&#34;</span>: <span style="color:#e6db74">&#34;Andy&#39;s checking&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;accountType&#34;</span>: <span style="color:#e6db74">&#34;CH&#34;</span>,
@@ -326,14 +357,14 @@ Date: Thu, 02 Nov 2023 18:36:31 GMT
 </li>
 <li>
 <p>Perform a transfer between the accounts (transfer $100 from account 2 to account 1)</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -X POST <span style="color:#e6db74">&#34;http://localhost:8085/transfer?fromAccount=2&amp;toAccount=1&amp;amount=100&#34;</span>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -X POST <span style="color:#e6db74">&#34;http://localhost:8085/transfer?fromAccount=2&amp;toAccount=1&amp;amount=100&#34;</span>
 </span></span><span style="display:flex;"><span>transfer status:withdraw succeeded deposit succeeded</span></span></code></pre></div>
 </li>
 <li>
 <p>Check that the transfer has been made.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -s http://API-ADDRESS-OF-API-GW/api/v1/account/1 | jq ; curl -s http://API-ADDRESS-OF-API-GW/api/v1/account/2 | jq</span></span></code></pre></div>
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl -s http://API-ADDRESS-OF-API-GW/api/v1/account/1 | jq ; curl -s http://API-ADDRESS-OF-API-GW/api/v1/account/2 | jq</span></span></code></pre></div>
 <p>The output should be similar to this. Make a note of the <code>accountBalance</code> values.</p>
-<div class="highlight wrap-code"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+<div class="highlight wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;accountId&#34;</span>: <span style="color:#ae81ff">1</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;accountName&#34;</span>: <span style="color:#e6db74">&#34;Andy&#39;s checking&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;accountType&#34;</span>: <span style="color:#e6db74">&#34;CH&#34;</span>,
@@ -369,12 +400,9 @@ Date: Thu, 02 Nov 2023 18:36:31 GMT
       <div id="R-header-topbar" class="default-animation"></div>
       <div id="R-header-wrapper" class="default-animation">
         <div id="R-header" class="default-animation">
-<img src="https://oracle.github.io/microservices-datadriven/cloudbank//cloudbank-logo.png" height="100px">
+<img src="https://oracle.github.io/microservices-backend/cloudbank//cloudbank-logo.png" height="100px">
         </div>
-        <script>
-          window.index_js_url="/microservices-datadriven/cloudbank/searchindex.en.js?1747144443";
-        </script>
-        <search><form action="/microservices-datadriven/cloudbank/search/index.html" method="get">
+        <search><form action="/microservices-backend/cloudbank/search/index.html" method="get">
           <div class="searchbox default-animation">
             <button class="search-detail" type="submit" title="Search (CTRL+ALT+f)"><i class="fas fa-search"></i></button>
             <label class="a11y-only" for="R-search-by">Search</label>
@@ -382,106 +410,73 @@ Date: Thu, 02 Nov 2023 18:36:31 GMT
             <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
           </div>
         </form></search>
-        <script>
-          var contentLangs=['en'];
-        </script>
-        <script src="/microservices-datadriven/cloudbank/js/auto-complete.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.stemmer.support.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.multi.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/lunr/lunr.en.min.js?1747144443" defer></script>
-        <script src="/microservices-datadriven/cloudbank/js/search.js?1747144443" defer></script>
       </div>
       <div id="R-homelinks" class="default-animation homelinks">
-        <ul>
-          <li><a class="padding" href="/microservices-datadriven/cloudbank/index.html"><i class="fa-fw fas fa-home"></i> Home</a></li>
-        </ul>
-        <hr class="padding">
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-homelinks">
+          <ul class="space collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/index.html"><a class="padding" href="/microservices-backend/cloudbank/index.html"><i class="fa-fw fas fa-home"></i> Home</a></li>
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-headercontrols">
+          <ul class="">
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
+        </div>
       </div>
       <div id="R-content-wrapper" class="highlightable">
-        <div id="R-shortcutmenu-home" class="R-sidebarmenu">
+        <div class="R-sidebarmenu R-shortcutmenu-main">
           <ul class="enlarge morespace collapsible-menu">
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/provision/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/provision/index.html">Provision an Instance</a><ul id="R-subsections-d6947c2d1078796b2bfd976ebc0e0264" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/devenv/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/devenv/index.html">Developer Environment</a><ul id="R-subsections-559c2972a719279af6301d7032063e64" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/account/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/account/index.html">Account Microservice</a><ul id="R-subsections-af4a17527840af40a6cda3fc650af51b" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/check/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/check/index.html">Check Processing</a><ul id="R-subsections-159f69b312555d5f0055ca241e6721e2" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/saga/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/saga/index.html">Manage Sagas</a><ul id="R-subsections-dfd968a77748ad1f1a28d6a9118be66e" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/springai/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/springai/index.html">CloudBank AI Assistant</a><ul id="R-subsections-868fb0154339332ae87e7c98e3fa9bee" class="collapsible-menu"></ul></li>
-            <li class="parent " data-nav-id="/microservices-datadriven/cloudbank/deploy-cli/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-cli/index.html">Deploy with the CLI</a><ul id="R-subsections-b839a8f6f0f5efd1be94b7f9da9e78d1" class="collapsible-menu">
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-cli/intro/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-cli/intro/index.html">Introduction</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-cli/get-code/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-cli/get-code/index.html">Get the sample code</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-cli/build/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-cli/build/index.html">Build CloudBank</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-cli/deploy/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-cli/deploy/index.html">Deploy CloudBank</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-cli/create-routes/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-cli/create-routes/index.html">Create APISIX routes</a></li>
-            <li class="active " data-nav-id="/microservices-datadriven/cloudbank/deploy-cli/verify/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-cli/verify/index.html">Verify the deployment</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-cli/chatbot/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-cli/chatbot/index.html">Deploy the optional chatbot</a></li></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/deploy-ide/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/deploy-ide/index.html">Deploy with an IDE</a><ul id="R-subsections-fd584c0da8f22ebe818df94300151866" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/backend/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/backend/index.html">Explore the Backend</a><ul id="R-subsections-f948b454f68385a53d2483b3c80424ae" class="collapsible-menu"></ul></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/cleanup/index.html"><a class="padding" href="/microservices-datadriven/cloudbank/cleanup/index.html">Cleanup</a><ul id="R-subsections-6d9c3a2633de07dcbf4491d943578384" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/provision/index.html"><a class="padding" href="/microservices-backend/cloudbank/provision/index.html">Provision an Instance</a><ul id="R-subsections-d6947c2d1078796b2bfd976ebc0e0264" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/devenv/index.html"><a class="padding" href="/microservices-backend/cloudbank/devenv/index.html">Developer Environment</a><ul id="R-subsections-559c2972a719279af6301d7032063e64" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/account/index.html"><a class="padding" href="/microservices-backend/cloudbank/account/index.html">Account Microservice</a><ul id="R-subsections-af4a17527840af40a6cda3fc650af51b" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/check/index.html"><a class="padding" href="/microservices-backend/cloudbank/check/index.html">Check Processing</a><ul id="R-subsections-159f69b312555d5f0055ca241e6721e2" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/saga/index.html"><a class="padding" href="/microservices-backend/cloudbank/saga/index.html">Manage Sagas</a><ul id="R-subsections-dfd968a77748ad1f1a28d6a9118be66e" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/springai/index.html"><a class="padding" href="/microservices-backend/cloudbank/springai/index.html">CloudBank AI Assistant</a><ul id="R-subsections-868fb0154339332ae87e7c98e3fa9bee" class="collapsible-menu"></ul></li>
+            <li class="parent " data-nav-id="/microservices-backend/cloudbank/deploy-cli/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/index.html">Deploy with the CLI</a><ul id="R-subsections-b839a8f6f0f5efd1be94b7f9da9e78d1" class="collapsible-menu">
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-cli/intro/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/intro/index.html">Introduction</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-cli/get-code/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/get-code/index.html">Get the sample code</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-cli/build/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/build/index.html">Build CloudBank</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-cli/deploy/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/deploy/index.html">Deploy CloudBank</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-cli/create-routes/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/create-routes/index.html">Create APISIX routes</a></li>
+            <li class="active " data-nav-id="/microservices-backend/cloudbank/deploy-cli/verify/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/verify/index.html">Verify the deployment</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-cli/chatbot/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-cli/chatbot/index.html">Deploy the optional chatbot</a></li></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/deploy-ide/index.html"><a class="padding" href="/microservices-backend/cloudbank/deploy-ide/index.html">Deploy with an IDE</a><ul id="R-subsections-fd584c0da8f22ebe818df94300151866" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/backend/index.html"><a class="padding" href="/microservices-backend/cloudbank/backend/index.html">Explore the Backend</a><ul id="R-subsections-f948b454f68385a53d2483b3c80424ae" class="collapsible-menu"></ul></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/cleanup/index.html"><a class="padding" href="/microservices-backend/cloudbank/cleanup/index.html">Cleanup</a><ul id="R-subsections-6d9c3a2633de07dcbf4491d943578384" class="collapsible-menu"></ul></li>
           </ul>
         </div>
-        <div id="R-shortcutmenu-shortcuts" class="R-sidebarmenu">
+        <div class="R-sidebarmenu R-shortcutmenu-shortcuts">
           <div class="nav-title padding">More</div>
           <ul class="space collapsible-menu">
-            <li class="" data-nav-id="https://github.com/oracle/microservices-datadriven"><a class="padding" href="https://github.com/oracle/microservices-datadriven" target="_blank"><i class='fa-fw fab fa-github'></i> GitHub repo</a></li>
-            <li class="" data-nav-id="https://bit.ly/oraclespringboot"><a class="padding" href="https://bit.ly/oraclespringboot" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Oracle Backend for Spring Boot and Microservices</a></li>
-            <li class="" data-nav-id="https://github.com/oracle/spring-cloud-oracle"><a class="padding" href="https://github.com/oracle/spring-cloud-oracle" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Spring Cloud Oracle</a></li>
-            <li class="" data-nav-id="/microservices-datadriven/cloudbank/more/credits/"><a class="padding" href="/microservices-datadriven/cloudbank/more/credits/"><i class='fa-fw fas fa-bullhorn'></i> Credits</a></li>
+            <li class="" data-nav-id="https://github.com/oracle/microservices-backend"><a class="padding" href="https://github.com/oracle/microservices-backend" rel="external" target="_blank"><i class='fa-fw fab fa-github'></i> GitHub repo</a></li>
+            <li class="" data-nav-id="https://bit.ly/oraclespringboot"><a class="padding" href="https://bit.ly/oraclespringboot" rel="external" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Oracle Backend for Spring Boot and Microservices</a></li>
+            <li class="" data-nav-id="https://github.com/oracle/spring-cloud-oracle"><a class="padding" href="https://github.com/oracle/spring-cloud-oracle" rel="external" target="_blank"><i class='fa-fw fas fa-bookmark'></i> Spring Cloud Oracle</a></li>
+            <li class="" data-nav-id="/microservices-backend/cloudbank/more/credits/"><a class="padding" href="/microservices-backend/cloudbank/more/credits/"><i class='fa-fw fas fa-bullhorn'></i> Credits</a></li>
           </ul>
         </div>
-        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showFooter"></div>
-        <div id="R-menu-footer">
-          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showFooter">
-          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks">
-            <ul>
-              <li id="R-select-language-container" class="footerLangSwitch">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-language"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <label class="a11y-only" for="R-select-language">Language</label>
-                    <select id="R-select-language" onchange="location = this.querySelector( this.value ).dataset.url;">
-                      <option id="R-select-language-en" value="#R-select-language-en" data-url="/microservices-datadriven/cloudbank/deploy-cli/verify/index.html" lang="en-us" selected></option>
-                    </select>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-              </li>
-              <li id="R-select-variant-container" class="footerVariantSwitch">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-paint-brush"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <label class="a11y-only" for="R-select-variant">Theme</label>
-                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
-                      <option id="R-select-variant-zen-light" value="zen-light" selected>Zen Light</option>
-                    </select>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-                <script>window.variants && variants.markSelectedVariant();</script>
-              </li>
-              <li class="footerVisitedLinks">
-                <div class="padding menu-control">
-                  <i class="fa-fw fas fa-history"></i>
-                  <span>&nbsp;</span>
-                  <div class="control-style">
-                    <button onclick="clearHistory();">Clear History</button>
-                  </div>
-                  <div class="clear"></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div id="R-footer" class="footerFooter showFooter">
-	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://www.oracle.com/">Oracle</a></p>
-		<p>Copyright &copy; 2022, 2024, <br>Oracle and/or its affiliates</p>
-          </div>
+        <div id="R-footer-margin"></div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding">
         </div>
+        <div class="R-sidebarmenu R-shortcutmenu-footercontrols">
+          <ul class="">
+          </ul>
+        </div>
+<div id="R-footer">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://www.oracle.com/">Oracle</a></p>
+		<p>Copyright &copy; 2022, 2024, <br>Oracle and/or its affiliates</p></div>
       </div>
     </aside>
-    <script src="/microservices-datadriven/cloudbank/js/clipboard.min.js?1747144443" defer></script>
-    <script src="/microservices-datadriven/cloudbank/js/perfect-scrollbar.min.js?1747144443" defer></script>
-    <script src="/microservices-datadriven/cloudbank/js/theme.js?1747144443" defer></script>
+    <script src="/microservices-backend/cloudbank/js/clipboard/clipboard.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/perfect-scrollbar/perfect-scrollbar.min.js?1772471396" defer></script>
+    <script src="/microservices-backend/cloudbank/js/theme.min.js?1772471396" defer></script>
   </body>
 </html>

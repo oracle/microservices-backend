@@ -2,79 +2,79 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Developer Environment :: CloudBank AI</title>
-    <link>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/index.html</link>
+    <link>https://oracle.github.io/microservices-backend/cloudbank/devenv/index.html</link>
     <description>This module guides you through setting up the tools required for a Spring Boot developer.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <atom:link href="https://oracle.github.io/microservices-datadriven/cloudbank/devenv/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://oracle.github.io/microservices-backend/cloudbank/devenv/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Introduction</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/intro/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/devenv/intro/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/intro/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/devenv/intro/index.html</guid>
       <description>This module walks you through setting up your development environment to work with Oracle Backend for Microservices and AI.&#xA;Estimated time: 20 minutes&#xA;Recommended Development Environment platforms and tools The following platforms are recommended for a development environment:&#xA;Windows 10 or 11, preferably with Windows Subsystem for Linux 2 macOS (11 or later recommended) on Intel or Apple silicon Linux, e.g., Oracle Linux, Ubuntu, etc. The following tools are recommended for a development environment:</description>
     </item>
     <item>
       <title>Install IDE</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/ide/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/devenv/ide/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/ide/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/devenv/ide/index.html</guid>
       <description>Oracle recommends Visual Studio Code, which you can download here, and the following extensions to make it easier to write and build your code:&#xA;Spring Boot Extension Pack Extension Pack for Java Oracle Developer Tools Note: It is possible to use other Integrated Development Environments however all the instructions in this Livemoduleare written for and tested with Visual Studio Code, so we recommend that you use it for this Live Lab.</description>
     </item>
     <item>
       <title>Install JDK</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/jdk/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/devenv/jdk/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/jdk/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/devenv/jdk/index.html</guid>
       <description>Oracle recommends the Java SE Development Kit. The modules are using Spring Boot 3.3.x so Java 21 is required.&#xA;Download and install the Java Development Kit&#xA;Download the latest x64 Java 21 Development Kit from Java SE Development Kit.&#xA;Decompress the archive in your chosen location, e.g., your home directory and then add it to your path (the exact version of Java might differ in your environment):&#xA;export JAVA_HOME=$HOME/jdk-21.0.3 export PATH=$JAVA_HOME/bin:$PATH Verify the installation</description>
     </item>
     <item>
       <title>Install Maven</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/maven/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/devenv/maven/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/maven/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/devenv/maven/index.html</guid>
       <description>You can use either Maven or Gradle to build your Spring Boot applications. If you prefer Maven, follow the steps in this task. If you prefer Gradle, skip to the next task instead.&#xA;Download Maven&#xA;Download Maven from the Apache Maven website.&#xA;Install Maven&#xA;Decompress the archive in your chosen location, e.g., your home directory and then add it to your path (the exact version of maven might differ in your environment):</description>
     </item>
     <item>
       <title>Install CLI</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/oractl/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/devenv/oractl/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/oractl/index.html</guid>
-      <description>The Oracle Backend for Microservices and AI CLI (oractl) is used to configure your backend and to deploy your Spring Boot applications to the backend.&#xA;Download the Oracle Backend for Microservices and AI CLI&#xA;Download the CLI from here&#xA;Install the Oracle Backend for Microservices and AI CLI&#xA;To install the CLI, you just need to make sure it is executable and add it to your PATH environment variable.&#xA;chmod +x oractl export PATH=/path/to/oractl:$PATH NOTE: If environment is a Mac you need run the following command sudo xattr -r -d com.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/devenv/oractl/index.html</guid>
+      <description>The Oracle Backend for Microservices and AI CLI (oractl) is used to configure your backend and to deploy your Spring Boot applications to the backend.&#xA;Download the Oracle Backend for Microservices and AI CLI&#xA;Download the CLI from here&#xA;Install the Oracle Backend for Microservices and AI CLI&#xA;To install the CLI, you just need to make sure it is executable and add it to your PATH environment variable.&#xA;chmod +x oractl export PATH=/path/to/oractl:$PATH NOTE: If environment is a Mac you need run the following command sudo xattr -r -d com.apple.quarantine &lt;downloaded-file&gt; otherwise will you get a security warning and the CLI will not work.</description>
     </item>
     <item>
       <title>Install Kubectl and OCI CLI</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/kubectl/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/devenv/kubectl/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/kubectl/index.html</guid>
-      <description>In later labs, you will look various resources in the Kubernetes cluster and access some of them using port forwarding (tunneling). To do this, you will need to install kubectl on your machine, and since Oracle Container Engine for Kubernetes uses token based authentication for kubectl access, you will also need to install the OCI CLI so that kubectl can obtain the necessary token.&#xA;Install kubectl&#xA;Install kubectl from the Kubernetes website.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/devenv/kubectl/index.html</guid>
+      <description>In later labs, you will look various resources in the Kubernetes cluster and access some of them using port forwarding (tunneling). To do this, you will need to install kubectl on your machine, and since Oracle Container Engine for Kubernetes uses token based authentication for kubectl access, you will also need to install the OCI CLI so that kubectl can obtain the necessary token.&#xA;Install kubectl&#xA;Install kubectl from the Kubernetes website. Click on the link for your operating system and follow the instructions to complete the installation. As mentioned in the instructions, you can use this command to verify the installation, and you can ignore the warning since we are just checking the installation was successful (your output may be slightly different):</description>
     </item>
     <item>
       <title>Configure Kubectl</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/kubectl-config/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/devenv/kubectl-config/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/kubectl-config/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/devenv/kubectl-config/index.html</guid>
       <description>At the end of the previous lab, during the verification of the installation, you looked at the end of the apply log and copied a command to obtain a Kubernetes configuration file to access your cluster. In that lab, you used OCI CLoud Shell to confirm you could access the cluster. Now, you need to configure similar access from your own development machine. You can run that same command on your local machine, we recommend that you choose a different location for the file, so it does not overwrite or interfere with any other Kubernetes configuration file you might already have on your machine.</description>
     </item>
     <item>
       <title>Install SQLcl</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/sqlcl/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/devenv/sqlcl/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/sqlcl/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/devenv/sqlcl/index.html</guid>
       <description>(Optional) Install SQLcl&#xA;If you do not already have a database client, Oracle SQL Developer Command Line (SQLcl) is a free command line interface for Oracle Database which includes great features like auto-completion and command history. All the Labs are using SQLcl as the database client.&#xA;If you choose to use SQLcl make sure it is in your PATH variable:&#xA;export PATH=/path/to/sqlcl:$PATH</description>
     </item>
     <item>
       <title>Database Access</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/db-access/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/devenv/db-access/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/db-access/index.html</guid>
-      <description>The Oracle Backend for Microservices and AI includes an Oracle Database. An instance of an Oracle Autonomous Database (Shared) is created during installation.&#xA;To access the database from a local machine you need to download the wallet and configure SQLcl to use the downloaded wallet.&#xA;Download the Wallet Login into the OCI Console. Oracle Cloud&#xA;Navigate to Autonomous Transaction Processing.&#xA;Make sure that you have the right compartment selected and click on the database name.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/devenv/db-access/index.html</guid>
+      <description>The Oracle Backend for Microservices and AI includes an Oracle Database. An instance of an Oracle Autonomous Database (Shared) is created during installation.&#xA;To access the database from a local machine you need to download the wallet and configure SQLcl to use the downloaded wallet.&#xA;Download the Wallet Login into the OCI Console. Oracle Cloud&#xA;Navigate to Autonomous Transaction Processing.</description>
     </item>
     <item>
       <title>Install IDE Plugin</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/ide-plugin/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/devenv/ide-plugin/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/devenv/ide-plugin/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/devenv/ide-plugin/index.html</guid>
       <description>Some modules contain optional parts which show you how to do deployments and configuration with the IDE plugins instead of using the CLI. If you plan to do those optional parts, you need to install the VS Code extension for Oracle Backend for Microservices and AI. It is an extension to browse and deploy applications on the Oracle Backend for Microservices and AI platform. This plugin allows to inspect the content of an Oracle Backend for Microservices and AI deployment, in terms of applications, services and related configurations.</description>
     </item>
   </channel>

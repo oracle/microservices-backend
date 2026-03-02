@@ -2,72 +2,72 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Account Microservice :: CloudBank AI</title>
-    <link>https://oracle.github.io/microservices-datadriven/cloudbank/account/index.html</link>
+    <link>https://oracle.github.io/microservices-backend/cloudbank/account/index.html</link>
     <description>This module walks you through building your very first microservice using Spring Boot. It assumes no prior knowledge of Spring Boot, so its a great place to start if you have not used Spring Boot before. This module demonstrates how to build a service with a synchronous API implemented as REST endpoints using Spring Web MVC, and how to store data in Oracle Database using Spring Data JPA.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <atom:link href="https://oracle.github.io/microservices-datadriven/cloudbank/account/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://oracle.github.io/microservices-backend/cloudbank/account/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Introduction</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/account/intro/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/account/intro/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/account/intro/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/account/intro/index.html</guid>
       <description>This module walks you through the steps to build a Spring Boot microservice from scratch, and to deploy it into the Oracle Backend for Microservices and AI. In this lab, we will build the “Account” microservice. In the next lab, the remaining Cloud Bank microservices will be provided for you.&#xA;Estimated Time: 20 minutes&#xA;Quick walk through on how to build an account microservice.&#xA;Objectives In this lab, you will:</description>
     </item>
     <item>
       <title>Create Project</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/account/create-project/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/account/create-project/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/account/create-project/index.html</guid>
-      <description>Create a project to hold your Account service. In this lab, you will use the Spring Initialzr directly from Visual Studio Code, however it is also possible to use Spring Initialzr online and download a zip file with the generated project.&#xA;Create the project&#xA;In Visual Studio Code, press Ctrl+Shift+P (Cmd+Shift+P on a Mac) to access the command window. Start typing “Spring Init” and you will see a number of options to create a Spring project, as shown in the image below.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/account/create-project/index.html</guid>
+      <description>Create a project to hold your Account service. In this lab, you will use the Spring Initialzr directly from Visual Studio Code, however it is also possible to use Spring Initialzr online and download a zip file with the generated project.&#xA;Create the project&#xA;In Visual Studio Code, press Ctrl+Shift+P (Cmd+Shift+P on a Mac) to access the command window. Start typing “Spring Init” and you will see a number of options to create a Spring project, as shown in the image below. Select the option to Create a Maven Project.</description>
     </item>
     <item>
       <title>Implement First Service</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/account/first-service/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/account/first-service/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/account/first-service/index.html</guid>
-      <description>Implement the first simple endpoint&#xA;Create AccountController.java Create a new directory in the directory src/main/java/com/example/accounts called controller. In that new directory, create a new Java file called AccountController.java. When prompted for the type, choose class.&#xA;Your new file should look like this:&#xA;package com.example.accounts.controller; public class AccountController { } Add the RestController annotation Add the RestController annotation to this class to tell Spring Boot that we want this class to expose REST services.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/account/first-service/index.html</guid>
+      <description>Implement the first simple endpoint&#xA;Create AccountController.java Create a new directory in the directory src/main/java/com/example/accounts called controller. In that new directory, create a new Java file called AccountController.java. When prompted for the type, choose class.&#xA;Your new file should look like this:&#xA;package com.example.accounts.controller; public class AccountController { } Add the RestController annotation Add the RestController annotation to this class to tell Spring Boot that we want this class to expose REST services. You can just start typing @RestController before the public class statement and Visual Studio Code will offer code completion for you. When you select from the pop-up, Visual Studio Code will also add the import statement for you. The list of suggestions is based on the dependencies you added to your project.</description>
     </item>
     <item>
       <title>Prepare Database Objects</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/account/prepare-database/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/account/prepare-database/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/account/prepare-database/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/account/prepare-database/index.html</guid>
       <description>Get the database user ADMIN password&#xA;The ADMIN password can be retrieved from a k8s secret using this command. Replace the DBNAME with the name of your database. Save the password as it will be needed in later steps.&#xA;$ kubectl -n application get secret DBNAME-db-secrets -o jsonpath=&#39;{.data.db\.password}&#39; | base64 -d If you don’t know the name of the database, execute the following command and look for the line DBNAME-db-secrets.</description>
     </item>
     <item>
       <title>Use Spring Data JPA</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/account/jpa/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/account/jpa/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/account/jpa/index.html</guid>
-      <description>Add Spring Data JPA to the Account service and configure it to access the database&#xA;Spring Data JPA allows our Spring Boot application to easily use the database. It uses simple Java POJOs to represent the data model and provides a lot of out-of-the-box features which means there is a lot less boilerplate code to be written.&#xA;To add Spring Data JPA and the Oracle Database drivers to your project, open the Maven POM (pom.</description>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/account/jpa/index.html</guid>
+      <description>Add Spring Data JPA to the Account service and configure it to access the database&#xA;Spring Data JPA allows our Spring Boot application to easily use the database. It uses simple Java POJOs to represent the data model and provides a lot of out-of-the-box features which means there is a lot less boilerplate code to be written.&#xA;To add Spring Data JPA and the Oracle Database drivers to your project, open the Maven POM (pom.xml) and add these extra dependencies for Spring Data JPA, Oracle Spring Boot Starters for Oracle Database UCP (Universal Connection Pool) and Wallet:</description>
     </item>
     <item>
       <title>Query and Create Accounts</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/account/cr-accounts/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/account/cr-accounts/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/account/cr-accounts/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/account/cr-accounts/index.html</guid>
       <description>Create a service to list all accounts&#xA;Open your AccountsController.java file and add a final field in the class of type AccountRepository. And update the constructor to accept an argument of this type and set the field to that value. This tells Spring Boot to inject the JPA repository class we just created into this class. That will make it available to use in our services. The updated parts of your class should look like this:</description>
     </item>
     <item>
       <title>Extra Account Endpoints</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/account/extra-endpoints/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/account/extra-endpoints/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/account/extra-endpoints/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/account/extra-endpoints/index.html</guid>
       <description>If you would like to learn more about endpoints and implement the remainder of the account-related endpoints, this task provides the necessary details.&#xA;Implement Get Accounts for Customer ID endpoint&#xA;Add a new method to your AccountController.java class that responds to the HTTP GET method. This method should accept a customer ID as a path variable and return a list of accounts for that customer ID. If no accounts are found, return an empty body and set the HTTP Status Code to 204 (No Content).</description>
     </item>
     <item>
       <title>Deploy Account Service</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/account/deploy/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/account/deploy/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/account/deploy/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/account/deploy/index.html</guid>
       <description>Prepare the data source configuration for deployment&#xA;Update the data source configuration in your src/main/resources/application.yaml as shown in the example below. This will cause the service to read the correct database details that will be injected into its pod by the Oracle Backend for Microservices and AI.&#xA;datasource: url: ${spring.datasource.url} username: ${spring.datasource.username} password: ${spring.datasource.password} Add the client and configuration for the Spring Eureka Service Registry&#xA;When you deploy the application to the backend, you want it to register with the Eureka Service Registry so that it can be discovered by other services including the APISIX API Gateway, so that we can easily expose it outside the cluster.</description>
     </item>
     <item>
       <title>Expose using APISIX</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/account/expose/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/account/expose/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/account/expose/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/account/expose/index.html</guid>
       <description>Now that the account service is deployed, you need to expose it through the API Gateway so that clients will be able to access it. This is done by creating a “route” in APISIX Dashboard.&#xA;Retrieve the admin password for the APISIX API Gateway.&#xA;Execute the following command to get the password for the admin user for the APISIX API Gateway:&#xA;$ kubectl get secret -n apisix apisix-dashboard -o jsonpath=&#39;{.data.conf\.yaml}&#39; | base64 -d | grep &#39;password:&#39; Access the APISIX Dashboard</description>
     </item>
   </channel>

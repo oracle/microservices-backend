@@ -2,37 +2,37 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Cleanup :: CloudBank AI</title>
-    <link>https://oracle.github.io/microservices-datadriven/cloudbank/cleanup/index.html</link>
+    <link>https://oracle.github.io/microservices-backend/cloudbank/cleanup/index.html</link>
     <description>This module demonstrates how to clean up any resources created when you provisioned an instance of Oracle Backend for Microservices and AI on Oracle Cloud Infrastructure (OCI) or on your local machine in containers.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <atom:link href="https://oracle.github.io/microservices-datadriven/cloudbank/cleanup/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://oracle.github.io/microservices-backend/cloudbank/cleanup/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Introduction</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/cleanup/intro/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/cleanup/intro/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/cleanup/intro/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/cleanup/intro/index.html</guid>
       <description>When you have finished this Live module you may wish to clean up the resources you created. If so, you may complete the steps in this optional module.&#xA;Estimated module Time: 20 minutes&#xA;Quick walk through on how to clean up the module environment.&#xA;Objectives In this workshop, you will learn how to:&#xA;Clean up your instance of the Oracle Backend for Microservices and AI and other resources you created during this Live module Prerequisites This module assumes you have:</description>
     </item>
     <item>
       <title>Local cleanup</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/cleanup/uninstall-local/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/cleanup/uninstall-local/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/cleanup/uninstall-local/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/cleanup/uninstall-local/index.html</guid>
       <description>Note: These steps apply only if you chose the option to install in a local container.&#xA;Stop the local container using this command:&#xA;docker stop obaas Note: If you want to use the environment again later, stop at this step. You can restart it later with the command docker start obaas.&#xA;Remove the local container using this command:&#xA;docker rm obaas</description>
     </item>
     <item>
       <title>OCI Free Tier Cleanup</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/cleanup/uninstall-free-trial/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/cleanup/uninstall-free-trial/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/cleanup/uninstall-free-trial/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/cleanup/uninstall-free-trial/index.html</guid>
       <description>Note: These steps apply only if you chose the option to install in OCI Free Tier.&#xA;Login into your OCI Free Trail account.&#xA;Delete the Compute Instance.&#xA;Select the compartment where you installed the Compute instance in the drop down box on the left hand side of the OCI Console.&#xA;Navigate to the Compute Instances page by clicking on the link on the home page of the OCI Console or opening the main menu using the “hamburger” icon ( ) in the top left corner of the console and searching for “instance”:</description>
     </item>
     <item>
       <title>OCI Marketplace Uninstall</title>
-      <link>https://oracle.github.io/microservices-datadriven/cloudbank/cleanup/uninstall-mp/index.html</link>
+      <link>https://oracle.github.io/microservices-backend/cloudbank/cleanup/uninstall-mp/index.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://oracle.github.io/microservices-datadriven/cloudbank/cleanup/uninstall-mp/index.html</guid>
+      <guid>https://oracle.github.io/microservices-backend/cloudbank/cleanup/uninstall-mp/index.html</guid>
       <description>Note: These steps apply only if you chose the option to install the full stack from OCI Marketplace.&#xA;The Oracle Backend for Microservices and AI environment was deployed using ORM and Terraform. The uninstall will use OCI Resource Manager (ORM) to Destroy the stack.&#xA;Navigate to OCI Resource Manager Stacks&#xA;Make sure you choose the Compartment where you installed Oracle Backend for Microservices and AI. Click on the Stack Name (which will be different from the screenshot)</description>
     </item>
   </channel>
