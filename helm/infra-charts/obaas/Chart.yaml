@@ -20,6 +20,10 @@ appVersion: "2.1.0-build.3"
 # kube-state-metrics, strimzi-kafka-operator, coherence-operator) are in the obaas-prereqs chart.
 # Install obaas-prereqs once per cluster before installing this chart.
 dependencies:
+  - name: gateway-helm
+    repository: "file://charts/gateway-helm"
+    version: 1.7.0
+    condition: gateway-helm.enabled
   - name: ingress-nginx
     version: "4.13.2"
     repository: https://kubernetes.github.io/ingress-nginx
