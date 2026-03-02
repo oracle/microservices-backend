@@ -3,7 +3,7 @@ entries:
   obaas:
   - apiVersion: v2
     appVersion: 2.0.0
-    created: "2026-03-02T10:44:12.231851656-05:00"
+    created: "2026-03-02T16:17:56.122524064-05:00"
     dependencies:
     - condition: ingress-nginx.enabled
       name: ingress-nginx
@@ -26,7 +26,7 @@ entries:
       repository: https://oracle.github.io/ai-optimizer/helm
       version: '>=2.0.0 <3.0.0'
     description: A Helm chart for Oracle Backend as a Service
-    digest: 38ffbf0607430701966fda5dcaff82733f1024e29e404f2cd607724d7a32997c
+    digest: 591f33e0d865ef1b624269868edbfb2e8b354f256b20f899fdca18eeb606e903
     home: https://oracle.github.io/microservices-backend
     kubeVersion: '>= 1.32.1'
     maintainers:
@@ -41,7 +41,7 @@ entries:
   obaas-prereqs:
   - apiVersion: v2
     appVersion: 2.0.0
-    created: "2026-03-02T10:44:12.252595329-05:00"
+    created: "2026-03-02T16:17:56.145269814-05:00"
     dependencies:
     - condition: external-secrets.enabled
       name: external-secrets
@@ -69,7 +69,7 @@ entries:
       version: 3.5.6
     description: Prerequisites and cluster-singleton infrastructure for Oracle Backend
       as a Service
-    digest: 57be1485b888f31b16ae80d59daa427118336df524d4077bcc3d3ed6ca0c7a5a
+    digest: 4c1cbd755ae4f1708f4443102636c65f6be24b43aa47da8939b11db814bceacd
     home: https://oracle.github.io/microservices-backend
     kubeVersion: '>= 1.32.1'
     maintainers:
@@ -84,7 +84,7 @@ entries:
   obaas-sample-app:
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2026-03-02T10:44:12.253731185-05:00"
+    created: "2026-03-02T16:17:56.145818417-05:00"
     description: A Helm chart for deploying applications to the Oracle Backend for
       Microservices and AI (OBaaS) Platform
     digest: 5e054d0265af986d177095005be3f95d1502b0c31f6813f552596898aa1ea8a9
@@ -98,4 +98,4 @@ entries:
     urls:
     - obaas-sample-app-0.0.1.tgz
     version: 0.0.1
-generated: "2026-03-02T10:44:12.195408636-05:00"
+generated: "2026-03-02T16:17:56.085698344-05:00"
