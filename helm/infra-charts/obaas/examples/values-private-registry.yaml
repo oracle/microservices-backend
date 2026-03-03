@@ -574,10 +574,10 @@ signoz:
           verbs: ["get", "list", "watch"]
     config:
       receivers:
-        otlp:
-          protocols:
-            grpc:
-            http:
+        # otlp:
+        #   protocols:
+        #     grpc:
+        #     http:
         k8s_events:
           auth_type: serviceAccount
         prometheus:
