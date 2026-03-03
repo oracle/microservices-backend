@@ -28,10 +28,17 @@ AppVersion: 2.1.0-build.2
 
 # 0.0.4 - Mar 1, 2026
 
-AppVersion: 2.1.0-build.2
+AppVersion: 2.1.0-build.3
 
 - Fix issue in oraOperator wait-for-certmgr job: was not creating imagePullSecret
 - Fix issue in airgap patch job to handle imagePullSecret correctly
 - Fix issue in otmm template to handle imagePullSecret correctly
 - Update sample values files to specificy imagePullSecrets as required for each sub-chart
+
+# 0.0.5 - Mar 3, 2026
+
+AppVersion: 2.1.0-build.4
+
+- Update otel-collector config to add k8s_events receiver
+- Update rbac to allow otel-collector to get/list/watch events
 
