@@ -42,6 +42,13 @@ AppVersion: 2.1.0-build.4
 - Update otel-collector config to add k8s_events receiver
 - Update rbac to allow otel-collector to get/list/watch events
 
+# 0.0.5 - Mar 3, 2026
+
+AppVersion: 2.1.0-build.4
+
+- Update otel-collector config to add k8s_events receiver
+- Update rbac to allow otel-collector to get/list/watch events
+
 # 0.0.6 - TBD
 
 AppVersion: 2.1.0-build.5
