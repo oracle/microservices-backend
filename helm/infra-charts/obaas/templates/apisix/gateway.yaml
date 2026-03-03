@@ -1,0 +1,43 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+
+{{- if (index .Values "apisix").enabled }}
+{{- if (index .Values "gateway-helm").enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: {{ .Release.Name }}-envoy-gateway
+  namespace: {{ .Release.Namespace }}
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ .Release.Name }}-envoy-apisix
+  namespace: {{ .Release.Namespace }}
+spec:
+  gatewayClassName: {{ .Release.Name }}-envoy-gateway
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Name }}-envoy-apisix-all-hosts
+  namespace: {{ .Release.Namespace }}
+spec:
+  parentRefs:
+    - name: {{ .Release.Name }}-envoy-apisix
+  rules:
+    - backendRefs:
+        - name: {{ printf "%s-apisix-gateway" .Release.Name }}
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+{{- end }}
+{{- end }}
