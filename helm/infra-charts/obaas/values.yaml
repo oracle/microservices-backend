@@ -468,7 +468,7 @@ signoz:
     clusterRole:
       rules:
         - apiGroups: [""]
-          resources: ["pods", "namespaces", "nodes", "services", "endpoints"]
+          resources: ["pods", "namespaces", "nodes", "services", "endpoints", "events"]
           verbs: ["get", "list", "watch"]
         - apiGroups: ["apps"]
           resources: ["replicasets"]
@@ -481,6 +481,12 @@ signoz:
           verbs: ["get", "list", "watch"]
     config:
       receivers:
+        otlp:
+          protocols:
+            grpc:
+            http:
+        k8s_events:
+          auth_type: serviceAccount
         prometheus:
           config:
             global:
@@ -538,7 +544,7 @@ signoz:
         pipelines:
           logs:
             receivers:
-              # - k8s_events
+              - k8s_events
               - otlp
               - httplogreceiver/heroku
               - httplogreceiver/json
