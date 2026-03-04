@@ -92,9 +92,33 @@
             <artifactId>jersey-media-json-binding</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- Replace JUL with SLF4J/Logback for modern logging and OpenTelemetry OTLP structured logging -->
         <dependency>
-            <groupId>io.helidon.logging</groupId>
-            <artifactId>helidon-logging-jul</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.14</version>
+        </dependency>
+        <!-- Bridge internal Helidon JUL logs to SLF4J/Logback -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <!-- Structural JSON Logging -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>7.4</version>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-logback-mdc-1.0</artifactId>
+            <version>2.1.0-alpha</version> <!-- Depending on OPENTELEMETRY java instrumentation version, usually 2.x or 1.x aligns with the SDK -->
             <scope>runtime</scope>
         </dependency>
         <dependency>

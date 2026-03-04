@@ -213,66 +213,33 @@ otel.exporter.otlp.protocol=http/protobuf
 
 ## OpenTelemetry Logging
 
-This service implements **OpenTelemetry OTLP logging with trace correlation** to export logs to observability backends like SigNoz.
+This service implements **Structured JSON Logging with Trace Correlation** to natively export logs to observability backends like SigNoz without manual OpenTelemetry SDK configurations.
 
-### Architecture
+### Architecture: "Platform Pays Once"
 
-Since Helidon 4.x uses Java Util Logging (JUL) and there is no standalone OpenTelemetry JUL appender artifact, we implement a **custom JUL handler** that bridges logs to OpenTelemetry.
+This application relies on the underlying Kubernetes OpenTelemetry DaemonSet to parse structured logs. The microservice itself is completely decoupled from telemetry exporters or APIs.
 
 **Key Components:**
-1. **Custom Handler**: [`OpenTelemetryJULHandler.java`](src/main/java/com/example/observability/OpenTelemetryJULHandler.java)
-   - Bridges JUL → OpenTelemetry LogsBridge API
-   - Uses `.setContext(Context.current())` to capture trace context
-   - Ensures logs include `trace_id` and `span_id` for correlation
+1. **Dependencies** (`pom.xml`):
+   - `slf4j-api` and `logback-classic` (Replaces JUL)
+   - `logstash-logback-encoder` (Formats output as JSON)
+   - `opentelemetry-logback-mdc-1.0` (Bridges OTel context to MDC)
 
-2. **Dependencies** (`pom.xml`):
-   ```xml
-   <dependency>
-       <groupId>io.opentelemetry</groupId>
-       <artifactId>opentelemetry-sdk-logs</artifactId>
-   </dependency>
-   <dependency>
-       <groupId>io.opentelemetry</groupId>
-       <artifactId>opentelemetry-api</artifactId>
-   </dependency>
-   ```
+2. **Configuration** (`src/main/resources/logback.xml`):
+   Standardizes all container application text output to pure JSON string lines via the `LogstashEncoder`.
 
-3. **Configuration** (`logging.properties`):
-   ```properties
-   handlers=java.util.logging.ConsoleHandler,com.example.observability.OpenTelemetryJULHandler
-   com.example.observability.OpenTelemetryJULHandler.level=ALL
-   ```
+3. **Trace Injection** (`src/main/java/com/example/MdcFilter.java`):
+   A custom JAX-RS `ContainerRequestFilter` that intercepts incoming HTTP requests, extracts the active `trace_id` and `span_id` from the OpenTelemetry SpanContext, and securely drops them into the SLF4J ThreadLocal MDC. 
 
-4. **Application Config** (`application.yaml`):
-   ```yaml
-   otel:
-     logs:
-       exporter: otlp
-   ```
-
-### How It Works
-
-1. Helidon's `helidon-microprofile-telemetry` initializes `GlobalOpenTelemetry` with OTLP configuration
-2. The custom handler accesses this via `GlobalOpenTelemetry.get().getLogsBridge()`
-3. For each log record, the handler calls `.setContext(Context.current())` to link logs to active traces
-4. Logs are exported via OTLP to the configured endpoint (e.g., SigNoz)
-5. In SigNoz, logs appear with `trace_id` and `span_id`, enabling seamless log-trace correlation
+4. **Cluster Collection**:
+   Because the logs are printed to `stdout` in pure JSON with trace IDs attached, the cluster's OpenTelemetry DaemonSet natively scrapes, parses, and correlates the logs entirely outside of the application's runtime.
 
 ### Benefits
 
-- ✅ **No Java Agent required** - Keeps image size small
-- ✅ **Automatic trace correlation** - Logs link directly to traces
-- ✅ **Standard API** - Uses official OpenTelemetry SDK
-- ✅ **Minimal overhead** - Only logs actually emitted by the application
-
-### Environment Variables
-
-Set these in your deployment (already configured in `deployment.yaml`):
-```bash
-OTEL_LOGS_EXPORTER=otlp
-OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
-JAVA_TOOL_OPTIONS=-Dotel.java.global-autoconfigure.enabled=true
-```
+- ✅ **No Manual SDK Setup** - No custom `GlobalOpenTelemetry` endpoints to configure inside the app.
+- ✅ **Automatic Trace Correlation** - Any vanilla `LOGGER.info()` statement instantly gets stamped with the distributed Trace ID.
+- ✅ **Zero Exporter Overhead** - The application only prints text locally; the cluster agent handles the expensive network gRPC telemetry export.
+- ✅ **SigNoz Ready** - Log levels and trace graphs are perfectly mapped out-of-the-box.
 
 ## Build Architecture
 
