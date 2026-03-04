@@ -4,10 +4,10 @@ apiVersion: v2
 type: application
 name: obaas-sample-app
 description: A Helm chart for deploying applications to the Oracle Backend for Microservices and AI (OBaaS) Platform
-home: https://oracle.github.io/microservices-datadriven
+home: https://oracle.github.io/microservices-backend
 maintainers:
   - name: Oracle and/or its affiliates
     email: obaas_ww@oracle.com
-    url: https://oracle.github.io/microservices-datadriven
+    url: https://oracle.github.io/microservices-backend
 version: 0.0.1
 appVersion: "0.0.1"

@@ -22,7 +22,7 @@ useradd obaas
 
 ### Download Oracle Backend for Microservices and AI
 
-Download the latest version of [Oracle Backend for Microservices and AI](https://github.com/oracle/microservices-datadriven/releases/download/OBAAS-1.4.0/onprem-ebaas_latest.zip) and unzip into a new directory.
+Download the latest version of [Oracle Backend for Microservices and AI](https://github.com/oracle/microservices-backend/releases/download/OBAAS-1.4.0/onprem-ebaas_latest.zip) and unzip into a new directory.
 
 As the `obaas` user, run this command:
 

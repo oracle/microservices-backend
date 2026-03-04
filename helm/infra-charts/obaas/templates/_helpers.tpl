@@ -114,6 +114,24 @@ Get the signoz authentication secret name
 {{- print "signoz-authn" }}
 {{- end }}
 {{- end }}
+
+{{/*
+Compute the SigNoz subchart's fullname, mirroring signoz.fullname logic.
+Honors signoz.nameOverride and signoz.fullnameOverride from parent values.
+*/}}
+{{- define "obaas.signoz.fullname" -}}
+{{- if .Values.signoz.fullnameOverride -}}
+{{- .Values.signoz.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default "signoz" .Values.signoz.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
 {{/*
 Generate a random password for database credentials
 */}}

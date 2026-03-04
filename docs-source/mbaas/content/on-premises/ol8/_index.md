@@ -80,7 +80,7 @@ minikube addons enable ingress
 
 ### Download Oracle Backend for Parse Server
 
-As the `obaas` user, download [Oracle Backend for Parse Server](https://github.com/oracle/microservices-datadriven/releases/download/OBAAS-1.0.0/onprem-mbaas_latest.zip) and unzip into a new directory. For example:
+As the `obaas` user, download [Oracle Backend for Parse Server](https://github.com/oracle/microservices-backend/releases/download/OBAAS-1.0.0/onprem-mbaas_latest.zip) and unzip into a new directory. For example:
 
 ```bash
 unzip onprem-mbaas_latest.zip -d ~/obaas

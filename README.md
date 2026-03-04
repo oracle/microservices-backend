@@ -4,7 +4,7 @@ This repository contains sample code for simplifying microservices architectures
 
 Microservices are loosely-coupled service-oriented architectures with a bounded context. Microservices are increasingly used for application modernization to deliver agile application development practices. However, the data-driven nature of enterprise applications has made building, deploying, and maintaining microservices complex.
 
-[Read our blogs](https://oracle.github.io/microservices-datadriven/spring/blogs)
+[Read our blogs](https://oracle.github.io/microservices-backend/spring/blogs)
 
 ## Projects
 
@@ -18,7 +18,7 @@ Microservices are loosely-coupled service-oriented architectures with a bounded 
 ### Oracle Backend for Microservices and AI
 
 The Oracle Backend for Microservices and AI (OBaaS) is a comprehensive microservices platform for AI microservices with Oracle AI Database.
-[Documentation](https://oracle.github.io/microservices-datadriven/obaas/) 
+[Documentation](https://oracle.github.io/microservices-backend/obaas/) 
 
 Deploy into Oracle Cloud Infrastructure using Infrastructure as Code:
 
@@ -27,12 +27,12 @@ Deploy into Oracle Cloud Infrastructure using Infrastructure as Code:
 ### CloudBank AI
 
 Build an Application with Spring Boot and Spring Cloud Oracle with Oracle AI Database and Kubernetes.
-* [Documentation](https://oracle.github.io/microservices-datadriven/cloudbank/)
+* [Documentation](https://oracle.github.io/microservices-backend/cloudbank/)
 
 ### Oracle Spring Boot Starters
 
 Spring Boot Starters that make it easy to use various Oracle technologies in Spring Boot projects.
-* [Documentation](https://oracle.github.io/microservices-datadriven/spring/starters/)
+* [Documentation](https://oracle.github.io/microservices-backend/spring/starters/)
 
 ### Data Refactoring Advisor
 
@@ -60,4 +60,4 @@ Licensed under the Universal Permissive License v 1.0 as shown at <https://oss.o
 
 [ATP]: https://docs.oracle.com/en/cloud/paas/autonomous-database/index.html
 [magic_button]: https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg
-[magic_arch_stack]: https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle/microservices-datadriven/releases/latest/download/obaas-iac.zip
+[magic_arch_stack]: https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle/microservices-backend/releases/latest/download/obaas-iac.zip

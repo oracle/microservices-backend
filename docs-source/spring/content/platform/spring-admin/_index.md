@@ -32,7 +32,7 @@ the applications:
     {{< img name="obaas-springadmin-apps" size="medium" lazy=false >}}
     <!-- spellchecker-enable -->
 
-    On the dashboard you will see all the internal services registered with Eureka. If you have deployed the sample application [CloudBank](https://github.com/oracle/microservices-datadriven/tree/main/cloudbank-v4) or done the [LiveLab for Oracle Backend for Microservices and AI](https://bit.ly/cloudbankAI) you will see those services.
+    On the dashboard you will see all the internal services registered with Eureka. If you have deployed the sample application [CloudBank](https://github.com/oracle/microservices-backend/tree/main/cloudbank-v4) or done the [LiveLab for Oracle Backend for Microservices and AI](https://bit.ly/cloudbankAI) you will see those services.
 
     If you click (expand) an application and click on the instance of service you will details about the service instance, metrics, configuration, and so on,
 

@@ -6,6 +6,8 @@
 container-registry.oracle.com/database/observability-exporter:2.2.0
 container-registry.oracle.com/database/otmm:24.4.1
 container-registry.oracle.com/database/sqlcl:25.3.0
+container-registry.oracle.com/database/free:latest
+container-registry.oracle.com/database/operator:2.0
 container-registry.oracle.com/middleware/coherence-operator:3.5.6
 docker.io/altinity/clickhouse-operator:0.21.2
 docker.io/altinity/metrics-exporter:0.21.2
@@ -17,6 +19,8 @@ docker.io/curlimages/curl:8.17.0
 docker.io/groundnuty/k8s-wait-for:v2.0
 docker.io/library/alpine:3.18.2
 docker.io/library/alpine/k8s:1.28.13
+docker.io/library/nginx:alpine
+docker.io/otel/opentelemetry-collector-contrib:0.139.0
 docker.io/signoz/signoz-otel-collector:v0.129.11
 docker.io/signoz/signoz-schema-migrator:v0.129.11
 docker.io/signoz/signoz:v0.102.1
@@ -36,7 +40,12 @@ phx.ocir.io/id9y6mi8tcky/oke-public-oracle-database-operator@sha256:d9fb9bf8b94f
 container-registry.oracle.com/obaas/admin-server:2.0.0
 container-registry.oracle.com/obaas/conductor:server-2.0.0
 container-registry.oracle.com/obaas/conductor:cache-2.0.0
+container-registry.oracle.com/obaas/dashboards:2.0.0
 container-registry.oracle.com/obaas/service-registry:2.0.0
 quay.io/strimzi/operator:0.45.1
+quay.io/jetstack/cert-manager-cainjector:v1.19.1
+quay.io/jetstack/cert-manager-controller:v1.19.1
+quay.io/jetstack/cert-manager-webhook:v1.19.1
 registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.17.0
 registry.k8s.io/metrics-server/metrics-server:v0.8.0
+registry.k8s.io/ingress-nginx/controller:v1.11.5

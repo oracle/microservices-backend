@@ -6,7 +6,7 @@ title: "Extra Parse Test Code"
 
 To test the Parse API direct access from the same page, let's add a few lines of codes to the `index.html` file to show four new buttons to **Insert**, **Get** and **Update** a
 restaurant (minimum properties) in the same collection created from the Firebase-on-Parse SDK. The application logic is
-in the [`/parsef/example.js`](https://github.com/oracle/microservices-datadriven/blob/main/developer-preview/parsef/example.js) file.
+in the [`/parsef/example.js`](https://github.com/oracle/microservices-backend/blob/main/developer-preview/parsef/example.js) file.
 
 * The modified parts included in the `index.html` file are the following:
 

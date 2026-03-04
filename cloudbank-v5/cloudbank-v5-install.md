@@ -481,5 +481,5 @@ done
 ## Additional Resources
 
 - [CloudBank README](README.md) - Detailed testing guide
-- [OBaaS Documentation](https://oracle.github.io/microservices-datadriven/obaas/)
-- [Report Issues](https://github.com/oracle/microservices-datadriven/issues)
+- [OBaaS Documentation](https://oracle.github.io/microservices-backend/obaas/)
+- [Report Issues](https://github.com/oracle/microservices-backend/issues)

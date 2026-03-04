@@ -123,7 +123,7 @@ applications can talk to models hosted by Ollama.
 Now, you will create a simple Spring AI application that uses Llama3 to
 create a simple chatbot.
 
-> **Note:** The sample code used in this module is available [here](https://github.com/oracle/microservices-datadriven/tree/main/cloudbank-v4/chatbot).
+> **Note:** The sample code used in this module is available [here](https://github.com/oracle/microservices-backend/tree/main/cloudbank-v4/chatbot).
 
 1. Create a new Spring Boot project
 

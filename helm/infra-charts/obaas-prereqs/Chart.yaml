@@ -5,15 +5,15 @@ type: application
 name: "obaas-prereqs"
 kubeVersion: ">= 1.32.1"
 description: Prerequisites and cluster-singleton infrastructure for Oracle Backend as a Service
-home: https://oracle.github.io/microservices-datadriven
+home: https://oracle.github.io/microservices-backend
 maintainers:
   - name: Oracle and/or its affiliates
     email: obaas_ww@oracle.com
-    url: https://oracle.github.io/microservices-datadriven
+    url: https://oracle.github.io/microservices-backend
 # This is the chart version.
-version: 0.0.1
+version: 0.0.5
 # This is the version number of the application being deployed.
-appVersion: "2.0.0"
+appVersion: "2.1.0-build.4"
 
 # SubCharts - Cluster-scoped singleton infrastructure
 dependencies:

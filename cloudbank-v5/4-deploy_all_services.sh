@@ -55,7 +55,7 @@ DRY_RUN=false
 print_step "Checking obaas Helm repo..."
 if ! helm repo list | grep -q "^obaas"; then
     print_info "Adding obaas Helm repo..."
-    helm repo add obaas https://oracle.github.io/microservices-datadriven/helm
+    helm repo add obaas https://oracle.github.io/microservices-backend/helm
 else
     print_info "obaas Helm repo already exists, skipping add"
 fi

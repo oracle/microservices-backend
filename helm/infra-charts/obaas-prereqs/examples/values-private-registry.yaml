@@ -27,66 +27,103 @@
 #
 # =============================================================================
 
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+
 # -----------------------
 # -- Global Configuration
 # -----------------------
 global:
+  # All prerequisite components install into the release namespace (specified with -n flag)
+  # There is no global namespace override - components use the namespace you provide during install
+
   # Image pull secret for private registry authentication
   # This is automatically propagated to all subcharts via YAML anchors
-  imagePullSecrets:
+  imagePullSecrets: &imagePullSecrets 
     - name: myregistry-secret
 
+# ------------------------------------
+# -- OBaaS Prerequisites Configuration
+# ------------------------------------
+
+# These are cluster-scoped singleton components that should only be installed once per cluster
+#
+# Image Override Pattern:
+# All image configurations are commented out by default to use upstream defaults.
+# To use a private registry or air-gapped installation, uncomment and set the image values.
+# Example: Change "registry.k8s.io" to "myregistry.example.com" for all components.
+
+# -------------------------
+# -- SubChart Configuration
+# -------------------------
+
 # =============================================================================
-# cert-manager
+# Oracle Database Operatior (and its prereq cert-manager)
 # =============================================================================
 # Default registry: quay.io
 # Has multiple components, each needs registry override
 
 oracle-database-operator:
   enabled: true
+  # Empty namespace will cause the use of .Release.Namespace
+  namespace: ""
+  replicas: 1
+  # Image pull secrets for private registries (shared with cert-manager subchart)
+  imagePullSecrets: *imagePullSecrets
   image:
-    registry: myregistry.example.com
-    repository: database/operator
+    repository: myregistry.example.com/database/operator
+    # Specify a version tag for reproducible deployments
     tag: "2.0"
     pullPolicy: IfNotPresent
-  cert-manager:
-    installCRDs: true
-    # Main controller
-    image:
-      registry: myregistry.example.com
-      repository: jetstack/cert-manager-controller
-      # tag: ""  # Uses chart default
-    # Webhook
-    webhook:
-      image:
-        registry: myregistry.example.com
-        repository: jetstack/cert-manager-webhook
-        # tag: ""  # Uses chart default
-    # CA Injector
-    cainjector:
-      image:
-        registry: myregistry.example.com
-        repository: jetstack/cert-manager-cainjector
-        # tag: ""  # Uses chart default
-    # ACME Solver
-    acmesolver:
-      image:
-        registry: myregistry.example.com
-        repository: jetstack/cert-manager-acmesolver
-        # tag: ""  # Uses chart default
-    # Startup API Check
-    startupapicheck:
-      image:
-        registry: myregistry.example.com
-        repository: jetstack/cert-manager-startupapicheck
-        # tag: ""  # Uses chart default
+  # Deployment scope configuration
+  scope:
+    mode: cluster
+  # RBAC configuration
+  rbac:
+    nodeAccess: false
+  # Enable leader election for controller manager
+  leaderElection: true
+  # Pod Disruption Budget (only applies when replicas > 1)
+  pdb:
+    enabled: true
+    minAvailable: 1
+    # maxUnavailable: 1  # Alternative to minAvailable
+  # Wait job configuration for cert-manager webhook readiness (not passed to subchart)
   certManagerWaitJob:
     # Waits for cert-manager webhook before creating Issuer/Certificate resources
+    # Set to false only if cert-manager is known to be ready (e.g., pre-installed and running)
     enabled: true
     image:
-      repository: registry.k8s.io/kubectl
+      repository: myregistry.example.com/kubectl
       tag: "v1.28.0"
       pullPolicy: IfNotPresent
+  # cert-manager subchart values (passed to subchart when enabled=true)
+  cert-manager:
+    enabled: true
+    # Empty namespace will cause the use of .Release.Namespace
+    namespace: ""
+    installCRDs: true
+    crds:
+      # Allow CRDs to be deleted on uninstall (WARNING: deletes all cert-manager resources)
+      keep: false
+    global:
+      imagePullSecrets: *imagePullSecrets
+    image:
+      repository: myregistry.example.com/jetstack/cert-manager-controller
+      tag: v1.19.1
+    webhook:
+      image:
+        repository: myregistry.example.com/jetstack/cert-manager-webhook
+        tag: v1.19.1
+    cainjector:
+      image:
+        repository: myregistry.example.com/jetstack/cert-manager-cainjector
+        tag: v1.19.1
+    startupapicheck:
+      image:
+        repository: myregistry.example.com/jetstack/cert-manager-startupapicheck
+        tag: v1.19.1
 
 # =============================================================================
 # external-secrets
@@ -97,17 +134,23 @@ oracle-database-operator:
 external-secrets:
   enabled: true
   installCRDs: true
+  # Uses global.imagePullSecrets
+  imagePullSecrets: *imagePullSecrets
+  global:
+    imagePullSecrets: *imagePullSecrets
+  # Uncomment to override the default image repository
   image:
-    repository: myregistry.example.com/external-secrets/external-secrets
-    # tag: ""  # Uses chart default
+    repository: "myregistry.example.com/external-secrets/external-secrets"
   webhook:
     image:
       repository: myregistry.example.com/external-secrets/external-secrets
-      # tag: ""  # Uses chart default
+      pullPolicy: IfNotPresent
+    imagePullSecrets: *imagePullSecrets
   certController:
     image:
       repository: myregistry.example.com/external-secrets/external-secrets
-      # tag: ""  # Uses chart default
+      pullPolicy: IfNotPresent
+    imagePullSecrets: *imagePullSecrets
 
 # =============================================================================
 # metrics-server
@@ -117,9 +160,12 @@ external-secrets:
 
 metrics-server:
   enabled: true
+  # Uses global.imagePullSecrets
+  # global:
+  imagePullSecrets: *imagePullSecrets
+  # Uncomment to override the default image repository
   image:
-    repository: myregistry.example.com/metrics-server/metrics-server
-    # tag: ""  # Uses chart default
+    repository: "myregistry.example.com/metrics-server/metrics-server"
 
 # =============================================================================
 # kube-state-metrics
@@ -128,10 +174,18 @@ metrics-server:
 
 kube-state-metrics:
   enabled: true
+  imagePullSecrets: *imagePullSecrets
+  # global:
+  #   # Uses global.imagePullSecrets
+  #   imagePullSecrets: *imagePullSecrets
+  # Uncomment to override the default image
   image:
-    registry: myregistry.example.com
-    repository: kube-state-metrics/kube-state-metrics
-    # tag: ""  # Uses chart default
+    registry: "myregistry.example.com"  # Default: registry.k8s.io
+    repository: "kube-state-metrics/kube-state-metrics"
+  # Control which namespaces it monitors
+  # releaseNamespace: false  # Set to true to only watch release namespace
+  # namespaces: ""  # Comma-separated list or yaml list of namespaces to watch
+  # namespacesDenylist: ""  # Namespaces to exclude from watching
 
 # =============================================================================
 # strimzi-kafka-operator
@@ -141,10 +195,21 @@ kube-state-metrics:
 
 strimzi-kafka-operator:
   enabled: true
-  # This sets the registry for both the operator and Kafka images it creates
-  defaultImageRegistry: myregistry.example.com
-  # Default repository prefix (images are under strimzi/)
-  defaultImageRepository: strimzi
+  # List of namespaces the operator should watch (empty = watch all namespaces)
+  watchNamespaces: []
+  # Set to true to watch all namespaces (recommended for multi-tenant OBaaS installations)
+  watchAnyNamespace: true
+  # Uncomment to override the default image registry and repository
+  defaultImageRegistry: "myregistry.example.com"  # Default: quay.io
+  defaultImageRepository: "strimzi"  # Default: strimzi
+  defaultImageTag: 0.45.1
+  image:
+    # Uses global.imagePullSecrets
+    imagePullSecrets: *imagePullSecrets
+    registry: myregistry.example.com
+    repository: strimzi
+    name: operator
+    tag: 0.45.1
 
 # =============================================================================
 # coherence-operator
@@ -153,13 +218,22 @@ strimzi-kafka-operator:
 
 coherence-operator:
   enabled: true
-  # Operator image
+  # Uses global.imagePullSecrets
+  imagePullSecrets: *imagePullSecrets
+  # Operator image configuration
   image:
-    registry: myregistry.example.com/middleware
-    name: coherence-operator
+    registry: "myregistry.example.com/middleware"
+    name: "coherence-operator"
     tag: "3.5.6"
   # Default Coherence image for applications
   defaultCoherenceImage:
-    registry: myregistry.example.com/middleware
-    name: coherence-ce
+    registry: "myregistry.example.com/middleware"
+    name: "coherence-ce"
     tag: "25.03.2"
+  # Operator replicas (HA by default)
+  replicas: 3
+  # Namespaces to watch (empty string = all namespaces)
+  # Override to limit operator scope: "namespace1,namespace2"
+  watchNamespaces: ""
+  # Override default resources if needed
+  resources: {}

@@ -9,13 +9,13 @@ To run Cloud Bank you need OBaaS version 1.2.0 [Oracle Backend for Spring Boot a
 1. Clone the source repository
 
    ```shell
-   git clone https://github.com/oracle/microservices-datadriven.git
+   git clone https://github.com/oracle/microservices-backend.git
    ```
 
 1. Got to the `CloudBank-v32` directory
 
    ```shell
-   cd microservices-datadriven/cloudbank-v32
+   cd microservices-backend/cloudbank-v32
    ```
 
 1. Build CloudBank

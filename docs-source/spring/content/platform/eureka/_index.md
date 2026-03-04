@@ -26,7 +26,7 @@ To access the Eureka web user interface, process these steps:
     {{< img name="obaas-eureka-dashboard" size="medium" lazy=false >}}
     <!-- spellchecker-enable -->
 
-    On the dashboard you will see all the internal services registered with Eureka. If you have deployed the sample application [CloudBank](https://github.com/oracle/microservices-datadriven/tree/main/cloudbank-v4) or done the [LiveLab for Oracle Backend for Microservices and AI](https://bit.ly/cloudbankAI) you will see those services.
+    On the dashboard you will see all the internal services registered with Eureka. If you have deployed the sample application [CloudBank](https://github.com/oracle/microservices-backend/tree/main/cloudbank-v4) or done the [LiveLab for Oracle Backend for Microservices and AI](https://bit.ly/cloudbankAI) you will see those services.
 
 ## Enable a Spring boot application for Eureka
 

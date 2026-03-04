@@ -22,7 +22,7 @@ Engine for Kubernetes (OKE) for customer usage with Oracle Backend for Parse Pla
 
 &nbsp;
 {{< hint type=[warning] icon=gdoc_fire title="Interested in Spring Boot or Microservices, too?" >}}
-Check out [Oracle Backend for Spring Boot and Microservices](https://oracle.github.io/microservices-datadriven/spring/)
+Check out [Oracle Backend for Spring Boot and Microservices](https://oracle.github.io/microservices-backend/spring/)
 {{< /hint >}}
 &nbsp;
 

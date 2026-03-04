@@ -85,4 +85,4 @@ Spring Boot is an open-source Java-based framework that simplifies the developme
 
 ### Using LLMs hosted by Ollama in your Spring application
 
-Our self-paced hands-on example **CloudBank AI** includes an example of how to [build a simple chatbot](https://oracle.github.io/microservices-datadriven/cloudbank/springai/simple-chat) using Spring AI and Ollama.
+Our self-paced hands-on example **CloudBank AI** includes an example of how to [build a simple chatbot](https://oracle.github.io/microservices-backend/cloudbank/springai/simple-chat) using Spring AI and Ollama.

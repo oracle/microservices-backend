@@ -1,4 +1,4 @@
-baseURL = 'https://oracle.github.io/microservices-datadriven/transactional-event-queues/'
+baseURL = 'https://oracle.github.io/microservices-backend/transactional-event-queues/'
 languageCode = 'en-us'
 title = 'Transactional Event Queues'
 theme = 'hugo-theme-relearn'
@@ -17,7 +17,7 @@ ignoreLogs = ['warning-goldmark-raw-html']
 [[menu.Shortcuts]]
 name = "<i class='fa-fw fab fa-github'></i> GitHub repo"
 identifier = "ds"
-url = "https://github.com/oracle/microservices-datadriven"
+url = "https://github.com/oracle/microservices-backend"
 weight = 10
 
 [[menu.Shortcuts]]

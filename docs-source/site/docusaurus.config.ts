@@ -17,12 +17,12 @@ const config: Config = {
   url: 'https://oracle.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/microservices-datadriven/obaas',
+  baseUrl: '/microservices-backend/obaas',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'oracle', // Usually your GitHub org/user name.
-  projectName: 'microservices-datadriven', // Usually your repo name.
+  projectName: 'microservices-backend', // Usually your repo name.
 
   onBrokenLinks: 'throw',
   markdown: {
@@ -48,7 +48,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
-          //   'https://github.com/oracle/microservices-datadriven/tree/main/docs-source/site/',
+          //   'https://github.com/oracle/microservices-backend/tree/main/docs-source/site/',
         },
         gtag: {
           trackingID: 'G-2EVY167E00',
@@ -78,10 +78,10 @@ const config: Config = {
         },
         {
           type: 'docsVersionDropdown',
-          versions: ['current']
+          versions: ['current', '2.0.0']
         },
         {
-          href: 'https://github.com/oracle/microservices-datadriven',
+          href: 'https://github.com/oracle/microservices-backend',
           label: 'GitHub',
           position: 'right',
         },
@@ -133,7 +133,7 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/oracle/microservices-datadriven',
+              href: 'https://github.com/oracle/microservices-backend',
             },
           ],
         },

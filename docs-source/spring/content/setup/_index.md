@@ -125,9 +125,9 @@ You must meet the following prerequisites to use Oracle Backend for Microservice
 
   - The Kubernetes command-line interface (kubectl). [Installing kubectl documentation](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
   - Oracle Cloud Infrastructure command-line interface (CLI). [Quickstart - Installing the CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm#Quickstart).
-  - Oracle Backend for Microservices and AI command-line interface (oractl). [Download oractl](https://github.com/oracle/microservices-datadriven/releases/tag/OBAAS-1.4.0).
-  - [OPTIONAL]Oracle Backend for Microservices and AI VS Code Extension. [Download VS Code Extension](https://github.com/oracle/microservices-datadriven/releases/tag/OBAAS-1.4.0).
-  - [OPTIONAL]Oracle Backend for Microservices and AI IntelliJ plugin. [Download VS Code Extension](https://github.com/oracle/microservices-datadriven/releases/tag/OBAAS-1.4.0).
+  - Oracle Backend for Microservices and AI command-line interface (oractl). [Download oractl](https://github.com/oracle/microservices-backend/releases/tag/OBAAS-1.4.0).
+  - [OPTIONAL]Oracle Backend for Microservices and AI VS Code Extension. [Download VS Code Extension](https://github.com/oracle/microservices-backend/releases/tag/OBAAS-1.4.0).
+  - [OPTIONAL]Oracle Backend for Microservices and AI IntelliJ plugin. [Download VS Code Extension](https://github.com/oracle/microservices-backend/releases/tag/OBAAS-1.4.0).
 
 You can use the [cost estimator for pricing](https://www.oracle.com/cloud/costestimator.html).
 
@@ -454,7 +454,7 @@ To set up the local machine, process these steps:
 
 1. Install the Oracle Backend for Microservices and AI command-line.
 
-   The Oracle Backend for Microservices and AI command-line interface, `oractl`, is available for Linux and Mac systems. Download the binary that you want from the [Releases](https://github.com/oracle/microservices-datadriven/releases/tag/OBAAS-1.4.0) page and add it to your PATH environment variable. You can rename the binary to remove the suffix.
+   The Oracle Backend for Microservices and AI command-line interface, `oractl`, is available for Linux and Mac systems. Download the binary that you want from the [Releases](https://github.com/oracle/microservices-backend/releases/tag/OBAAS-1.4.0) page and add it to your PATH environment variable. You can rename the binary to remove the suffix.
 
    If your environment is a Linux or Mac machine, run `chmod +x` on the downloaded binary. Also, if your environment is a Mac, run the following command. Otherwise, you get a security warning and the CLI does not work:
 

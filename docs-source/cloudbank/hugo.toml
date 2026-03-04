@@ -1,4 +1,4 @@
-baseURL = 'https://oracle.github.io/microservices-datadriven/cloudbank/'
+baseURL = 'https://oracle.github.io/microservices-backend/cloudbank/'
 languageCode = 'en-us'
 title = 'CloudBank AI'
 theme = 'hugo-theme-relearn'
@@ -16,7 +16,7 @@ googleAnalytics = "G-7HWQVTJ803"
 [[menu.Shortcuts]]
 name = "<i class='fa-fw fab fa-github'></i> GitHub repo"
 identifier = "ds"
-url = "https://github.com/oracle/microservices-datadriven"
+url = "https://github.com/oracle/microservices-backend"
 weight = 10
 
 [[menu.Shortcuts]]

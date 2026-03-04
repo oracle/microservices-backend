@@ -35,7 +35,7 @@ See the Oracle Free Use Terms and Conditions [License](https://oss.oracle.com/li
 
 ## Installation
 
-1. Download the IntelliJ plugin ZIP file from [here](https://github.com/oracle/microservices-datadriven/releases/tag/OBAAS-1.4.0).
+1. Download the IntelliJ plugin ZIP file from [here](https://github.com/oracle/microservices-backend/releases/tag/OBAAS-1.4.0).
 
 2. On the IntelliJ Settings plugins page, click the "gear" icon and select **Install Plugin from Disk...**. Browse your filesystem for the IntelliJ plugin ZIP file, and select it.
 

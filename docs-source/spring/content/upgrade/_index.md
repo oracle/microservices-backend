@@ -26,7 +26,7 @@ This method is recommended for development deployments, or after testing the upg
 
 ## Download the Marketplace Upgrade Stack
 
-Visit the [Release](https://github.com/oracle/microservices-datadriven/releases/) page and download the `marketplace_upgrade.zip` file for the version you are upgrading to.
+Visit the [Release](https://github.com/oracle/microservices-backend/releases/) page and download the `marketplace_upgrade.zip` file for the version you are upgrading to.
 
 ## Update the Current Stack
 
@@ -90,7 +90,7 @@ The Custom In-Place upgrade can be applied to any existing installation of the O
 
 ## Download the Latest Installation
 
-Visit the [Release](https://github.com/oracle/microservices-datadriven/releases/) page and download the `custom-ebaas_latest.zip` file for the version you are upgrading to.
+Visit the [Release](https://github.com/oracle/microservices-backend/releases/) page and download the `custom-ebaas_latest.zip` file for the version you are upgrading to.
 
 Unzip the `custom-ebaas_latest.zip` file.
 
@@ -120,7 +120,7 @@ The custom out-of-place upgrade assumes you have out-of-place infrastructure to 
 
 ## Download the Latest Installation
 
-Visit the [Release](https://github.com/oracle/microservices-datadriven/releases/) page and download the `custom-ebaas_latest.zip` file for the version you are upgrading to.
+Visit the [Release](https://github.com/oracle/microservices-backend/releases/) page and download the `custom-ebaas_latest.zip` file for the version you are upgrading to.
 
 Unzip the `custom-ebaas_latest.zip` file.
 

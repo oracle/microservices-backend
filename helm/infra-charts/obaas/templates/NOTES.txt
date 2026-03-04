@@ -167,8 +167,8 @@ IMPORTANT NOTES
 {{- end }}
 
 For more information:
-  Documentation: https://oracle.github.io/microservices-datadriven
-  Issues: https://github.com/oracle/microservices-datadriven/issues
+  Documentation: https://oracle.github.io/microservices-backend
+  Issues: https://github.com/oracle/microservices-backend/issues
 
 To upgrade this release:
   helm upgrade {{ .Release.Name }} obaas/obaas -n {{ .Release.Namespace }}

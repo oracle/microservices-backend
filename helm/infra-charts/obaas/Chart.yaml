@@ -5,21 +5,25 @@ type: application
 name: "obaas"
 kubeVersion: ">= 1.32.1"
 description: A Helm chart for Oracle Backend as a Service
-home: https://oracle.github.io/microservices-datadriven
+home: https://oracle.github.io/microservices-backend
 maintainers:
   - name: Oracle and/or its affiliates
     email: obaas_ww@oracle.com
-    url: https://oracle.github.io/microservices-datadriven
+    url: https://oracle.github.io/microservices-backend
 # This is the chart version.
-version: 0.0.1
+version: 0.0.6
 # This is the version number of the application being deployed.
-appVersion: "2.0.0"
+appVersion: "2.1.0-build.5"
 
 # SubCharts
 # Note: Cluster-singleton prerequisites (oracle-database-operator, external-secrets, metrics-server,
 # kube-state-metrics, strimzi-kafka-operator, coherence-operator) are in the obaas-prereqs chart.
 # Install obaas-prereqs once per cluster before installing this chart.
 dependencies:
+  - name: gateway-helm
+    repository: "file://charts/gateway-helm"
+    version: 1.7.0
+    condition: gateway-helm.enabled
   - name: ingress-nginx
     version: "4.13.2"
     repository: https://kubernetes.github.io/ingress-nginx

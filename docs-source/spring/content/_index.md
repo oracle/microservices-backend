@@ -78,4 +78,4 @@ Developers also have access to development or build time services and libraries 
 We'd love to hear from you!  You can contact us in the following channels:
 
 - [#oracle-db-microservices Slack channel](https://oracledevs.slack.com/archives/C06L9CDGR6Z) in the Oracle Developers slack workspace.
-- [Open an issue in GitHub](https://github.com/oracle/microservices-datadriven/issues/new).
+- [Open an issue in GitHub](https://github.com/oracle/microservices-backend/issues/new).

@@ -62,7 +62,7 @@ of the Firebase API emulation using the following steps:
         ```
 		
         To enable the import, create a directory `parsef` under the project directory and copy the file
-        [parsef.js](https://github.com/oracle/microservices-datadriven/blob/main/developer-preview/parsef/parsef.js) into it.
+        [parsef.js](https://github.com/oracle/microservices-backend/blob/main/developer-preview/parsef/parsef.js) into it.
 
     * The **Parse JavaScript SDK** is included with this line:
 	

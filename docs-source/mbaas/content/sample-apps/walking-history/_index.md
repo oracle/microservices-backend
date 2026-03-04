@@ -24,8 +24,8 @@ To try this sample application, you need the following:
 Once you have the prerequisites, start cloning the source code for the application. For example:
 
 ```
-git clone https://github.com/oracle/microservices-datadriven
-cd microservices-datadriven/developer-preview/walking-history
+git clone https://github.com/oracle/microservices-backend
+cd microservices-backend/developer-preview/walking-history
 ```
 
 This directory contains the source code for the application. In the source code, you need to update the file `App.js` to set the `APPLICATION_ID` and server URL to match your environment.

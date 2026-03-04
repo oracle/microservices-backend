@@ -31,7 +31,7 @@ system or software requirements. For example:
 
 ## Download
 
-Download [Oracle Backend for Parse Platform](https://github.com/oracle/microservices-datadriven/releases/download/OBAAS-1.0.0/on-prem-mbaas_v0.1.1.zip).
+Download [Oracle Backend for Parse Platform](https://github.com/oracle/microservices-backend/releases/download/OBAAS-1.0.0/on-prem-mbaas_v0.1.1.zip).
 
 ## Setup
 

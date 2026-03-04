@@ -4,7 +4,7 @@ description: "Command Line Interface for Oracle Backend for Microservices and AI
 keywords: "cli tool deployment spring springboot microservices development oracle backend"
 ---
 
-The Oracle Backend for Microservices and AI offers a command-line interface (CLI), `oractl`. The CLI commands simplify the deployment of microservices applications as well as bindings with the resources that they use.Download the [CLI here](https://github.com/oracle/microservices-datadriven/releases/tag/OBAAS-1.4.0). The platform-specific binary can be renamed to `oractl` for convenience.
+The Oracle Backend for Microservices and AI offers a command-line interface (CLI), `oractl`. The CLI commands simplify the deployment of microservices applications as well as bindings with the resources that they use.Download the [CLI here](https://github.com/oracle/microservices-backend/releases/tag/OBAAS-1.4.0). The platform-specific binary can be renamed to `oractl` for convenience.
 
 Table of Contents:
 
@@ -81,7 +81,7 @@ Oracle Backend for Microservices and AI CLI is used to configure your backend an
 
 1. Download the Oracle Backend for Microservices and AI CLI `oractl`
 
-   Download the [CLI from here](https://github.com/oracle/microservices-datadriven/releases/tag/OBAAS-1.4.0)
+   Download the [CLI from here](https://github.com/oracle/microservices-backend/releases/tag/OBAAS-1.4.0)
 
 1. Rename the downloaded file to `oractl`
 
@@ -173,15 +173,15 @@ datastore create --namespace application --username customer --id customer
 Upload the Spring microservice jars
 
 ```shell
-artifact create --namespace application --workload account --imageVersion 0.0.1 --file /Users/devusr/microservices-datadriven/cloudbank-v4/account/target/account-0.0.1-SNAPSHOT.jar
+artifact create --namespace application --workload account --imageVersion 0.0.1 --file /Users/devusr/microservices-backend/cloudbank-v4/account/target/account-0.0.1-SNAPSHOT.jar
 
-artifact create --namespace application --workload checks --imageVersion 0.0.1 --file /Users/devusr/microservices-datadriven/cloudbank-v4/checks/target/checks-0.0.1-SNAPSHOT.jar
+artifact create --namespace application --workload checks --imageVersion 0.0.1 --file /Users/devusr/microservices-backend/cloudbank-v4/checks/target/checks-0.0.1-SNAPSHOT.jar
 
-artifact create --namespace application --workload customer --imageVersion 0.0.1 --file /Users/devusr/microservices-datadriven/cloudbank-v4/customer/target/customer-0.0.1-SNAPSHOT.jar
+artifact create --namespace application --workload customer --imageVersion 0.0.1 --file /Users/devusr/microservices-backend/cloudbank-v4/customer/target/customer-0.0.1-SNAPSHOT.jar
 
-artifact create --namespace application --workload creditscore --imageVersion 0.0.1 --file /Users/devusr/microservices-datadriven/cloudbank-v4/creditscore/target/creditscore-0.0.1-SNAPSHOT.jar
+artifact create --namespace application --workload creditscore --imageVersion 0.0.1 --file /Users/devusr/microservices-backend/cloudbank-v4/creditscore/target/creditscore-0.0.1-SNAPSHOT.jar
 
-artifact create --namespace application --workload transfer --imageVersion 0.0.1 --file /Users/devusr/microservices-datadriven/cloudbank-v4/transfer/target/transfer-0.0.1-SNAPSHOT.jar
+artifact create --namespace application --workload transfer --imageVersion 0.0.1 --file /Users/devusr/microservices-backend/cloudbank-v4/transfer/target/transfer-0.0.1-SNAPSHOT.jar
 ```
 
 Create images from the artifacts

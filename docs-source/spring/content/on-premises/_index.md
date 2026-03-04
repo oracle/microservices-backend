@@ -27,7 +27,7 @@ When installing in a _desktop_ environment, for example a developer's desktop, t
 
 ## Download
 
-Download the latest release of [Oracle Backend for Microservices and AI](https://github.com/oracle/microservices-datadriven/releases/download/OBAAS-1.4.0/onprem-ebaas_latest.zip).
+Download the latest release of [Oracle Backend for Microservices and AI](https://github.com/oracle/microservices-backend/releases/download/OBAAS-1.4.0/onprem-ebaas_latest.zip).
 
 ## Setup
 

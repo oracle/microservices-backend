@@ -9,13 +9,13 @@ To run Cloud Bank you need OBaaS version 1.3.0 [Oracle Backend for Microservices
 1. Clone the source repository
 
    ```shell
-   git clone https://github.com/oracle/microservices-datadriven.git
+   git clone https://github.com/oracle/microservices-backend.git
    ```
 
 1. Got to the `cloudBank-v4` directory
 
    ```shell
-   cd microservices-datadriven/cloudbank-v4
+   cd microservices-backend/cloudbank-v4
    ```
 
 1. Build CloudBank
@@ -155,7 +155,7 @@ deploy --service-name transfer --artifact-path transfer/target/transfer-0.0.1-SN
 
 ## Deploy **optional** Chatbot
 
-If you have deployed OBaas with a GPU cluster and installed Ollama on the GPU cluster [Install Ollama](https://oracle.github.io/microservices-datadriven/cloudbank/springai/simple-chat/index.html) you can deploy the `chatbot` service.
+If you have deployed OBaas with a GPU cluster and installed Ollama on the GPU cluster [Install Ollama](https://oracle.github.io/microservices-backend/cloudbank/springai/simple-chat/index.html) you can deploy the `chatbot` service.
 
 > Note if you already have a running session with `oractl` you can skip step 1-3.
 

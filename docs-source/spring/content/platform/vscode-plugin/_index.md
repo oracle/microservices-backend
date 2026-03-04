@@ -26,7 +26,7 @@ You must have already installed and configured the following software which requ
 
 ## Installation
 
-1. Download the plug-in from [here](https://github.com/oracle/microservices-datadriven/releases/tag/OBAAS-1.4.0).
+1. Download the plug-in from [here](https://github.com/oracle/microservices-backend/releases/tag/OBAAS-1.4.0).
 
 2. On the VS Code left menu bar, click on the **Extensions** symbol:
 

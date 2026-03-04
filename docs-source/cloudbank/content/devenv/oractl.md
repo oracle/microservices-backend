@@ -8,7 +8,7 @@ The Oracle Backend for Microservices and AI CLI (*oractl*) is used to configure 
 
 1. Download the Oracle Backend for Microservices and AI CLI
 
-   Download the CLI from [here](https://github.com/oracle/microservices-datadriven/releases/tag/OBAAS-1.3.0)
+   Download the CLI from [here](https://github.com/oracle/microservices-backend/releases/tag/OBAAS-1.3.0)
 
 2. Install the Oracle Backend for Microservices and AI CLI
 

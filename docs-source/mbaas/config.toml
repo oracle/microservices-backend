@@ -1,4 +1,4 @@
-baseURL = 'https://oracle.github.io/microservices-datadriven/mbaas/'
+baseURL = 'https://oracle.github.io/microservices-backend/mbaas/'
 languageCode = 'en-us'
 title = 'Oracle Backend for Parse Platform'
 theme = "hugo-geekdoc"
