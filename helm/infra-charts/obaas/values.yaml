@@ -638,6 +638,25 @@ k8s-infra:
       enabled: true
     loggingExporter:
       enabled: false
+    logsCollection:
+      operators:
+        - id: container-parser
+          type: container
+        - type: json_parser
+          id: java-json-parser
+          parse_from: body
+          if: 'body matches "^\\{"'
+        - type: severity_parser
+          parse_from: attributes.level
+          if: 'attributes.level != nil'
+        - type: trace_parser
+          trace_id:
+            parse_from: attributes.trace_id
+          span_id:
+            parse_from: attributes.span_id
+          trace_flags:
+            parse_from: attributes.trace_flags
+          if: 'attributes.trace_id != nil'
 
 kafka:
   enabled: false 
