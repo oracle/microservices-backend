@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 
 /**
- * Helidon MP Customer REST Resource with all features from original Spring API
+ * Helidon MP Customer REST Resource
  */
 @RequestScoped
 @Path("/api/v1/customer")

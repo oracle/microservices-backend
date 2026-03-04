@@ -1,3 +1,5 @@
+// Copyright (c) 2026, Oracle and/or its affiliates.
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/
 package com.example;
 
 import io.opentelemetry.api.trace.Span;
@@ -12,26 +14,16 @@ import java.io.IOException;
 
 /**
  * A JAX-RS Container Filter that intercepts incoming HTTP requests and bridges
- * the active
- * OpenTelemetry execution context into the SLF4J Mapped Diagnostic Context
+ * the active OpenTelemetry execution context into the SLF4J Mapped Diagnostic
+ * Context
  * (MDC).
  * <p>
- * Why is this necessary?
- * Standard Java/Helidon loggers rely on ThreadLocal variables (MDC) to attach
- * context to logs.
- * OpenTelemetry tracks distributed traces using its own context mechanism.
- * Without this bridge,
- * when the application logs a message, the logger has no idea what the current
- * Trace ID is.
- * <p>
  * This filter extracts the Trace ID, Span ID, and Trace Flags from the active
- * OTel Span
- * and actively populates the SLF4J MDC map at the start of every HTTP request.
- * It then
- * rigorously cleans up the MDC map on the HTTP response (in a `finally`
- * block-equivalent
- * lifecycle phase) to prevent catastrophic context-bleeding across Helidon
- * virtual threads.
+ * OTel Span and populates the SLF4J MDC map at the start of every HTTP request.
+ * It
+ * strictly cleans up the MDC map during the HTTP response lifecycle phase to
+ * prevent
+ * context-bleeding across concurrent virtual threads.
  */
 @Provider
 public class MdcFilter implements ContainerRequestFilter, ContainerResponseFilter {

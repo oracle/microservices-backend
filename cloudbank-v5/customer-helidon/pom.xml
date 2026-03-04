@@ -92,7 +92,7 @@
             <artifactId>jersey-media-json-binding</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!-- Replace JUL with SLF4J/Logback for modern logging and OpenTelemetry OTLP structured logging -->
+        <!-- Core Logging Frameworks (SLF4J API and Logback implementation) -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

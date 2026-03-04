@@ -1,3 +1,5 @@
+// Copyright (c) 2026, Oracle and/or its affiliates.
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/
 package com.example;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -10,18 +12,12 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import java.util.Set;
 
 /**
- * JAX-RS Application configuration.
- * Installs the JUL-to-SLF4J bridge on startup so internal Helidon logs
- * are correctly routed to Logback.
+ * Main entry point for the Helidon JAX-RS Application.
+ * Registers business resources and configures the SLF4J logging bridge.
  */
 @ApplicationScoped
 @ApplicationPath("/")
 public class CustomerApplication extends Application {
-
-    // We remove the injected OpenTelemetry instance because Helidon MicroProfile
-    // Telemetry only fully initializes Traces and Metrics providers.
-    // Instead, we will force the OpenTelemetry Auto-Configure SDK to initialize the
-    // Logs.
 
     public void init(@Observes @Initialized(ApplicationScoped.class) Object event) {
         // Remove existing JUL handlers
@@ -32,13 +28,6 @@ public class CustomerApplication extends Application {
 
         System.out.println("Initialized SLF4JBridgeHandler to route Java Util Logging to Logback.");
 
-        // We must initialize the AutoConfigured SDK to read the OTEL_* environment
-        // variables
-        // and physically boot up the OtlpHttpLogRecordExporter, since Helidon MP
-        // Telemetry limits itself to Traces.
-        // OTLP Log Exports will natively bypass the application since Kubernetes
-        // OpenTelemetry Agents
-        // scrape structural stdout Logs!
     }
 
     @Override

@@ -221,7 +221,7 @@ This application relies on the underlying Kubernetes OpenTelemetry DaemonSet to 
 
 **Key Components:**
 1. **Dependencies** (`pom.xml`):
-   - `slf4j-api` and `logback-classic` (Replaces JUL)
+   - `slf4j-api` and `logback-classic` (Core logging framework APIs)
    - `logstash-logback-encoder` (Formats output as JSON)
    - `opentelemetry-logback-mdc-1.0` (Bridges OTel context to MDC)
 
