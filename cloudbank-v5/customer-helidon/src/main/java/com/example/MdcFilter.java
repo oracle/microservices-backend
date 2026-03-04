@@ -15,15 +15,12 @@ import java.io.IOException;
 /**
  * A JAX-RS Container Filter that intercepts incoming HTTP requests and bridges
  * the active OpenTelemetry execution context into the SLF4J Mapped Diagnostic
- * Context
- * (MDC).
+ * Context(MDC).
  * <p>
  * This filter extracts the Trace ID, Span ID, and Trace Flags from the active
  * OTel Span and populates the SLF4J MDC map at the start of every HTTP request.
- * It
- * strictly cleans up the MDC map during the HTTP response lifecycle phase to
- * prevent
- * context-bleeding across concurrent virtual threads.
+ * It strictly cleans up the MDC map during the HTTP response lifecycle phase to
+ * prevent context-bleeding across concurrent virtual threads.
  */
 @Provider
 public class MdcFilter implements ContainerRequestFilter, ContainerResponseFilter {
