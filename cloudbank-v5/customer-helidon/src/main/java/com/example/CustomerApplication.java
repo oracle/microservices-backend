@@ -9,8 +9,6 @@ import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import java.util.Set;
-
 /**
  * Main entry point for the Helidon JAX-RS Application.
  * Registers business resources and configures the SLF4J logging bridge.
@@ -30,8 +28,4 @@ public class CustomerApplication extends Application {
 
     }
 
-    @Override
-    public Set<Class<?>> getClasses() {
-        return Set.of(CustomerResource.class, MdcFilter.class);
-    }
 }
