@@ -129,6 +129,19 @@ admin-server:
   # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
   # resources: {}
 
+# Config Server
+config-server:
+  global:
+    imagePullSecrets: 
+      - name: myregistry-secret
+  enabled: true
+  replicas: 1
+  image:
+    repository: myregistry.example.com/obaas/config-server
+    tag: "2.0.0"
+  # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
+  # resources: {}
+
 # Oracle Transaction Manager for Microservices (OTMM)
 otmm:
   global:
