@@ -322,6 +322,14 @@ Requires either 'dsn' OR all of (host, port, service_name).
 {{- end -}}
 
 {{/*
+Config Server Helper
+This helper is used to check if the Config Server database definitions are needed.
+*/}}
+{{- define "obaas.configServer.enabled" -}}
+{{- index (index .Values "config-server") "enabled" -}}
+{{- end -}}
+
+{{/*
 Database Type Helpers
 These helpers provide consistent database type checking across templates.
 */}}

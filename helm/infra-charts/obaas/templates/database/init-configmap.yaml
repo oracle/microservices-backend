@@ -68,7 +68,7 @@ data:
     END;
     /
 
-    {{- if eq ".Values.config-server.enabled" "true" }}
+    {{- if eq (include "obaas.configServer.enabled" .) "true" }}
     CREATE TABLE "$DB_USERNAME".PROPERTIES (
         ID NUMBER GENERATED ALWAYS AS IDENTITY ( START WITH 1 CACHE 20 ) ,
         APPLICATION VARCHAR2 (4000) ,
