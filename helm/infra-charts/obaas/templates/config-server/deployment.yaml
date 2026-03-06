@@ -52,11 +52,13 @@ spec:
             secretKeyRef:
               name: {{ include "obaas.databaseSecret" $ }}
               key: {{ if $.Values.database.authN }}{{ default "password" $.Values.database.authN.passwordKey }}{{ else }}password{{ end }}
-        - name: DB_CONNECT_STRING
+        - name: DB_SERVICE
           valueFrom:
             secretKeyRef:
               name: {{ include "obaas.databaseSecret" $ }}
               key: {{ if $.Values.database.authN }}{{ default "service" $.Values.database.authN.serviceKey }}{{ else }}service{{ end }}
+        - name: CONNECT_STRING
+              value: jdbc:oracle:thin:@$(DB_SERVICE)?TNS_ADMIN=$(TNS_ADMIN)
         {{- if .Values.eureka.enabled }}
         - name: EUREKA_SERVER_ADDRESS
           valueFrom:
