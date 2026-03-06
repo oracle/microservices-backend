@@ -1,0 +1,27 @@
+## Copyright (c) 2024, 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+{{- if .Values.extraConfigMaps }}
+{{- $configMapNames := keys .Values.extraConfigMaps | sortAlpha }}
+{{- range $cmName := $configMapNames }}
+{{- $cmData := index $.Values.extraConfigMaps $cmName }}
+{{- if not (kindIs "map" $cmData) }}
+{{- fail (printf "extraConfigMaps.%s must be a map of key/value entries" $cmName) }}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $cmName }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: extra-config
+    app.kubernetes.io/part-of: {{ $.Release.Name }}
+    {{- include "obaas.labels" $ | nindent 4 }}
+data:
+{{- $entryNames := keys $cmData | sortAlpha }}
+{{- range $entryName := $entryNames }}
+  {{ $entryName }}: |
+{{ toString (index $cmData $entryName) | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

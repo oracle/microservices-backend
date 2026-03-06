@@ -35,6 +35,28 @@ global:
         repository: nginx
         tag: "alpine"        
 
+# Extra ConfigMaps created in the release namespace.
+# Each top-level key is the ConfigMap name.
+# Each nested key/value pair becomes an entry in the ConfigMap data section.
+#
+# Example:
+# extraConfigMaps:
+#   apisix-custom-plugin:
+#     abd.lua: |
+#       local core = require("apisix.core")
+#       local plugin_name = "abd"
+#       local _M = {
+#           version = 0.1,
+#           priority = 2500,
+#           name = plugin_name,
+#           schema = {}
+#       }
+#       function _M.access(conf, ctx)
+#           core.log.info("ABD plugin executed")
+#       end
+#       return _M
+extraConfigMaps: {}
+
 # -----------------------
 # -- OBaaS Configuration
 #
