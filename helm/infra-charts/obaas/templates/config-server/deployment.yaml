@@ -40,6 +40,8 @@ spec:
           containerPort: 8080
           protocol: TCP
         env:
+        - name: TNS_ADMIN
+          value: /tnsadmin
         - name: DB_USERNAME
           valueFrom:
             secretKeyRef:
@@ -77,5 +79,14 @@ spec:
             cpu: 250m
             memory: 256Mi
           {{- end }}
+        volumeMounts:
+        - name: tns-admin
+          mountPath: /tnsadmin
+
+      volumes:
+      - name: tns-admin
+        secret:
+          secretName: {{ ternary (include "obaas.databaseAdbTnsAdminSecret" $) (include "obaas.databaseTnsAdminSecret" $) (eq (include "obaas.database.isADB" $) "true") }}
+          optional: true
 
 {{- end }}
