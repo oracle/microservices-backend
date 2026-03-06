@@ -25,10 +25,9 @@ import java.io.IOException;
  * prevent context-bleeding across concurrent virtual threads.
  * <p>
  * The @Priority annotation ensures this filter executes after Helidon's
- * internal
- * OpenTelemetry filters have initialized the tracing span for the incoming
- * request,
- * guaranteeing that Span.current() will return a valid context.
+ * internal OpenTelemetry filters have initialized the tracing span for the
+ * incoming request, guaranteeing that Span.current() will return a valid
+ * context.
  */
 @Provider
 @Priority(Priorities.USER + 100)
