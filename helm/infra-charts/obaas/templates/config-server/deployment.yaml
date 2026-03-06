@@ -1,0 +1,94 @@
+## Copyright (c) 2024, 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+{{- if (index .Values "config-server").enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-config-server
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}-config-server
+    app.kubernetes.io/component: config-server
+    app.kubernetes.io/part-of: {{ .Release.Name }}
+    {{- include "obaas.labels" . | nindent 4 }}
+spec:
+  replicas: {{ (index .Values "config-server").replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-config-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}-config-server
+        app.kubernetes.io/component: config-server
+      {{- if .Values.signoz.enabled }}
+      annotations:
+        signoz.io/scrape: "true"
+        signoz.io/port: "8080"
+        signoz.io/path: "/metrics"
+      {{- end }}
+    spec:
+      {{- include "obaas.imagePullSecrets" (dict "local" (index .Values "config-server").imagePullSecrets "global" .Values.global.imagePullSecrets) | nindent 6 }}
+      restartPolicy: Always
+      containers:
+      - name: config-server
+        image: "{{ (index .Values "config-server").image.repository }}:{{ (index .Values "config-server").image.tag }}"
+        imagePullPolicy: {{ (index .Values "config-server").image.pullPolicy | default "IfNotPresent" }}
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        env:
+        - name: TNS_ADMIN
+          value: /tnsadmin
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "obaas.databaseSecret" $ }}
+              key: {{ if $.Values.database.authN }}{{ default "username" $.Values.database.authN.usernameKey }}{{ else }}username{{ end }}
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "obaas.databaseSecret" $ }}
+              key: {{ if $.Values.database.authN }}{{ default "password" $.Values.database.authN.passwordKey }}{{ else }}password{{ end }}
+        - name: DB_SERVICE
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "obaas.databaseSecret" $ }}
+              key: {{ if $.Values.database.authN }}{{ default "service" $.Values.database.authN.serviceKey }}{{ else }}service{{ end }}
+        - name: DB_CONNECT_STRING
+          value: "jdbc:oracle:thin:@$(DB_SERVICE)?TNS_ADMIN=$(TNS_ADMIN)"
+        {{- if .Values.eureka.enabled }}
+        - name: EUREKA_SERVER_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Release.Name }}-eureka-server
+              key: url
+        {{- end }}
+        {{- if .Values.signoz.enabled }}
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://{{ .Release.Name }}-signoz-otel-collector.{{ .Release.Namespace }}:4318"
+        {{- end }}
+        resources:
+          {{- if (index .Values "config-server").resources }}
+          {{- toYaml (index .Values "config-server").resources | nindent 10 }}
+          {{- else }}
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          {{- end }}
+        volumeMounts:
+        - name: tns-admin
+          mountPath: /tnsadmin
+
+      volumes:
+      - name: tns-admin
+        secret:
+          secretName: {{ ternary (include "obaas.databaseAdbTnsAdminSecret" $) (include "obaas.databaseTnsAdminSecret" $) (eq (include "obaas.database.isADB" $) "true") }}
+          optional: true
+
+{{- end }}
