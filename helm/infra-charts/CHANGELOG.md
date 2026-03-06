@@ -42,15 +42,9 @@ AppVersion: 2.1.0-build.4
 - Update otel-collector config to add k8s_events receiver
 - Update rbac to allow otel-collector to get/list/watch events
 
-# 0.0.5 - Mar 3, 2026
-
-AppVersion: 2.1.0-build.4
-
-- Update otel-collector config to add k8s_events receiver
-- Update rbac to allow otel-collector to get/list/watch events
-
-# 0.0.6 - TBD
+# 0.0.6 - Mar 6, 2026
 
 AppVersion: 2.1.0-build.5
 
 - Add Envoy Gateway Controller Helm chart to `obaas`. The Envoy Gateway Controller implements the Kubernetes Gateway API as a replacement for `ingress-nginx`. Because the Gateway and Ingress APIs are separate, the gateway and ingress controllers may run concurrently.
+- Add Spring Cloud Config Server

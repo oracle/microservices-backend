@@ -65,7 +65,7 @@ spec:
         {{- if .Values.signoz.enabled }}
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: "http://{{ .Release.Name }}-signoz-otel-collector.{{ .Release.Namespace }}:4318"
-        {{- end }}              
+        {{- end }}
         resources:
           {{- if (index .Values "config-server").resources }}
           {{- toYaml (index .Values "config-server").resources | nindent 10 }}

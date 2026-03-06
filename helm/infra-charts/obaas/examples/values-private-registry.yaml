@@ -132,7 +132,7 @@ admin-server:
 # Config Server
 config-server:
   global:
-    imagePullSecrets: 
+    imagePullSecrets:
       - name: myregistry-secret
   enabled: true
   replicas: 1
