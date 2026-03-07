@@ -16,6 +16,7 @@ There are several dashboards that are pre-installed in SigNoz, for example:
   - [Oracle Database Dashboard](#oracle-database-dashboard)
   - [Kube State Metrics Dashboard](#kube-state-metrics-dashboard)
   - [Apache APISIX Dashboard](#apache-apisix-dashboard)
+  - [Envoy Gateway Dashboard](#envoy-gateway-dashboard)
   - [Helidon Main Dashboard](#helidon-main-dashboard)
   - [Helidon MP Details](#helidon-mp-details)
   - [Helidon SE Details](#helidon-se-details)
@@ -109,6 +110,16 @@ This dashboard provides details of the APISIX API Gateway including:
 Here is an example of this dashboard:
 
 ![Apache APISIX Dashboard](images/apache-apisix-dashboard.png)
+
+### Envoy Gateway Dashboard
+
+This dashboard provides details of the Envoy Gateway, including:
+
+- Requests by type
+- Gateway controller runtime operations
+- Gateway processes and work queue
+
+![Envoy Gateway Dashboard](images/envoy-gateway-dashboard.png)
 
 In addition, the following dashboards are also pre-installed:
 
