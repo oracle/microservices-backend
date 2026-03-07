@@ -1,6 +1,6 @@
 ---
 title: Pre-installed dashboards
-sidebar_position: 4
+sidebar_position: 5
 ---
 :::note
 More details can be found in the [SigNoz Documentation](https://signoz.io/docs/introduction/).

@@ -1,6 +1,6 @@
 ---
 title: Metrics, Logs and Traces
-sidebar_position: 3
+sidebar_position: 4
 ---
 :::note
 More details can be found in the [SigNoz Documentation](https://signoz.io/docs/introduction/).
