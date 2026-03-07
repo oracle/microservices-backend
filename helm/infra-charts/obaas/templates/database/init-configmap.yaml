@@ -68,6 +68,38 @@ data:
     END;
     /
 
+    {{- if eq (include "obaas.configServer.enabled" .) "true" }}
+    CREATE TABLE "$DB_USERNAME".PROPERTIES (
+        ID NUMBER GENERATED ALWAYS AS IDENTITY ( START WITH 1 CACHE 20 ) ,
+        APPLICATION VARCHAR2 (4000) ,
+        PROFILE     VARCHAR2 (4000) ,
+        LABEL       VARCHAR2 (4000) ,
+        PROP_KEY    VARCHAR2 (4000) NOT NULL,
+        VALUE       VARCHAR2 (4000) NOT NULL,
+        CREATED_ON  TIMESTAMP DEFAULT SYSDATE,
+        CREATED_BY  VARCHAR2 (100) DEFAULT COALESCE(
+            REGEXP_SUBSTR(SYS_CONTEXT('USERENV','CLIENT_IDENTIFIER'),'^[^:]*'),
+            SYS_CONTEXT('USERENV','SESSION_USER')),
+        UPDATED_ON  TIMESTAMP ,
+        UPDATED_BY  VARCHAR2 (100)
+    ) LOGGING;
+
+    ALTER TABLE "$DB_USERNAME".PROPERTIES
+        ADD CONSTRAINT PROPERTIES_PK PRIMARY KEY ( ID )
+            USING INDEX LOGGING ;
+
+    COMMENT ON TABLE "$DB_USERNAME".PROPERTIES IS 'SPRING CLOUD CONFIG SERVER TABLE';
+
+    CREATE OR REPLACE EDITIONABLE TRIGGER "$DB_USERNAME"."AUDIT_TRG" BEFORE
+        UPDATE ON "$DB_USERNAME".PROPERTIES
+        FOR EACH ROW
+    BEGIN
+        :new.updated_on := sysdate;
+        :new.updated_by := coalesce(regexp_substr(sys_context('USERENV', 'CLIENT_IDENTIFIER'), '^[^:]*'), sys_context('USERENV', 'SESSION_USER'));
+    END;
+    /
+    {{- end }}
+
     {{- if eq (include "obaas.database.isSIDB" .) "true" }}
     STARTUP FORCE;
     ALTER SYSTEM REGISTER;

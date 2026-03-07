@@ -26,21 +26,20 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 
 /**
- * Helidon MP Customer REST Resource with all features from original Spring API
+ * Helidon MP Customer REST Resource
  */
 @RequestScoped
 @Path("/api/v1/customer")
 public class CustomerResource {
-    
+
     private static final Logger LOGGER = Logger.getLogger(CustomerResource.class.getName());
-    
+
     @PersistenceContext(unitName = "customer")
     private EntityManager entityManager;
-    
+
     @Context
     private UriInfo uriInfo;
-    
-    
+
     /**
      * Get all customers
      * 
@@ -50,6 +49,7 @@ public class CustomerResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCustomers() {
         try {
+            LOGGER.info("Fetching all customers");
             List<Customer> customers = entityManager.createNamedQuery("getCustomers", Customer.class).getResultList();
             return Response.ok(customers).build();
         } catch (Exception e) {
@@ -57,7 +57,7 @@ public class CustomerResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
     /**
      * Find customers by name (containing)
      * 
@@ -69,7 +69,9 @@ public class CustomerResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCustomerByName(@PathParam("customerName") String customerName) {
         try {
-            TypedQuery<Customer> query = entityManager.createNamedQuery("getCustomerByCustomerNameContaining", Customer.class);
+            LOGGER.info("Fetching customer by name: " + customerName);
+            TypedQuery<Customer> query = entityManager.createNamedQuery("getCustomerByCustomerNameContaining",
+                    Customer.class);
             query.setParameter("customerName", "%" + customerName + "%");
             List<Customer> customers = query.getResultList();
             return Response.ok(customers).build();
@@ -78,7 +80,7 @@ public class CustomerResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
     /**
      * Get Customer with specific ID.
      *
@@ -90,6 +92,7 @@ public class CustomerResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCustomerById(@PathParam("id") String id) {
         try {
+            LOGGER.info("Fetching customer by ID: " + id);
             Customer customer = entityManager.find(Customer.class, id);
             if (customer != null) {
                 return Response.ok(customer).build();
@@ -101,7 +104,7 @@ public class CustomerResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
     /**
      * Get customer that contains an email.
      *
@@ -113,7 +116,9 @@ public class CustomerResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCustomerByEmail(@PathParam("email") String email) {
         try {
-            TypedQuery<Customer> query = entityManager.createNamedQuery("getCustomerByCustomerEmailContaining", Customer.class);
+            LOGGER.info("Fetching customer by email: " + email);
+            TypedQuery<Customer> query = entityManager.createNamedQuery("getCustomerByCustomerEmailContaining",
+                    Customer.class);
             query.setParameter("customerEmail", "%" + email + "%");
             List<Customer> customers = query.getResultList();
             return Response.ok(customers).build();
@@ -122,7 +127,7 @@ public class CustomerResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
     /**
      * Create a customer.
      *
@@ -135,18 +140,19 @@ public class CustomerResource {
     @Transactional(Transactional.TxType.REQUIRED)
     public Response createCustomer(Customer customer) {
         try {
+            LOGGER.info("Creating new customer with ID: " + customer.getCustomerId());
             // Check if customer already exists
             Customer existingCustomer = entityManager.find(Customer.class, customer.getCustomerId());
-            
+
             if (existingCustomer == null) {
                 entityManager.persist(customer);
                 entityManager.flush(); // Ensure the entity is persisted
-                
+
                 // Build the location URI for the created resource
                 URI location = UriBuilder.fromResource(CustomerResource.class)
-                    .path("{id}")
-                    .build(customer.getCustomerId());
-                    
+                        .path("{id}")
+                        .build(customer.getCustomerId());
+
                 return Response.created(location).build();
             } else {
                 return Response.status(Response.Status.CONFLICT).entity(customer).build();
@@ -156,7 +162,7 @@ public class CustomerResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
     /**
      * Update a specific Customer (ID).
      *
@@ -171,13 +177,14 @@ public class CustomerResource {
     @Transactional(Transactional.TxType.REQUIRED)
     public Response updateCustomer(@PathParam("id") String id, Customer customer) {
         try {
+            LOGGER.info("Updating customer with ID: " + id);
             Customer existingCustomer = entityManager.find(Customer.class, id);
             if (existingCustomer != null) {
                 // Update the existing customer with new values
                 existingCustomer.setCustomerName(customer.getCustomerName());
                 existingCustomer.setCustomerEmail(customer.getCustomerEmail());
                 existingCustomer.setCustomerOtherDetails(customer.getCustomerOtherDetails());
-                
+
                 Customer updatedCustomer = entityManager.merge(existingCustomer);
                 return Response.ok(updatedCustomer).build();
             } else {
@@ -188,7 +195,7 @@ public class CustomerResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
     /**
      * Delete a specific customer (ID).
      *
@@ -200,6 +207,7 @@ public class CustomerResource {
     @Transactional(Transactional.TxType.REQUIRED)
     public Response deleteCustomer(@PathParam("customerId") String customerId) {
         try {
+            LOGGER.info("Deleting customer with ID: " + customerId);
             Customer customer = entityManager.find(Customer.class, customerId);
             if (customer != null) {
                 entityManager.remove(customer);
@@ -212,7 +220,7 @@ public class CustomerResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
     /**
      * Apply for loan - Method isn't fully implemented.
      *
@@ -224,6 +232,7 @@ public class CustomerResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response applyForLoan(@PathParam("amount") long amount) {
         try {
+            LOGGER.info("Processing loan application for amount: " + amount);
             // Check Credit Rating
             // Amount vs Rating approval?
             // Create Account

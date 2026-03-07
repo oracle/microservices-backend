@@ -78,7 +78,7 @@ const config: Config = {
         },
         {
           type: 'docsVersionDropdown',
-          versions: ['current']
+          versions: ['current', '2.0.0']
         },
         {
           href: 'https://github.com/oracle/microservices-backend',

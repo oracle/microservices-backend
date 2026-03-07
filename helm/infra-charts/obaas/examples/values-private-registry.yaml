@@ -129,6 +129,19 @@ admin-server:
   # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
   # resources: {}
 
+# Config Server
+config-server:
+  global:
+    imagePullSecrets:
+      - name: myregistry-secret
+  enabled: true
+  replicas: 1
+  image:
+    repository: myregistry.example.com/obaas/config-server
+    tag: "2.0.0"
+  # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
+  # resources: {}
+
 # Oracle Transaction Manager for Microservices (OTMM)
 otmm:
   global:
@@ -147,6 +160,8 @@ oracle-database-exporter:
   global:
     imagePullSecrets: 
       - name: myregistry-secret
+  imagePullSecrets: 
+    - name: myregistry-secret       
   enabled: true
   replicas: 1
   image:
@@ -459,6 +474,9 @@ apisix:
   # etcd configuration
   etcd:
     enabled: true
+    global:
+      imagePullSecrets: 
+        - myregistry-secret
     replicaCount: 3
     # Disable pre-upgrade hook when etcd is being installed for the first time
     # (even if the parent chart is being upgraded)
@@ -556,7 +574,7 @@ signoz:
     clusterRole:
       rules:
         - apiGroups: [""]
-          resources: ["pods", "namespaces", "nodes", "services", "endpoints"]
+          resources: ["pods", "namespaces", "nodes", "services", "endpoints", "events"]
           verbs: ["get", "list", "watch"]
         - apiGroups: ["apps"]
           resources: ["replicasets"]
@@ -569,6 +587,12 @@ signoz:
           verbs: ["get", "list", "watch"]
     config:
       receivers:
+        # otlp:
+        #   protocols:
+        #     grpc:
+        #     http:
+        k8s_events:
+          auth_type: serviceAccount
         prometheus:
           config:
             global:
@@ -702,6 +726,11 @@ k8s-infra:
       enabled: true
     loggingExporter:
       enabled: false
+
+kafka:
+  enabled: false 
+  version: 3.9.1
+  metadataVersion: 3.9-IV0
 
 # =============================================================================
 # Image Reference Summary

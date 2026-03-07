@@ -3,6 +3,7 @@
 
 # Proxy traffic from the ingress-nginx LoadBalancer service to APISIX nodeport service
 {{- if (index .Values "apisix").enabled }}
+{{- if (index .Values "ingress-nginx").enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -22,4 +23,5 @@ spec:
                 name: {{ printf "%s-apisix-gateway" .Release.Name }}
                 port:
                   number: 80
+{{- end }}
 {{- end }}

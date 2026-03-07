@@ -26,6 +26,7 @@ Built on Oracle Database and designed for mission-critical workloads, OBaaS prov
 - **Scalability**: Elastic scaling to meet demand automatically
 - **Performance**: Optimized for low latency and high throughput
 - **Support**: Supported for Oracle AI Database customers, see KB181357 in Oracle Support for details
+- **Compliance**: Simplified open-source license compliance, see [Licensing Information User Manual](https://docs.oracle.com/en/database/oracle/backend-for-microservices-and-ai/2.0/licensing-guide/index.html) for details
 
 ### AI-Ready Platform
 

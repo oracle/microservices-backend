@@ -81,6 +81,43 @@ eureka:
   # Override default resources if needed (defaults: cpu 250m-500m, memory 1Gi-1200Mi)
   resources: {}
 
+gateway-helm:
+  enabled: true
+
+  # Global settings
+  global:
+    # If set, these take highest precedence and change both envoyGateway and ratelimit's container registry and pull secrets.
+    # -- Global override for image registry
+    imageRegistry: ""
+    # -- Global override for image pull secrets
+    imagePullSecrets: *imagePullSecrets
+
+    # If set, these override image-specific values: useful when installing the chart in a private registry environment.
+    # Override image-specific values directly if a global override is not desired.
+    images:
+      envoyGateway:
+        # This is the full image name including the hub, repo, and tag.
+        image: "docker.io/envoyproxy/gateway:v1.7.0"
+        # Specify image pull policy if default behavior isn't desired.
+        # Default behavior: latest images will be Always else IfNotPresent.
+        pullPolicy: Always
+        # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
+        pullSecrets: *imagePullSecrets
+      ratelimit:
+        # This is the full image name including the hub, repo, and tag.
+        image: "docker.io/envoyproxy/ratelimit:3fb70258"
+        # Specify image pull policy if default behavior isn't desired.
+        # Default behavior: latest images will be Always else IfNotPresent.
+        pullPolicy: IfNotPresent
+        # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
+        pullSecrets: *imagePullSecrets
+    replicas: 1
+    pod:
+      annotations:
+        "signoz.io/scrape": "true"
+        "signoz.io/port": "19001"
+        "signoz.io/path": "/metrics"
+
 ingress-nginx:
   enabled: true
   imagePullSecrets: *imagePullSecrets
@@ -280,6 +317,16 @@ admin-server:
   # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
   # resources: {}
 
+# Config Server
+config-server:
+  enabled: true
+  replicas: 1
+  image:
+    repository: container-registry.oracle.com/obaas/config-server
+    tag: "2.0.0"
+  # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
+  # resources: {}
+
 # Oracle Transaction Manager for Microservices (OTMM)
 otmm:
   enabled: true
@@ -468,7 +515,7 @@ signoz:
     clusterRole:
       rules:
         - apiGroups: [""]
-          resources: ["pods", "namespaces", "nodes", "services", "endpoints"]
+          resources: ["pods", "namespaces", "nodes", "services", "endpoints", "events"]
           verbs: ["get", "list", "watch"]
         - apiGroups: ["apps"]
           resources: ["replicasets"]
@@ -481,6 +528,12 @@ signoz:
           verbs: ["get", "list", "watch"]
     config:
       receivers:
+        # otlp:
+        #   protocols:
+        #     grpc: {}
+        #     http: {}
+        k8s_events:
+          auth_type: serviceAccount
         prometheus:
           config:
             global:
@@ -602,6 +655,25 @@ k8s-infra:
       enabled: true
     loggingExporter:
       enabled: false
+    logsCollection:
+      operators:
+        - id: container-parser
+          type: container
+        - type: json_parser
+          id: java-json-parser
+          parse_from: body
+          if: 'body matches "^\\{"'
+        - type: severity_parser
+          parse_from: attributes.level
+          if: 'attributes.level != nil'
+        - type: trace_parser
+          trace_id:
+            parse_from: attributes.trace_id
+          span_id:
+            parse_from: attributes.span_id
+          trace_flags:
+            parse_from: attributes.trace_flags
+          if: 'attributes.trace_id != nil'
 
 kafka:
   enabled: false

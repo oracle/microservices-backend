@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 
+      Console appender for structured JSON logs. 
+      This leverages LogstashEncoder and MDC / OpenTelemetry provider auto-injection 
+      so OpenTelemetry Agents can scrape contextually rich stdout logs.
+    -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    </appender>
+
+    <!--
+      Configure the root logger to uniquely send logs to JSON Console.
+    -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <!-- Quiet down verbose internal Helidon logs if necessary -->
+    <logger name="org.jboss.weld" level="WARN" />
+</configuration>
