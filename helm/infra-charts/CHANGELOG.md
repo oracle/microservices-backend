@@ -48,3 +48,5 @@ AppVersion: 2.1.0-build.5
 
 - Add Envoy Gateway Controller Helm chart to `obaas`. The Envoy Gateway Controller implements the Kubernetes Gateway API as a replacement for `ingress-nginx`. Because the Gateway and Ingress APIs are separate, the gateway and ingress controllers may run concurrently.
 - Add Spring Cloud Config Server
+- Add ability to create extra arbitrary config maps, e.g., to hold code for custom APISIX plugins
+- Add example of custom APISIX plugin configuration
