@@ -111,12 +111,15 @@ gateway-helm:
         pullPolicy: IfNotPresent
         # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
         pullSecrets: *imagePullSecrets
-    replicas: 1
+
+  deployment:
     pod:
       annotations:
         "signoz.io/scrape": "true"
         "signoz.io/port": "19001"
         "signoz.io/path": "/metrics"
+    replicas: 1
+
 
 ingress-nginx:
   enabled: true
