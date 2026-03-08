@@ -3,11 +3,32 @@ title: Release Notes
 sidebar_position: 0
 ---
 
-export const OBAAS_VERSION = '2.0.0';
+export const OBAAS_VERSION = '2.1.0';
 
 ## Release Notes for Oracle Backend for Microservices and AI (OBaaS)
 
 The current version of OBaaS is {OBAAS_VERSION}.
+
+This version supports Helidon 4.3.x or later, Spring Boot 3.5.x and Spring Cloud 2025.0.x, Spring Boot 3.4.x and Spring Cloud 2024.0.x, Spring
+Framework 6.2 and 7.x, with limited backwards compatibility for Spring Boot 2.7.x and for earlier versions of Helidon 4.x. 
+
+Platform services use Java 25, Spring Boot 4.0.3, and Spring Cloud 2025.1.1.
+
+### Additions in this Release
+
+* Envoy Gateway is added to provide external access to the cluster, implementing the new Kubernetes Gateway API.
+* OpenTelemetry Operator is added to provide auto-instrumentation for Java applications.
+
+### Deprecations in this Release 
+
+Components that are deprecated in this release may be removed in a future release.
+
+* NGINX Ingress Controller is deprecated in this release due to deprecation of the Ingress API in Kubernetes, in favor of the new Gateway API.
+* Coherence Operator is deprecated in this release.
+
+### Replacements/changes/updaates in this Release
+
+* Conductor-OSS is replaced with Oracle Transaction Manager For Microservices (MicroTx) Workflow (based on Conductor-OSS)
 
 ### OBaaS Helm Charts - Complete Image List
 
@@ -16,7 +37,7 @@ The following table lists all container images used in OBaaS {OBAAS_VERSION} (so
 | Component | Image | Version |
 |-----------|-------|---------|
 | Alpine | `docker.io/library/alpine` | 3.18.2 |
-| Apache APISIX | `docker.io/apache/apisix` | 3.14.1-ubuntu |
+| Apache APISIX | `docker.io/apache/apisix` | 3.15.0-ubuntu |
 | BusyBox | `docker.io/busybox` | 1.36 |
 | Cert Manager (CA Injector) | `phx.ocir.io/id9y6mi8tcky/oke-public-cert-manager-cainjector` | |
 | Cert Manager (Controller) | `phx.ocir.io/id9y6mi8tcky/oke-public-cert-manager-controller` | |
@@ -26,7 +47,6 @@ The following table lists all container images used in OBaaS {OBAAS_VERSION} (so
 | ClickHouse Server | `docker.io/clickhouse/clickhouse-server` | 25.5.6 |
 | Cluster Proportional Autoscaler | `phx.ocir.io/id9y6mi8tcky/oke-public-cluster-proportional-autoscaler-amd64` | |
 | Coherence Operator | `container-registry.oracle.com/middleware/coherence-operator` | 3.5.6 |
-| Conductor Server | `container-registry.oracle.com/obaas/conductor` | server-{OBAAS_VERSION}, cache-{OBAAS_VERSION} |
 | CoreDNS | `phx.ocir.io/id9y6mi8tcky/oke-public-coredns` | |
 | Curl | `docker.io/curlimages/curl` | 8.17.0 |
 | etcd | `docker.io/bitnamilegacy/etcd` | 3.6.1 |
@@ -43,7 +63,7 @@ The following table lists all container images used in OBaaS {OBAAS_VERSION} (so
 | Oracle Database Operator | `phx.ocir.io/id9y6mi8tcky/oke-public-oracle-database-operator` | |
 | OTMM (Transaction Manager) | `container-registry.oracle.com/database/otmm` | 24.4.1 |
 | Proxymux CLI | `phx.ocir.io/axoxdievda5j/oke-public-proxymux-cli` | |
-| Signoz | `docker.io/signoz/signoz` | v0.102.1 |
+| Signoz | `docker.io/signoz/signoz` | v0.113.0 |
 | Signoz OpenTelemetry Collector | `docker.io/signoz/signoz-otel-collector` | v0.129.11 |
 | Signoz Schema Migrator | `docker.io/signoz/signoz-schema-migrator` | v0.129.11 |
 | Spring Boot Admin | `container-registry.oracle.com/obaas/admin-server` | {OBAAS_VERSION} |
