@@ -340,6 +340,7 @@ otmm:
   commonConfiguration:
     security: {}
   workflowServer:
+    enabled: false
     encryption:
       enabled: true
     logging: {}
@@ -353,7 +354,6 @@ otmm:
         enabled: true
       storage:
         fileSystem: {}
-    enabled: true
     image:
       repository: container-registry.oracle.com/database/workflow-server
       tag: latest
