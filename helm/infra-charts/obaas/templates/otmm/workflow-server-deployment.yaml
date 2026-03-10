@@ -1,0 +1,211 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+{{- if .Values.otmm.workflowServer.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-otmm-workflow-server
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}-otmm-workflow-server
+    app.kubernetes.io/component: transaction-coordinator
+    app.kubernetes.io/part-of: {{ .Release.Name }}
+    {{- include "obaas.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.otmm.workflowServer.replicas}}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-otmm-workflow-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}-otmm-workflow-server
+      {{- if .Values.signoz.enabled }}
+      annotations:
+        signoz.io/scrape: "true"
+        signoz.io/port: "9090"
+        signoz.io/path: "/metrics"
+      {{- end }}
+    spec:
+      {{- include "obaas.imagePullSecrets" (dict "local" (index .Values "otmm").imagePullSecrets "global" .Values.global.imagePullSecrets) | nindent 6 }}
+      serviceAccountName: {{ .Release.Name }}-otmm-workflow-server
+      securityContext:
+        fsGroup: 1000
+        supplementalGroups: [1000]
+      containers:
+        - name: server
+          image: {{ .Values.otmm.workflowServer.image.repository }}:{{ .Values.otmm.workflowServer.image.tag }}
+          imagePullPolicy: {{ (index .Values "otmm").image.pullPolicy | default "IfNotPresent" }}
+          ports:
+            - containerPort: 9010
+              name: http
+            - containerPort: 9090
+              name: metrics
+          resources:
+            {{- with .Values.otmm.workflowServer.resources }}
+            {{ toYaml . | nindent 6 }}
+            {{- else }}
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+            requests:
+              cpu: "2"
+              memory: "2Gi"
+          {{- end }}
+          volumeMounts:
+            - name: workflow-fs-volume
+              mountPath: /app/data/workflow-file-system
+            - name: oracle-db-wallet-volume
+              mountPath: /app/oracle/wallet
+              readOnly: true
+          env:
+            # Default configuration
+            - name: LOAD_SAMPLE
+              value: "false"
+            - name: SERVER_SERVLET_CONTEXT_PATH
+              value: "/workflow-server"
+            - name: SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE
+              value: {{ .Values.otmm.workflowServer.config.storage.fileSystem.maxUploadSize | default "10MB" }}
+            - name: SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE
+              value: {{ .Values.otmm.workflowServer.config.storage.fileSystem.maxUploadSize | default "10MB" }}
+
+            # Storage configurations at higher level
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "obaas.databaseSecret" $ }}
+                  key: {{ if $.Values.database.authN }}{{ default "username" $.Values.database.authN.usernameKey }}{{ else }}username{{ end }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "obaas.databaseSecret" $ }}
+                  key: {{ if $.Values.database.authN }}{{ default "password" $.Values.database.authN.passwordKey }}{{ else }}password{{ end }}
+            - name: DB_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "obaas.databaseSecret" $ }}
+                  key: {{ if $.Values.database.authN }}{{ default "service" $.Values.database.authN.serviceKey }}{{ else }}service{{ end }}
+            - name: TNS_ADMIN
+              value: /app/oracle/wallet
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:oracle:thin:@$(DB_SERVICE)?TNS_ADMIN=$(TNS_ADMIN)"
+            - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+              value: "oracle.jdbc.OracleDriver"
+            - name: CONDUCTOR_ORACLE_FLYWAY_ENABLED
+              value: "true"
+            # Storage configurations based on queue type
+            - name: CONDUCTOR_QUEUE_TYPE
+              value: "oracle"
+            # Storage configurations based on metadata type
+            - name: CONDUCTOR_DB_TYPE
+              value: "oracle"
+            # Indexing configuration
+            {{- if .Values.otmm.workflowServer.config.indexing.enabled }}
+            - name: CONDUCTOR_INDEXING_ENABLED
+              value: "true"
+            {{- else }}
+            - name: CONDUCTOR_INDEXING_ENABLED
+              value: "false"
+            {{- end }}
+            - name: CONDUCTOR_INDEXING_TYPE
+              value: "oracle"
+
+            # Logging configuration
+            - name: CONDUCTOR_LOG_LEVEL
+              value: {{ .Values.otmm.workflowServer.logging.level | default "info" }}
+            - name: LOGGING_LEVEL_COM_NETFLIX_CONDUCTOR
+              value: {{ .Values.otmm.workflowServer.logging.level | default "info" }}
+            - name: LOGGING_LEVEL_COM_ORACLE_MICROTX
+              value: {{ .Values.otmm.workflowServer.logging.level | default "info" }}
+            - name: CONDUCTOR_LOG_FORMAT
+              value: {{ .Values.otmm.workflowServer.logging.format | default "json" }}
+            - name: CONDUCTOR_LOG_OUTPUT
+              value: {{ .Values.otmm.workflowServer.logging.output | default "stdout" }}
+
+            # Metrics configuration
+            - name: CONDUCTOR_METRICS_ENABLED
+              value: "true"
+            - name: CONDUCTOR_METRICS_PORT
+              value: "9090"
+            - name: CONDUCTOR_METRICS_PATH
+              value: "/metrics"
+
+            # Security configuration
+            {{- if eq .Values.otmm.commonConfiguration.security.enabled true }}
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI
+              value: {{ .Values.otmm.commonConfiguration.security.identityProvider.jwksUri | quote }}
+            - name: POLICY_SECURITY_CLAIMS_ROLE_PATHS
+              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.claimsRolePaths | quote }}
+            - name: POLICY_SECURITY_ROLE_SUPER_ADMIN
+              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.roles.superAdmin | quote }}
+            - name: POLICY_SECURITY_ROLE_ADMIN
+              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.roles.admin | quote }}
+            - name: POLICY_SECURITY_ROLE_USER
+              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.roles.user | quote }}
+            - name: POLICY_SECURITY_ROLE_READ_ONLY_USER
+              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.roles.readOnlyUser | quote }}
+            - name: POLICY_SECURITY_ROLE_METADATA_MANAGER
+              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.roles.metadataManager | quote }}
+            - name: POLICY_SECURITY_ROLE_WORKER
+              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.roles.worker | quote }}
+            {{- else if eq .Values.otmm.commonConfiguration.security.enabled false }}
+            - name: CONDUCTOR_SECURITY_ENABLED
+              value: "false"
+            {{- end }}
+
+            # File System paths
+            - name: CONDUCTOR_CONNECTOR_STORAGE_PATH
+              value: "/app/data/workflow-file-system/connectors"
+            - name: CONDUCTOR_STORAGE_STORAGE_PATH_LOCATION
+              value: "/app/data/workflow-file-system/generic-data"
+
+            # TxEventQ task properties
+            - name: CONDUCTOR_TASKS_TXEVENTQ_PUBLISH_REQUESTTIMEOUT
+              value: {{ .Values.otmm.workflowServer.taskConfig.txeventq.requestTimeout | default "20000ms" }}
+            - name: CONDUCTOR_TASKS_TXEVENTQ_PUBLISH_CACHETIME
+              value: {{ .Values.otmm.workflowServer.taskConfig.txeventq.cacheTime | default "120000ms" }}
+            - name: CONDUCTOR_TASKS_TXEVENTQ_PUBLISH_CACHESIZE
+              value: {{ .Values.otmm.workflowServer.taskConfig.txeventq.cacheSize | default "10" | quote }}
+
+            # Transaction task specific properties
+            - name: CONDUCTOR_TASKS_TRANSACTION_READTIMEOUT
+              value: {{ .Values.otmm.workflowServer.taskConfig.transaction.readTimeout | default "180000ms" }}
+            - name: CONDUCTOR_TASKS_TRANSACTION_CONNECTTIMEOUT
+              value: {{ .Values.otmm.workflowServer.taskConfig.transaction.connectTimeout | default "180000ms" }}
+
+            # GRPC task specific properties
+            - name: CONDUCTOR_TASKS_GRPC_TASK_CACHESIZE
+              value: {{ .Values.otmm.workflowServer.taskConfig.grpc.cacheSize | default "10" | quote }}
+            - name: CONDUCTOR_TASKS_GRPC_TASK_CACHETIME
+              value: {{ .Values.otmm.workflowServer.taskConfig.grpc.cacheTime | default "120000ms" }}
+
+            # SQL task specific properties
+            - name: CONDUCTOR_TASKS_SQL_CACHESIZE
+              value: {{ .Values.otmm.workflowServer.taskConfig.sql.cacheSize | default "15" | quote }}
+            - name: CONDUCTOR_TASKS_SQL_CACHETIME
+              value: {{ .Values.otmm.workflowServer.taskConfig.sql.cacheTime | default "600s" }}
+              
+          livenessProbe:
+            httpGet:
+              path: /workflow-server/health
+              port: 9010
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /workflow-server/health
+              port: 9010
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 3
+      volumes:
+            - name: workflow-fs-volume
+              emptyDir: {}
+            - name: oracle-db-wallet-volume
+              secret:
+                secretName: {{ ternary (include "obaas.databaseAdbTnsAdminSecret" $) (include "obaas.databaseTnsAdminSecret" $) (eq (include "obaas.database.isADB" $) "true") }}
+                optional: true
+{{- end }}

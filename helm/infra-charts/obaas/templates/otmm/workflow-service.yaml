@@ -1,0 +1,29 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-otmm-workflow-server
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}-otmm-workflow-server
+    app.kubernetes.io/component: transaction-coordinator
+    app.kubernetes.io/part-of: {{ .Release.Name }}
+    {{- include "obaas.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9010
+      targetPort: 9010
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: {{ .Release.Name }}-otmm-workflow-server
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-otmm-workflow-server
+  namespace: {{ .Release.Namespace }}
+  labels:
+    account: {{ .Release.Name }}-otmm-workflow-server

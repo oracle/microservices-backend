@@ -337,6 +337,27 @@ otmm:
   image:
     repository: container-registry.oracle.com/database/otmm
     tag: "24.4.1"
+  commonConfiguration:
+    security: {}
+  workflowServer:
+    logging: {}
+    taskConfig:
+      txeventq: {}
+      transaction: {}
+      grpc: {}
+      sql: {}
+    config:
+      indexing:
+        enabled: true
+      storage:
+        fileSystem: {}
+    enabled: true
+    image:
+      repository: container-registry.oracle.com/database/workflow-server
+      tag: latest
+    replicas: 1
+    # Override default resources if needed (defaults: cpu 2, memory 4Gi)
+    # resources: {}
   # Override default resources if needed (defaults: cpu 250m, memory 1Gi)
   # resources: {}
 
