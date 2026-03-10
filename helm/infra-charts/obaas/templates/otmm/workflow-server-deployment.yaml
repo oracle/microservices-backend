@@ -214,7 +214,6 @@ spec:
             - name: oracle-db-wallet-volume
               secret:
                 secretName: {{ ternary (include "obaas.databaseAdbTnsAdminSecret" $) (include "obaas.databaseTnsAdminSecret" $) (eq (include "obaas.database.isADB" $) "true") }}
-                optional: true
             - name: encryption-key-volume
               secret:
                 defaultMode: 420
