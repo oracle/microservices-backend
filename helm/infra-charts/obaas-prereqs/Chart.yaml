@@ -33,18 +33,26 @@ dependencies:
     version: "0.45.1"
     repository: https://strimzi.io/charts/
     condition: strimzi-kafka-operator.enabled
+  - name: coherence-operator
+    version: "3.5.6"
+    repository: https://oracle.github.io/coherence-operator/charts
+    condition: coherence-operator.enabled
+  #
+  # NOTE that both opentelemetry-operator and oracle-database-operator have dependencies on cert-manager, 
+  # so if cert-manager is already installed, modify values.yaml to disable cert-manager in the subcharts
+  #
+  # Installs the OpenTelemetry Operator to enable auto-instrumentation via custom resources
+  - name: opentelemetry-operator
+    version: "0.107.0"
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+    condition: opentelemetry-operator.enabled
   - name: oracle-database-operator
     # NOTE: cert-manager is a dependency of oracle-database-operator
     #       if cert-manager is already installed, modify values.yaml
     version: "0.1.0"
     repository: "file://charts"
     condition: oracle-database-operator.enabled
-  - name: coherence-operator
-    version: "3.5.6"
-    repository: https://oracle.github.io/coherence-operator/charts
-    condition: coherence-operator.enabled
-  # Installs the OpenTelemetry Operator to enable auto-instrumentation via custom resources
-  - name: opentelemetry-operator
-    version: "0.107.0"
-    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
-    condition: opentelemetry-operator.enabled
+  - name: cert-manager
+    version: "1.19.1"
+    repository: https://charts.jetstack.io
+    condition: cert-manager.enabled
