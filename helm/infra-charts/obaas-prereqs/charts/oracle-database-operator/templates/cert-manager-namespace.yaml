@@ -1,0 +1,11 @@
+{{- if index .Values "cert-manager" "enabled" }}
+{{- $ns := index .Values "cert-manager" "namespace" }}
+{{- if and $ns (ne $ns $.Release.Namespace) }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $ns }}
+  labels:
+    {{- include "oracle-database-operator.labels" . | nindent 4 }}
+{{- end }}
+{{- end }}

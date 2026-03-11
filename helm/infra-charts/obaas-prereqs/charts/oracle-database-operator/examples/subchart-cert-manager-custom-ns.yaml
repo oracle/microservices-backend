@@ -1,0 +1,12 @@
+# USE-CASE 4: Subchart cert-manager in custom namespace
+#
+# Install operator (cert-manager installed automatically):
+#   helm install oraop . -f examples/subchart-cert-manager-custom-ns.yaml
+#
+# Or:
+#   helm install oraop . --set cert-manager.namespace=my-cert-manager
+
+cert-manager:
+  enabled: true
+  namespace: "my-cert-manager"
+  installCRDs: true

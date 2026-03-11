@@ -1,0 +1,32 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "oracle-database-operator.name" . }}-proxy-rolebinding
+  labels:
+    {{- include "oracle-database-operator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "oracle-database-operator.name" . }}-proxy-role
+subjects:
+- kind: ServiceAccount
+  name: {{ include "oracle-database-operator.serviceAccountName" . }}
+  namespace: {{ include "oracle-database-operator.namespace" . }}
+{{- if eq .Values.scope.mode "cluster" }}
+---
+# ClusterRoleBinding for cluster-scoped deployment (watch all namespaces)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "oracle-database-operator.name" . }}-manager-rolebinding
+  labels:
+    {{- include "oracle-database-operator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "oracle-database-operator.name" . }}-manager-role
+subjects:
+- kind: ServiceAccount
+  name: {{ include "oracle-database-operator.serviceAccountName" . }}
+  namespace: {{ include "oracle-database-operator.namespace" . }}
+{{- end }}

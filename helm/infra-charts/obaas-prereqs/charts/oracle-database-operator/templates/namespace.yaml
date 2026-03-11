@@ -1,0 +1,8 @@
+{{- if and .Values.namespace (ne .Values.namespace .Release.Namespace) }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    {{- include "oracle-database-operator.labels" . | nindent 4 }}
+  name: {{ .Values.namespace }}
+{{- end }}

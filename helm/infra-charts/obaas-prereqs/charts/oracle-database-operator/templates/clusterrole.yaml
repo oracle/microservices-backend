@@ -1,0 +1,261 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "oracle-database-operator.name" . }}-manager-role
+  labels:
+    {{- include "oracle-database-operator.labels" . | nindent 4 }}
+rules:
+# Core API group resources
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - endpoints
+  - events
+  - namespaces
+  - persistentvolumeclaims
+  - persistentvolumes
+  - pods
+  - pods/exec
+  - pods/log
+  - secrets
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps/status
+  - persistentvolumeclaims/status
+  - services/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - secrets/status
+  verbs:
+  - get
+# Apps API group resources
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets/status
+  - deployments/status
+  - statefulsets/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets/finalizers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+# Coordination API group for leader election
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - get
+  - list
+  - update
+# Oracle Database CRDs
+- apiGroups:
+  - database.oracle.com
+  resources:
+  - autonomouscontainerdatabases
+  - autonomousdatabases
+  - dataguardbrokers
+  - dbcssystems
+  - events
+  - lrests
+  - lrpdbs
+  - oraclerestarts
+  - oraclerestdataservices
+  - ordssrvs
+  - shardingdatabases
+  - singleinstancedatabases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - database.oracle.com
+  resources:
+  - autonomouscontainerdatabases/status
+  - autonomousdatabasebackups/status
+  - autonomousdatabaserestores/status
+  - dataguardbrokers/status
+  - dbcssystems/status
+  - lrests/status
+  - lrpdbs/status
+  - oraclerestarts/status
+  - oraclerestdataservices/status
+  - ordssrvs/status
+  - shardingdatabases/status
+  - singleinstancedatabases/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - database.oracle.com
+  resources:
+  - autonomousdatabasebackups
+  - autonomousdatabaserestores
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - update
+  - watch
+- apiGroups:
+  - database.oracle.com
+  resources:
+  - autonomousdatabases/status
+  verbs:
+  - patch
+  - update
+- apiGroups:
+  - database.oracle.com
+  resources:
+  - dataguardbrokers/finalizers
+  - dbcssystems/finalizers
+  - lrests/finalizers
+  - lrpdbs/finalizers
+  - oraclerestarts/finalizers
+  - oraclerestdataservices/finalizers
+  - ordssrvs/finalizers
+  - shardingdatabases/finalizers
+  - singleinstancedatabases/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - database.oracle.com
+  resources:
+  - lrpdbs/configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - patch
+  - update
+# Prometheus Operator resources
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+# Oracle Observability CRDs
+- apiGroups:
+  - observability.oracle.com
+  resources:
+  - databaseobservers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - observability.oracle.com
+  resources:
+  - databaseobservers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - observability.oracle.com
+  resources:
+  - databaseobservers/status
+  verbs:
+  - get
+  - patch
+  - update
+# Storage resources
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclasses
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "oracle-database-operator.name" . }}-metrics-reader
+  labels:
+    {{- include "oracle-database-operator.labels" . | nindent 4 }}
+rules:
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "oracle-database-operator.name" . }}-proxy-role
+  labels:
+    {{- include "oracle-database-operator.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
