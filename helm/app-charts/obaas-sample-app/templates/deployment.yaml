@@ -23,6 +23,8 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- if .Values.otel.enabled }}
+        # Injects the OpenTelemetry Java agent into the application pod.
+        instrumentation.opentelemetry.io/inject-java: "{{ .Release.Namespace }}/traces-instrumentation"
         signoz.io/scrape: "true"
         signoz.io/port: "{{ .Values.service.port }}"
         {{- if eq (.Values.obaas.framework | upper) "SPRING_BOOT" }}
@@ -98,8 +100,7 @@ spec:
 
           {{- /* OTEL */}}
           {{- if .Values.otel.enabled }}
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: {{ include "obaas.otel.endpoint" . | quote }}
+            # OTEL handled by the OpenTelemetry Operator.
           {{- end }}
 
           {{- /* Spring Profiles */}}
@@ -144,20 +145,10 @@ spec:
 
           {{- /* OTEL */}}
           {{- if .Values.otel.enabled }}
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: {{ include "obaas.otel.endpoint" . | quote }}
-            - name: OTEL_EXPORTER_OTLP_PROTOCOL
-              value: "http/protobuf"
+            # OTEL Traces/Metrics handled by Operator
+            # Setting explicit configuration here for logs-to-traces correlation
             - name: OTEL_SERVICE_NAME
-              value: {{ .Values.helidon.otel.serviceName | quote }}
-            - name: OTEL_SDK_DISABLED
-              value: "false"
-            - name: OTEL_METRICS_EXPORTER
-              value: "otlp"
-            - name: OTEL_LOGS_EXPORTER
-              value: "otlp"
-            - name: JAVA_TOOL_OPTIONS
-              value: "-Dotel.java.global-autoconfigure.enabled=true"
+              value: {{ include "obaas-app.fullname" . | quote }}
           {{- end }}
 
           {{- /* Eureka */}}
@@ -200,7 +191,7 @@ spec:
             - name: metrics.virtual-threads.enabled
               value: {{ $helidonMetrics.virtual_threads_enabled | default false | quote }}
             - name: metrics.app-name
-              value: {{ .Values.helidon.otel.serviceName | default "" | quote }}
+              value: {{ include "obaas-app.fullname" . | quote }}
           {{- end }}
 
           ports:

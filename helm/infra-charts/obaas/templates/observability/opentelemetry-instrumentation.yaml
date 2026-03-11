@@ -5,7 +5,7 @@ metadata:
   name: traces-instrumentation
 spec:
   exporter:
-    endpoint: http://{{ include "obaas.signoz.fullname" . }}-otel-collector:4318
+    endpoint: http://{{ include "obaas.signoz.fullname" . }}-otel-collector:4317
   propagators:
     - tracecontext
     - baggage

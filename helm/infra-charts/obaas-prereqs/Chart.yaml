@@ -37,7 +37,7 @@ dependencies:
     # NOTE: cert-manager is a dependency of oracle-database-operator
     #       if cert-manager is already installed, modify values.yaml
     version: "0.1.0"
-    repository: "file://charts/oracle-database-operator"
+    repository: "file://charts"
     condition: oracle-database-operator.enabled
   - name: coherence-operator
     version: "3.5.6"
