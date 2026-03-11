@@ -11,5 +11,8 @@ spec:
     - baggage
     - b3
   sampler:
-    type: always_on
+    type: {{ .Values.signoz.instrumentation.sampler.type }}
+    {{- if .Values.signoz.instrumentation.sampler.argument }}
+    argument: {{ .Values.signoz.instrumentation.sampler.argument | quote }}
+    {{- end }}
 {{- end }}
