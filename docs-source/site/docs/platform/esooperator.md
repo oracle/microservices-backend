@@ -1,6 +1,6 @@
 ---
 title: External Secrets Operator
-sidebar_position: 7
+sidebar_position: 8
 ---
 ## External Secrets Operator
 

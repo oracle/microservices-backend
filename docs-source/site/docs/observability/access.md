@@ -1,6 +1,6 @@
 ---
 title: Access SigNoz
-sidebar_position: 2
+sidebar_position: 3
 ---
 ## Accessing SigNoz Observability Platform
 

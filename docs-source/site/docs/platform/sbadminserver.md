@@ -1,6 +1,6 @@
 ---
 title: Spring Boot Admin Server
-sidebar_position: 10
+sidebar_position: 11
 ---
 ## Spring Boot Admin Server
 

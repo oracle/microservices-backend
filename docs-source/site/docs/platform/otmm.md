@@ -1,6 +1,6 @@
 ---
 title: Oracle Transaction Manager for Microservices
-sidebar_position: 9
+sidebar_position: 10
 ---
 ## Oracle Transaction Manager for Microservices
 
@@ -38,6 +38,18 @@ spring:
 lra:
   coordinator:
     url: ${MP_LRA_COORDINATOR_URL}
+```
+
+## MicroTx Workflow Server
+
+The MicroTx Workflow Server extends transaction coordinator with advanced workflow capabilities. 
+
+Before running the workflow server, ensure you have at least 2 CPU and 4 Gi memory free in your cluster. To enable the workflow server, set the `otmm.workflowServer.enabled` property to true in the Helm values:
+
+```yaml
+otmm:
+  workflowServer:
+    enabled: true
 ```
 
 ## Upgrading to the commercial version
