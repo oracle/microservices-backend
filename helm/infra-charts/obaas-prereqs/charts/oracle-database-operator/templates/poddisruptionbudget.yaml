@@ -1,0 +1,20 @@
+{{- if and .Values.pdb.enabled (gt (int .Values.replicas) 1) }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "oracle-database-operator.name" . }}-controller-manager
+  namespace: {{ include "oracle-database-operator.namespace" . }}
+  labels:
+    {{- include "oracle-database-operator.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.pdb.minAvailable }}
+  minAvailable: {{ .Values.pdb.minAvailable }}
+  {{- else if .Values.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.pdb.maxUnavailable }}
+  {{- else }}
+  minAvailable: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "oracle-database-operator.selectorLabels" . | nindent 6 }}
+{{- end }}

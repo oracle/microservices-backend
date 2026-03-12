@@ -1,7 +1,4 @@
 dependencies:
-- name: cert-manager
-  repository: https://charts.jetstack.io
-  version: v1.19.1
 - name: external-secrets
   repository: https://charts.external-secrets.io
   version: 1.1.0
@@ -14,5 +11,14 @@ dependencies:
 - name: strimzi-kafka-operator
   repository: https://strimzi.io/charts/
   version: 0.45.1
-digest: sha256:e74d5cf0effbb5ea6b87f78d20df67d2ae7e1780154c847709ecf00dce8535bd
-generated: "2025-12-04T15:11:20.478588Z"
+- name: coherence-operator
+  repository: https://oracle.github.io/coherence-operator/charts
+  version: 3.5.6
+- name: opentelemetry-operator
+  repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+  version: 0.107.0
+- name: oracle-database-operator
+  repository: file://charts/oracle-database-operator
+  version: 0.2.0
+digest: sha256:2bd4ee7a4836ba7e868669ec28cc4ba5a79013a0aa206a363cc852ee4b883bee
+generated: "2026-03-12T09:22:19.299517-07:00"

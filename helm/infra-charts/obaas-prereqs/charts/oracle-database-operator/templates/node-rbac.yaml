@@ -1,0 +1,32 @@
+{{- if .Values.rbac.nodeAccess }}
+# ClusterRole for NodePort services - grants permission to list/watch nodes
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "oracle-database-operator.name" . }}-manager-role-node
+  labels:
+    {{- include "oracle-database-operator.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "oracle-database-operator.name" . }}-manager-role-node-binding
+  labels:
+    {{- include "oracle-database-operator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "oracle-database-operator.name" . }}-manager-role-node
+subjects:
+- kind: ServiceAccount
+  name: {{ include "oracle-database-operator.serviceAccountName" . }}
+  namespace: {{ include "oracle-database-operator.namespace" . }}
+{{- end }}

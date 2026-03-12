@@ -1,0 +1,115 @@
+{{- if .Values.certManagerWaitJob.enabled }}
+{{- $webhookConfigName := include "oracle-database-operator.certManagerWebhookConfig" . -}}
+{{- $maxAttempts := .Values.certManagerWaitJob.maxAttempts | default 60 -}}
+{{- $sleepSeconds := .Values.certManagerWaitJob.sleepSeconds | default 5 -}}
+{{- $timeoutSeconds := mul $maxAttempts $sleepSeconds -}}
+# Wait for cert-manager webhook to be ready before creating Issuer resources
+# Uses kubectl wait to check for caBundle injection (no shell required)
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-wait-for-cert-manager
+  namespace: {{ include "oracle-database-operator.namespace" . }}
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}-wait-for-cert-manager
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+rules:
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["validatingwebhookconfigurations"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Name }}-wait-for-cert-manager
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+subjects:
+- kind: ServiceAccount
+  name: {{ .Release.Name }}-wait-for-cert-manager
+  namespace: {{ include "oracle-database-operator.namespace" . }}
+roleRef:
+  kind: ClusterRole
+  name: {{ .Release.Name }}-wait-for-cert-manager
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-wait-for-cert-manager
+  namespace: {{ include "oracle-database-operator.namespace" . }}
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Chart.Name }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ .Release.Name }}-wait-for-cert-manager
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: wait-for-webhook
+        image: {{ .Values.certManagerWaitJob.image.repository | default "registry.k8s.io/kubectl" }}:{{ .Values.certManagerWaitJob.image.tag }}
+        imagePullPolicy: {{ .Values.certManagerWaitJob.image.pullPolicy | default "IfNotPresent" }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        {{- with .Values.certManagerWaitJob.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- else }}
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        {{- end }}
+        args:
+        - wait
+        - --for=jsonpath={.webhooks[0].clientConfig.caBundle}
+        - validatingwebhookconfiguration/{{ $webhookConfigName }}
+        - --timeout={{ $timeoutSeconds }}s
+{{- end }}

@@ -1,0 +1,114 @@
+{{- include "oracle-database-operator.validateScopeConfig" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oracle-database-operator.name" . }}-controller-manager
+  namespace: {{ include "oracle-database-operator.namespace" . }}
+  labels:
+    {{- include "oracle-database-operator.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "oracle-database-operator.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "oracle-database-operator.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: {{ include "oracle-database-operator.serviceAccountName" . }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if or .Values.affinity (gt (int .Values.replicas) 1) }}
+      affinity:
+        {{- if .Values.affinity }}
+        {{- toYaml .Values.affinity | nindent 8 }}
+        {{- else }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  {{- include "oracle-database-operator.selectorLabels" . | nindent 18 }}
+              topologyKey: kubernetes.io/hostname
+        {{- end }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: manager
+        image: {{ include "oracle-database-operator.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - /manager
+        args:
+        {{- if .Values.leaderElection }}
+        - --enable-leader-election
+        {{- end }}
+        env:
+        - name: WATCH_NAMESPACE
+          {{- if eq .Values.scope.mode "namespace" }}
+          value: {{ .Values.scope.watchNamespaces | join "," | quote }}
+          {{- else }}
+          value: ""
+          {{- end }}
+        {{- with .Values.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.webhook.port | default 9443 }}
+          name: webhook-server
+          protocol: TCP
+        - containerPort: 8080
+          name: metrics
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.probes.liveness.periodSeconds | default 20 }}
+          timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds | default 3 }}
+          failureThreshold: {{ .Values.probes.liveness.failureThreshold | default 3 }}
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds | default 5 }}
+          periodSeconds: {{ .Values.probes.readiness.periodSeconds | default 10 }}
+          timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds | default 3 }}
+          failureThreshold: {{ .Values.probes.readiness.failureThreshold | default 3 }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: false
+          runAsUser: 1002
+        volumeMounts:
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: cert
+          readOnly: true
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds | default 10 }}
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: {{ .Values.webhook.certificateSecretName | default "webhook-server-cert" }}

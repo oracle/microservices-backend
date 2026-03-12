@@ -50,3 +50,9 @@ AppVersion: 2.1.0-build.5
 - Add Spring Cloud Config Server
 - Add ability to create extra arbitrary config maps, e.g., to hold code for custom APISIX plugins
 - Add example of custom APISIX plugin configuration
+
+# 0.0.7 - Mar XX, 2026
+
+AppVersion: 2.1.0-build.6
+
+- Add OpenTelemetre Operator to enable auto-instrumentation via custom resources

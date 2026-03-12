@@ -23,9 +23,6 @@ helidon:
   datasource:
     # -- (Required for Helidon) Datasource name matching application.yaml
     name: ""
-  otel:
-    # -- (Required for Helidon) Service name for OTEL
-    serviceName: ""
 
 # -----------------------
 # -- Optional Configuration

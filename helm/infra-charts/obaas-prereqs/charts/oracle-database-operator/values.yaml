@@ -1,0 +1,176 @@
+# Default values for oracle-database-operator
+replicas: 3
+
+# Namespace for Oracle Database Operator resources
+# Defaults to the release namespace if not specified
+namespace: "oracle-database-operator-system"
+
+# Image pull secrets for private registries (shared with cert-manager subchart)
+imagePullSecrets: &imagePullSecrets []
+# Example:
+# imagePullSecrets: &imagePullSecrets
+#   - name: my-registry-secret
+image:
+  repository: container-registry.oracle.com/database/operator
+  # Specify a version tag for reproducible deployments
+  tag: "2.0"
+  pullPolicy: IfNotPresent
+
+# Deployment scope configuration
+scope:
+  # "cluster" = watch all namespaces (default), creates ClusterRoleBinding
+  # "namespace" = watch specific namespaces only, creates RoleBindings in those namespaces
+  mode: cluster
+
+  # For namespace-scoped mode: list of namespaces to watch
+  # RoleBindings will be created in each of these namespaces
+  watchNamespaces: []
+  # Example: ["default", "my-app-namespace"]
+
+# RBAC configuration
+rbac:
+  # Grant operator permission to list/watch nodes
+  # Required if database CRs will use NodePort service type
+  nodeAccess: false
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 400m
+    memory: 400Mi
+  requests:
+    cpu: 400m
+    memory: 400Mi
+
+# Enable leader election for controller manager
+leaderElection: true
+
+# Health probe configuration
+probes:
+  liveness:
+    initialDelaySeconds: 15
+    periodSeconds: 20
+    timeoutSeconds: 3
+    failureThreshold: 3
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Pod Disruption Budget (only applies when replicas > 1)
+pdb:
+  enabled: true
+  minAvailable: 1
+  # maxUnavailable: 1  # Alternative to minAvailable
+
+# Pod affinity/anti-affinity rules
+# If not set and replicas > 1, a default soft anti-affinity is applied
+affinity: {}
+# Example custom affinity:
+# affinity:
+#   podAntiAffinity:
+#     requiredDuringSchedulingIgnoredDuringExecution:
+#     - labelSelector:
+#         matchLabels:
+#           app.kubernetes.io/name: oracle-database-operator
+#       topologyKey: kubernetes.io/hostname
+
+# Node selector for pod scheduling
+nodeSelector: {}
+# Example:
+# nodeSelector:
+#   kubernetes.io/os: linux
+
+# Tolerations for pod scheduling
+tolerations: []
+# Example:
+# tolerations:
+# - key: "dedicated"
+#   operator: "Equal"
+#   value: "database-operator"
+#   effect: "NoSchedule"
+
+# Termination grace period in seconds
+terminationGracePeriodSeconds: 10
+
+# Extra environment variables for the controller manager container
+extraEnv: []
+# Example:
+# extraEnv:
+# - name: LOG_LEVEL
+#   value: "debug"
+# - name: MY_SECRET
+#   valueFrom:
+#     secretKeyRef:
+#       name: my-secret
+#       key: password
+
+# Service Account configuration
+serviceAccount:
+  # The name of the service account to use
+  # If empty, uses the existing "default" service account
+  # If specifying a custom name, ensure the service account exists before installing
+  name: ""
+
+# Webhook configuration
+webhook:
+  # Failure policy for webhooks (Fail or Ignore)
+  failurePolicy: Fail
+  # Webhook server port
+  port: 9443
+  # Secret name containing the webhook TLS certificate
+  certificateSecretName: webhook-server-cert
+  # Webhook timeout in seconds (optional)
+  timeoutSeconds: 10
+
+# OCI Credentials for Autonomous Database
+# Required for ADB provisioning/binding. See: set_ocicredentials.sh
+ociCredentials:
+  # Option 1: Reference an existing Secret containing OCI credentials
+  existingSecretName: ""
+
+  # Option 2: Provide values to create a Secret (used if existingSecretName is empty)
+  tenancy: ""
+  user: ""
+  fingerprint: ""
+  region: ""
+  passphrase: "" # optional, for encrypted private keys
+
+  # Reference an existing Secret containing the OCI API private key
+  # User must create this separately (e.g., using set_ocicredentials.sh or kubectl)
+  secretName: ""
+
+# Wait job configuration for cert-manager webhook readiness (not passed to subchart)
+certManagerWaitJob:
+  # Waits for cert-manager webhook before creating Issuer/Certificate resources
+  # Set to false only if cert-manager is known to be ready (e.g., pre-installed and running)
+  enabled: true
+  image:
+    repository: registry.k8s.io/kubectl
+    tag: "v1.28.0"
+    pullPolicy: IfNotPresent
+
+  # Timeout configuration: maxAttempts * sleepSeconds = total wait time
+  maxAttempts: 60
+  sleepSeconds: 5
+
+  # Resource limits for the wait job (defaults applied in template if empty)
+  resources: {}
+
+  # External cert-manager webhook service name (only used when cert-manager.enabled=false)
+  externalWebhookServiceName: "cert-manager-webhook"
+
+# cert-manager subchart values (passed to subchart when enabled=true)
+# See README.md and examples/ for installation scenarios
+cert-manager:
+  enabled: true
+  # Namespace for cert-manager (subchart install location and webhook lookup)
+  # Defaults to the release namespace if not specified
+  namespace: "cert-manager"
+  installCRDs: true
+  crds:
+    # Allow CRDs to be deleted on uninstall (WARNING: deletes all cert-manager resources)
+    keep: false
+  global:
+    imagePullSecrets: *imagePullSecrets
