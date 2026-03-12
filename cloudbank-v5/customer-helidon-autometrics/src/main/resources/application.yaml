@@ -1,0 +1,12 @@
+  server:
+    features:
+      eureka:
+        enabled: true
+        client:
+          base-uri: ${eureka.client.service-url.defaultZone}
+          connect-timeout: PT10S
+          read-timeout: PT30S
+        instance:
+          name: "customer-helidon"
+          hostname: ${eureka.instance.hostname}
+          prefer-ip-address: ${eureka.instance.preferIpAddress:true}
