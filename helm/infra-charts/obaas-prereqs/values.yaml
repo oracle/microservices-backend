@@ -62,18 +62,6 @@ oracle-database-operator:
   # don't use the cert-manager subchart 
   cert-manager:
     enabled: false
-    
-
-cert-manager:
-  enabled: true
-  # Empty namespace will cause the use of .Release.Namespace
-  namespace: ""
-  installCRDs: true
-  crds:
-    # Allow CRDs to be deleted on uninstall (WARNING: deletes all cert-manager resources)
-    keep: false
-  global:
-    imagePullSecrets: *imagePullSecrets
 
 external-secrets:
   enabled: true

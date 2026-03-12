@@ -37,10 +37,6 @@ dependencies:
     version: "3.5.6"
     repository: https://oracle.github.io/coherence-operator/charts
     condition: coherence-operator.enabled
-  #
-  # NOTE that both opentelemetry-operator and oracle-database-operator have dependencies on cert-manager, 
-  # so if cert-manager is already installed, modify values.yaml to disable cert-manager in the subcharts
-  #
   # Installs the OpenTelemetry Operator to enable auto-instrumentation via custom resources
   - name: opentelemetry-operator
     version: "0.107.0"
@@ -48,11 +44,7 @@ dependencies:
     condition: opentelemetry-operator.enabled
   - name: oracle-database-operator
     # NOTE: cert-manager is a dependency of oracle-database-operator
-    #       if cert-manager is already installed, modify values.yaml
+    #       if cert-manager is already installed, modify values.yaml to disable cert-manager in the subchart
     version: "0.2.0"
     repository: "file://charts/oracle-database-operator"
     condition: oracle-database-operator.enabled
-  - name: cert-manager
-    version: "1.19.1"
-    repository: https://charts.jetstack.io
-    condition: cert-manager.enabled
