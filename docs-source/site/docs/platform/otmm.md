@@ -40,6 +40,18 @@ lra:
     url: ${MP_LRA_COORDINATOR_URL}
 ```
 
+## MicroTx Workflow Server
+
+The MicroTx Workflow Server extends transaction coordinator with advanced workflow capabilities. 
+
+Before running the workflow server, ensure you have at least 2 CPU and 4 Gi memory free in your cluster. To enable the workflow server, set the `otmm.workflowServer.enabled` property to true in the Helm values:
+
+```yaml
+otmm:
+  workflowServer:
+    enabled: true
+```
+
 ## Upgrading to the commercial version
 
 If you have licensed Oracle Transaction Manager for Microservices Enterprise Edition, please see the [documentation](https://docs.oracle.com/en/database/oracle/transaction-manager-for-microservices/23.4.1/index.html) for details of how to install and configure MicroTx. Oracle recommends that you perform a new installation rather than attempting to upgrade the provided MicroTx Free installation to the commercial version.
