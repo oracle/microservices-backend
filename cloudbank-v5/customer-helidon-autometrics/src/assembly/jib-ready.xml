@@ -1,0 +1,24 @@
+<assembly>
+    <id>deployment</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <!-- Copy the main JAR to root of ZIP -->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <includes>
+                <include>${project.build.finalName}.jar</include>
+            </includes>
+            <outputDirectory>.</outputDirectory>
+            <fileMode>755</fileMode>
+        </fileSet>
+        <!-- Copy dependencies to app/libs in ZIP -->
+        <fileSet>
+            <directory>${project.build.directory}/libs</directory>
+            <outputDirectory>app/libs</outputDirectory>
+            <fileMode>644</fileMode>
+        </fileSet>
+    </fileSets>
+</assembly>
