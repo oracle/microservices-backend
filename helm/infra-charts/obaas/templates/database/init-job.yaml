@@ -17,6 +17,7 @@ spec:
   ttlSecondsAfterFinished: 300  # 5 minutes
   template:
     spec:
+      {{- include "obaas.imagePullSecrets" (dict "local" .Values.database.imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) | nindent 6 }}
       restartPolicy: Never
       containers:
       - name: oracle-sqlcl-runner

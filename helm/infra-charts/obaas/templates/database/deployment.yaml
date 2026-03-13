@@ -24,6 +24,7 @@ spec:
         app.kubernetes.io/component: database
         {{- include "obaas.labels" . | nindent 8 }}
     spec:
+      {{- include "obaas.imagePullSecrets" (dict "local" .Values.database.imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) | nindent 6 }}
       securityContext:
         fsGroup: 54321
         runAsGroup: 54321

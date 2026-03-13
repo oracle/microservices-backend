@@ -623,7 +623,7 @@ signoz:
     image:
       registry: docker.io
       repository: clickhouse/clickhouse-server
-    imagePullSecrets: []
+    imagePullSecrets: *imagePullSecrets
     initContainers:
       udf:
         image:
