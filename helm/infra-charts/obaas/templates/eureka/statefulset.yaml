@@ -29,7 +29,7 @@ spec:
         signoz.io/path: "/actuator/prometheus"
       {{- end }}
     spec:
-      {{- include "obaas.imagePullSecrets" (dict "local" .Values.eureka.imagePullSecrets "global" .Values.global.imagePullSecrets) | nindent 6 }}
+      {{- include "obaas.imagePullSecrets" (dict "local" .Values.eureka.imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) | nindent 6 }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

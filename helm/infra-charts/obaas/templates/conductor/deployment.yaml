@@ -29,7 +29,7 @@ spec:
         signoz.io/path: "/actuator/prometheus"
       {{- end }}
     spec:
-      {{- include "obaas.imagePullSecrets" (dict "local" (index .Values "conductor-server").imagePullSecrets "global" .Values.global.imagePullSecrets) | nindent 6 }}
+      {{- include "obaas.imagePullSecrets" (dict "local" (index .Values "conductor-server").imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) | nindent 6 }}
       restartPolicy: Always
       containers:
       - name: conductor-server
@@ -106,7 +106,7 @@ spec:
         signoz.io/path: "/actuator/prometheus"
       {{- end }}
     spec:
-      {{- include "obaas.imagePullSecrets" (dict "local" (index .Values "conductor-server").imagePullSecrets "global" .Values.global.imagePullSecrets) | nindent 6 }}
+      {{- include "obaas.imagePullSecrets" (dict "local" (index .Values "conductor-server").imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) | nindent 6 }}
       restartPolicy: Always
       containers:
       - name: conductor-server

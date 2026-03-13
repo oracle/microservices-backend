@@ -29,7 +29,7 @@ spec:
         signoz.io/path: "/metrics"
       {{- end }}
     spec:
-      {{- include "obaas.imagePullSecrets" (dict "local" (index .Values "oracle-database-exporter").imagePullSecrets "global" .Values.global.imagePullSecrets) | nindent 6 }}
+      {{- include "obaas.imagePullSecrets" (dict "local" (index .Values "oracle-database-exporter").imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) | nindent 6 }}
       restartPolicy: Always
       containers:
       - name: metrics-exporter

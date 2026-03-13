@@ -28,7 +28,7 @@ spec:
         signoz.io/path: "/actuator/prometheus"
       {{- end }}
     spec:
-      {{- include "obaas.imagePullSecrets" (dict "local" (index .Values "admin-server").imagePullSecrets "global" .Values.global.imagePullSecrets) | nindent 6 }}
+      {{- include "obaas.imagePullSecrets" (dict "local" (index .Values "admin-server").imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) | nindent 6 }}
       containers:
       - name: admin-server
         image: "{{ (index .Values "admin-server").image.repository }}:{{ (index .Values "admin-server").image.tag }}"

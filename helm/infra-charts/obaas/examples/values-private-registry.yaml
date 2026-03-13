@@ -45,23 +45,12 @@ global:
   # including a self-signed TLS certificate for accounts.google.com
   airGapped: true
 
-  # Image pull secret name — single source of truth for the secret name
+  # Image pull secret name — change this ONE value to configure all pull secrets
   imagePullSecretName: &secretName myregistry-secret
 
-  # Anchor definitions for imagePullSecrets in two formats.
-  # Underscore prefix = not consumed by templates directly, only used as YAML anchor sources.
-  # This avoids parent global.imagePullSecrets bleeding into subcharts that expect different formats.
-
-  # Format A: [{name: secret}] — K8s standard (ingress-nginx, parent chart components, gateway-helm global)
-  _ipsObjects: &ipsObjects
-    - name: *secretName
-
-  # Format B: ["secret"] — plain strings (signoz, k8s-infra, apisix/etcd, gateway-helm pullSecrets)
-  _ipsStrings: &ipsStrings
+  # Image pull secrets list (string format; helpers normalize to {name: ...} where needed)
+  imagePullSecrets: &imagePullSecrets
     - *secretName
-
-  # Wire into global so parent-chart templates pick it up (helper normalizes strings to objects)
-  imagePullSecrets: *ipsStrings
 
   # Utility images used by global hooks (e.g., PVC cleanup on uninstall)
   utilities:
@@ -113,7 +102,7 @@ ai-optimizer:
 # Eureka Service Discovery
 eureka:
   global:
-    imagePullSecrets: *ipsObjects
+    imagePullSecrets: *imagePullSecrets
   enabled: true
   replicas: 3
   image:
@@ -125,7 +114,7 @@ eureka:
 # Admin Server
 admin-server:
   global:
-    imagePullSecrets: *ipsObjects
+    imagePullSecrets: *imagePullSecrets
   enabled: true
   replicas: 1
   image:
@@ -137,7 +126,7 @@ admin-server:
 # Config Server
 config-server:
   global:
-    imagePullSecrets: *ipsObjects
+    imagePullSecrets: *imagePullSecrets
   enabled: true
   replicas: 1
   image:
@@ -149,7 +138,7 @@ config-server:
 # Oracle Transaction Manager for Microservices (OTMM)
 otmm:
   global:
-    imagePullSecrets: *ipsObjects
+    imagePullSecrets: *imagePullSecrets
   enabled: true
   replicas: 1
   image:
@@ -161,8 +150,8 @@ otmm:
 # Oracle Database Exporter (Prometheus metrics for Oracle Database)
 oracle-database-exporter:
   global:
-    imagePullSecrets: *ipsObjects
-  imagePullSecrets: *ipsObjects
+    imagePullSecrets: *imagePullSecrets
+  imagePullSecrets: *imagePullSecrets
   enabled: true
   replicas: 1
   image:
@@ -178,7 +167,7 @@ oracle-database-exporter:
 # Conductor Server (Netflix Conductor - Workflow Orchestration)
 conductor-server:
   global:
-    imagePullSecrets: *ipsObjects
+    imagePullSecrets: *imagePullSecrets
   enabled: true
   replicas: 1
   image:
@@ -197,7 +186,7 @@ conductor-server:
 
 database:
   global:
-    imagePullSecrets: *ipsObjects
+    imagePullSecrets: *imagePullSecrets
   enabled: true
   # Database type: SIDB-FREE, ADB-FREE, ADB-S, or OTHER
   type: "SIDB-FREE"
@@ -291,16 +280,16 @@ gateway-helm:
   enabled: true
   global:
     imageRegistry: myregistry.example.com
-    imagePullSecrets: *ipsObjects
+    imagePullSecrets: *imagePullSecrets
     images:
       envoyGateway:
         image: "myregistry.example.com/envoyproxy/gateway:v1.7.0"
         pullPolicy: Always
-        pullSecrets: *ipsStrings
+        pullSecrets: *imagePullSecrets
       ratelimit:
         image: "myregistry.example.com/envoyproxy/ratelimit:3fb70258"
         pullPolicy: IfNotPresent
-        pullSecrets: *ipsStrings
+        pullSecrets: *imagePullSecrets
 
 # =============================================================================
 # Subcharts - Ingress NGINX
@@ -309,7 +298,9 @@ gateway-helm:
 
 ingress-nginx:
   enabled: true
-  imagePullSecrets: *ipsObjects
+  # ingress-nginx requires [{name: ...}] format (upstream chart, cannot use string anchor)
+  imagePullSecrets:
+    - name: *secretName
   controller:
     metrics:
       enabled: true
@@ -344,7 +335,7 @@ apisix:
   enabled: true
   # Uses global.imagePullSecrets (expects string list format)
   global:
-    imagePullSecrets: *ipsStrings
+    imagePullSecrets: *imagePullSecrets
     security: 
       allowInsecureImages: true
 
@@ -493,7 +484,7 @@ apisix:
   etcd:
     enabled: true
     global:
-      imagePullSecrets: *ipsStrings
+      imagePullSecrets: *imagePullSecrets
     replicaCount: 3
     # Disable pre-upgrade hook when etcd is being installed for the first time
     # (even if the parent chart is being upgraded)
@@ -552,7 +543,7 @@ signoz:
     image:
       registry: myregistry.example.com
       repository: signoz/signoz
-    imagePullSecrets: *ipsStrings
+    imagePullSecrets: *imagePullSecrets
     initContainers:
       init:
         image:

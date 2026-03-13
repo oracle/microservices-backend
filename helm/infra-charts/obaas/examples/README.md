@@ -154,7 +154,7 @@ Or create a custom values file that extends an example:
 # my-custom-values.yaml
 global:
   imagePullSecrets:
-    - name: myregistry-secret
+    - myregistry-secret
 
 # Disable components you don't need
 ai-optimizer:

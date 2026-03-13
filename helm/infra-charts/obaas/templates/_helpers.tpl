@@ -7,8 +7,8 @@ Expand the name of the chart.
 */}}
 {{/*
 Image Pull Secrets Helper
-Renders imagePullSecrets block with local-first fallback to global.
-Usage: {{ include "obaas.imagePullSecrets" (dict "local" .Values.component.imagePullSecrets "global" .Values.global.imagePullSecrets) | nindent 6 }}
+Renders imagePullSecrets block with local-first fallback to global, then secretName.
+Usage: {{ include "obaas.imagePullSecrets" (dict "local" .Values.component.imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) | nindent 6 }}
 */}}
 {{- define "obaas.imagePullSecrets" -}}
 {{- $secrets := list -}}
@@ -16,6 +16,8 @@ Usage: {{ include "obaas.imagePullSecrets" (dict "local" .Values.component.image
   {{- $secrets = .local -}}
 {{- else if .global -}}
   {{- $secrets = .global -}}
+{{- else if .secretName -}}
+  {{- $secrets = list .secretName -}}
 {{- end -}}
 {{- if $secrets }}
 imagePullSecrets:
@@ -31,9 +33,9 @@ imagePullSecrets:
 
 {{/*
 Image Pull Secret Name Helper
-Returns the name of the first image pull secret (local-first, fallback to global).
+Returns the name of the first image pull secret (local-first, fallback to global, then secretName).
 Useful for config values that need just the secret name, not the full block.
-Usage: {{ include "obaas.imagePullSecretName" (dict "local" .Values.component.imagePullSecrets "global" .Values.global.imagePullSecrets) }}
+Usage: {{ include "obaas.imagePullSecretName" (dict "local" .Values.component.imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) }}
 */}}
 {{- define "obaas.imagePullSecretName" -}}
 {{- $local := .local -}}
@@ -51,6 +53,8 @@ Usage: {{ include "obaas.imagePullSecretName" (dict "local" .Values.component.im
   {{- else -}}
 {{ $first.name }}
   {{- end -}}
+{{- else if .secretName -}}
+{{ .secretName }}
 {{- else -}}
 ""
 {{- end -}}

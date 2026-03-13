@@ -18,17 +18,12 @@ global:
   # including a self-signed TLS certificate for accounts.google.com
   airGapped: false
 
-  # Image pull secret name — single source of truth for the secret name
-  # Set this to your secret name for private registry; leave empty for public registries
+  # Image pull secret name for private registries (leave empty for public registries)
   imagePullSecretName: ""
 
-  # Format A: [{name: secret}] — K8s standard (ingress-nginx, parent chart components, gateway-helm global)
-  # For private registry, change to: &ipsObjects [{name: myregistry-secret}]
-  imagePullSecrets: &ipsObjects []
-
-  # Format B: ["secret"] — plain strings (signoz, k8s-infra, apisix/etcd, gateway-helm pullSecrets)
-  # For private registry, change to: &ipsStrings [myregistry-secret]
-  _ipsStrings: &ipsStrings []
+  # Image pull secrets — string format, helpers normalize to {name: ...} automatically
+  # For private registry: ["myregistry-secret"]
+  imagePullSecrets: &imagePullSecrets []
 
   # Utility image used by hooks and jobs
   utilities:
@@ -98,7 +93,7 @@ gateway-helm:
     # -- Global override for image registry
     imageRegistry: ""
     # -- Global override for image pull secrets
-    imagePullSecrets: *ipsObjects
+    imagePullSecrets: *imagePullSecrets
 
     # If set, these override image-specific values: useful when installing the chart in a private registry environment.
     # Override image-specific values directly if a global override is not desired.
@@ -110,7 +105,7 @@ gateway-helm:
         # Default behavior: latest images will be Always else IfNotPresent.
         pullPolicy: Always
         # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
-        pullSecrets: *ipsStrings
+        pullSecrets: *imagePullSecrets
       ratelimit:
         # This is the full image name including the hub, repo, and tag.
         image: "docker.io/envoyproxy/ratelimit:3fb70258"
@@ -118,7 +113,7 @@ gateway-helm:
         # Default behavior: latest images will be Always else IfNotPresent.
         pullPolicy: IfNotPresent
         # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
-        pullSecrets: *ipsStrings
+        pullSecrets: *imagePullSecrets
 
   deployment:
     pod:
@@ -131,7 +126,11 @@ gateway-helm:
 
 ingress-nginx:
   enabled: true
-  imagePullSecrets: *ipsObjects
+  # ingress-nginx requires [{name: ...}] format (upstream chart, no normalization)
+  # For private registry, uncomment and set:
+  # imagePullSecrets:
+  #   - name: myregistry-secret
+  imagePullSecrets: []
   controller:
     metrics:
       enabled: true
@@ -151,7 +150,7 @@ apisix:
   enabled: true
   # Uses global.imagePullSecrets
   global:
-    imagePullSecrets: *ipsStrings
+    imagePullSecrets: *imagePullSecrets
 
   # RBAC required for Kubernetes service discovery
   rbac:
@@ -466,7 +465,7 @@ database:
 signoz:
   enabled: true
   global:
-    imagePullSecrets: *ipsStrings
+    imagePullSecrets: *imagePullSecrets
   # Utility images for setup jobs
   utilities:
     curlJq:
