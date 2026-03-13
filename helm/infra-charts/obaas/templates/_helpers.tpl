@@ -11,14 +11,20 @@ Renders imagePullSecrets block with local-first fallback to global.
 Usage: {{ include "obaas.imagePullSecrets" (dict "local" .Values.component.imagePullSecrets "global" .Values.global.imagePullSecrets) | nindent 6 }}
 */}}
 {{- define "obaas.imagePullSecrets" -}}
-{{- $local := .local -}}
-{{- $global := .global -}}
-{{- if or $local $global }}
+{{- $secrets := list -}}
+{{- if .local -}}
+  {{- $secrets = .local -}}
+{{- else if .global -}}
+  {{- $secrets = .global -}}
+{{- end -}}
+{{- if $secrets }}
 imagePullSecrets:
-  {{- if $local }}
-  {{- toYaml $local | nindent 2 }}
+  {{- range $secrets }}
+  {{- if kindIs "string" . }}
+  - name: {{ . | quote }}
   {{- else }}
-  {{- toYaml $global | nindent 2 }}
+  - name: {{ .name }}
+  {{- end }}
   {{- end }}
 {{- end }}
 {{- end }}
@@ -32,10 +38,19 @@ Usage: {{ include "obaas.imagePullSecretName" (dict "local" .Values.component.im
 {{- define "obaas.imagePullSecretName" -}}
 {{- $local := .local -}}
 {{- $global := .global -}}
+{{- $secrets := list -}}
 {{- if $local -}}
-{{ (index $local 0).name }}
+  {{- $secrets = $local -}}
 {{- else if $global -}}
-{{ (index $global 0).name }}
+  {{- $secrets = $global -}}
+{{- end -}}
+{{- if $secrets -}}
+  {{- $first := index $secrets 0 -}}
+  {{- if kindIs "string" $first -}}
+{{ $first }}
+  {{- else -}}
+{{ $first.name }}
+  {{- end -}}
 {{- else -}}
 ""
 {{- end -}}

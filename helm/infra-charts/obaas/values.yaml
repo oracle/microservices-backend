@@ -18,9 +18,17 @@ global:
   # including a self-signed TLS certificate for accounts.google.com
   airGapped: false
 
-  # This overrides all secrets for pulling an image from a private repository
-  # When set, automatically applied to all subcharts via YAML anchors
-  imagePullSecrets: &imagePullSecrets []
+  # Image pull secret name — single source of truth for the secret name
+  # Set this to your secret name for private registry; leave empty for public registries
+  imagePullSecretName: ""
+
+  # Format A: [{name: secret}] — K8s standard (ingress-nginx, parent chart components, gateway-helm global)
+  # For private registry, change to: &ipsObjects [{name: myregistry-secret}]
+  imagePullSecrets: &ipsObjects []
+
+  # Format B: ["secret"] — plain strings (signoz, k8s-infra, apisix/etcd, gateway-helm pullSecrets)
+  # For private registry, change to: &ipsStrings [myregistry-secret]
+  _ipsStrings: &ipsStrings []
 
   # Utility image used by hooks and jobs
   utilities:
@@ -90,7 +98,7 @@ gateway-helm:
     # -- Global override for image registry
     imageRegistry: ""
     # -- Global override for image pull secrets
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: *ipsObjects
 
     # If set, these override image-specific values: useful when installing the chart in a private registry environment.
     # Override image-specific values directly if a global override is not desired.
@@ -102,7 +110,7 @@ gateway-helm:
         # Default behavior: latest images will be Always else IfNotPresent.
         pullPolicy: Always
         # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
-        pullSecrets: *imagePullSecrets
+        pullSecrets: *ipsStrings
       ratelimit:
         # This is the full image name including the hub, repo, and tag.
         image: "docker.io/envoyproxy/ratelimit:3fb70258"
@@ -110,7 +118,7 @@ gateway-helm:
         # Default behavior: latest images will be Always else IfNotPresent.
         pullPolicy: IfNotPresent
         # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
-        pullSecrets: *imagePullSecrets
+        pullSecrets: *ipsStrings
 
   deployment:
     pod:
@@ -123,7 +131,7 @@ gateway-helm:
 
 ingress-nginx:
   enabled: true
-  imagePullSecrets: *imagePullSecrets
+  imagePullSecrets: *ipsObjects
   controller:
     metrics:
       enabled: true
@@ -143,7 +151,7 @@ apisix:
   enabled: true
   # Uses global.imagePullSecrets
   global:
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: *ipsStrings
 
   # RBAC required for Kubernetes service discovery
   rbac:
@@ -458,8 +466,7 @@ database:
 signoz:
   enabled: true
   global:
-    # Uses global.imagePullSecrets
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: *ipsStrings
   # Utility images for setup jobs
   utilities:
     curlJq:
