@@ -151,7 +151,21 @@ helm repo add obaas https://oracle.github.io/microservices-backend/helm
 helm repo update
 ```
 
-#### Step 1: Install Prerequisites (Once Per Cluster)
+#### Step 1: Install cert-manager
+
+OBaaS requires [cert-manager](https://cert-manager.io/) as a prerequisite. If you do not have cert-manager installed on your cluster, install it now:
+
+```shell
+helm install \
+  cert-manager oci://quay.io/jetstack/charts/cert-manager \
+  --version v1.19.1 \
+  --namespace cert-manager \
+  --create-namespace \
+  --set installCRDs=true \
+  --set crds.keep=false
+```
+
+#### Step 2: Install Prerequisites (Once Per Cluster)
 
 :::warning Cluster-Scoped Installation
 Only install prerequisites once per cluster. Installing multiple times will cause CRD conflicts and duplicate operator controllers.
@@ -169,7 +183,7 @@ kubectl get pods -n obaas-system
 
 All pods should reach `Running` status within 2-3 minutes.
 
-#### Step 2: Install OBaaS
+#### Step 3: Install OBaaS
 
 Choose an example configuration that matches your deployment scenario and install:
 
@@ -189,7 +203,7 @@ kubectl get pods -n <namespace> -w
 It may take 5-10 additional minutes for all pods to reach Running state.
 :::
 
-#### Step 3: Verify Installation
+#### Step 4: Verify Installation
 
 After installation completes, verify all components are running:
 

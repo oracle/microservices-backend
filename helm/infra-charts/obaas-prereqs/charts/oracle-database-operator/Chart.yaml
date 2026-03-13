@@ -1,0 +1,23 @@
+apiVersion: v2
+appVersion: 2.0.0
+dependencies:
+- condition: cert-manager.enabled
+  name: cert-manager
+  repository: https://charts.jetstack.io
+  version: v1.19.1
+description: A Helm chart for Oracle Database Operator for Kubernetes
+home: https://github.com/oracle/oracle-database-operator
+keywords:
+- oracle
+- database
+- operator
+- kubernetes
+kubeVersion: '>=1.21.0-0'
+maintainers:
+- name: Oracle
+  url: https://www.oracle.com
+name: oracle-database-operator
+sources:
+- https://github.com/oracle/oracle-database-operator
+type: application
+version: 0.2.0

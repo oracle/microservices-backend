@@ -1,0 +1,14 @@
+Oracle Database Operator has been installed.
+
+Namespace: {{ include "oracle-database-operator.namespace" . }}
+
+To verify the installation:
+
+  kubectl -n {{ include "oracle-database-operator.namespace" . }} get all 
+
+To check the operator logs:
+
+  kubectl -n {{ include "oracle-database-operator.namespace" . }} logs -l control-plane=controller-manager -f
+
+For more information, visit:
+  https://github.com/oracle/oracle-database-operator

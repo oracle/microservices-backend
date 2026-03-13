@@ -344,6 +344,29 @@ otmm:
   image:
     repository: container-registry.oracle.com/database/otmm
     tag: "24.4.1"
+  commonConfiguration:
+    security: {}
+  workflowServer:
+    enabled: false
+    encryption:
+      enabled: true
+    logging: {}
+    taskConfig:
+      txeventq: {}
+      transaction: {}
+      grpc: {}
+      sql: {}
+    config:
+      indexing:
+        enabled: true
+      storage:
+        fileSystem: {}
+    image:
+      repository: container-registry.oracle.com/database/workflow-server
+      tag: latest
+    replicas: 1
+    # Override default resources if needed (defaults: cpu 2, memory 4Gi)
+    # resources: {}
   # Override default resources if needed (defaults: cpu 250m, memory 1Gi)
   # resources: {}
 
@@ -487,6 +510,13 @@ signoz:
     # Email for the admin user (only used when existingSecret is not specified)
     # A random password will be automatically generated
     email: "admin@example.com"
+  instrumentation:
+    sampler:
+      # e.g. parentbased_traceidratio, always_on, always_off
+      # Using parentbased_traceidratio ensures distributed traces are kept intact
+      type: "parentbased_traceidratio"
+      # Only applies if using a ratio sampler. 1.0 = 100%, 0.1 = 10%
+      argument: "1.0"
   # Change to override individual component images
   signoz:
     image:

@@ -11,9 +11,9 @@ maintainers:
     email: obaas_ww@oracle.com
     url: https://oracle.github.io/microservices-backend
 # This is the chart version.
-version: 0.0.6
+version: 0.0.7
 # This is the version number of the application being deployed.
-appVersion: "2.1.0-build.5"
+appVersion: "2.1.0-build.6"
 
 # SubCharts - Cluster-scoped singleton infrastructure
 dependencies:
@@ -33,13 +33,18 @@ dependencies:
     version: "0.45.1"
     repository: https://strimzi.io/charts/
     condition: strimzi-kafka-operator.enabled
-  - name: oracle-database-operator
-    # NOTE: cert-manager is a dependency of oracle-database-operator
-    #       if cert-manager is already installed, modify values.yaml
-    version: "0.1.0"
-    repository: "file://charts"
-    condition: oracle-database-operator.enabled
   - name: coherence-operator
     version: "3.5.6"
     repository: https://oracle.github.io/coherence-operator/charts
     condition: coherence-operator.enabled
+  # Installs the OpenTelemetry Operator to enable auto-instrumentation via custom resources
+  - name: opentelemetry-operator
+    version: "0.107.0"
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+    condition: opentelemetry-operator.enabled
+  - name: oracle-database-operator
+    # NOTE: cert-manager is a dependency of oracle-database-operator
+    #       if cert-manager is already installed, modify values.yaml to disable cert-manager in the subchart
+    version: "0.2.0"
+    repository: "file://charts/oracle-database-operator"
+    condition: oracle-database-operator.enabled

@@ -1,0 +1,17 @@
+# USE-CASE 1: Standalone cert-manager in "cert-manager" namespace
+#
+# Pre-requisite: Install cert-manager separately
+#   helm repo add jetstack https://charts.jetstack.io
+#   helm install cert-manager jetstack/cert-manager \
+#     --namespace cert-manager --create-namespace \
+#     --set installCRDs=true
+#
+# Install operator:
+#   helm install oraop . -f examples/standalone-cert-manager-default-ns.yaml
+
+cert-manager:
+  enabled: false
+  namespace: "cert-manager"
+
+certManagerWaitJob:
+  externalWebhookServiceName: "cert-manager-webhook"

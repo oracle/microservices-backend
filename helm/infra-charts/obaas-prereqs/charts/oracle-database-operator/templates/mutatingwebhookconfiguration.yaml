@@ -1,0 +1,45 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: {{ include "oracle-database-operator.certManagerInjectAnnotation" . }}
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "3"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  name: {{ include "oracle-database-operator.name" . }}-mutating-webhook-configuration
+  labels:
+    {{- include "oracle-database-operator.labels" . | nindent 4 }}
+webhooks:
+{{- $webhooks := include "oracle-database-operator.mutatingWebhooks" . | fromYamlArray }}
+{{- range $webhook := $webhooks }}
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: {{ include "oracle-database-operator.webhookServiceName" $ }}
+      namespace: {{ include "oracle-database-operator.namespace" $ }}
+      path: {{ $webhook.path }}
+  failurePolicy: {{ $.Values.webhook.failurePolicy }}
+  name: {{ $webhook.name }}
+  {{- if $.Values.webhook.timeoutSeconds }}
+  timeoutSeconds: {{ $.Values.webhook.timeoutSeconds }}
+  {{- end }}
+  rules:
+  - apiGroups:
+    - {{ $webhook.apiGroup }}
+    apiVersions:
+    - {{ $webhook.apiVersion }}
+    operations:
+    {{- if $webhook.operations }}
+    {{- range $webhook.operations }}
+    - {{ . }}
+    {{- end }}
+    {{- else }}
+    - CREATE
+    - UPDATE
+    {{- end }}
+    resources:
+    - {{ $webhook.resources }}
+  sideEffects: None
+{{- end }}

@@ -30,6 +30,8 @@ A CNCF-compliant Kubernetes cluster with the following specifications:
 - At least 2 OCPU and 32GB memory per worker node
 - Working storage provider with storage class for RWX (ReadWriteMany) PVs
 
+*If you are installing the OTMM workflow-server, allocate at least an additional 2 CPUs and 4Gi RAM per cluster.*
+
 **Capacity planning:**
 
 - Base configuration supports ONE OBaaS installation plus applications

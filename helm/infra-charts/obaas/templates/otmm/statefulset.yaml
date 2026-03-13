@@ -54,7 +54,7 @@ spec:
           {{- toYaml (index .Values "otmm").resources | nindent 10 }}
           {{- else }}
           limits:
-            cpu: 250m
+            cpu: 1
             memory: 1Gi
           requests:
             cpu: 250m
