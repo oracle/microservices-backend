@@ -299,7 +299,7 @@ apisix:
     replicaCount: 3
     # Disable pre-upgrade hook when etcd is being installed for the first time
     # (even if the parent chart is being upgraded)
-    preUpgradeHook:
+    preUpgradeJob:
       enabled: false
     image:
       registry: docker.io

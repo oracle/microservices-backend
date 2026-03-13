@@ -486,10 +486,6 @@ apisix:
     global:
       imagePullSecrets: *imagePullSecrets
     replicaCount: 3
-    # Disable pre-upgrade hook when etcd is being installed for the first time
-    # (even if the parent chart is being upgraded)
-    preUpgradeHook:
-      enabled: false
     image:
       registry: myregistry.example.com
       repository: bitnamilegacy/etcd
