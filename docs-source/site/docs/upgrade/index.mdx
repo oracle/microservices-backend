@@ -1,0 +1,104 @@
+---
+title: Upgrade
+sidebar_position: 0
+---
+
+export const OBAAS_VERSION = '2.1.0';
+
+This page documents how to upgrade to OBaaS version {OBAAS_VERSION} from earlier versions.
+
+:::warning Important
+Before performing any upgrade, we recommend that you make a backup of your environment.
+:::
+
+## Upgrading from OBaaS 2.0.0
+
+You may directly upgrade from OBaaS 2.0.0 to {OBAAS_VERSION} by performing a Helm upgrade. 
+
+The general process is as follows:
+
+- Get the new Helm charts for OBaaS {OBAAS_VERSION}
+- Review your configuration (`values.yaml` files)
+- Perform the Helm upgrade
+
+The following sections provide more detail.
+
+### Get the new Helm charts
+
+If you installed a previous version (2.0.0 or later) you should already have the Helm repository configured.
+If you do not, you can configure it by running this command:
+
+```
+helm repo add obaas https://oracle.github.io/microservices-backend/helm
+```
+
+Then, pull the new charts from the Helm repository using this command:
+
+```
+helm repo update
+```
+
+To see a list of charts available in the repository, use this command:
+
+```
+helm search repo obaas
+```
+
+Note that the "APP VERSION" shown in the output is the version of OBaaS itself.
+
+### Review your configuration
+
+Before upgrading, you should review your existing configuration.  If you no longer have the `values.yaml` file that
+you used to install your environment, you can obtain the current configuration using this command (adjusted to match
+your chart name and namespace):
+
+```
+helm get all obaas-prereqs -n obaas-system
+helm get all obaas -n obaas
+```
+
+You should carefully review your configuration and ensure your new `values.yaml` files (one for each chart) maintain your settings and customizations.
+In particular, check the following: 
+
+- Make sure you have set `enabled: true` for all existing components that you wish to keep
+- Make sure that secret names are correct for your environment, especially secrets with database credentials
+- Make sure that any custom images or private registry configuration is maintained
+- Check the configuration for any new components introduced in the target release 
+- Remove the configuration for any components which are no longer included in the target release
+
+### Perform the Helm upgrade
+
+You can perform the upgrade using commands similiar to these.  Please ensure that you use the correct chart name and namespace
+for your environment, and that you use your customized `values.yaml` file:
+
+```
+helm upgrade --install obaas-prereqs -n obaas-system obaas/obaas-prereqs -f values.yaml [--debug]
+helm upgrade --install obaas -n obaas obaas/obaas -f values.yaml [--debug]
+```
+
+
+
+## Upgrading from versions before OBaaS 2.0.0
+
+OBaaS versions before 2.0.0 did not use Helm charts for installation.
+
+In-place upgrades are not supported when the existing release is pre-2.0.0.  You must use an out-of-place upgrade to upgrade from a release before 2.0.0
+to 2.0.0 or a later release. 
+
+### Out-of-place upgrade
+
+To perform an out-of-place upgrade, you must install a new OBaaS environment at the target version, with your desired configuration and customizations,
+and then migrate your data and applications to the new environment.
+
+The following data should be considered for migration: 
+
+TODO
+
+- database secrets, including bindings
+- config data from properties table
+- dashboard customizations
+- custom resource definitions, e.g., coherence or kafka cluster definitions
+
+Note that upgrading will in most cases mean moving to a newer version of each component.  As we update components to keep up with the
+latest versions, and to manage security vulnerabilities, sometimes an incompatible ("breaking") API change will be required.
+If you are upgrading to a new release, you may need to upgrade you application code or configuration to adjust to these changes.
