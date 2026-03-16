@@ -30,7 +30,10 @@ A CNCF-compliant Kubernetes cluster with the following specifications:
 - At least 2 OCPU and 32GB memory per worker node
 - Working storage provider with storage class for RWX (ReadWriteMany) PVs
 
-*If you are installing the OTMM workflow-server, allocate at least an additional 2 CPUs and 4Gi RAM per cluster.*
+You may need extra capacity:
+
+- If you are installing the OTMM workflow-server, allocate at least an additional 2 CPUs and 4Gi RAM per cluster.
+- If you are using the Single Instance Database (SIDB) option, which runs the Oracle AI Database in a container in the cluster, you may need more ephemeral storage on your nodes to allow space for the database file system.  We recommend at least 250GB of ephemeral node storage for this option.
 
 **Capacity planning:**
 

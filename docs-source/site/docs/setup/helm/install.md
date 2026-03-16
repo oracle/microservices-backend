@@ -231,6 +231,10 @@ helm upgrade --install obaas obaas/obaas -f examples/values-default.yaml -n obaa
 
 #### SIDB-FREE Database (`values-sidb-free.yaml`)
 
+:::warning Important
+If you use SIDB, you may need more ephemeral storage on your nodes.  Please refer to [prerequisites](./prereqs.md) for details.
+:::
+
 Uses Oracle Database Free as an in-cluster container. This is the default database type.
 
 **Use case:** Development, testing, standalone deployments
