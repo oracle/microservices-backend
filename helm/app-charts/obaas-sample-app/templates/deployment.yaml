@@ -98,6 +98,12 @@ spec:
               value: {{ include "obaas-app.fullname" . }}
           {{- end }}
 
+          {{- /* Spring Cloud Config Server */}}
+          {{- if .Values.configServer.enabled }}
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: {{ include "obaas.configServer.url" . | quote }}
+          {{- end }}
+
           {{- /* OTEL */}}
           {{- if .Values.otel.enabled }}
             # OTEL handled by the OpenTelemetry Operator.

@@ -215,6 +215,19 @@ Eureka URL for Spring Boot
 {{- end }}
 
 {{/*
+Spring Cloud Config Server endpoint
+*/}}
+{{- define "obaas.configServer.endpoint" -}}
+{{- $configServer := .Values.configServer | default dict }}
+{{- $endpoint := $configServer.endpoint | default "" }}
+{{- if $endpoint }}
+{{- $endpoint }}
+{{- else }}
+{{- printf "http://%s-config-server.%s.svc.cluster.local:8080" (include "obaas.releaseName" .) .Release.Namespace }}
+{{- end }}
+{{- end }}
+
+{{/*
 OTEL endpoint
 */}}
 {{- define "obaas.otel.endpoint" -}}
