@@ -101,7 +101,7 @@ spec:
           {{- /* Spring Cloud Config Server */}}
           {{- if .Values.configServer.enabled }}
             - name: SPRING_CLOUD_CONFIG_URI
-              value: {{ include "obaas.configServer.url" . | quote }}
+              value: {{ include "obaas.configServer.endpoint" . | quote }}
           {{- end }}
 
           {{- /* OTEL */}}
