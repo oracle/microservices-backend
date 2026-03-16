@@ -29,6 +29,7 @@ A CNCF-compliant Kubernetes cluster with the following specifications:
 - Minimum 3 worker nodes
 - At least 2 OCPU and 32GB memory per worker node
 - Working storage provider with storage class for RWX (ReadWriteMany) PVs
+- Working network provider supporting either Ingress or Gateway API for external cluster access
 
 You may need extra capacity:
 

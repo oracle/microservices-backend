@@ -1,6 +1,6 @@
 ---
 title: Helm Chart installation
-sidebar_position: 2
+sidebar_position: 3
 ---
 ## Oracle Backend for Microservices and AI (OBaaS) Helm Charts
 
