@@ -9,6 +9,8 @@ Choose your preferred deployment method for OBaaS based on your requirements and
 
 ### Deploy with Helm
 
+Helm deployment is the only supported method of installation for production environments.
+
 **Best for**: Deploying to existing Kubernetes clusters.
 
 **What you get**:
@@ -29,7 +31,7 @@ Choose your preferred deployment method for OBaaS based on your requirements and
 
 ### Deploy using OCI "Magic Button"
 
-Complete infrastructure provisioning on Oracle Cloud Infrastructure.
+Complete development/test infrastructure provisioning on Oracle Cloud Infrastructure.
 
 **What you get**:
 

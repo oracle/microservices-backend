@@ -219,6 +219,8 @@ kubectl get pods -A
 
 ### Example Configurations
 
+Several example configurations are provided for comparision. 
+
 #### Default Configuration (`values-default.yaml`)
 
 Minimal configuration with no overrides. All subcharts use their default settings.

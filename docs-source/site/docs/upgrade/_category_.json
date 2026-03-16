@@ -1,0 +1,8 @@
+{
+  "label": "Upgrade",
+  "position": 7,
+  "link": {
+    "type": "doc",
+    "id": "upgrade/index"
+  }
+}
