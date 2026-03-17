@@ -1,0 +1,190 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+{{- if and (index .Values "apisix").enabled (index .Values "gateway-helm").enabled }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-gateway-pre-delete
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-7"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+{{- with .Values.global.imagePullSecretName }}
+imagePullSecrets:
+  - name: {{ . }}
+{{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Name }}-gateway-pre-delete
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-7"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+rules:
+- apiGroups: ["gateway.networking.k8s.io"]
+  resources: ["gateways", "httproutes"]
+  verbs: ["get", "list", "delete"]
+- apiGroups: ["gateway.envoyproxy.io"]
+  resources: ["envoyproxies"]
+  verbs: ["get", "list", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "delete"]
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Release.Name }}-gateway-pre-delete
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-7"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Release.Name }}-gateway-pre-delete
+subjects:
+- kind: ServiceAccount
+  name: {{ .Release.Name }}-gateway-pre-delete
+  namespace: {{ .Release.Namespace }}
+---
+# GatewayClass is cluster-scoped — requires ClusterRole (not Role)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}-{{ .Release.Namespace }}-gateway-pre-delete
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-7"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+rules:
+- apiGroups: ["gateway.networking.k8s.io"]
+  resources: ["gatewayclasses"]
+  verbs: ["get", "list", "delete", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Name }}-{{ .Release.Namespace }}-gateway-pre-delete
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-7"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Release.Name }}-{{ .Release.Namespace }}-gateway-pre-delete
+subjects:
+- kind: ServiceAccount
+  name: {{ .Release.Name }}-gateway-pre-delete
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-gateway-pre-delete
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-6"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      name: {{ .Release.Name }}-gateway-pre-delete
+    spec:
+      serviceAccountName: {{ .Release.Name }}-gateway-pre-delete
+      restartPolicy: Never
+      containers:
+      - name: gateway-cleanup
+        image: {{ .Values.global.utilities.kubectl.image.registry }}/{{ .Values.global.utilities.kubectl.image.repository }}:{{ .Values.global.utilities.kubectl.image.tag }}
+        command:
+        - sh
+        - -c
+        - |
+          set -e
+          NS="{{ .Release.Namespace }}"
+          RELEASE="{{ .Release.Name }}"
+          echo "=== Gateway Pre-Delete Hook ==="
+          echo "Cleaning up Envoy Gateway data plane resources in namespace $NS..."
+
+          # Delete Gateway CR — this triggers the controller to tear down the data plane
+          GW="${RELEASE}-envoy-apisix"
+          if kubectl get gateway "$GW" -n "$NS" >/dev/null 2>&1; then
+            echo "Deleting Gateway $GW..."
+            kubectl delete gateway "$GW" -n "$NS" --wait=true --timeout=30s || true
+          else
+            echo "Gateway $GW not found, skipping"
+          fi
+
+          # Delete HTTPRoute
+          HR="${RELEASE}-envoy-apisix-all-hosts"
+          if kubectl get httproute "$HR" -n "$NS" >/dev/null 2>&1; then
+            echo "Deleting HTTPRoute $HR..."
+            kubectl delete httproute "$HR" -n "$NS" --wait=false
+          fi
+
+          # Delete GatewayClass — remove finalizers first (controller may have added them)
+          GC="${RELEASE}-envoy-gateway"
+          if kubectl get gatewayclass "$GC" >/dev/null 2>&1; then
+            echo "Removing finalizers from GatewayClass $GC..."
+            kubectl patch gatewayclass "$GC" -p '{"metadata":{"finalizers":null}}' --type=merge 2>/dev/null || true
+            echo "Deleting GatewayClass $GC..."
+            kubectl delete gatewayclass "$GC" --wait=true --timeout=30s || true
+          fi
+
+          # Delete EnvoyProxy CR if it exists
+          EP="${RELEASE}-envoy-proxy"
+          if kubectl get envoyproxy "$EP" -n "$NS" >/dev/null 2>&1; then
+            echo "Deleting EnvoyProxy $EP..."
+            kubectl delete envoyproxy "$EP" -n "$NS" --wait=false
+          fi
+
+          # Wait for the controller to clean up data plane resources
+          echo "Waiting for data plane resources to be cleaned up..."
+          TIMEOUT=60
+          ELAPSED=0
+          while [ $ELAPSED -lt $TIMEOUT ]; do
+            REMAINING=$(kubectl get deployments -n "$NS" -l gateway.envoyproxy.io/owning-gateway-name="${GW}" --no-headers 2>/dev/null | wc -l || echo "0")
+            REMAINING=$(echo "$REMAINING" | tr -d ' ')
+            if [ "$REMAINING" -eq 0 ]; then
+              echo "All data plane deployments cleaned up"
+              break
+            fi
+            echo "Waiting for $REMAINING deployment(s) to be deleted... ($ELAPSED/$TIMEOUT seconds)"
+            sleep 5
+            ELAPSED=$((ELAPSED + 5))
+          done
+
+          # Force-delete any remaining data plane resources
+          if [ $ELAPSED -ge $TIMEOUT ]; then
+            echo "Timeout reached — force-deleting remaining data plane resources..."
+            kubectl delete deployments -n "$NS" -l gateway.envoyproxy.io/owning-gateway-name="${GW}" --wait=false 2>/dev/null || true
+            kubectl delete services -n "$NS" -l gateway.envoyproxy.io/owning-gateway-name="${GW}" --wait=false 2>/dev/null || true
+          fi
+
+          # Final verification
+          REMAINING_DEPLOY=$(kubectl get deployments -n "$NS" -l gateway.envoyproxy.io/owning-gateway-name="${GW}" --no-headers 2>/dev/null | wc -l || echo "0")
+          REMAINING_SVC=$(kubectl get services -n "$NS" -l gateway.envoyproxy.io/owning-gateway-name="${GW}" --no-headers 2>/dev/null | wc -l || echo "0")
+          REMAINING_DEPLOY=$(echo "$REMAINING_DEPLOY" | tr -d ' ')
+          REMAINING_SVC=$(echo "$REMAINING_SVC" | tr -d ' ')
+
+          if [ "$REMAINING_DEPLOY" -gt 0 ] || [ "$REMAINING_SVC" -gt 0 ]; then
+            echo "Warning: $REMAINING_DEPLOY deployment(s) and $REMAINING_SVC service(s) still remaining"
+            kubectl get deployments,services -n "$NS" -l gateway.envoyproxy.io/owning-gateway-name="${GW}" 2>/dev/null || true
+          else
+            echo "All Envoy Gateway data plane resources successfully cleaned up"
+          fi
+
+          echo "=== Gateway pre-delete cleanup complete ==="
+{{- end }}
