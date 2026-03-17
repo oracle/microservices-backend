@@ -103,32 +103,19 @@ Pull policy for the Envoy Gateway image.
 
 {{/*
 Pull secrets for the Envoy Gateway image.
-Normalizes string items to {name: ...} objects for K8s compatibility.
-Priority: global.imagePullSecrets > deployment.envoyGateway.imagePullSecrets
-         > global.images.envoyGateway.pullSecrets > global.imagePullSecretName
 */}}
 {{- define "eg.image.pullSecrets" -}}
-{{- $secrets := list -}}
-{{- if gt (len (default (list) .Values.global.imagePullSecrets)) 0 -}}
-  {{- $secrets = .Values.global.imagePullSecrets -}}
-{{- else if gt (len (default (list) .Values.deployment.envoyGateway.imagePullSecrets)) 0 -}}
-  {{- $secrets = .Values.deployment.envoyGateway.imagePullSecrets -}}
-{{- else if gt (len (default (list) .Values.global.images.envoyGateway.pullSecrets)) 0 -}}
-  {{- $secrets = .Values.global.images.envoyGateway.pullSecrets -}}
-{{- else if .Values.global.imagePullSecretName -}}
-  {{- $secrets = list (dict "name" .Values.global.imagePullSecretName) -}}
-{{- end -}}
-{{- if $secrets -}}
+{{- if .Values.global.imagePullSecrets -}}
 imagePullSecrets:
-{{- range $secrets }}
-{{- if kindIs "string" . }}
-- name: {{ . | quote }}
-{{- else }}
-- {{ toYaml . | nindent 2 | trim }}
-{{- end }}
-{{- end }}
+{{ toYaml .Values.global.imagePullSecrets }}
+{{- else if .Values.deployment.envoyGateway.imagePullSecrets -}}
+imagePullSecrets:
+{{ toYaml .Values.deployment.envoyGateway.imagePullSecrets }}
+{{- else if .Values.global.images.envoyGateway.pullSecrets -}}
+imagePullSecrets:
+{{ toYaml .Values.global.images.envoyGateway.pullSecrets }}
 {{- else -}}
-imagePullSecrets: []
+imagePullSecrets: {{ toYaml list }}
 {{- end }}
 {{- end }}
 
@@ -148,29 +135,16 @@ The name of the Envoy Ratelimit image.
 
 {{/*
 Pull secrets for the Envoy Ratelimit image.
-Normalizes string items to {name: ...} objects for K8s compatibility.
-Priority: global.imagePullSecrets > global.images.ratelimit.pullSecrets > global.imagePullSecretName
 */}}
 {{- define "eg.ratelimit.image.pullSecrets" -}}
-{{- $secrets := list -}}
-{{- if gt (len (default (list) .Values.global.imagePullSecrets)) 0 -}}
-  {{- $secrets = .Values.global.imagePullSecrets -}}
-{{- else if gt (len (default (list) .Values.global.images.ratelimit.pullSecrets)) 0 -}}
-  {{- $secrets = .Values.global.images.ratelimit.pullSecrets -}}
-{{- else if .Values.global.imagePullSecretName -}}
-  {{- $secrets = list (dict "name" .Values.global.imagePullSecretName) -}}
-{{- end -}}
-{{- if $secrets -}}
+{{- if .Values.global.imagePullSecrets }}
 imagePullSecrets:
-{{- range $secrets }}
-{{- if kindIs "string" . }}
-- name: {{ . | quote }}
+{{ toYaml .Values.global.imagePullSecrets }}
+{{- else if .Values.global.images.ratelimit.pullSecrets -}}
+imagePullSecrets:
+{{ toYaml .Values.global.images.ratelimit.pullSecrets }}
 {{- else }}
-- {{ toYaml . | nindent 2 | trim }}
-{{- end }}
-{{- end }}
-{{- else -}}
-imagePullSecrets: []
+imagePullSecrets: {{ toYaml list }}
 {{- end }}
 {{- end }}
 
@@ -185,7 +159,7 @@ provider:
     rateLimitDeployment:
       container:
         image: {{ include "eg.ratelimit.image" . }}
-      {{- if (or (gt (len (default (list) .Values.global.imagePullSecrets)) 0) (gt (len (default (list) .Values.global.images.ratelimit.pullSecrets)) 0) .Values.global.imagePullSecretName) }}
+      {{- if (or .Values.global.imagePullSecrets .Values.global.images.ratelimit.pullSecrets) }}
       pod:
         {{- include "eg.ratelimit.image.pullSecrets" . | nindent 8 }}
       {{- end }}
