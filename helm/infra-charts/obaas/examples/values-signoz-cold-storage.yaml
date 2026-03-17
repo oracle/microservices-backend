@@ -1,0 +1,32 @@
+## Copyright (c) 2024, 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+#
+#    helm upgrade --install obaas . \
+#      -f examples/values-signoz-cold-storage.yaml \
+#      -n obaas
+
+# Enable Signoz
+signoz:
+  enabled: true
+
+  # Configure cold storage for Signoz
+  #
+  #  Hot Storage (Local Disk)
+  #  ↓  [after retention threshold]
+  #  Cold Storage (OCI Bucket / S3-compatible)
+  #  ↓  [query hits cold data]
+  # persistence.size → "How big is my local disk?"
+  # defaultKeepFreeSpaceBytes → "How much of that disk should always remain free before offloading to cold storage?"
+  #
+  # The endpoint in this example is using Oracle OCI Storage Bucket
+  clickhouse:
+    coldStorage:
+      enabled: true
+      defaultKeepFreeSpaceBytes: "10485760"
+      type: s3
+      endpoint: <END-POINT>
+      accessKey: <YOUR-ACCESS-KEY>
+      secretAccess: <YOUR-SECRET-ACCESS-KEY>
+    persistence:
+      enabled: true
+      size: 100Gi

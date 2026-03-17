@@ -18,7 +18,7 @@ global:
 
 # -----------------------
 # -- OBaaS Components
-# All components enabled with default settings
+# All components besides creating Kafka cluster enabled with default settings
 
 # Service Discovery
 eureka:
@@ -54,4 +54,12 @@ signoz:
 
 # AI Optimizer (disabled by default)
 ai-optimizer:
+  enabled: false
+
+# Config Server
+config-server:
+  enabled: true
+
+# Create Kafka cluster
+kafka:
   enabled: false
