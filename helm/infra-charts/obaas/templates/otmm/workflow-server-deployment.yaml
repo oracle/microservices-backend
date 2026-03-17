@@ -27,7 +27,7 @@ spec:
         signoz.io/path: "/metrics"
       {{- end }}
     spec:
-      {{- include "obaas.imagePullSecrets" (dict "local" (index .Values "otmm").imagePullSecrets "global" .Values.global.imagePullSecrets) | nindent 6 }}
+      {{- include "obaas.imagePullSecrets" (dict "local" (index .Values "otmm").imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) | nindent 6 }}
       serviceAccountName: {{ .Release.Name }}-otmm-workflow-server
       securityContext:
         fsGroup: 1000

@@ -7,51 +7,57 @@ Expand the name of the chart.
 */}}
 {{/*
 Image Pull Secrets Helper
-Renders imagePullSecrets block with local-first fallback to global, then secretName.
+Renders imagePullSecrets block with local-first fallback to global list, then to secretName.
+Normalizes string items to {name: ...} objects for Kubernetes compatibility.
 Usage: {{ include "obaas.imagePullSecrets" (dict "local" .Values.component.imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) | nindent 6 }}
 */}}
 {{- define "obaas.imagePullSecrets" -}}
-{{- $secrets := list -}}
-{{- if .local -}}
-  {{- $secrets = .local -}}
-{{- else if .global -}}
-  {{- $secrets = .global -}}
-{{- else if .secretName -}}
-  {{- $secrets = list .secretName -}}
-{{- end -}}
-{{- if $secrets }}
+{{- $local := .local -}}
+{{- $global := .global -}}
+{{- if $local }}
 imagePullSecrets:
-  {{- range $secrets }}
+  {{- range $local }}
   {{- if kindIs "string" . }}
   - name: {{ . | quote }}
   {{- else }}
-  - name: {{ .name }}
+  - {{ toYaml . | nindent 4 | trim }}
   {{- end }}
   {{- end }}
+{{- else if $global }}
+imagePullSecrets:
+  {{- range $global }}
+  {{- if kindIs "string" . }}
+  - name: {{ . | quote }}
+  {{- else }}
+  - {{ toYaml . | nindent 4 | trim }}
+  {{- end }}
+  {{- end }}
+{{- else if .secretName }}
+imagePullSecrets:
+  - name: {{ .secretName | quote }}
 {{- end }}
 {{- end }}
 
 {{/*
 Image Pull Secret Name Helper
-Returns the name of the first image pull secret (local-first, fallback to global, then secretName).
-Useful for config values that need just the secret name, not the full block.
+Returns the name of the first image pull secret (local-first, fallback to global list, then secretName).
+Handles both string items and {name: ...} objects.
 Usage: {{ include "obaas.imagePullSecretName" (dict "local" .Values.component.imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) }}
 */}}
 {{- define "obaas.imagePullSecretName" -}}
 {{- $local := .local -}}
 {{- $global := .global -}}
-{{- $secrets := list -}}
 {{- if $local -}}
-  {{- $secrets = $local -}}
-{{- else if $global -}}
-  {{- $secrets = $global -}}
-{{- end -}}
-{{- if $secrets -}}
-  {{- $first := index $secrets 0 -}}
-  {{- if kindIs "string" $first -}}
-{{ $first }}
+  {{- if kindIs "string" (index $local 0) -}}
+    {{ index $local 0 }}
   {{- else -}}
-{{ $first.name }}
+    {{ (index $local 0).name }}
+  {{- end -}}
+{{- else if $global -}}
+  {{- if kindIs "string" (index $global 0) -}}
+    {{ index $global 0 }}
+  {{- else -}}
+    {{ (index $global 0).name }}
   {{- end -}}
 {{- else if .secretName -}}
 {{ .secretName }}

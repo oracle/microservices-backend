@@ -11,19 +11,36 @@
 # IMPORTANT: This file is for the 'obaas' chart only. For the 'obaas-prereqs'
 # chart, see the corresponding example in ../obaas-prereqs/examples/
 #
-# Prerequisites:
-#   1. Create the image pull secret before installing:
-#      kubectl create secret docker-registry myregistry-secret \
-#        --docker-server=myregistry.example.com \
-#        --docker-username=<username> \
-#        --docker-password=<password> \
-#        --docker-email=<email> \
-#        -n <namespace>
+# ----- Setup Steps -----
 #
-#   2. Mirror the required images to your private registry
+# Step 1: Create the image pull secret in your target namespace:
 #
-# Usage:
-#   helm upgrade --install obaas . -n <namespace> -f examples/values-private-registry.yaml
+#   kubectl create secret docker-registry myregistry-secret \
+#     --docker-server=myregistry.example.com \
+#     --docker-username=<username> \
+#     --docker-password=<password> \
+#     --docker-email=<email> \
+#     -n obaas
+#
+# Step 2: Mirror the required images to your private registry.
+#   See the Image Reference Summary at the bottom of this file for the full list.
+#
+# Step 3: Set your secret name in global.imagePullSecretName below.
+#   Replace "myregistry-secret" with your secret name — keep everything else as-is:
+#
+#   global:
+#     imagePullSecretName: &secretName myregistry-secret   # <-- your secret name here
+#     imagePullSecrets: &imagePullSecrets
+#       - *secretName
+#
+#   IMPORTANT: Do not rename or remove &secretName, &imagePullSecrets, or *secretName.
+#   These are YAML anchors that propagate the value to all subcharts automatically.
+#   OBaaS helpers normalize the string list to Kubernetes {name: ...} objects.
+#
+# Step 4: Install or upgrade the chart:
+#
+#   helm upgrade --install obaas . -n obaas \
+#     -f examples/values-private-registry.yaml
 #
 # =============================================================================
 
@@ -45,10 +62,12 @@ global:
   # including a self-signed TLS certificate for accounts.google.com
   airGapped: true
 
-  # Image pull secret name — change this ONE value to configure all pull secrets
+  # Image pull secret name — this is the ONLY value you need to change (see Step 3 above).
+  # The &secretName anchor propagates it to ingress-nginx and other object-format subcharts.
   imagePullSecretName: &secretName myregistry-secret
 
-  # Image pull secrets list (string format; helpers normalize to {name: ...} where needed)
+  # Image pull secrets as a string list — used by subcharts that expect ["secret-name"] format
+  # (apisix, signoz, gateway-helm). OBaaS helpers normalize strings to {name: ...} objects.
   imagePullSecrets: &imagePullSecrets
     - *secretName
 
