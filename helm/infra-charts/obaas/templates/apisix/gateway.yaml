@@ -3,6 +3,25 @@
 
 {{- if (index .Values "apisix").enabled }}
 {{- if (index .Values "gateway-helm").enabled }}
+{{- $gw := index .Values "gateway-helm" }}
+{{- $envoyImage := dig "config" "envoyGateway" "provider" "kubernetes" "envoyDeployment" "container" "image" "" $gw }}
+{{- if $envoyImage }}
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: {{ .Release.Name }}-envoy-proxy
+  namespace: {{ .Release.Namespace }}
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyDeployment:
+        container:
+          image: {{ $envoyImage | quote }}
+        pod:
+          {{- include "obaas.imagePullSecrets" (dict "local" nil "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) | nindent 10 }}
+---
+{{- end }}
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
@@ -10,6 +29,13 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  {{- if $envoyImage }}
+  parametersRef:
+    group: gateway.envoyproxy.io
+    kind: EnvoyProxy
+    name: {{ .Release.Name }}-envoy-proxy
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
