@@ -6,8 +6,10 @@ sidebar_position: 3
 
 This document describes how to deploy OBaaS to an existing Kubernetes cluster using Helm charts.
 
+- [Quick Start Decision Guide](#quick-start-decision-guide) — Choose the right example values file for your deployment
 - [Architecture](#architecture) — Two-chart design, components, and cluster layout
 - [Prerequisites](#prerequisites) — Required tools and cluster access
+- [Names and Namespace Conventions](#names-and-namespace-conventions) — Replace example release names and namespaces with your own values
 - [Installation Guide](#installation-guide) — Step-by-step deployment process
 - [Example Configurations](#example-configurations) — Common deployment scenarios:
   - [Default](#default-configuration-values-defaultyaml) — Quick start with no overrides
@@ -17,14 +19,31 @@ This document describes how to deploy OBaaS to an existing Kubernetes cluster us
   - [Multi-Tenant](#multi-tenant-setup-values-tenant1yaml-values-tenant2yaml) — Run multiple OBaaS instances in one cluster
   - [Namespace and Scope](#namespace-and-scope-configuration-values-namespace-overrideyaml) — Control which namespaces components watch
   - [SigNoz Existing Secret](#signoz-existing-secret-values-signoz-existing-secretyaml) — Pre-provisioned SigNoz credentials
+  - [SigNoz Cold Storage](#signoz-cold-storage-values-signoz-cold-storageyaml) — Offload older observability data to S3-compatible object storage
   - [Private Registry](#private-registry-configuration-values-private-registryyaml) — Air-gapped and corporate registry setups
   - [Combining Examples](#combining-examples) — Layer multiple values files together
 - [Uninstallation](#uninstallation) — Teardown instructions
 - [Next Steps](#next-steps) — Deploy applications and configure observability
 
+### Quick Start Decision Guide
+
+Choose the example values file that best matches your deployment scenario:
+
+- `values-default.yaml` - Minimal installation with default settings
+- `values-sidb-free.yaml` - Development or testing with an in-cluster Oracle Database Free container
+- `values-existing-adb.yaml` - Production deployments using an existing OCI Autonomous Database
+- `values-byodb.yaml` - Production deployments using an existing non-Autonomous Oracle Database
+- `values-tenant1.yaml` and `values-tenant2.yaml` - Multi-tenant deployments in a shared cluster
+- `values-namespace-override.yaml` - Custom ingress namespace watching behavior
+- `values-signoz-existing-secret.yaml` - Pre-provisioned SigNoz admin credentials
+- `values-signoz-cold-storage.yaml` - Long-term observability retention using S3-compatible object storage
+- `values-private-registry.yaml` - Air-gapped or private registry environments
+
+If you are unsure where to start, use `values-sidb-free.yaml` for evaluation or `values-existing-adb.yaml` for an external OCI Autonomous Database deployment.
+
 ### Architecture
 
-The deployment uses a two-chart architecture. The charts are separated because the OBaaS Prerequisites cahrt installs cluster-wide CRDs and operators that may only exist once in a cluster, while the OBaaS chart contains namespace-scoped resources that can be safely installed multiple times.
+The deployment uses a two-chart architecture. The charts are separated because the OBaaS prerequisites chart installs cluster-wide CRDs and operators that may only exist once in a cluster, while the OBaaS chart contains namespace-scoped resources that can be safely installed multiple times.
 
 **obaas-prereqs** (cluster-scoped, install once):
 
@@ -140,6 +159,28 @@ helm version
 kubectl get nodes
 ```
 
+### Names and Namespace Conventions
+
+The release names `obaas` and `obaas-prereqs`, along with the namespace names `obaas` and `obaas-system`, are used throughout this document as examples only. Replace them with the release names and namespaces that match your environment.
+
+- `obaas` - example Helm release name for the OBaaS application chart
+- `obaas-prereqs` - example Helm release name for the prerequisites chart
+- `obaas` - example namespace for namespace-scoped OBaaS application components
+- `obaas-system` - example namespace for the cluster-scoped prerequisites chart
+
+All namespace-scoped OBaaS resources are deployed into the namespace provided with the `-n` flag in the Helm and `kubectl` commands, and the prerequisites chart is installed once per cluster into the namespace you choose for those cluster-level resources.
+
+For example:
+
+```bash
+helm upgrade --install <prereqs-release> obaas/obaas-prereqs -n <platform-system-namespace> --create-namespace [--debug]
+helm upgrade --install <app-release> obaas/obaas -n <application-namespace> --create-namespace [--debug]
+kubectl get pods -n <platform-system-namespace>
+kubectl get pods -n <application-namespace>
+```
+
+If you are deploying multiple OBaaS instances in the same cluster, each instance should use its own namespace. The prerequisite chart should still be installed once per cluster in a single shared namespace of your choice.
+
 ### Installation Guide
 
 #### Step 0: Configure Helm Repository
@@ -172,23 +213,23 @@ Only install prerequisites once per cluster. Installing multiple times will caus
 :::
 
 ```bash
-helm upgrade --install obaas-prereqs obaas/obaas-prereqs -n obaas-system --create-namespace [--debug] [--values <path_to_custom_values>]
+helm upgrade --install <prereqs-release> obaas/obaas-prereqs -n <platform-system-namespace> --create-namespace [--debug] [--values <path_to_custom_values>]
 ```
 
 Verify all prerequisite pods are running before proceeding:
 
 ```bash
-kubectl get pods -n obaas-system
+kubectl get pods -n <platform-system-namespace>
 ```
 
 All pods should reach `Running` status within 2-3 minutes.
 
-#### Step 3: Install OBaaS
+#### Step 3: Choose a Values File and Install OBaaS
 
 Choose an example configuration that matches your deployment scenario and install:
 
 ```bash
-helm upgrade --install obaas obaas/obaas -f examples/<values-file>.yaml -n <namespace> --create-namespace [--debug]
+helm upgrade --install <app-release> obaas/obaas -f examples/<values-file>.yaml -n <application-namespace> --create-namespace [--debug]
 ```
 
 See [Example Configurations](#example-configurations) below for the full list of available examples.
@@ -196,7 +237,7 @@ See [Example Configurations](#example-configurations) below for the full list of
 Monitor the installation:
 
 ```bash
-kubectl get pods -n <namespace> -w
+kubectl get pods -n <application-namespace> -w
 ```
 
 :::tip First Deployment
@@ -219,7 +260,19 @@ kubectl get pods -A
 
 ### Example Configurations
 
-Several example configurations are provided for comparision. 
+Several example configurations are provided for comparison.
+
+| Values file | Best for | External DB required | Notes |
+|---|---|---|---|
+| `values-default.yaml` | Minimal evaluation | No | Uses chart defaults |
+| `values-sidb-free.yaml` | Development and testing | No | Runs Oracle Database Free in the cluster |
+| `values-existing-adb.yaml` | OCI production | Yes | Uses Autonomous Database |
+| `values-byodb.yaml` | Existing Oracle Database | Yes | Non-Autonomous Oracle Database only |
+| `values-tenant1.yaml`, `values-tenant2.yaml` | Multi-tenant setups | Depends | Requires unique ingress settings per tenant |
+| `values-namespace-override.yaml` | Namespace watch tuning | Depends | Adjusts ingress scope |
+| `values-signoz-existing-secret.yaml` | GitOps and pre-created credentials | Depends | Uses an existing SigNoz secret |
+| `values-signoz-cold-storage.yaml` | Long-term observability retention | Depends | Uses S3-compatible object storage |
+| `values-private-registry.yaml` | Air-gapped and private registry installs | Depends | Mirrors images to a private registry |
 
 #### Default Configuration (`values-default.yaml`)
 
@@ -227,8 +280,10 @@ Minimal configuration with no overrides. All subcharts use their default setting
 
 **Use case:** Quick start, development, testing
 
+**Installation:**
+
 ```bash
-helm upgrade --install obaas obaas/obaas -f examples/values-default.yaml -n obaas --create-namespace [--debug]
+helm upgrade --install <app-release> obaas/obaas -f examples/values-default.yaml -n <application-namespace> --create-namespace [--debug]
 ```
 
 #### SIDB-FREE Database (`values-sidb-free.yaml`)
@@ -241,8 +296,10 @@ Uses Oracle Database Free as an in-cluster container. This is the default databa
 
 **Use case:** Development, testing, standalone deployments
 
+**Installation:**
+
 ```bash
-helm upgrade --install obaas obaas/obaas -f examples/values-sidb-free.yaml -n obaas --create-namespace [--debug]
+helm upgrade --install <app-release> obaas/obaas -f examples/values-sidb-free.yaml -n <application-namespace> --create-namespace [--debug]
 ```
 
 #### Existing ADB Configuration (`values-existing-adb.yaml`)
@@ -254,47 +311,47 @@ Connects to an existing OCI Autonomous Database (ADB-S) instead of deploying a d
 <details>
 <summary>Prerequisites: Create required secrets before installing</summary>
 
-1. Create the OCI API key secret:
+1. Create the OCI API key secret.
 
    ```bash
-   python3 tools/oci_config.py --namespace NAMESPACE [--config CONFIG] [--profile PROFILE]
+   python3 tools/oci_config.py --namespace <application-namespace> [--config <config-file>] [--profile <profile-name>]
    ```
 
    :::note
    Python 3.12 or later is required to run the `oci_config.py` script.
    :::
 
-1. Create the privileged authentication secret for the ADMIN user, replace DBNAME with the name of your database:
+1. Create the privileged authentication secret for the `ADMIN` user. Replace `<db-name>` with the name of your database.
 
    ```bash
-    kubectl -n NAMESPACE create secret generic DBNAME-db-priv-authn \
+    kubectl -n <application-namespace> create secret generic <db-name>-db-priv-authn \
       --from-literal=username=ADMIN \
-      --from-literal=password=YOUR_ADMIN_PASSWORD \
-      --from-literal=service=DBNAME_tp
+      --from-literal=password=<admin-password> \
+      --from-literal=service=<db-name>_tp
    ```
 
-1. **OPTIONAL**: Create the application user secret for the OBAAS_USER user, replace DBNAME with the name of your database:
+1. Optional: create the application user secret for `OBAAS_USER`. Replace `<db-name>` with the name of your database.
 
    ```bash
-    kubectl -n NAMESPACE create secret generic DBNAME-db-authn \
+    kubectl -n <application-namespace> create secret generic <db-name>-db-authn \
       --from-literal=username=OBAAS_USER \
-      --from-literal=password=YOUR_ADMIN_PASSWORD \
-      --from-literal=service=DBNAME_tp
+      --from-literal=password=<app-user-password> \
+      --from-literal=service=<db-name>_tp
    ```
 
 </details>
 
 **Installation:**
 
-The name `obaas` in the command below should reflect your environment, the `obaas` value is just an example. The `--set database.authN.secretName=NAME_OF_APPUSER_SECRET` is optional.
+The `--set database.authN.secretName=<app-user-secret>` argument is optional.
 
 ```bash
-helm upgrade --install obaas obaas/obaas \
-  -n NAMESPACE \
+helm upgrade --install <app-release> obaas/obaas \
+  -n <application-namespace> \
   -f examples/values-existing-adb.yaml \
-  --set database.oci.ocid=ADB_OCID \
-  --set database.privAuthN.secretName=NAME_OF_ADMINUSER_SECRET
-  --set database.authN.secretName=NAME_OF_APPUSER_SECRET
+  --set database.oci.ocid=<adb-ocid> \
+  --set database.privAuthN.secretName=<admin-user-secret> \
+  --set database.authN.secretName=<app-user-secret> \
   [--debug]
 ```
 
@@ -309,18 +366,18 @@ an Oracle Base DB or an on-premises Oracle AI Database.
 <details>
 <summary>Prerequisites: Create required secrets before installing</summary>
 
-Create the privileged authentication secret for an appropriate admin user:
+1. Create the privileged authentication secret for an appropriate admin user.
 
    ```bash
-   kubectl -n NAMESPACE create secret generic obaas-db-priv-authn \
+   kubectl -n <application-namespace> create secret generic <db-name>-db-priv-authn \
      --from-literal=username=SYSTEM \
-     --from-literal=password=<SYSTEM PASSWORD> \
-     --from-literal=service=your.service.name
+     --from-literal=password=<system-password> \
+     --from-literal=service=<service-name>
    ```
 
-  The admin user should be a user with DBA privileges that can be used to create application users and grant them appropriate privileges For example, the SYSTEM user is a good choice.  This user should not require the SYSDBA role.
+1. Use an admin user with DBA privileges that can create application users and grant the required permissions. The `SYSTEM` user is a good choice. This user should not require the `SYSDBA` role.
 
-  This user should have the following permissions:
+1. Ensure the admin user has the following permissions:
 
   ```sql
   SELECT WITH ADMIN OPTION on:
@@ -335,16 +392,16 @@ Create the privileged authentication secret for an appropriate admin user:
     SYS.DBMS_AQIN, SYS.DBMS_AQJMS_INTERNAL
   ```
 
-Review and update the database connection details in `examples/values-byodb.yaml`
+1. Review and update the database connection details in `examples/values-byodb.yaml`.
 
 </details>
 
 **Installation:**
 
 ```bash
-helm upgrade --install obaas obaas/obaas \
-  -n NAMESPACE \
-  -f examples/values-byodb.yaml 
+helm upgrade --install <app-release> obaas/obaas \
+  -n <application-namespace> \
+  -f examples/values-byodb.yaml \
   [--debug]
 ```
 
@@ -361,12 +418,14 @@ Each tenant **must** have unique values for the following to avoid conflicts:
 - `controller.ingressClassResource.controllerValue`
 - `controller.electionID`
 
+**Installation:**
+
 ```bash
 # Install first tenant
-helm upgrade --install obaas-tenant1 obaas/obaas -n tenant1 -f examples/values-tenant1.yaml --create-namespace [--debug]
+helm upgrade --install <tenant1-release> obaas/obaas -n <tenant1-namespace> -f examples/values-tenant1.yaml --create-namespace [--debug]
 
 # Install second tenant
-helm upgrade --install obaas-tenant2 obaas/obaas -n tenant2 -f examples/values-tenant2.yaml --create-namespace [--debug]
+helm upgrade --install <tenant2-release> obaas/obaas -n <tenant2-namespace> -f examples/values-tenant2.yaml --create-namespace [--debug]
 ```
 
 #### Namespace and Scope Configuration (`values-namespace-override.yaml`)
@@ -375,8 +434,10 @@ Demonstrates how to configure the ingress-nginx watching scope. All OBaaS compon
 
 **Use case:** Controlling which namespaces components watch
 
+**Installation:**
+
 ```bash
-helm upgrade --install obaas obaas/obaas -f examples/values-namespace-override.yaml -n obaas-platform --create-namespace [--debug]
+helm upgrade --install <app-release> obaas/obaas -f examples/values-namespace-override.yaml -n <application-namespace> --create-namespace [--debug]
 ```
 
 #### SigNoz Existing Secret (`values-signoz-existing-secret.yaml`)
@@ -385,15 +446,52 @@ Uses a pre-existing Kubernetes secret for SigNoz admin authentication instead of
 
 **Use case:** GitOps workflows, pre-provisioned credentials
 
+**Prerequisites:**
+
+1. Create the secret before installing the chart.
+
+**Installation:**
+
 ```bash
 # Create the secret first
 kubectl create secret generic my-signoz-secret \
   --from-literal=email=admin@mydomain.com \
   --from-literal=password=my-secure-password \
-  -n obaas
+  -n <application-namespace>
 
 # Install with the example
-helm upgrade --install obaas obaas/obaas -f examples/values-signoz-existing-secret.yaml -n obaas [--debug]
+helm upgrade --install <app-release> obaas/obaas -f examples/values-signoz-existing-secret.yaml -n <application-namespace> [--debug]
+```
+
+#### SigNoz Cold Storage (`values-signoz-cold-storage.yaml`)
+
+Configures SigNoz ClickHouse cold storage so recent telemetry stays on local persistent disk and older data is offloaded to S3-compatible object storage.
+
+This example can be used with Oracle Cloud Infrastructure Object Storage or with an on-premises S3-compatible object store such as MinIO.
+
+**Use case:** Longer telemetry retention, reduced local disk pressure, and support for both cloud and on-premises object storage backends
+
+<details>
+<summary>Prerequisites: Prepare object storage settings before installing</summary>
+
+1. Create or identify an S3-compatible bucket for SigNoz cold storage.
+
+1. Collect the connection details for your object store: `endpoint`, `accessKey`, and `secretAccess`.
+
+1. Review and update `examples/values-signoz-cold-storage.yaml` with your environment-specific values.
+
+1. Size local ClickHouse storage appropriately. `signoz.clickhouse.persistence.size` controls hot storage capacity, and `signoz.clickhouse.coldStorage.defaultKeepFreeSpaceBytes` controls how much local disk remains free before older data is offloaded.
+
+1. For on-premises installations, you can use an S3-compatible endpoint provided by MinIO instead of OCI Object Storage. ([min.io](https://min.io/))
+
+</details>
+
+**Installation:**
+
+```bash
+helm upgrade --install <app-release> obaas/obaas \
+  -f examples/values-signoz-cold-storage.yaml \
+  -n <application-namespace> --create-namespace [--debug]
 ```
 
 #### Private Registry Configuration (`values-private-registry.yaml`)
@@ -402,19 +500,19 @@ Uses a private container registry for all images with authentication.
 
 **Use case:** Air-gapped environments, corporate registries, security compliance
 
-**Prerequisites:**
+<details>
+<summary>Prerequisites</summary>
 
 1. Mirror all required images to your private registry.
 
-    A utility is provided to mirror the images to your registry.  Provide the name of your target registry.
-    Note that you must be authenticated to the target registry before running this script.
+   A utility is provided to mirror the images to your registry. Provide the name of your target registry. You must be authenticated to the target registry before running this script.
 
-    ```bash
-    cd helm/infra-charts/tools
-    ./mirror-images.sh myregistry.example.com
-    ```
+   ```bash
+   cd helm/infra-charts/tools
+   ./mirror-images.sh myregistry.example.com
+   ```
 
-2. Create an image pull secret:
+1. Create an image pull secret.
 
    ```bash
    kubectl create secret docker-registry myregistry-secret \
@@ -424,11 +522,15 @@ Uses a private container registry for all images with authentication.
      --docker-email=<email>
    ```
 
-3. Install both the obaas-prereqs and obaas charts using a values file with your registry details:
+1. Install both the `obaas-prereqs` and `obaas` charts using values files with your registry details.
+
+</details>
+
+**Installation:**
 
 ```bash
-helm upgrade --install obaas-prereqs obaas/obaas-prereqs -f obaas-prereqs/examples/values-private-registry.yaml [--debug]
-helm upgrade --install obaas obaas/obaas -f obaas/examples/values-private-registry.yaml [--debug]
+helm upgrade --install <prereqs-release> obaas/obaas-prereqs -n <platform-system-namespace> -f obaas-prereqs/examples/values-private-registry.yaml --create-namespace [--debug]
+helm upgrade --install <app-release> obaas/obaas -n <application-namespace> -f obaas/examples/values-private-registry.yaml --create-namespace [--debug]
 ```
 
 <details>
@@ -462,10 +564,10 @@ You can layer multiple values files to combine configurations:
 
 ```bash
 # Combine multi-tenant and private registry configurations
-helm upgrade --install obaas-tenant1 obaas/obaas \
+helm upgrade --install <tenant1-release> obaas/obaas \
   -f examples/values-tenant1.yaml \
   -f examples/values-private-registry.yaml \
-  -n tenant1 --create-namespace [--debug]
+  -n <tenant1-namespace> --create-namespace [--debug]
 ```
 
 Or create a custom values file:
@@ -495,21 +597,21 @@ Uninstalling will delete all resources. Ensure you have backups of any important
 **Step 1: Uninstall OBaaS instances first:**
 
 ```bash
-helm uninstall obaas -n obaas-prod
-helm uninstall obaas-tenant1 -n tenant1
-helm uninstall obaas-tenant2 -n tenant2
+helm uninstall <app-release> -n <application-namespace>
+helm uninstall <tenant1-release> -n <tenant1-namespace>
+helm uninstall <tenant2-release> -n <tenant2-namespace>
 ```
 
 **Step 2: Delete namespaces (optional):**
 
 ```bash
-kubectl delete namespace obaas-prod tenant1 tenant2
+kubectl delete namespace <application-namespace> <tenant1-namespace> <tenant2-namespace>
 ```
 
 **Step 3: Uninstall prerequisites (only if removing entirely):**
 
 ```bash
-helm uninstall obaas-prereqs -n obaas-system
+helm uninstall <prereqs-release> -n <platform-system-namespace>
 ```
 
 :::danger Warning
