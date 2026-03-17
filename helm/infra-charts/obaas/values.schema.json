@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "global": {
+      "type": "object",
+      "properties": {
+        "imagePullSecrets": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "object", "properties": { "name": { "type": "string" } }, "required": ["name"] }
+            ]
+          },
+          "description": "Image pull secrets must be a list (strings or {name: ...} objects), not a bare string. Use --set global.imagePullSecrets[0]=mysecret"
+        }
+      }
+    }
+  }
+}

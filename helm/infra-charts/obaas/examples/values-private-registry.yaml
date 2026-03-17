@@ -11,19 +11,36 @@
 # IMPORTANT: This file is for the 'obaas' chart only. For the 'obaas-prereqs'
 # chart, see the corresponding example in ../obaas-prereqs/examples/
 #
-# Prerequisites:
-#   1. Create the image pull secret before installing:
-#      kubectl create secret docker-registry myregistry-secret \
-#        --docker-server=myregistry.example.com \
-#        --docker-username=<username> \
-#        --docker-password=<password> \
-#        --docker-email=<email> \
-#        -n <namespace>
+# ----- Setup Steps -----
 #
-#   2. Mirror the required images to your private registry
+# Step 1: Create the image pull secret in your target namespace:
 #
-# Usage:
-#   helm upgrade --install obaas . -n <namespace> -f examples/values-private-registry.yaml
+#   kubectl create secret docker-registry myregistry-secret \
+#     --docker-server=myregistry.example.com \
+#     --docker-username=<username> \
+#     --docker-password=<password> \
+#     --docker-email=<email> \
+#     -n obaas
+#
+# Step 2: Mirror the required images to your private registry.
+#   See the Image Reference Summary at the bottom of this file for the full list.
+#
+# Step 3: Set your secret name in global.imagePullSecretName below.
+#   Replace "myregistry-secret" with your secret name — keep everything else as-is:
+#
+#   global:
+#     imagePullSecretName: &secretName myregistry-secret   # <-- your secret name here
+#     imagePullSecrets: &imagePullSecrets
+#       - *secretName
+#
+#   IMPORTANT: Do not rename or remove &secretName, &imagePullSecrets, or *secretName.
+#   These are YAML anchors that propagate the value to all subcharts automatically.
+#   OBaaS helpers normalize the string list to Kubernetes {name: ...} objects.
+#
+# Step 4: Install or upgrade the chart:
+#
+#   helm upgrade --install obaas . -n obaas \
+#     -f examples/values-private-registry.yaml
 #
 # =============================================================================
 
@@ -45,16 +62,14 @@ global:
   # including a self-signed TLS certificate for accounts.google.com
   airGapped: true
 
-  # This SHOULD be used to override all secrets for pulling an image from a private repository
-  # And when set WOULD automatically applied to all subcharts via YAML anchors
-  # BUT some of the subcharts (apisix, signoz) expect a list of strings
-  # and other charts expect a map (name: secret-name) 
-  # SO we cannot use this, and instead need to specify for each chart separately (as below)
-  # imagePullSecrets: #&imagePullSecrets 
-  #   - name: myregistry-secret
+  # Image pull secret name — this is the ONLY value you need to change (see Step 3 above).
+  # The &secretName anchor propagates it to ingress-nginx and other object-format subcharts.
+  imagePullSecretName: &secretName myregistry-secret
 
-  # this is used by OTMM only
-  imagePullSecretName: myregistry-secret
+  # Image pull secrets as a string list — used by subcharts that expect ["secret-name"] format
+  # (apisix, signoz, gateway-helm). OBaaS helpers normalize strings to {name: ...} objects.
+  imagePullSecrets: &imagePullSecrets
+    - *secretName
 
   # Utility images used by global hooks (e.g., PVC cleanup on uninstall)
   utilities:
@@ -106,8 +121,7 @@ ai-optimizer:
 # Eureka Service Discovery
 eureka:
   global:
-    imagePullSecrets: 
-      - name: myregistry-secret
+    imagePullSecrets: *imagePullSecrets
   enabled: true
   replicas: 3
   image:
@@ -119,8 +133,7 @@ eureka:
 # Admin Server
 admin-server:
   global:
-    imagePullSecrets: 
-      - name: myregistry-secret
+    imagePullSecrets: *imagePullSecrets
   enabled: true
   replicas: 1
   image:
@@ -132,8 +145,7 @@ admin-server:
 # Config Server
 config-server:
   global:
-    imagePullSecrets:
-      - name: myregistry-secret
+    imagePullSecrets: *imagePullSecrets
   enabled: true
   replicas: 1
   image:
@@ -145,8 +157,7 @@ config-server:
 # Oracle Transaction Manager for Microservices (OTMM)
 otmm:
   global:
-    imagePullSecrets: 
-      - name: myregistry-secret
+    imagePullSecrets: *imagePullSecrets
   enabled: true
   replicas: 1
   image:
@@ -158,10 +169,8 @@ otmm:
 # Oracle Database Exporter (Prometheus metrics for Oracle Database)
 oracle-database-exporter:
   global:
-    imagePullSecrets: 
-      - name: myregistry-secret
-  imagePullSecrets: 
-    - name: myregistry-secret       
+    imagePullSecrets: *imagePullSecrets
+  imagePullSecrets: *imagePullSecrets
   enabled: true
   replicas: 1
   image:
@@ -177,8 +186,7 @@ oracle-database-exporter:
 # Conductor Server (Netflix Conductor - Workflow Orchestration)
 conductor-server:
   global:
-    imagePullSecrets: 
-      - name: myregistry-secret
+    imagePullSecrets: *imagePullSecrets
   enabled: true
   replicas: 1
   image:
@@ -197,8 +205,7 @@ conductor-server:
 
 database:
   global:
-    imagePullSecrets: 
-      - name: myregistry-secret
+    imagePullSecrets: *imagePullSecrets
   enabled: true
   # Database type: SIDB-FREE, ADB-FREE, ADB-S, or OTHER
   type: "SIDB-FREE"
@@ -285,13 +292,42 @@ database:
     # region: ""
 
 # =============================================================================
+# Subcharts - Envoy Gateway
+# =============================================================================
+
+gateway-helm:
+  enabled: true
+  config:
+    envoyGateway:
+      provider:
+        type: Kubernetes
+        kubernetes:
+          envoyDeployment:
+            container:
+              image: "myregistry.example.com/envoyproxy/envoy:distroless-v1.37.0"
+  global:
+    imageRegistry: myregistry.example.com
+    imagePullSecrets: *imagePullSecrets
+    images:
+      envoyGateway:
+        image: "myregistry.example.com/envoyproxy/gateway:v1.7.0"
+        pullPolicy: Always
+        pullSecrets: *imagePullSecrets
+      ratelimit:
+        image: "myregistry.example.com/envoyproxy/ratelimit:3fb70258"
+        pullPolicy: IfNotPresent
+        pullSecrets: *imagePullSecrets
+
+# =============================================================================
 # Subcharts - Ingress NGINX
 # =============================================================================
 # Default registry: registry.k8s.io
 
 ingress-nginx:
   enabled: true
-  imagePullSecrets: *imagePullSecrets
+  # ingress-nginx requires [{name: ...}] format (upstream chart, cannot use string anchor)
+  imagePullSecrets:
+    - name: *secretName
   controller:
     metrics:
       enabled: true
@@ -324,7 +360,7 @@ ingress-nginx:
 
 apisix:
   enabled: true
-  # Uses global.imagePullSecrets
+  # Uses global.imagePullSecrets (expects string list format)
   global:
     imagePullSecrets: *imagePullSecrets
     security: 
@@ -475,13 +511,8 @@ apisix:
   etcd:
     enabled: true
     global:
-      imagePullSecrets: 
-        - myregistry-secret
+      imagePullSecrets: *imagePullSecrets
     replicaCount: 3
-    # Disable pre-upgrade hook when etcd is being installed for the first time
-    # (even if the parent chart is being upgraded)
-    preUpgradeHook:
-      enabled: false
     image:
       registry: myregistry.example.com
       repository: bitnamilegacy/etcd
@@ -507,12 +538,7 @@ apisix:
 
 signoz:
   enabled: true
-  imagePullSecrets: 
-      - myregistry-secret
   global:
-    # Uses global.imagePullSecrets
-    imagePullSecrets: 
-      - myregistry-secret
     imageRegistry: myregistry.example.com
   # Utility images for setup jobs
   utilities:
@@ -540,8 +566,7 @@ signoz:
     image:
       registry: myregistry.example.com
       repository: signoz/signoz
-    imagePullSecrets: 
-     - myregistry-secret
+    imagePullSecrets: *imagePullSecrets
     initContainers:
       init:
         image:
@@ -666,8 +691,6 @@ signoz:
     image:
       registry: myregistry.example.com
       repository: clickhouse/clickhouse-server
-    imagePullSecrets: 
-      - myregistry-secret
     initContainers:
       udf:
         image:
@@ -695,8 +718,6 @@ signoz:
         image:
           registry: myregistry.example.com
           repository: altinity/metrics-exporter
-      imagePullSecrets: 
-      - myregistry-secret
 
 k8s-infra:
   global:
@@ -704,7 +725,6 @@ k8s-infra:
     clusterName: obaas
     deploymentEnvironment: obaas
     imageRegistry: myregistry.example.com
-    # imagePullSecrets: *imagePullSecrets
   otelCollectorEndpoint: signoz-otel-collector:4317
   otelInsecure: true
   otelAgent:
@@ -712,15 +732,11 @@ k8s-infra:
       registry: myregistry.example.com
       repository: otel/opentelemetry-collector-contrib
       tag: 0.139.0
-    imagePullSecrets: 
-      - myregistry-secret
   otelDeployment:
     image:
       registry: myregistry.example.com
       repository: otel/opentelemetry-collector-contrib
       tag: 0.139.0
-    imagePullSecrets: 
-      - myregistry-secret
   presets:
     otlpExporter:
       enabled: true

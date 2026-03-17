@@ -1,0 +1,15 @@
+apiVersion: v2
+appVersion: 15.0.0
+description: A Helm Chart for PostgreSQL
+home: https://signoz.io/
+icon: https://wiki.postgresql.org/wiki/File:PostgreSQL_logo.3colors.svg
+maintainers:
+- email: hello@signoz.io
+  name: SigNoz
+  url: https://signoz.io
+name: postgresql
+sources:
+- https://github.com/signoz/charts
+- https://github.com/postgres/postgres
+type: application
+version: 0.0.2

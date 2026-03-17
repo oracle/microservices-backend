@@ -6,36 +6,83 @@ Licensed under the Universal Permissive License v1.0 as shown at http://oss.orac
 Expand the name of the chart.
 */}}
 {{/*
+Validate imagePullSecrets format.
+Fails early with a clear message if imagePullSecrets is a bare string instead of a list.
+*/}}
+{{- define "obaas.validateImagePullSecrets" -}}
+{{- if and .Values.global.imagePullSecrets (kindIs "string" .Values.global.imagePullSecrets) -}}
+  {{- fail "global.imagePullSecrets must be a list, not a string. Use --set global.imagePullSecrets[0]=mysecret or set it as a list in your values file." -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Image Pull Secrets Helper
-Renders imagePullSecrets block with local-first fallback to global.
-Usage: {{ include "obaas.imagePullSecrets" (dict "local" .Values.component.imagePullSecrets "global" .Values.global.imagePullSecrets) | nindent 6 }}
+Renders imagePullSecrets block with local-first fallback to global list, then to secretName.
+Normalizes string items to {name: ...} objects for Kubernetes compatibility.
+Usage: {{ include "obaas.imagePullSecrets" (dict "local" .Values.component.imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) | nindent 6 }}
 */}}
 {{- define "obaas.imagePullSecrets" -}}
 {{- $local := .local -}}
 {{- $global := .global -}}
-{{- if or $local $global }}
+{{- if kindIs "string" $local -}}
+  {{- $local = list $local -}}
+{{- end -}}
+{{- if kindIs "string" $global -}}
+  {{- $global = list $global -}}
+{{- end -}}
+{{- if $local }}
 imagePullSecrets:
-  {{- if $local }}
-  {{- toYaml $local | nindent 2 }}
+  {{- range $local }}
+  {{- if kindIs "string" . }}
+  - name: {{ . | quote }}
   {{- else }}
-  {{- toYaml $global | nindent 2 }}
+  - {{ toYaml . | nindent 4 | trim }}
   {{- end }}
+  {{- end }}
+{{- else if $global }}
+imagePullSecrets:
+  {{- range $global }}
+  {{- if kindIs "string" . }}
+  - name: {{ . | quote }}
+  {{- else }}
+  - {{ toYaml . | nindent 4 | trim }}
+  {{- end }}
+  {{- end }}
+{{- else if .secretName }}
+imagePullSecrets:
+  - name: {{ .secretName | quote }}
 {{- end }}
 {{- end }}
 
 {{/*
 Image Pull Secret Name Helper
-Returns the name of the first image pull secret (local-first, fallback to global).
-Useful for config values that need just the secret name, not the full block.
-Usage: {{ include "obaas.imagePullSecretName" (dict "local" .Values.component.imagePullSecrets "global" .Values.global.imagePullSecrets) }}
+Returns the name of the first image pull secret (local-first, fallback to global list, then secretName).
+Handles both string items and {name: ...} objects.
+Usage: {{ include "obaas.imagePullSecretName" (dict "local" .Values.component.imagePullSecrets "global" .Values.global.imagePullSecrets "secretName" .Values.global.imagePullSecretName) }}
 */}}
 {{- define "obaas.imagePullSecretName" -}}
 {{- $local := .local -}}
 {{- $global := .global -}}
+{{- if kindIs "string" $local -}}
+  {{- $local = list $local -}}
+{{- end -}}
+{{- if kindIs "string" $global -}}
+  {{- $global = list $global -}}
+{{- end -}}
 {{- if $local -}}
-{{ (index $local 0).name }}
+  {{- if kindIs "string" (index $local 0) -}}
+    {{ index $local 0 }}
+  {{- else -}}
+    {{ (index $local 0).name }}
+  {{- end -}}
 {{- else if $global -}}
-{{ (index $global 0).name }}
+  {{- if kindIs "string" (index $global 0) -}}
+    {{ index $global 0 }}
+  {{- else -}}
+    {{ (index $global 0).name }}
+  {{- end -}}
+{{- else if .secretName -}}
+{{ .secretName }}
 {{- else -}}
 ""
 {{- end -}}

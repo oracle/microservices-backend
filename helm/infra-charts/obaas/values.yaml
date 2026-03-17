@@ -18,8 +18,23 @@ global:
   # including a self-signed TLS certificate for accounts.google.com
   airGapped: false
 
-  # This overrides all secrets for pulling an image from a private repository
-  # When set, automatically applied to all subcharts via YAML anchors
+  # Image pull secret name for private registries.
+  # To configure, first create the secret in your namespace:
+  #   kubectl create secret docker-registry myregistry-secret \
+  #     --docker-server=myregistry.example.com \
+  #     --docker-username=<user> --docker-password=<pass> -n <namespace>
+  # Then replace "" with your secret name (keep &secretName and &imagePullSecrets as-is):
+  #   imagePullSecretName: &secretName myregistry-secret
+  #   imagePullSecrets: &imagePullSecrets
+  #     - *secretName
+  # The &secretName and &imagePullSecrets anchors are YAML plumbing that propagate the
+  # value to all subcharts — do not rename or remove them.
+  # See examples/values-private-registry.yaml for a complete working example.
+  imagePullSecretName: &secretName ""
+
+  # Image pull secrets list (string format for subchart compatibility).
+  # OBaaS helpers normalize strings to {name: ...} objects where needed.
+  # Do not remove &imagePullSecrets or *secretName — they wire the value to subcharts.
   imagePullSecrets: &imagePullSecrets []
 
   # Utility image used by hooks and jobs
@@ -84,9 +99,20 @@ eureka:
 gateway-helm:
   enabled: true
 
+  # Envoy Gateway controller configuration
+  config:
+    envoyGateway:
+      provider:
+        type: Kubernetes
+        kubernetes:
+          envoyDeployment:
+            container:
+              # Envoy proxy data plane image — override to use a private registry.
+              # Default: docker.io/envoyproxy/envoy:distroless-v1.37.0
+              image: ""
+
   # Global settings
   global:
-    # If set, these take highest precedence and change both envoyGateway and ratelimit's container registry and pull secrets.
     # -- Global override for image registry
     imageRegistry: ""
     # -- Global override for image pull secrets
@@ -123,7 +149,10 @@ gateway-helm:
 
 ingress-nginx:
   enabled: true
-  imagePullSecrets: *imagePullSecrets
+  # ingress-nginx (deprecated) requires object format [{name: "x"}]; configure independently:
+  # imagePullSecrets:
+  #   - name: myregistry-secret
+  imagePullSecrets: []
   controller:
     metrics:
       enabled: true
@@ -141,7 +170,6 @@ ingress-nginx:
 
 apisix:
   enabled: true
-  # Uses global.imagePullSecrets
   global:
     imagePullSecrets: *imagePullSecrets
 
@@ -292,7 +320,7 @@ apisix:
     replicaCount: 3
     # Disable pre-upgrade hook when etcd is being installed for the first time
     # (even if the parent chart is being upgraded)
-    preUpgradeHook:
+    preUpgradeJob:
       enabled: false
     image:
       registry: docker.io
@@ -481,7 +509,6 @@ database:
 signoz:
   enabled: true
   global:
-    # Uses global.imagePullSecrets
     imagePullSecrets: *imagePullSecrets
   # Utility images for setup jobs
   utilities:
@@ -647,7 +674,7 @@ signoz:
     image:
       registry: docker.io
       repository: clickhouse/clickhouse-server
-    imagePullSecrets: []
+    imagePullSecrets: *imagePullSecrets
     initContainers:
       udf:
         image:

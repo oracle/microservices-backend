@@ -1,0 +1,67 @@
+1. You have just deployed SigNoz cluster:
+
+- signoz version: '{{ .Values.signoz.image.tag }}'
+- otel-collector version: '{{ .Values.otelCollector.image.tag }}'
+
+2. Get the application URL by running these commands:
+
+{{- if .Values.signoz.ingress.enabled -}}
+{{- range $host := .Values.signoz.ingress.hosts }}
+
+  {{- range .paths }}
+  http{{ if $.Values.signoz.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+
+{{- end }}
+{{- else if contains "NodePort" .Values.signoz.service.type }}
+
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "signoz.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+
+{{- else if contains "LoadBalancer" .Values.signoz.service.type }}
+
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "signoz.fullname" . }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "signoz.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.signoz.service.port }}
+
+{{- else if contains "ClusterIP" .Values.signoz.service.type }}
+
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ .Chart.Name }},app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/component={{ .Values.signoz.name }}" -o jsonpath="{.items[0].metadata.name}")
+  echo "Visit http://127.0.0.1:{{ .Values.signoz.service.port }} to use your application"
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME {{ .Values.signoz.service.port }}:{{ .Values.signoz.service.port }}
+
+{{- end }}
+
+{{/*
+Generates deprecation notices for NOTES.txt
+*/}}
+{{- define "signoz.deprecationNotices" -}}
+{{- $messages := list -}}
+{{- if .Values.signoz.additionalEnvs -}}
+  {{- $messages = append $messages "The '.Values.signoz.additionalEnvs' key is deprecated. Please move these values to '.Values.signoz.env'." -}}
+{{- end -}}
+{{- if .Values.signoz.configVars -}}
+  {{- $messages = append $messages "The '.Values.signoz.configVars' key is deprecated. Please move these values to '.Values.signoz.env'." -}}
+{{- end -}}
+{{- if .Values.signoz.smtpVars -}}
+  {{- $messages = append $messages "The '.Values.signoz.smtpVars' key is deprecated. Please move these values to '.Values.signoz.env'." -}}
+{{- end -}}
+
+{{- if not (empty $messages) -}}
+DEPRECATION NOTICE:
+{{- range $messages }}
+- {{ . }}
+{{- end }}
+Please update your values.yaml file. These keys will be removed in a future release.
+{{- end -}}
+{{- end -}}
+{{ include "signoz.deprecationNotices" . }}
+
+{{- if .Release.IsUpgrade }}
+NOTES:
+- We no longer bundle K8s-Infra chart with the SigNoz chart installation. For any existing set up, please install k8s-infra chart separately with the relevant override values.
+- OtelCollectorMetrics is no longer bundled with the SigNoz chart and has been removed. See https://github.com/SigNoz/charts/issues/593 for more details.
+- Frontend is deprecated and has been removed as it is now bundled with the signoz component. See https://github.com/SigNoz/signoz/issues/6762 for more details.
+{{- end }}

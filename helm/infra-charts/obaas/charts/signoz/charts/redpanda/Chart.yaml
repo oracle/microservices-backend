@@ -1,0 +1,34 @@
+annotations:
+  artifacthub.io/images: |
+    - name: redpanda
+      image: docker.redpanda.com/redpandadata/redpanda:v25.1.2
+    - name: busybox
+      image: busybox:latest
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://docs.redpanda.com
+    - name: "Helm (>= 3.10.0)"
+      url: https://helm.sh/docs/intro/install/
+apiVersion: v2
+appVersion: v25.1.2
+dependencies:
+- condition: console.enabled
+  name: console
+  repository: https://charts.redpanda.com
+  version: '>=0.5 <1.0'
+- condition: connectors.enabled
+  name: connectors
+  repository: https://charts.redpanda.com
+  version: '>=0.1.2 <1.0'
+description: Redpanda is the real-time engine for modern apps.
+icon: https://images.ctfassets.net/paqvtpyf8rwu/3cYHw5UzhXCbKuR24GDFGO/73fb682e6157d11c10d5b2b5da1d5af0/skate-stand-panda.svg
+kubeVersion: '>= 1.25.0-0'
+maintainers:
+- name: redpanda-data
+  url: https://github.com/orgs/redpanda-data/people
+name: redpanda
+sources:
+- https://github.com/redpanda-data/redpanda-operator/tree/main/charts/redpanda
+type: application
+version: 5.10.2

@@ -34,7 +34,7 @@ dependencies:
     condition: signoz.enabled
   - name: signoz
     version: "0.102.1"
-    repository: https://charts.signoz.io
+    repository: "file://charts/signoz"
     condition: signoz.enabled
   - name: apisix
     version: "2.12.3"
