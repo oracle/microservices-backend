@@ -1,6 +1,6 @@
 ---
 title: Helm Chart installation
-sidebar_position: 2
+sidebar_position: 3
 ---
 ## Oracle Backend for Microservices and AI (OBaaS) Helm Charts
 
@@ -219,6 +219,8 @@ kubectl get pods -A
 
 ### Example Configurations
 
+Several example configurations are provided for comparision. 
+
 #### Default Configuration (`values-default.yaml`)
 
 Minimal configuration with no overrides. All subcharts use their default settings.
@@ -230,6 +232,10 @@ helm upgrade --install obaas obaas/obaas -f examples/values-default.yaml -n obaa
 ```
 
 #### SIDB-FREE Database (`values-sidb-free.yaml`)
+
+:::warning Important
+If you use SIDB, you may need more ephemeral storage on your nodes.  Please refer to [prerequisites](./prereqs.md) for details.
+:::
 
 Uses Oracle Database Free as an in-cluster container. This is the default database type.
 

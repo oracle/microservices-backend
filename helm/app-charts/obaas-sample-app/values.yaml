@@ -72,6 +72,9 @@ database:
 eureka:
   enabled: true
 
+configServer:
+  enabled: true
+
 otel:
   enabled: true
 
