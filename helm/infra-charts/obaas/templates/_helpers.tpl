@@ -6,6 +6,16 @@ Licensed under the Universal Permissive License v1.0 as shown at http://oss.orac
 Expand the name of the chart.
 */}}
 {{/*
+Validate imagePullSecrets format.
+Fails early with a clear message if imagePullSecrets is a bare string instead of a list.
+*/}}
+{{- define "obaas.validateImagePullSecrets" -}}
+{{- if and .Values.global.imagePullSecrets (kindIs "string" .Values.global.imagePullSecrets) -}}
+  {{- fail "global.imagePullSecrets must be a list, not a string. Use --set global.imagePullSecrets[0]=mysecret or set it as a list in your values file." -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Image Pull Secrets Helper
 Renders imagePullSecrets block with local-first fallback to global list, then to secretName.
 Normalizes string items to {name: ...} objects for Kubernetes compatibility.
@@ -14,6 +24,12 @@ Usage: {{ include "obaas.imagePullSecrets" (dict "local" .Values.component.image
 {{- define "obaas.imagePullSecrets" -}}
 {{- $local := .local -}}
 {{- $global := .global -}}
+{{- if kindIs "string" $local -}}
+  {{- $local = list $local -}}
+{{- end -}}
+{{- if kindIs "string" $global -}}
+  {{- $global = list $global -}}
+{{- end -}}
 {{- if $local }}
 imagePullSecrets:
   {{- range $local }}
@@ -47,6 +63,12 @@ Usage: {{ include "obaas.imagePullSecretName" (dict "local" .Values.component.im
 {{- define "obaas.imagePullSecretName" -}}
 {{- $local := .local -}}
 {{- $global := .global -}}
+{{- if kindIs "string" $local -}}
+  {{- $local = list $local -}}
+{{- end -}}
+{{- if kindIs "string" $global -}}
+  {{- $global = list $global -}}
+{{- end -}}
 {{- if $local -}}
   {{- if kindIs "string" (index $local 0) -}}
     {{ index $local 0 }}
