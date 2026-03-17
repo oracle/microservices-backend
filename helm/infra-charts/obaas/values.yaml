@@ -99,6 +99,18 @@ eureka:
 gateway-helm:
   enabled: true
 
+  # Envoy Gateway controller configuration
+  config:
+    envoyGateway:
+      provider:
+        type: Kubernetes
+        kubernetes:
+          envoyDeployment:
+            container:
+              # Envoy proxy data plane image — override to use a private registry.
+              # Default: docker.io/envoyproxy/envoy:distroless-v1.37.0
+              image: ""
+
   # Global settings
   global:
     # -- Global override for image registry

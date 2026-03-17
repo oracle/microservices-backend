@@ -297,6 +297,14 @@ database:
 
 gateway-helm:
   enabled: true
+  config:
+    envoyGateway:
+      provider:
+        type: Kubernetes
+        kubernetes:
+          envoyDeployment:
+            container:
+              image: "myregistry.example.com/envoyproxy/envoy:distroless-v1.37.0"
   global:
     imageRegistry: myregistry.example.com
     imagePullSecrets: *imagePullSecrets
