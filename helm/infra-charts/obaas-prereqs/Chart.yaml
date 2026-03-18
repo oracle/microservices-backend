@@ -11,9 +11,9 @@ maintainers:
     email: obaas_ww@oracle.com
     url: https://oracle.github.io/microservices-backend
 # This is the chart version.
-version: 0.0.7
+version: 0.0.8
 # This is the version number of the application being deployed.
-appVersion: "2.1.0-build.6"
+appVersion: "2.1.0-build.7"
 
 # SubCharts - Cluster-scoped singleton infrastructure
 dependencies:
@@ -30,7 +30,7 @@ dependencies:
     repository: https://prometheus-community.github.io/helm-charts
     condition: kube-state-metrics.enabled
   - name: strimzi-kafka-operator
-    version: "0.45.1"
+    version: "0.51.0"
     repository: https://strimzi.io/charts/
     condition: strimzi-kafka-operator.enabled
   - name: coherence-operator

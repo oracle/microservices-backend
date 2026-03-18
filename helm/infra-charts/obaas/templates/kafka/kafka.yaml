@@ -2,8 +2,26 @@
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
 {{- if $.Values.kafka.enabled }}
 ---
-
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  name: dual-role
+  labels:
+    strimzi.io/cluster: {{ .Release.Name }}-kafka-cluster
+spec:
+  replicas: 3
+  roles:
+    - controller
+    - broker
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: persistent-claim
+        size: 100Gi
+        kraftMetadata: shared
+---
+apiVersion: kafka.strimzi.io/v1
 kind: Kafka
 metadata:
   name: {{ .Release.Name }}-kafka-cluster
