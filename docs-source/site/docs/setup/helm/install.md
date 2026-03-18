@@ -308,7 +308,7 @@ Connects to an existing OCI Autonomous Database (ADB-S) instead of deploying a d
 
 **Use case:** Production deployments using a pre-provisioned OCI Autonomous Database
 
-<details>
+<details open>
 <summary>Prerequisites: Create required secrets before installing</summary>
 
 1. Create the OCI API key secret.
@@ -316,6 +316,10 @@ Connects to an existing OCI Autonomous Database (ADB-S) instead of deploying a d
    ```bash
    python3 tools/oci_config.py --namespace <application-namespace> [--config <config-file>] [--profile <profile-name>]
    ```
+
+   `<config-file>` is the location of your OCI configuration file, e.g., `/home/user/.oci/config`
+   
+   `<profile>` is the profile in your config file to use, if not `DEFAULT`
 
    :::note
    Python 3.12 or later is required to run the `oci_config.py` script.
@@ -363,7 +367,7 @@ an Oracle Base DB or an on-premises Oracle AI Database.
 
 **Use case:** Production deployments using a pre-existing Oracle AI Database (non-Autonomous)
 
-<details>
+<details open>
 <summary>Prerequisites: Create required secrets before installing</summary>
 
 1. Create the privileged authentication secret for an appropriate admin user.
@@ -471,7 +475,7 @@ This example can be used with Oracle Cloud Infrastructure Object Storage or with
 
 **Use case:** Longer telemetry retention, reduced local disk pressure, and support for both cloud and on-premises object storage backends
 
-<details>
+<details open>
 <summary>Prerequisites: Prepare object storage settings before installing</summary>
 
 1. Create or identify an S3-compatible bucket for SigNoz cold storage.
@@ -500,7 +504,7 @@ Uses a private container registry for all images with authentication.
 
 **Use case:** Air-gapped environments, corporate registries, security compliance
 
-<details>
+<details open>
 <summary>Prerequisites</summary>
 
 1. Mirror all required images to your private registry.
@@ -533,7 +537,7 @@ helm upgrade --install <prereqs-release> obaas/obaas-prereqs -n <platform-system
 helm upgrade --install <app-release> obaas/obaas -n <application-namespace> -f obaas/examples/values-private-registry.yaml --create-namespace [--debug]
 ```
 
-<details>
+<details open>
 <summary>Image registry override details</summary>
 
 Each subchart has its own image configuration that must be set explicitly.
