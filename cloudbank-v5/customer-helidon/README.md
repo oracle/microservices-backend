@@ -171,13 +171,11 @@ Exercise the application as described above.
 
 ## Configuration
 
-### Application Properties (`application.yaml`)
-```yaml
+### MicroProfile Config (`META-INF/microprofile-config.properties`)
+```properties
 # Microprofile server properties
 server.port=8080
 server.host=0.0.0.0
-# Change the following to true to enable the optional MicroProfile Metrics REST.request metrics
-metrics.rest-request.enabled=false
 
 # Application properties. This is the default greeting
 app.greeting=Hello
@@ -185,61 +183,65 @@ app.greeting=Hello
 # Database connection factory - specifies Oracle UCP driver for connection pooling
 javax.sql.DataSource.customer.connectionFactoryClassName = oracle.jdbc.pool.OracleDataSource
 
-# Local Oracle Database Configuration
-# Uncomment the following lines to connect to a local Oracle Docker container out-of-the-box:
+# Enable when connecting to local Oracle container
 # javax.sql.DataSource.customer.URL = jdbc:oracle:thin:@//localhost:1521/freepdb1
 # javax.sql.DataSource.customer.user = customer
 # javax.sql.DataSource.customer.password = Welcome12345
 
-# Hibernate/JPA Configuration
+# Enable Table Creation
 hibernate.hbm2ddl.auto=create
 hibernate.show_sql=true
-hibernate.format_sql=true
-# Fix JTA transaction coordinator issue
 hibernate.transaction.coordinator_class=jta
 
-# Eureka service discovery configuration
-server.features.eureka.client.base-uri=http://eureka.eureka:8761/eureka
-server.features.eureka.instance.name=helidon-customer-service
-server.features.eureka.instance.hostName=helidon.helidon
-
-# OpenTelemetry configuration
-otel.sdk.disabled=false
-otel.service.name=customer-helidon
-otel.logs.exporter=otlp
-otel.exporter.otlp.endpoint=http://localhost:4318
-otel.exporter.otlp.protocol=http/protobuf
+# Liquibase configuration - Helidon style
+liquibase.change-log=classpath:db/changelog/controller.yaml
+liquibase.url=${javax.sql.DataSource.customer.URL}
+liquibase.user=${liquibase.datasource.username}
+liquibase.password=${liquibase.datasource.password}
+liquibase.enabled=${LIQUIBASE_ENABLED:true}
 ```
 
-## OpenTelemetry Logging
+### Application Config (`application.yaml`)
+```yaml
+server:
+  features:
+    eureka:
+      enabled: true
+      client:
+        base-uri: ${eureka.client.service-url.defaultZone}
+        connect-timeout: PT10S
+        read-timeout: PT30S
+      instance:
+        name: "customer-helidon"
+        hostname: ${eureka.instance.hostname}
+        prefer-ip-address: ${eureka.instance.preferIpAddress:true}
+```
+## OpenTelemetry Auto-Instrumentation
 
-This service implements **Structured JSON Logging with Trace Correlation** to natively export logs to observability backends like SigNoz without manual OpenTelemetry SDK configurations.
+This service uses **OpenTelemetry Kubernetes Auto-Instrumentation** via the OTel Operator. All metrics, distributed traces, and log correlations are injected natively into the pod at runtime without any custom code.
 
-### Architecture: "Platform Pays Once"
+### Architecture: "Zero-Code Observability"
 
-This application relies on the underlying Kubernetes OpenTelemetry DaemonSet to parse structured logs. The microservice itself is completely decoupled from telemetry exporters or APIs.
+This application relies on the OpenTelemetry Operator mutating webhook to drop a Java Agent into the container on startup. 
 
 **Key Components:**
 1. **Dependencies** (`pom.xml`):
+   - Only Standard Helidon & Logging Framework APIs are used.
    - `slf4j-api` and `logback-classic` (Core logging framework APIs)
    - `logstash-logback-encoder` (Formats output as JSON)
-   - `opentelemetry-logback-mdc-1.0` (Bridges OTel context to MDC)
 
 2. **Configuration** (`src/main/resources/logback.xml`):
-   Standardizes all container application text output to pure JSON string lines via the `LogstashEncoder`.
+   Standardizes all container application text output to pure JSON string lines via the `LogstashEncoder`. The injected Java Agent automatically hooks into Logback to drop the active `trace_id` and `span_id` into the MDC.
 
-3. **Trace Injection** (`src/main/java/com/example/MdcFilter.java`):
-   A custom JAX-RS `ContainerRequestFilter` that intercepts incoming HTTP requests, extracts the active `trace_id` and `span_id` from the OpenTelemetry SpanContext, and securely drops them into the SLF4J ThreadLocal MDC. 
-
-4. **Cluster Collection**:
-   Because the logs are printed to `stdout` in pure JSON with trace IDs attached, the cluster's OpenTelemetry DaemonSet natively scrapes, parses, and correlates the logs entirely outside of the application's runtime.
+3. **Cluster Collection**:
+   Because the logs are printed to `stdout` in pure JSON with trace IDs attached natively by the agent, the cluster's OpenTelemetry Collector natively scrapes, parses, and correlates the traces, metrics, and logs entirely outside of the application's runtime.
 
 ### Benefits
 
-- ✅ **No Manual SDK Setup** - No custom `GlobalOpenTelemetry` endpoints to configure inside the app.
-- ✅ **Automatic Trace Correlation** - Any vanilla `LOGGER.info()` statement instantly gets stamped with the distributed Trace ID.
-- ✅ **Zero Exporter Overhead** - The application only prints text locally; the cluster agent handles the expensive network gRPC telemetry export.
-- ✅ **SigNoz Ready** - Log levels and trace graphs are perfectly mapped out-of-the-box.
+- ✅ **No Manual SDK Setup** - No OpenTelemetry SDK or exporter dependencies are packaged in the app.
+- ✅ **Automatic Instrumentation** - All JAX-RS endpoints, JDBC connections, and SLF4J loggers are intercepted automatically by the Operator-injected agent.
+- ✅ **Dynamic Configuration** - Tracing endpoints, sampling rates, and service names are managed purely by cluster administrators via `Instrumentation` CRDs.
+- ✅ **SigNoz Ready** - Log levels, database spans, and trace graphs are perfectly mapped out-of-the-box.
 
 ## Build Architecture
 
@@ -304,14 +306,14 @@ A `values.yaml` file is provided to configure the service. You **must** verify/u
 
 | Parameter | Description | Value in `values.yaml` |
 | :--- | :--- | :--- |
-| `image.repository` | OCI Registry path for the image | e.g., `us-phoenix-1.ocir.io/mytenancy/customer-helidon` |
+| `image.repository` | OCI Registry path for the image | e.g., `REGION.ocir.io/TENANCY/cloudbank-v5/customer-helidon` |
 | `image.tag` | Image version tag | `5.0-SNAPSHOT` |
-| `database.walletSecret` | Secret containing the Autonomous Database wallet | `<release>-adb-tns-admin` |
-| `database.authN.secretName` | Secret containing DB credentials for the app | `<release>-db-authn` |
-| `database.privAuthN.secretName` | Secret containing DB credentials for Liquibase | `adb-admin-creds` |
+| `database.authN.secretName` | Secret containing DB credentials for the app | `obaas-db-authn` |
+| `database.privAuthN.secretName` | Secret containing DB credentials for Liquibase | `db-admin-creds` |
 | `obaas.framework` | Framework type (Required for correct startup) | `HELIDON` |
+| `helidon.datasource.name` | The name of the Helidon datasource | `customer` |
 
-> **Note:** The secrets `adb-admin-creds` and `<release>-db-authn` are typically created by the `3-k8s_db_secrets.sh` script during the installation process. Ensure these exist in your namespace before deployment.
+> **Note:** The secrets `db-admin-creds` and `obaas-db-authn` are typically created by the `3-k8s_db_secrets.sh` script during the installation process. Ensure these exist in your namespace before deployment.
 
 ### 3. Build and Push
 Use the following command to build the container image and push it to your OCI registry:

@@ -9,29 +9,23 @@ image:
 
 obaas:
   # Release name confirmed via 'helm list'
-  releaseName: ""  
+  releaseName: "obaas"  
   framework: "HELIDON"
 
 helidon:
   datasource:
     name: "customer"
-  otel:
-    serviceName: "customer-helidon"
-  metrics:
-    rest_request_enabled: true
+
 
 database:
   # OMITTING name to prevent db-init job from running (since we don't have admin creds)
   # name: "obaasclient" 
   
-  # Explicitly using the verified wallet secret
-  walletSecret: "obaas-dev-adb-tns-admin"
-  
   # Explicitly using the existing tenant db secret found in the cluster
   authN:
-    secretName: "obaas-dev-db-authn"
+    secretName: "obaas-db-authn"
   privAuthN:
-    secretName: "adb-admin-creds"
+    secretName: "db-admin-creds"
 
 
 # Eureka configuration is largely handled by the chart templates, 
