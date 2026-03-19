@@ -112,23 +112,3 @@ Notes:
 
 If you deploy your application using the OBaaS application Helm chart, you can enable Eureka by
 setting `obaas.eureka.enabled: true` in your `values.yaml`.
-
-:::note
- Helidon does not support the Eureka URL being a list.  If you have multiple Eureka server replicas (which is normal),
- you wil need to edit the deployment template to only include one server address.
-:::
-
-Update your `templates/deployment.yaml` to ensure the Helidon framework section uses a single Eureka URL:
-
-```
-{{- if eq .Values.obaas.framework "HELIDON" }}
-{{- if $.Values.obaas.eureka.enabled }}
-  - name: eureka.client.service-url.defaultZone
-    value: "http://eureka-0.eureka.{{ .Values.obaas.namespace }}.svc.cluster.local:8761/eureka"
-  - name: eureka.instance.hostname
-    value: {{ include "obaas-app.fullname" . }}-{{ $.Release.Namespace }}
-  - name: eureka.instance.preferIpAddress
-    value: "true"
-{{- end }}
-{{- end }}
-```
