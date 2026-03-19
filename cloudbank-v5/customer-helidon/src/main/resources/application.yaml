@@ -10,15 +10,3 @@
           name: "customer-helidon"
           hostname: ${eureka.instance.hostname}
           prefer-ip-address: ${eureka.instance.preferIpAddress:true}
-
-  otel:
-    sdk:
-      disabled: false
-    service:
-      name: ${OTEL_SERVICE_NAME:customer-helidon}
-    logs:
-      exporter: otlp
-    exporter:
-      otlp:
-        endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}
-        protocol: ${OTEL_EXPORTER_OTLP_PROTOCOL:http/protobuf}

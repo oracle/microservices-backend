@@ -33,6 +33,13 @@ nb-configuration.xml
 .project
 .classpath
 .factorypath
+.helidon
 
 # OCA
 .oca/*
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
