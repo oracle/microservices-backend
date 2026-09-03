@@ -210,12 +210,12 @@ database:
   sqlcl:
     image:
       repository: myregistry.example.com/database/sqlcl
-      tag: "26.2.0"
+      tag: "26.2.2"
 
   # For SIDB-FREE/ADB-FREE: container image configuration (exclude for ADB-S)
   image:
     repository: "myregistry.example.com/database/free"
-    tag: "23.26.2.0"
+    tag: "23.26.3.0"
 
   # For ADB-S: OCI Autonomous Database OCID (exclude for SIDB-FREE/ADB-FREE/OTHER)
   oci:

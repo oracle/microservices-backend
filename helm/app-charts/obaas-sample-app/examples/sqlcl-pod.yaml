@@ -6,7 +6,7 @@ spec:
   restartPolicy: Never
   containers:
   - name: sqlcl
-    image: container-registry.oracle.com/database/sqlcl:26.2.0
+    image: container-registry.oracle.com/database/sqlcl:26.2.2
     env:
     # - name: TNS_ADMIN
     #   value: /app/tns_admin
