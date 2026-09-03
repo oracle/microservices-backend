@@ -50,7 +50,7 @@ If you are unsure where to start, use `values-sidb-free.yaml` for evaluation or 
 
 The deployment uses a two-chart architecture. The charts are separated because the OBaaS prerequisites chart installs cluster-wide CRDs and operators that may only exist once in a cluster, while the OBaaS chart contains namespace-scoped resources that can be safely installed multiple times.
 
-For configuration options supplied by a dependent chart, see the [version-pinned dependent Helm chart references](./chart-references.md). The references include the upstream README and complete values file for the versions bundled with OBaaS 2.1.1.
+For configuration options supplied by a dependent chart, see the [version-pinned dependent Helm chart references](./chart-references.md). The references include the upstream README and complete values file for the versions bundled with OBaaS 2.1.2.
 
 **obaas-prereqs** (cluster-scoped, install once):
 
@@ -521,14 +521,14 @@ helm upgrade --install <app-release> obaas/obaas -f examples/values-signoz-exist
 
 #### Replace SigNoZ during an existing-release upgrade
 
-OBaaS 2.1.1 replaces SigNoZ rather than migrating it when upgrading an
+OBaaS 2.1.2 replaces SigNoZ rather than migrating it when upgrading an
 existing release. The procedure permanently deletes all existing SigNoZ
 telemetry, dashboards, users, alerts, ClickHouse data, and ZooKeeper data. It
 does not affect the application database or other OBaaS services.
 
 This release has no in-place or data-preserving SigNoZ upgrade path. Back up any
 observability data that must be retained before proceeding. A data-preserving
-migration using SigNoZ's own documentation is not supported by OBaaS 2.1.1.
+migration using SigNoZ's own documentation is not supported by OBaaS 2.1.2.
 
 Use the complete values file for the installed release and explicitly
 acknowledge the data loss:

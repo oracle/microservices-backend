@@ -1,0 +1,145 @@
+---
+title: Prerequisites
+sidebar_position: 1
+---
+## Overview
+
+Before installing Oracle Backend for Microservices and AI (OBaaS), ensure your environment meets all prerequisites. Installing without meeting these requirements will result in deployment failures.
+
+:::danger[Warning]
+If your environment does not meet the prerequisites, the installation may not succeed. Do not proceed with installation until you have confirmed your environment meets all requirements.
+:::
+
+## System Requirements
+
+### Oracle OCI
+
+If you are installing into Oracle OCI you need the right [OCI IAM policies](../oci_policies.md) in place.  Please review and ensure you have the required policies and permissions before installing.
+
+### Kubernetes Cluster
+
+A CNCF-compliant Kubernetes cluster with the following specifications:
+
+**Cluster version:**
+
+- Kubernetes 1.34+
+
+**Infrastructure requirements:**
+
+- Minimum 3 worker nodes
+- At least 2 OCPU and 32GB memory per worker node
+- Working storage provider with storage class for RWX (ReadWriteMany) PVs
+- Working network provider supporting either Ingress or Gateway API for external cluster access
+- (optional but recommended) Kubernetes NetworkPolicy enforcement from the cluster CNI plugin
+
+You may need extra capacity:
+
+- If you are installing the OTMM workflow-server, allocate at least an additional 2 CPUs and 4Gi RAM per cluster.
+- If you are using the Single Instance Database (SIDB) option, which runs the Oracle AI Database in a container in the cluster, you may need more ephemeral storage on your nodes to allow space for the database file system.  We recommend at least 250GB of ephemeral node storage for this option.
+
+**Capacity planning:**
+
+- Base configuration supports ONE OBaaS installation plus applications
+- For TWO OBaaS instances: double the number of worker nodes
+- Scale worker nodes based on additional application requirements
+
+:::tip[Recommended]
+Oracle Kubernetes Engine (OKE) "Quick Create/Enhanced" cluster is the recommended platform for OBaaS deployments.
+:::
+
+### NetworkPolicy enforcement
+
+The OBaaS application chart creates NetworkPolicy resources in each release namespace. These policies establish a default-deny baseline, allow traffic within the release namespace, allow DNS egress, and allow public ingress only to the gateway and ingress entrypoints that OBaaS exposes. For compatibility, outbound traffic to external destinations is explicitly allowed by default.
+
+NetworkPolicy objects are only enforced when the Kubernetes cluster uses a CNI plugin that implements NetworkPolicy. Before using OBaaS in a shared or production cluster, confirm that your CNI has NetworkPolicy enforcement enabled. Clusters without an enforcing CNI will accept the NetworkPolicy resources, but pod traffic will not be isolated by them.
+
+If you disable the chart's default external egress allowance, add explicit `networkPolicy.extraEgress` rules for every required external dependency, including Oracle Database endpoints, OCI APIs, image registries, identity providers, and any outbound service your applications call.
+
+### Oracle Database
+
+You must have access to an Oracle Database instance (19c or later). The following database types are supported:
+
+- Oracle Autonomous Database (ADB-S or ADB-D)
+- Oracle Database on-premise or in the cloud
+
+**Version requirements:**
+
+| Minimum | Recommended |
+|---------|-------------|
+| Oracle Database 19c | Oracle Autonomous Database 26ai ATP |
+
+:::info[AI Features]
+To use OBaaS AI capabilities, you must use Oracle Database 26ai or later. Earlier versions do not support AI features.
+:::
+
+**Recommended configuration:**
+
+- 2 ECPU
+- 1 TB storage
+- Secure access from anywhere enabled
+
+**Access requirements:**
+
+- ADMIN or SYSTEM credentials (required for schema creation)
+- Connection details: host, port, and service name
+
+### Private Image Repository (Optional)
+
+If using a private container image repository:
+
+**Requirements:**
+
+- All OBaaS images copied to your private registry
+- Registry credentials configured in Kubernetes
+- Network access from cluster to private registry
+
+**Helper script:**
+
+OBaaS provides the `mirror-images.sh` script to assist with copying images to your private repository.
+
+```bash
+helm/tools/mirror-images.sh
+```
+
+## Verification
+
+### Verify Kubernetes Cluster
+
+Check your Kubernetes version:
+
+```bash
+kubectl version --short
+```
+
+Verify worker nodes meet requirements:
+
+```bash
+kubectl get nodes
+kubectl describe nodes | grep -A 5 "Allocated resources"
+```
+
+Check storage classes:
+
+```bash
+kubectl get storageclass
+```
+
+Ensure you have a storage class that supports RWX (ReadWriteMany) access mode.
+
+### Verify Default Namespaces
+
+For a fresh OKE cluster, verify the default namespaces are present:
+
+```bash
+kubectl get ns
+```
+
+Expected output:
+
+```text
+NAME            STATUS   AGE
+default         Active   4m52s
+kube-node-lease Active   4m52s
+kube-public     Active   4m52s
+kube-system     Active   4m52s
+```
