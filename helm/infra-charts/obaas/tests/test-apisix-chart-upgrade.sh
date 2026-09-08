@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHART_DIR="${CHART_DIR:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
-IMAGE_LIST="${CHART_DIR}/../tools/image_lists/k8s_images_2.1.1.txt"
+IMAGE_LIST="${CHART_DIR}/../tools/image_lists/k8s_images_2.1.2.txt"
 RELEASE_NOTES="${CHART_DIR}/../../../docs-source/site/docs/rel_notes/index.mdx"
 PUBLIC_RENDER="$(mktemp)"
 PRIVATE_RENDER="$(mktemp)"

@@ -31,7 +31,7 @@ spec:
         securityContext:
           {{- toYaml . | nindent 10 }}
         {{ end }}
-        image: {{ .Values.database.sqlcl.image.repository | default "container-registry.oracle.com/database/sqlcl" }}:{{ .Values.database.sqlcl.image.tag | default "26.2.2" }}
+        image: {{ .Values.database.sqlcl.image.repository | default "container-registry.oracle.com/database/sqlcl" }}:{{ .Values.database.sqlcl.image.tag | default "26.2.1" }}
         env:
         - name: TNS_ADMIN
           value: /app/tns_admin

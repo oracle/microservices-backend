@@ -50,7 +50,7 @@ database:
   sqlcl:
     image:
       repository: container-registry.oracle.com/database/sqlcl
-      tag: "26.2.2"
+      tag: "26.2.1"
 
   # For SIDB-FREE/ADB-FREE: container image configuration (exclude for ADB-S)
   image:

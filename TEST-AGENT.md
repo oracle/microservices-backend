@@ -1,8 +1,6 @@
 # OBaaS And CloudBank Test Agent Runbook
 
-This guide tells an AI agent how to deploy, test, collect evidence, and report on Oracle Backend for Microservices and AI (OBaaS) 2.2.0 with the CloudBank v5 sample workload.
-
-Do not trust a hardcoded version number, including the ones in this guide, over the repository itself. Before relying on any version-specific instruction, confirm the current in-development version with `grep '^appVersion:' helm/infra-charts/obaas/Chart.yaml` and `grep '^version:' helm/infra-charts/obaas/Chart.yaml`. The `next` docs stream (`OBAAS_VERSION` in `docs-source/site/docs/upgrade/index.mdx` and `docs-source/site/docs/rel_notes/index.mdx`) can lag behind the chart sources; treat `Chart.yaml` as the source of truth for the target version number.
+This guide tells an AI agent how to deploy, test, collect evidence, and report on Oracle Backend for Microservices and AI (OBaaS) 2.1.2 with the CloudBank v5 sample workload.
 
 The expected output of a test run is a completed report created from the template in this file, plus an evidence directory containing command output, logs, screenshots, and vulnerability scan results.
 
@@ -10,7 +8,7 @@ The expected output of a test run is a completed report created from the templat
 
 Use only these sources for installation and test truth:
 
-- `AGENTS.md` for OBaaS 2.2.0 planning, installation, and verification.
+- `AGENTS.md` for OBaaS 2.1.2 planning, installation, and verification.
 - `CBV5-AGENT.md` for CloudBank v5 deployment, testing, and cleanup.
 - `docs-source/site/docs`, especially `intro.md`, `setup/helm/`, `platform/`, and `observability/`.
 - `helm/infra-charts/obaas-prereqs` and `helm/infra-charts/obaas`.
@@ -20,7 +18,7 @@ Use only these sources for installation and test truth:
 - The task list provided with this guide.
 - The SigNoz Services evidence checklist in this guide.
 
-Use only the OBaaS `next` documentation stream for 2.2.0. Do not use 2.1.1 or older behavior, older CloudBank documentation, or unrelated repository directories.
+Use only the OBaaS `next` documentation stream for 2.1.2. Do not use 2.1.0 or older behavior, older CloudBank documentation, or unrelated repository directories.
 
 Do not duplicate command syntax, values-file policy, secrets policy, or cleanup procedure from `AGENTS.md` or `CBV5-AGENT.md` in this file. If those guides conflict with this guide, treat them as canonical for deployment mechanics and treat this guide as canonical for test scope, evidence, and reporting.
 
@@ -38,8 +36,7 @@ Collect and record these values before any mutating command:
 | `<app-release>` | Helm release for the OBaaS application chart, for example `obaas`. |
 | `<prereqs-values-file>` | Values file for the prerequisites chart, if any. |
 | `<app-values-file>` | Values file for the OBaaS application chart. |
-| `<obaas-chart-version>` | Expected local chart version, `0.2.0`, recorded from both local `Chart.yaml` files. Reconfirm with `grep` rather than trusting this table, since the chart version can move ahead of documentation updates. |
-| `<database-persistence>` | Effective `database.persistence.enabled`, `storageClass`, and `size` for `SIDB-FREE`/`ADB-FREE`, plus the effective `global.cleanupPVCs` value. |
+| `<obaas-chart-version>` | Expected local chart version, `0.1.2`, recorded from both local `Chart.yaml` files. |
 | `<database-type>` | `SIDB-FREE`, `ADB-FREE`, `ADB-S`, or `OTHER`. |
 | `<storage-class>` | StorageClass selected for persistent components. |
 | `<access-path>` | Envoy Gateway by default, deprecated ingress-nginx when explicitly enabled, both, existing external access, or port-forward-only. |
@@ -143,12 +140,12 @@ Use this matrix as the master list for each run. Mark each test `Pass`, `Fail`, 
 | PRE-004 | Preflight | Verify cluster capacity policy. | Full validation meets requirements, or local deviations are recorded. | node describe |
 | PRE-005 | Preflight | Verify storage classes and RWX support decision. | Selected storage class and RWX status are recorded. | storageclass output |
 | PRE-006 | Preflight | Verify external access strategy. | Envoy Gateway default, explicit ingress-nginx opt-in, both, or port-forward-only path is documented. | service, ingress, gateway output |
-| PRE-007 | Preflight | Verify chart source and version. | Both local charts report chart version `0.2.0` and app version `2.2.0` (reconfirm from `Chart.yaml` rather than assuming this row); local paths are used unless public charts report the matching app version. | Chart.yaml and Helm search output |
+| PRE-007 | Preflight | Verify chart source and version. | Both local charts report chart version `0.1.2` and app version `2.1.2`; local paths are used unless public charts report app version `2.1.2`. | Chart.yaml and Helm search output |
 | PRE-008 | Preflight | Render selected chart values. | `helm lint` and `helm template` succeed for both charts; rendered output reflects selected optional components. | lint and rendered-manifest output |
 | INST-001 | Install | Install or verify cert-manager. | Helm reports `deployed`; cert-manager deployments are available; CRDs exist. A pending or missing Helm release is a failure even if pods are running. | Helm status, pod, wait, CRD output; on failure also capture Job logs and events |
 | INST-002 | Install | Install `obaas-prereqs` once. | Release deployed and prerequisite pods healthy. | Helm status and pod output |
 | INST-003 | Install | Install OBaaS. | Release deployed and OBaaS pods healthy. | Helm status and pod output |
-| INST-004 | Install | Verify no unexpected failed jobs or PVC problems. | Jobs succeeded and PVCs bound, including the database data PVC for `SIDB-FREE`/`ADB-FREE` when `database.persistence.enabled` (default `true`). | jobs, PVCs, events |
+| INST-004 | Install | Verify no unexpected failed jobs or PVC problems. | Jobs succeeded and PVCs bound. | jobs, PVCs, events |
 | PLAT-001 | Platform | Verify APISIX gateway. | Gateway service has external address or working port-forward. | service output, curl result |
 | PLAT-002 | Platform | Verify APISIX admin API. | Admin routes endpoint responds with valid admin key. | curl output |
 | PLAT-003 | Platform | Verify Eureka. | Eureka UI/API is reachable. | screenshot and HTTP output |
@@ -222,7 +219,6 @@ Platform checks:
 - The MicroTx Workflow Server uses the OBaaS application database secret and application schema. If Flyway DDL fails, collect the latest `obaas-run-sql-*` job logs and verify the application user has schema DDL privileges and quota before marking the issue as an application failure.
 - Treat the optional OTMM console as a separate component. The console web UI is served from `/consoleui/` on the `obaas-otmm-console` service, not from the service root. For example, from inside the cluster use `http://obaas-otmm-console.<application-namespace>.svc.cluster.local:5001/consoleui/`; with a local port-forward use `kubectl -n <application-namespace> port-forward svc/obaas-otmm-console 15001:5001` and open `http://127.0.0.1:15001/consoleui/`. The service root `/` may return `404 Endpoint not found` and should not by itself be treated as console failure. Do not use a healthy console screenshot as evidence that the workflow server is installed or that workflow database migrations succeeded.
 - Coherence is optional and deprecated. When `coherence.enabled=true`, verify the cluster-wide Coherence Operator deployment and CRD before installing, then verify the release-owned Coherence CR, requested member pods, namespace watch scope, and persistence decision. When disabled, mark `PLAT-014` as `Not Applicable` with values evidence.
-- For `SIDB-FREE` and `ADB-FREE`, database data is persisted by default (`database.persistence.enabled: true`, default `size: 250Gi`). Verify the database data PVC is `Bound` as part of `INST-004`, and record the effective `storageClass` and size. Record `global.cleanupPVCs` (default `true`), since it determines whether that PVC and its data are deleted on `helm uninstall`.
 
 CloudBank checks:
 
@@ -250,8 +246,6 @@ Use the following SigNoz Services checklist as the minimum UI evidence requireme
 ### Telemetry Data Readiness
 
 Do not start dashboard screenshot capture until the run has proved that relevant telemetry exists for the selected time window. Empty dashboards are not acceptable evidence for required observability tests unless the dashboard is for an optional component that was not installed or the report includes an explicit waiver.
-
-ClickHouse diagnostic logs (`signoz.clickhouse.clickhouseOperator.zookeeperLog` and `.processorsProfileLog`) default to a 1-day TTL. If a run needs longer-lived diagnostic retention to investigate a failure across multiple days, ask the operator to raise these values before the run rather than assuming default retention covers the full investigation window.
 
 Before UI capture, use curl, SigNoz API calls from an authenticated browser/session, ClickHouse queries, service metrics endpoints, or other direct telemetry checks to prove data is present. Save all command output under `$EVIDENCE_DIR/observability`.
 
@@ -571,21 +565,6 @@ Run destructive lifecycle tests only with explicit operator approval and only af
 3. Verify the namespace is empty except for explicitly retained or approved resources.
 4. Reinstall OBaaS into the same namespace using the same values.
 5. Rerun platform and CloudBank smoke tests, plus `7-test_all_services.sh` when the validation tier is `Full Validation`.
-
-Database data survival across this cycle depends on `global.cleanupPVCs` (default `true`),
-which deletes the database data PVC on uninstall. Record the effective value before step 2.
-When `cleanupPVCs` defaulted to `true`, the reinstalled database starting empty is expected
-behavior, not an unexplained data-loss failure; only treat it as a failure if `cleanupPVCs`
-was explicitly set to `false` and data still did not survive.
-
-Do not perform a full uninstall/reinstall to test SigNoz upgrade behavior; instead test the
-in-place `helm upgrade` path separately. Re-running `helm upgrade` against a namespace with
-an existing SigNoz release fails a `signozUpgrade.confirmDataLoss` guard unless
-`signozUpgrade.mode=destructive-replace` and `confirmDataLoss=true` are both set, and setting
-them permanently deletes all existing SigNoz telemetry, dashboards, alerts, and
-ClickHouse/ZooKeeper data. Treat this the same as any other destructive lifecycle test: do
-not set `confirmDataLoss=true` without explicit, recorded operator approval, and record that
-approval — along with the resulting data loss — in the report.
 
 ### Multi-OBaaS
 

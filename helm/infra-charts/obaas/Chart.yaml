@@ -11,9 +11,9 @@ maintainers:
     email: obaas_ww@oracle.com
     url: https://oracle.github.io/microservices-backend
 # This is the chart version.
-version: 0.2.0
+version: 0.1.2
 # This is the version number of the application being deployed.
-appVersion: "2.2.0"
+appVersion: "2.1.2"
 
 # SubCharts
 # Note: Cluster-singleton prerequisites (oracle-database-operator, external-secrets, metrics-server,
@@ -41,6 +41,6 @@ dependencies:
     repository: https://apache.github.io/apisix-helm-chart
     condition: apisix.enabled
   - name: ai-optimizer
-    version: "2.4.1"
+    version: "2.0.3"
     repository: https://oracle.github.io/ai-optimizer/helm
     condition: ai-optimizer.enabled

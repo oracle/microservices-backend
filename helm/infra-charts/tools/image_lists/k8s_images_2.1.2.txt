@@ -9,7 +9,7 @@ container-registry.oracle.com/database/microtx-coordinator:26.1.1
 container-registry.oracle.com/database/microtx-workflow:26.1.1
 container-registry.oracle.com/database/observability-exporter:2.5.0
 container-registry.oracle.com/database/operator:2.1.0
-container-registry.oracle.com/database/sqlcl:26.2.2
+container-registry.oracle.com/database/sqlcl:26.2.1
 container-registry.oracle.com/middleware/coherence-ce:22.06.13
 container-registry.oracle.com/middleware/coherence-operator:3.5.14
 container-registry.oracle.com/obaas/dashboards:2.1.0

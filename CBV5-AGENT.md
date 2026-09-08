@@ -687,7 +687,7 @@ spec:
   restartPolicy: Never
   containers:
   - name: cloudbank-db-cleanup
-    image: container-registry.oracle.com/database/sqlcl:26.2.2
+    image: container-registry.oracle.com/database/sqlcl:  26.2.1
     command: ["/bin/sh", "-c"]
     args:
     - |

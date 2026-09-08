@@ -124,7 +124,7 @@ eureka:
   connectionIdleTimeout: 90s
   image:
     repository: myregistry.example.com/obaas/service-registry
-    tag: "2.1.1"
+    tag: "2.1.2"
   # Override default resources if needed (defaults: cpu 250m-500m, memory 1Gi-1200Mi)
   resources: {}
 
@@ -136,7 +136,7 @@ admin-server:
   replicas: 1
   image:
     repository: myregistry.example.com/obaas/admin-server
-    tag: "2.1.1"
+    tag: "2.1.2"
   # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
   # resources: {}
 
@@ -148,7 +148,7 @@ config-server:
   replicas: 1
   image:
     repository: myregistry.example.com/obaas/config-server
-    tag: "2.1.1"
+    tag: "2.1.2"
   # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
   # resources: {}
 
@@ -210,7 +210,7 @@ database:
   sqlcl:
     image:
       repository: myregistry.example.com/database/sqlcl
-      tag: "26.2.2"
+      tag: "26.2.1"
 
   # For SIDB-FREE/ADB-FREE: container image configuration (exclude for ADB-S)
   image:

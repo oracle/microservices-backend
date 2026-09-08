@@ -134,33 +134,6 @@ AppVersion: 2.1.0
 
 - Production release of 2.1.0
 
-# 0.1.1 -August 12, 2026
+# TBD
 
-AppVersion 2.1.1
-
-* Create new documentation version, 2.1.0 by @andytael in https://github.com/oracle/microservices-backend/pull/1387
-* Strimzi Kafka TLS by @anders-swanson in https://github.com/oracle/microservices-backend/pull/1396
-* document SASL_SCRAM for strimzi by @anders-swanson in https://github.com/oracle/microservices-backend/pull/1398
-* Strimzi operator docu changes by @andytael in https://github.com/oracle/microservices-backend/pull/1399
-* fix(apisix): improve Eureka failover and configure OTEL metadata by @andytael in https://github.com/oracle/microservices-backend/pull/1401
-* Fix Virtual Threads Metrics by @ddrechse in https://github.com/oracle/microservices-backend/pull/1402
-* New version SQLcl and Coherence Operator by @andytael in https://github.com/oracle/microservices-backend/pull/1406
-* update db exporter by @markxnelson in https://github.com/oracle/microservices-backend/pull/1407
-* Update Cert Mgr by @andytael in https://github.com/oracle/microservices-backend/pull/1410
-* Update APISIX by @andytael in https://github.com/oracle/microservices-backend/pull/1411
-* Gateway 1.8.2 by @anders-swanson in https://github.com/oracle/microservices-backend/pull/1412
-* Resolve Failed to scrape Prometheus endpoint by @andytael in https://github.com/oracle/microservices-backend/pull/1413
-* Logfile for OTEL collector reports use of deprecated v1 endpoints by @andytael in https://github.com/oracle/microservices-backend/pull/1414
-* Upgrade opentelemetry operator by @andytael in https://github.com/oracle/microservices-backend/pull/1416
-* upgrade strimzi to 1.1.0 by @anders-swanson in https://github.com/oracle/microservices-backend/pull/1417
-* Housekeeping, doc update, Coherence updates by @andytael in https://github.com/oracle/microservices-backend/pull/1418
-* Improve virtual thread dashboard stats with peak window aggregation by @ddrechse in https://github.com/oracle/microservices-backend/pull/1421
-* Update the docs for non 3 replicas of Eureka by @andytael in https://github.com/oracle/microservices-backend/pull/1422
-* Fix Helidon JVM requests-per-second dashboard query by @ddrechse in https://github.com/oracle/microservices-backend/pull/1423
-* Update ESO version by @andytael in https://github.com/oracle/microservices-backend/pull/1431
-* Upgrade SigNoz to 0.134.0 with a validated two-stage ClickHouse migra… by @ddrechse in https://github.com/oracle/microservices-backend/pull/1420
-* Cert mgr update by @andytael in https://github.com/oracle/microservices-backend/pull/1433
-* Update k8s_image and default Coherence image by @andytael in https://github.com/oracle/microservices-backend/pull/1434
-* Coherence version fix by @andytael in https://github.com/oracle/microservices-backend/pull/1435
-* Disable high-volume ClickHouse diagnostic logs by @ddrechse - https://github.com/oracle/microservices-backend/pull/1440
-
+AppVersion 2.1.2
