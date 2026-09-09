@@ -73,13 +73,36 @@ When you deploy a microservice using the OBaaS sample app chart, the platform ha
 
 The following metrics are exported by the agent and available in the SigNoz Metrics Explorer:
 
-| Metric Name | Description |
-| :--- | :--- |
-| `kafka.producer.record_send_rate` | Average records sent per second. |
-| `kafka.producer.request_latency_max` | Maximum acknowledgment time from the broker. |
-| `kafka.producer.outgoing_byte_rate` | Data throughput in bytes per second. |
-| `kafka.consumer.fetch_manager_records_lag_max` | Maximum lag across all assigned partitions. |
-| `kafka.consumer.bytes_consumed_total` | Total volume of data processed by the consumer. |
+<table aria-label="Key Performance Indicators (KPIs) table">
+  <thead>
+    <tr>
+      <th scope="col">Metric Name</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><code>kafka.producer.record_send_rate</code></th>
+      <td>Average records sent per second.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>kafka.producer.request_latency_max</code></th>
+      <td>Maximum acknowledgment time from the broker.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>kafka.producer.outgoing_byte_rate</code></th>
+      <td>Data throughput in bytes per second.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>kafka.consumer.fetch_manager_records_lag_max</code></th>
+      <td>Maximum lag across all assigned partitions.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>kafka.consumer.bytes_consumed_total</code></th>
+      <td>Total volume of data processed by the consumer.</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Distributed Tracing & Logging
 

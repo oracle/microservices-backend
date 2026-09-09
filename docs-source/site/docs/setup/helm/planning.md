@@ -30,11 +30,28 @@ You will need to provide various configuration information to the Helm charts du
 
 Select the database mode by setting `database.type` to one of the supported values: `SIDB-FREE`, `ADB-FREE`, `ADB-S`, or `OTHER`. Use `SIDB-FREE` or `ADB-FREE` for in-cluster database deployments, `ADB-S` for Autonomous Database deployments, and `OTHER` for non-Autonomous Oracle Database deployments.
 
-| Type of deployment | Information you will need |
-| --- | --- | 
-| Autonomous AI Database (including Globally Distributed) | The OCID of your database, your OCI CLI or SDK configuration details, including your private key, and the password for your `ADMIN` user. | 
-| In-cluster (Single Instance) deployment | The username and password for both an admin user, e.g., `SYSTEM`, and a user for OBaaS, e.g., `OBAAS_USER`. | 
-| Any other type of deployment | The username and password for both an admin user, e.g., `SYSTEM`, and a user for OBaaS, e.g., `OBAAS_USER`, and the connection details for your database (host, port, service name). | 
+<table aria-label="Choose database deployment option table">
+  <thead>
+    <tr>
+      <th scope="col">Type of deployment</th>
+      <th scope="col">Information you will need</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Autonomous AI Database (including Globally Distributed)</th>
+      <td>The OCID of your database, your OCI CLI or SDK configuration details, including your private key, and the password for your <code>ADMIN</code> user.</td>
+    </tr>
+    <tr>
+      <th scope="row">In-cluster (Single Instance) deployment</th>
+      <td>The username and password for both an admin user, e.g., <code>SYSTEM</code>, and a user for OBaaS, e.g., <code>OBAAS_USER</code>.</td>
+    </tr>
+    <tr>
+      <th scope="row">Any other type of deployment</th>
+      <td>The username and password for both an admin user, e.g., <code>SYSTEM</code>, and a user for OBaaS, e.g., <code>OBAAS_USER</code>, and the connection details for your database (host, port, service name).</td>
+    </tr>
+  </tbody>
+</table>
 
 Ensure that you review the installation documentation and the instructions in the example `values.yaml` file provided for your specific type of database deployment and provide the necessary configuration information.  Also, ensure that you create Kubernetes secrets with your database credentials if required for your chosen deployment option.
 
