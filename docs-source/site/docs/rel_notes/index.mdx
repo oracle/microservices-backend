@@ -3,7 +3,7 @@ title: Release Notes
 sidebar_position: 0
 ---
 
-export const OBAAS_VERSION = '2.1.1';
+export const OBAAS_VERSION = '27.1.0';
 
 ## Release Notes for Oracle Backend for Microservices and AI (OBaaS)
 
@@ -17,10 +17,30 @@ Platform services use Java 25, Spring Boot 4.0.6, and Spring Cloud 2025.1.1.
 
 The OBaaS {OBAAS_VERSION} Helm charts use the following chart and application versions:
 
-| Chart | Chart Version | App Version | Kubernetes Version |
-|-------|---------------|-------------|--------------------|
-| `obaas-prereqs` | 0.1.1 | {OBAAS_VERSION} | 1.34 or later |
-| `obaas` | 0.1.1 | {OBAAS_VERSION} | 1.34 or later |
+<table aria-label="Helm Chart Versions table">
+  <thead>
+    <tr>
+      <th scope="col">Chart</th>
+      <th scope="col">Chart Version</th>
+      <th scope="col">App Version</th>
+      <th scope="col">Kubernetes Version</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><code>obaas-prereqs</code></th>
+      <td>0.1.1</td>
+      <td>{OBAAS_VERSION}</td>
+      <td>1.34 or later</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>obaas</code></th>
+      <td>0.1.1</td>
+      <td>{OBAAS_VERSION}</td>
+      <td>1.34 or later</td>
+    </tr>
+  </tbody>
+</table>
 
 > **Optional upgrade and SigNoz data loss**
 >
@@ -57,45 +77,214 @@ Components that are deprecated in this release may be removed in a future releas
 
 The following table lists container images for OBaaS {OBAAS_VERSION} (sorted alphabetically):
 
-| Component | Image | Version |
-|-----------|-------|---------|
-| Alpine Kubernetes Tools | `docker.io/alpine/k8s` | 1.36.2 |
-| Apache APISIX | `docker.io/apache/apisix` | 3.18.0-ubuntu |
-| BusyBox | `docker.io/busybox` | 1.37 |
-| Cert Manager (CA Injector) | `quay.io/jetstack/cert-manager-cainjector` | v1.21.1 |
-| Cert Manager (Controller) | `quay.io/jetstack/cert-manager-controller` | v1.21.1 |
-| Cert Manager (Startup API Check) | `quay.io/jetstack/cert-manager-startupapicheck` | v1.21.1 |
-| Cert Manager (Webhook) | `quay.io/jetstack/cert-manager-webhook` | v1.21.1 |
-| ClickHouse Metrics Exporter | `docker.io/altinity/metrics-exporter` | 0.21.2 |
-| ClickHouse Operator | `docker.io/altinity/clickhouse-operator` | 0.21.2 |
-| ClickHouse Server | `docker.io/clickhouse/clickhouse-server` | 25.12.5 |
-| Coherence CE | `container-registry.oracle.com/middleware/coherence-ce` | 22.06.13 |
-| Coherence Operator | `container-registry.oracle.com/middleware/coherence-operator` | 3.5.16 |
-| Config Server | `container-registry.oracle.com/obaas/config-server` | 2.1.0 |
-| Curl | `docker.io/curlimages/curl` | 8.20.0 |
-| Dashboards | `container-registry.oracle.com/obaas/dashboards` | 2.1.0 |
-| Envoy | `docker.io/envoyproxy/envoy` | distroless-v1.38.3 |
-| Envoy Gateway | `docker.io/envoyproxy/gateway` | v1.8.2 |
-| Envoy Ratelimit | `docker.io/envoyproxy/ratelimit` | master |
-| etcd | `docker.io/bitnamilegacy/etcd` | 3.6.1 |
-| Eureka | `container-registry.oracle.com/obaas/service-registry` | 2.1.0 |
-| External Secrets | `ghcr.io/external-secrets/external-secrets` | 2.10.0 |
-| Ingress NGINX Controller | `registry.k8s.io/ingress-nginx/controller` | v1.15.1 |
-| Kafka | `quay.io/strimzi/kafka` | 1.1.0-kafka-4.2.0 |
-| Kube State Metrics | `registry.k8s.io/kube-state-metrics/kube-state-metrics` | v2.17.0 |
-| Metrics Server | `registry.k8s.io/metrics-server/metrics-server` | v0.9.0 |
-| MicroTx Console | `container-registry.oracle.com/database/microtx-console` | 26.1.1 |
-| MicroTx Coordinator | `container-registry.oracle.com/database/microtx-coordinator` | 26.1.1 |
-| MicroTx Workflow | `container-registry.oracle.com/database/microtx-workflow` | 26.1.1 |
-| OBaaS Admin Server | `container-registry.oracle.com/obaas/admin-server` | 2.1.0 |
-| Observability Exporter | `container-registry.oracle.com/database/observability-exporter` | 2.4.2 |
-| OpenTelemetry Collector Contrib | `docker.io/otel/opentelemetry-collector-contrib` | 0.139.0 |
-| OpenTelemetry Java Autoinstrumentation | `ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java` | 2.30.0 |
-| OpenTelemetry Operator | `ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator` | 0.158.0 |
-| Oracle Database Free | `container-registry.oracle.com/database/free` | 23.26.2.0 |
-| Oracle Database Operator | `container-registry.oracle.com/database/operator` | 2.1.0 |
-| Signoz | `docker.io/signoz/signoz` | v0.134.0 |
-| Signoz OpenTelemetry Collector | `docker.io/signoz/signoz-otel-collector` | v0.144.6 |
-| SQLcl | `container-registry.oracle.com/database/sqlcl` | 26.2.0 |
-| Strimzi Operator | `quay.io/strimzi/operator` | 1.1.0 |
-| Zookeeper | `docker.io/signoz/zookeeper` | 3.7.1 |
+<table aria-label="OBaaS Helm Charts - Complete Image List table">
+  <thead>
+    <tr>
+      <th scope="col">Component</th>
+      <th scope="col">Image</th>
+      <th scope="col">Version</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Alpine Kubernetes Tools</th>
+      <td><code>docker.io/alpine/k8s</code></td>
+      <td>1.36.2</td>
+    </tr>
+    <tr>
+      <th scope="row">Apache APISIX</th>
+      <td><code>docker.io/apache/apisix</code></td>
+      <td>3.18.0-ubuntu</td>
+    </tr>
+    <tr>
+      <th scope="row">BusyBox</th>
+      <td><code>docker.io/busybox</code></td>
+      <td>1.37</td>
+    </tr>
+    <tr>
+      <th scope="row">Cert Manager (CA Injector)</th>
+      <td><code>quay.io/jetstack/cert-manager-cainjector</code></td>
+      <td>v1.21.1</td>
+    </tr>
+    <tr>
+      <th scope="row">Cert Manager (Controller)</th>
+      <td><code>quay.io/jetstack/cert-manager-controller</code></td>
+      <td>v1.21.1</td>
+    </tr>
+    <tr>
+      <th scope="row">Cert Manager (Startup API Check)</th>
+      <td><code>quay.io/jetstack/cert-manager-startupapicheck</code></td>
+      <td>v1.21.1</td>
+    </tr>
+    <tr>
+      <th scope="row">Cert Manager (Webhook)</th>
+      <td><code>quay.io/jetstack/cert-manager-webhook</code></td>
+      <td>v1.21.1</td>
+    </tr>
+    <tr>
+      <th scope="row">ClickHouse Metrics Exporter</th>
+      <td><code>docker.io/altinity/metrics-exporter</code></td>
+      <td>0.21.2</td>
+    </tr>
+    <tr>
+      <th scope="row">ClickHouse Operator</th>
+      <td><code>docker.io/altinity/clickhouse-operator</code></td>
+      <td>0.21.2</td>
+    </tr>
+    <tr>
+      <th scope="row">ClickHouse Server</th>
+      <td><code>docker.io/clickhouse/clickhouse-server</code></td>
+      <td>25.12.5</td>
+    </tr>
+    <tr>
+      <th scope="row">Coherence CE</th>
+      <td><code>container-registry.oracle.com/middleware/coherence-ce</code></td>
+      <td>22.06.13</td>
+    </tr>
+    <tr>
+      <th scope="row">Coherence Operator</th>
+      <td><code>container-registry.oracle.com/middleware/coherence-operator</code></td>
+      <td>3.5.16</td>
+    </tr>
+    <tr>
+      <th scope="row">Config Server</th>
+      <td><code>container-registry.oracle.com/obaas/config-server</code></td>
+      <td>2.1.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Curl</th>
+      <td><code>docker.io/curlimages/curl</code></td>
+      <td>8.20.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Dashboards</th>
+      <td><code>container-registry.oracle.com/obaas/dashboards</code></td>
+      <td>2.1.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Envoy</th>
+      <td><code>docker.io/envoyproxy/envoy</code></td>
+      <td>distroless-v1.38.3</td>
+    </tr>
+    <tr>
+      <th scope="row">Envoy Gateway</th>
+      <td><code>docker.io/envoyproxy/gateway</code></td>
+      <td>v1.8.2</td>
+    </tr>
+    <tr>
+      <th scope="row">Envoy Ratelimit</th>
+      <td><code>docker.io/envoyproxy/ratelimit</code></td>
+      <td>master</td>
+    </tr>
+    <tr>
+      <th scope="row">etcd</th>
+      <td><code>docker.io/bitnamilegacy/etcd</code></td>
+      <td>3.6.1</td>
+    </tr>
+    <tr>
+      <th scope="row">Eureka</th>
+      <td><code>container-registry.oracle.com/obaas/service-registry</code></td>
+      <td>2.1.0</td>
+    </tr>
+    <tr>
+      <th scope="row">External Secrets</th>
+      <td><code>ghcr.io/external-secrets/external-secrets</code></td>
+      <td>2.10.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Ingress NGINX Controller</th>
+      <td><code>registry.k8s.io/ingress-nginx/controller</code></td>
+      <td>v1.15.1</td>
+    </tr>
+    <tr>
+      <th scope="row">Kafka</th>
+      <td><code>quay.io/strimzi/kafka</code></td>
+      <td>1.1.0-kafka-4.2.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Kube State Metrics</th>
+      <td><code>registry.k8s.io/kube-state-metrics/kube-state-metrics</code></td>
+      <td>v2.17.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Metrics Server</th>
+      <td><code>registry.k8s.io/metrics-server/metrics-server</code></td>
+      <td>v0.9.0</td>
+    </tr>
+    <tr>
+      <th scope="row">MicroTx Console</th>
+      <td><code>container-registry.oracle.com/database/microtx-console</code></td>
+      <td>26.1.1</td>
+    </tr>
+    <tr>
+      <th scope="row">MicroTx Coordinator</th>
+      <td><code>container-registry.oracle.com/database/microtx-coordinator</code></td>
+      <td>26.1.1</td>
+    </tr>
+    <tr>
+      <th scope="row">MicroTx Workflow</th>
+      <td><code>container-registry.oracle.com/database/microtx-workflow</code></td>
+      <td>26.1.1</td>
+    </tr>
+    <tr>
+      <th scope="row">OBaaS Admin Server</th>
+      <td><code>container-registry.oracle.com/obaas/admin-server</code></td>
+      <td>2.1.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Observability Exporter</th>
+      <td><code>container-registry.oracle.com/database/observability-exporter</code></td>
+      <td>2.4.2</td>
+    </tr>
+    <tr>
+      <th scope="row">OpenTelemetry Collector Contrib</th>
+      <td><code>docker.io/otel/opentelemetry-collector-contrib</code></td>
+      <td>0.139.0</td>
+    </tr>
+    <tr>
+      <th scope="row">OpenTelemetry Java Autoinstrumentation</th>
+      <td><code>ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java</code></td>
+      <td>2.30.0</td>
+    </tr>
+    <tr>
+      <th scope="row">OpenTelemetry Operator</th>
+      <td><code>ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator</code></td>
+      <td>0.158.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Oracle Database Free</th>
+      <td><code>container-registry.oracle.com/database/free</code></td>
+      <td>23.26.2.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Oracle Database Operator</th>
+      <td><code>container-registry.oracle.com/database/operator</code></td>
+      <td>2.1.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Signoz</th>
+      <td><code>docker.io/signoz/signoz</code></td>
+      <td>v0.134.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Signoz OpenTelemetry Collector</th>
+      <td><code>docker.io/signoz/signoz-otel-collector</code></td>
+      <td>v0.144.6</td>
+    </tr>
+    <tr>
+      <th scope="row">SQLcl</th>
+      <td><code>container-registry.oracle.com/database/sqlcl</code></td>
+      <td>26.2.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Strimzi Operator</th>
+      <td><code>quay.io/strimzi/operator</code></td>
+      <td>1.1.0</td>
+    </tr>
+    <tr>
+      <th scope="row">Zookeeper</th>
+      <td><code>docker.io/signoz/zookeeper</code></td>
+      <td>3.7.1</td>
+    </tr>
+  </tbody>
+</table>

@@ -271,14 +271,40 @@ Strimzi also supports mTLS and custom CA certificates. For additional Strimzi ce
 
 ## Strimzi Custom Resources Reference
 
-| Resource | Purpose |
-|----------|---------|
-| `Kafka` | Defines the Kafka cluster configuration |
-| `KafkaNodePool` | Manages groups of Kafka nodes with specific roles |
-| `KafkaTopic` | Declaratively manages Kafka topics |
-| `KafkaUser` | Manages user authentication and authorization |
-| `KafkaConnect` | Deploys Kafka Connect for data integration |
-| `KafkaBridge` | Provides HTTP API access to Kafka |
+<table aria-label="Strimzi Custom Resources Reference table">
+  <thead>
+    <tr>
+      <th scope="col">Resource</th>
+      <th scope="col">Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><code>Kafka</code></th>
+      <td>Defines the Kafka cluster configuration</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>KafkaNodePool</code></th>
+      <td>Manages groups of Kafka nodes with specific roles</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>KafkaTopic</code></th>
+      <td>Declaratively manages Kafka topics</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>KafkaUser</code></th>
+      <td>Manages user authentication and authorization</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>KafkaConnect</code></th>
+      <td>Deploys Kafka Connect for data integration</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>KafkaBridge</code></th>
+      <td>Provides HTTP API access to Kafka</td>
+    </tr>
+  </tbody>
+</table>
 
 For the full custom resource reference, see the [Strimzi documentation](https://strimzi.io/docs/operators/latest/configuring).
 
