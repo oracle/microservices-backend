@@ -118,16 +118,26 @@ coherence-operator:
   image:
     registry: "container-registry.oracle.com/middleware"
     name: "coherence-operator"
-    tag: "3.5.14"
+    tag: "3.5.16"
   # Default Coherence image for applications
   defaultCoherenceImage:
     registry: "container-registry.oracle.com/middleware"
     name: "coherence-ce"
     tag: "22.06.13"
-  # Operator replicas (HA by default)
-  replicas: 3
+  # One operator replica is sufficient for evaluation/development clusters.
+  # Increase to 3 for highly available operator reconciliation.
+  replicas: 1
   # Namespaces to watch (empty string = all namespaces)
   # Override to limit operator scope: "namespace1,namespace2"
   watchNamespaces: ""
   # Override default resources if needed
   resources: {}
+
+opentelemetry-operator:
+  enabled: true
+  # Keep network-policy rollout separate from the operator and
+  # auto-instrumentation upgrade.
+  manager:
+    featureGatesMap:
+      operator.networkpolicy: false
+      operand.networkpolicy: false

@@ -521,7 +521,7 @@ apisix:
   # Full registry path required for clusters with short name mode enforcing
   image:
     repository: "myregistry.example.com/apache/apisix"
-    tag: "3.17.0-ubuntu"
+    tag: "3.18.0-ubuntu"
 
   # Init container image
   initContainer:

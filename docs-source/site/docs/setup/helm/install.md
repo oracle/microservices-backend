@@ -240,6 +240,19 @@ kubectl get pods -n <platform-system-namespace>
 
 All pods should reach `Running` status within 2-3 minutes.
 
+To verify that Metrics Server is serving resource metrics, check its aggregated
+APIService and query node or pod usage:
+
+```bash
+kubectl get apiservice v1beta1.metrics.k8s.io
+kubectl top nodes
+kubectl top pods -n <application-namespace>
+```
+
+The APIService should report `Available=True`. A temporarily empty `kubectl
+top` result can be normal immediately after startup while the first scrape
+completes.
+
 #### Step 3: Choose a Values File and Install OBaaS
 
 Choose an example configuration that matches your deployment scenario and install:

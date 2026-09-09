@@ -13,9 +13,9 @@ dependencies:
   version: 0.134.0
 - name: apisix
   repository: https://apache.github.io/apisix-helm-chart
-  version: 2.16.0
+  version: 2.17.0
 - name: ai-optimizer
   repository: https://oracle.github.io/ai-optimizer/helm
-  version: 2.4.1
-digest: sha256:de18c535fc3f7ff47a2499a66b6a106b4d429b0b2408c29844fd63ffc7511613
-generated: "2026-08-20T15:08:32.107175+01:00"
+  version: 2.0.3
+digest: sha256:30695c208db8854bd2c268b179a021297c6f2f7ebf07542dce925f082b5c8bbc
+generated: "2026-09-08T15:10:01.220967-05:00"

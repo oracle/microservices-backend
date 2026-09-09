@@ -4,7 +4,7 @@ dependencies:
   version: 2.10.0
 - name: metrics-server
   repository: https://kubernetes-sigs.github.io/metrics-server/
-  version: 3.13.1
+  version: 3.14.0
 - name: kube-state-metrics
   repository: https://prometheus-community.github.io/helm-charts
   version: 6.4.1
@@ -13,12 +13,12 @@ dependencies:
   version: 1.1.0
 - name: coherence-operator
   repository: https://oracle.github.io/coherence-operator/charts
-  version: 3.5.14
+  version: 3.5.16
 - name: opentelemetry-operator
   repository: https://open-telemetry.github.io/opentelemetry-helm-charts
-  version: 0.119.0
+  version: 0.122.0
 - name: oracle-database-operator
   repository: file://charts/oracle-database-operator
   version: 0.2.0
-digest: sha256:8bd5f9242d89e983cfba6b8816182eaf94253ede6fa49a6642be378c8dd26c88
-generated: "2026-09-03T14:46:04.844886-05:00"
+digest: sha256:4327a43cee13f6d69409248bde265230618363e241a01ff789a49e7bf9cabcce
+generated: "2026-09-08T16:04:56.907169-05:00"

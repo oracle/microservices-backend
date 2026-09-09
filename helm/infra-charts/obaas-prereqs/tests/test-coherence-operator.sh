@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -65,6 +68,11 @@ fi
 kubectl rollout status deployment/coherence-operator \
   -n "${OBAAS_PREREQS_NAMESPACE}" \
   --timeout "${TIMEOUT}"
+
+kubectl get deployment/coherence-operator \
+  -n "${OBAAS_PREREQS_NAMESPACE}" \
+  -o jsonpath='{.spec.template.spec.containers[?(@.name=="manager")].image}{"\n"}' \
+  | grep -Fx 'container-registry.oracle.com/middleware/coherence-operator:3.5.16'
 
 kubectl wait --for=condition=Established \
   crd/coherence.coherence.oracle.com \

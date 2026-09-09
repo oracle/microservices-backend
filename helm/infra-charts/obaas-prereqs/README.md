@@ -33,6 +33,20 @@ helm upgrade --install obaas-prereqs . -n obaas-system --create-namespace --valu
 
 **Note:** All prerequisite components will be installed into the `obaas-system` namespace. While these components operate cluster-wide and manage cluster-scoped resources (CRDs, cluster roles, etc.), their deployments, services, and other namespaced resources will reside in `obaas-system`.
 
+### Verify Metrics Server
+
+Metrics Server is working when its aggregated APIService is available and
+`kubectl top` returns current node or pod usage:
+
+```bash
+kubectl get apiservice v1beta1.metrics.k8s.io
+kubectl top nodes
+kubectl top pods -n <application-namespace>
+```
+
+The APIService should report `Available=True`; an empty `kubectl top` result
+immediately after startup can be normal while the first scrape completes.
+
 ### After Prerequisites are Installed
 
 Once the prerequisites are installed, you can install the main OBaaS chart multiple times in different namespaces:

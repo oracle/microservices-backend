@@ -224,14 +224,15 @@ coherence-operator:
   image:
     registry: "myregistry.example.com/middleware"
     name: "coherence-operator"
-    tag: "3.5.14"
+    tag: "3.5.16"
   # Default Coherence image for applications
   defaultCoherenceImage:
     registry: "myregistry.example.com/middleware"
     name: "coherence-ce"
-    tag: "22.06.13"
-  # Operator replicas (HA by default)
-  replicas: 3
+    tag: "26.04"
+  # One operator replica is sufficient for evaluation/development clusters.
+  # Increase to 3 for highly available operator reconciliation.
+  replicas: 1
   # Namespaces to watch (empty string = all namespaces)
   # Override to limit operator scope: "namespace1,namespace2"
   watchNamespaces: ""
@@ -245,7 +246,7 @@ opentelemetry-operator:
   manager:
     collectorImage:
       repository: "myregistry.example.com/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s"
-      tag: "0.154.0"
+      tag: "0.158.0"
     image:
       repository: "myregistry.example.com/open-telemetry/opentelemetry-operator"
-      tag: "0.154.0"
+      tag: "0.158.0"

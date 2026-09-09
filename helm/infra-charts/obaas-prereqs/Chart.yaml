@@ -22,7 +22,7 @@ dependencies:
     repository: https://charts.external-secrets.io
     condition: external-secrets.enabled
   - name: metrics-server
-    version: "3.13.1"
+    version: "3.14.0"
     repository: https://kubernetes-sigs.github.io/metrics-server/
     condition: metrics-server.enabled
   - name: kube-state-metrics
@@ -34,12 +34,12 @@ dependencies:
     repository: https://strimzi.io/charts/
     condition: strimzi-kafka-operator.enabled
   - name: coherence-operator
-    version: "3.5.14"
+    version: "3.5.16"
     repository: https://oracle.github.io/coherence-operator/charts
     condition: coherence-operator.enabled
   # Installs the OpenTelemetry Operator to enable auto-instrumentation via custom resources
   - name: opentelemetry-operator
-    version: "0.119.0"
+    version: "0.122.0"
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     condition: opentelemetry-operator.enabled
   - name: oracle-database-operator

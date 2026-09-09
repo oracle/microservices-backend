@@ -37,7 +37,7 @@ dependencies:
     repository: https://charts.signoz.io
     condition: signoz.enabled
   - name: apisix
-    version: "2.16.0"
+    version: "2.17.0"
     repository: https://apache.github.io/apisix-helm-chart
     condition: apisix.enabled
   - name: ai-optimizer
