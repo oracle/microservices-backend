@@ -9,13 +9,42 @@ This guide outlines the steps to build, deploy, and expose an application on Ora
 
 ### Deployment Steps
 
-| Step | Description | Details |
-|------|-------------|---------|
-| 1 | **Create container repositories** | Set up a repository per microservice in your container registry (OCIR, ECR, ACR, etc.). |
-| 2 | **Build and push images** | Use Maven and Eclipse JKube to build JARs, create container images, and push to the registry. |
-| 3 | **Create database secrets** | Create Kubernetes secrets with privileged and per-service database credentials. |
-| 4 | **Deploy with Helm** | Install each service using the `obaas-sample-app` Helm chart with a per-service `values.yaml`. |
-| 5 | **Create API gateway routes** | Configure Apache APISIX routes to expose services externally via Eureka discovery. |
+<table aria-label="Deployment Steps table">
+  <thead>
+    <tr>
+      <th scope="col">Step</th>
+      <th scope="col">Description</th>
+      <th scope="col">Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td><strong>Create container repositories</strong></td>
+      <td>Set up a repository per microservice in your container registry (OCIR, ECR, ACR, etc.).</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td><strong>Build and push images</strong></td>
+      <td>Use Maven and Eclipse JKube to build JARs, create container images, and push to the registry.</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td><strong>Create database secrets</strong></td>
+      <td>Create Kubernetes secrets with privileged and per-service database credentials.</td>
+    </tr>
+    <tr>
+      <th scope="row">4</th>
+      <td><strong>Deploy with Helm</strong></td>
+      <td>Install each service using the <code>obaas-sample-app</code> Helm chart with a per-service <code>values.yaml</code>.</td>
+    </tr>
+    <tr>
+      <th scope="row">5</th>
+      <td><strong>Create API gateway routes</strong></td>
+      <td>Configure Apache APISIX routes to expose services externally via Eureka discovery.</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Detailed Guide
 

@@ -38,17 +38,62 @@ SigNoZ stores recent ClickHouse data on the local persistent volume as hot stora
 
 ### Configuration Summary
 
-| Key | Value | Description |
-|---|---|---|
-| `signoz.enabled` | `true` | Enables the SigNoz deployment. |
-| `signoz.clickhouse.coldStorage.enabled` | `true` | Enables ClickHouse cold storage. |
-| `signoz.clickhouse.coldStorage.defaultKeepFreeSpaceBytes` | `"10485760"` | Keeps at least 10 MiB of local disk space free before moving older data to cold storage. Set value to reflect your environment |
-| `signoz.clickhouse.coldStorage.type` | `s3` | Uses an S3-compatible object storage API. |
-| `signoz.clickhouse.coldStorage.endpoint` | `<END-POINT>` | Object storage endpoint URL. |
-| `signoz.clickhouse.coldStorage.accessKey` | `<YOUR-ACCESS-KEY>` | Access key for the object storage service. |
-| `signoz.clickhouse.coldStorage.secretAccess` | `<YOUR-SECRET-ACCESS-KEY>` | Secret key for the object storage service. |
-| `signoz.clickhouse.persistence.enabled` | `true` | Enables persistent local storage for ClickHouse hot data. |
-| `signoz.clickhouse.persistence.size` | `100Gi` | Size of the local persistent volume used for hot storage. Set value to reflect your environment |
+<table aria-label="Configuration Summary table">
+  <thead>
+    <tr>
+      <th scope="col">Key</th>
+      <th scope="col">Value</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><code>signoz.enabled</code></th>
+      <td><code>true</code></td>
+      <td>Enables the SigNoz deployment.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>signoz.clickhouse.coldStorage.enabled</code></th>
+      <td><code>true</code></td>
+      <td>Enables ClickHouse cold storage.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>signoz.clickhouse.coldStorage.defaultKeepFreeSpaceBytes</code></th>
+      <td><code>"10485760"</code></td>
+      <td>Keeps at least 10 MiB of local disk space free before moving older data to cold storage. Set value to reflect your environment</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>signoz.clickhouse.coldStorage.type</code></th>
+      <td><code>s3</code></td>
+      <td>Uses an S3-compatible object storage API.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>signoz.clickhouse.coldStorage.endpoint</code></th>
+      <td><code>&lt;END-POINT&gt;</code></td>
+      <td>Object storage endpoint URL.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>signoz.clickhouse.coldStorage.accessKey</code></th>
+      <td><code>&lt;YOUR-ACCESS-KEY&gt;</code></td>
+      <td>Access key for the object storage service.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>signoz.clickhouse.coldStorage.secretAccess</code></th>
+      <td><code>&lt;YOUR-SECRET-ACCESS-KEY&gt;</code></td>
+      <td>Secret key for the object storage service.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>signoz.clickhouse.persistence.enabled</code></th>
+      <td><code>true</code></td>
+      <td>Enables persistent local storage for ClickHouse hot data.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>signoz.clickhouse.persistence.size</code></th>
+      <td><code>100Gi</code></td>
+      <td>Size of the local persistent volume used for hot storage. Set value to reflect your environment</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Installation
 

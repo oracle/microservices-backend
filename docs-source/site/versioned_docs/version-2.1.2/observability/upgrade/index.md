@@ -22,10 +22,27 @@ OBaaS chart normally.
 
 ## Choose an upgrade path
 
-| Existing environment | Recovery requirement | Guide |
-|---|---|---|
-| OBaaS 2.0.0 or 2.1.x with a SigNoZ version earlier than `0.134.0` | Historical telemetry, dashboards, and users must be recoverable | [Upgrade with protected recovery](./protected-recovery.md) **(recommended)** |
-| Any supported SigNoZ version earlier than `0.134.0` | Historical data does not require a protected recovery point | [Upgrade without protected recovery](./without-protected-recovery.md) |
+<table aria-label="Choose an upgrade path table">
+  <thead>
+    <tr>
+      <th scope="col">Existing environment</th>
+      <th scope="col">Recovery requirement</th>
+      <th scope="col">Guide</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">OBaaS 2.0.0 or 2.1.x with a SigNoZ version earlier than <code>0.134.0</code></th>
+      <td>Historical telemetry, dashboards, and users must be recoverable</td>
+      <td><a href="./protected-recovery">Upgrade with protected recovery</a> <strong>(recommended)</strong></td>
+    </tr>
+    <tr>
+      <th scope="row">Any supported SigNoZ version earlier than <code>0.134.0</code></th>
+      <td>Historical data does not require a protected recovery point</td>
+      <td><a href="./without-protected-recovery">Upgrade without protected recovery</a></td>
+    </tr>
+  </tbody>
+</table>
 
 If you are unsure which path applies, use the protected recovery guide.
 

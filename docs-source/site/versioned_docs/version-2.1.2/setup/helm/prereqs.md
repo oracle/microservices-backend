@@ -64,9 +64,20 @@ You must have access to an Oracle Database instance (19c or later). The followin
 
 **Version requirements:**
 
-| Minimum | Recommended |
-|---------|-------------|
-| Oracle Database 19c | Oracle Autonomous Database 26ai ATP |
+<table aria-label="Oracle Database table">
+  <thead>
+    <tr>
+      <th scope="col">Minimum</th>
+      <th scope="col">Recommended</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Oracle Database 19c</th>
+      <td>Oracle Autonomous Database 26ai ATP</td>
+    </tr>
+  </tbody>
+</table>
 
 :::info[AI Features]
 To use OBaaS AI capabilities, you must use Oracle Database 26ai or later. Earlier versions do not support AI features.
