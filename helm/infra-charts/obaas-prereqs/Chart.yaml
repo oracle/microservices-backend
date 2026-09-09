@@ -26,7 +26,7 @@ dependencies:
     repository: https://kubernetes-sigs.github.io/metrics-server/
     condition: metrics-server.enabled
   - name: kube-state-metrics
-    version: "6.4.1"
+    version: "8.4.2"
     repository: https://prometheus-community.github.io/helm-charts
     condition: kube-state-metrics.enabled
   - name: strimzi-kafka-operator

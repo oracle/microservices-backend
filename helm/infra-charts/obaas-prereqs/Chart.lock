@@ -7,7 +7,7 @@ dependencies:
   version: 3.14.0
 - name: kube-state-metrics
   repository: https://prometheus-community.github.io/helm-charts
-  version: 6.4.1
+  version: 8.4.2
 - name: strimzi-kafka-operator
   repository: https://strimzi.io/charts/
   version: 1.1.0
@@ -20,5 +20,5 @@ dependencies:
 - name: oracle-database-operator
   repository: file://charts/oracle-database-operator
   version: 0.2.0
-digest: sha256:4327a43cee13f6d69409248bde265230618363e241a01ff789a49e7bf9cabcce
-generated: "2026-09-08T16:04:56.907169-05:00"
+digest: sha256:38e371b8697c528767bfaa21c022cc653b643474e29bb359eaa9ff575512dc98
+generated: "2026-09-09T14:46:25.857853-05:00"
