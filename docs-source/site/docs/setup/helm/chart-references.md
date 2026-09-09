@@ -68,9 +68,9 @@ component; do not copy the complete dependency values into OBaaS documentation.
     </tr>
     <tr>
       <th scope="row"><code>kube-state-metrics</code></th>
-      <td>6.4.1</td>
-      <td><a href="https://github.com/prometheus-community/helm-charts/blob/kube-state-metrics-6.4.1/charts/kube-state-metrics/README.md" target="_blank" rel="noopener noreferrer">README</a></td>
-      <td><a href="https://github.com/prometheus-community/helm-charts/blob/kube-state-metrics-6.4.1/charts/kube-state-metrics/values.yaml" target="_blank" rel="noopener noreferrer">values.yaml</a></td>
+      <td>8.4.2</td>
+      <td><a href="https://github.com/prometheus-community/helm-charts/blob/kube-state-metrics-8.4.2/charts/kube-state-metrics/README.md" target="_blank" rel="noopener noreferrer">README</a></td>
+      <td><a href="https://github.com/prometheus-community/helm-charts/blob/kube-state-metrics-8.4.2/charts/kube-state-metrics/values.yaml" target="_blank" rel="noopener noreferrer">values.yaml</a></td>
     </tr>
     <tr>
       <th scope="row"><code>metrics-server</code></th>
