@@ -28,7 +28,7 @@ docker.io/otel/opentelemetry-collector-contrib:0.139.0
 docker.io/signoz/signoz-otel-collector:v0.144.6
 docker.io/signoz/signoz:v0.134.0
 docker.io/signoz/zookeeper:3.7.1
-ghcr.io/external-secrets/external-secrets:2.10.0
+ghcr.io/external-secrets/external-secrets:v2.10.0
 ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:2.30.0
 ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator:0.158.0
 quay.io/jetstack/cert-manager-cainjector:v1.21.1
