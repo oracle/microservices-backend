@@ -1,0 +1,138 @@
+# Workflow for validating Infrastructure as Code
+#
+# This workflow validates syntax, formatting, schema, and security.
+# It does NOT validate infrastructure logic or resource creation.
+# Manual testing with real OCI credentials is REQUIRED before merging.
+# See opentofu/TESTING.md for instructions.
+
+name: Validate Infrastructure as Code
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    paths:
+      - "opentofu/tests/**"
+      - "opentofu/**"
+      - ".github/workflows/opentofu.yml"
+
+  workflow_dispatch:
+
+# Optimize: Cache terraform providers across all jobs
+env:
+  TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
+
+jobs:
+  # Job 1: Static analysis (validation, formatting, schema)
+  verify-iac-static:
+    name: Static Analysis
+    if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/opentofu/opentofu:1.12.6
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Verify app_version is 0.0.0
+        working-directory: ./opentofu
+        run: |
+          if ! grep -qE '^\s*app_version\s*=\s*"0\.0\.0"\s*$' versions.tf; then
+            echo "::error file=opentofu/versions.tf::app_version must be \"0.0.0\" outside of the release workflow"
+            grep -nE '^\s*app_version\s*=' versions.tf || true
+            exit 1
+          fi
+
+      # Terraform validation steps
+      - name: Install Cache Dependencies
+        run: apk add --no-cache tar zstd
+
+      - name: Cache Terraform Providers
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+          key: ${{ runner.os }}-terraform-${{ hashFiles('opentofu/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
+
+      - name: Create Plugin Cache Directory
+        run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
+
+      - name: Initialize Infrastructure as Code
+        working-directory: ./opentofu
+        run: tofu init -backend=false
+
+      - name: Validate Infrastructure as Code
+        working-directory: ./opentofu
+        run: tofu validate
+
+      - name: Check Terraform Formatting
+        working-directory: ./opentofu
+        run: tofu fmt -recursive -check
+
+      # Schema validation
+      - name: Install Python and Dependencies
+        run: |
+          apk add --no-cache python3 py3-pip
+          pip3 install --break-system-packages pyyaml jsonschema referencing pytest
+
+      - name: Validate Oracle Resource Manager Schema
+        working-directory: ./tests/opentofu
+        run: python3 ./validate_omr_schema.py OMRMetaSchema.yaml ../../opentofu/schema.yaml
+
+      - name: Run OpenTofu render contract tests
+        # Exercises tests/opentofu/test_cfgmgt_optimizer_values.py, which
+        # invokes `tofu` to render ai-optimizer-values.yaml under various
+        # BYO/observability combinations. The container already has tofu.
+        # The single helm-requiring e2e test in that file skips here (no
+        # helm binary in this container); the unit-level tests cover the
+        # same defects without needing helm.
+        run: pytest tests/opentofu/ -v
+
+  # Job 2: Security scanning (runs on host for Docker access)
+  verify-iac-security:
+    name: Security Scan
+    if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Trivy
+        uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # v0.3.1
+        with:
+          cache: true
+
+      - name: Run Trivy Security Scan for IaC
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: config
+          scan-ref: opentofu
+          format: sarif
+          output: trivy-results.sarif
+          exit-code: '0'
+          cache: false
+          skip-setup-trivy: true
+
+  verify-iac-summary:
+    name: Validation Summary
+    if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions: {}
+    needs: [verify-iac-static, verify-iac-security]
+
+    steps:
+      - name: All Validations Passed
+        run: |
+          echo "✅ Syntax, formatting, schema, security validated"
+          echo "⚠️  Does NOT validate infrastructure logic"
+          echo "📖 See opentofu/TESTING.md for manual testing requirements"

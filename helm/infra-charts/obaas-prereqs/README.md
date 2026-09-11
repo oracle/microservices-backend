@@ -24,6 +24,9 @@ This chart must be installed **once per cluster** before installing any OBaaS in
 ### Install Prerequisites (once per cluster)
 
 ```bash
+# Install cert-manager (version correct as of: 11-Sept-2026)
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.21.2/cert-manager.yaml
+
 # Install prerequisites
 helm upgrade --install obaas-prereqs . --create-namespace -n obaas-system
 
