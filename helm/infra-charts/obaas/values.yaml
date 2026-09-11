@@ -40,7 +40,7 @@ global:
       image:
         registry: docker.io
         repository: alpine/k8s
-        tag: "1.36.2"
+        tag: "1.36.4"
 # OBAAS PLATFORM CONFIGURATION
 otelCollectorEndpoint: "obaas-signoz-otel-collector:4318"
 
@@ -429,7 +429,7 @@ apisix:
   # source of truth instead of a duplicated payload here.
   extraContainers:
     - name: apisix-plugin-metadata
-      image: "docker.io/alpine/k8s:1.36.2"
+      image: "docker.io/alpine/k8s:1.36.4"
       command: ["sh", "-c"]
       args:
         - |

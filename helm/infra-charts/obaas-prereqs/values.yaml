@@ -30,12 +30,12 @@ oracle-database-operator:
   # Empty namespace will cause the use of .Release.Namespace
   namespace: ""
   replicas: 1
-  # Image pull secrets for private registries (shared with cert-manager subchart)
+  # Image pull secrets for private registries
   imagePullSecrets: &imagePullSecrets []
   image:
     repository: container-registry.oracle.com/database/operator
     # Specify a version tag for reproducible deployments
-    tag: "2.1.0"
+    tag: "2.2.0"
     pullPolicy: IfNotPresent
   # Deployment scope configuration
   scope:
@@ -50,18 +50,6 @@ oracle-database-operator:
     enabled: true
     minAvailable: 1
     # maxUnavailable: 1  # Alternative to minAvailable
-  # Wait job configuration for cert-manager webhook readiness (not passed to subchart)
-  certManagerWaitJob:
-    # Waits for cert-manager webhook before creating Issuer/Certificate resources
-    # Set to false only if cert-manager is known to be ready (e.g., pre-installed and running)
-    enabled: true
-    image:
-      repository: registry.k8s.io/kubectl
-      tag: "v1.28.0"
-      pullPolicy: IfNotPresent
-  # don't use the cert-manager subchart 
-  cert-manager:
-    enabled: false
 
 external-secrets:
   enabled: true

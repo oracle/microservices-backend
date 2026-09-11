@@ -43,8 +43,6 @@ dependencies:
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     condition: opentelemetry-operator.enabled
   - name: oracle-database-operator
-    # NOTE: cert-manager is a dependency of oracle-database-operator
-    #       if cert-manager is already installed, modify values.yaml to disable cert-manager in the subchart
     version: "0.2.0"
     repository: "file://charts/oracle-database-operator"
     condition: oracle-database-operator.enabled

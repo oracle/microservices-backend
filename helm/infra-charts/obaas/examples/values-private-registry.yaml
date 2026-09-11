@@ -72,7 +72,7 @@ global:
       image:
         registry: myregistry.example.com
         repository: alpine/k8s
-        tag: "1.36.2"
+        tag: "1.36.4"
     nginx:
       image:
         registry: myregistry.example.com
