@@ -202,14 +202,14 @@ strimzi-kafka-operator:
   # Uncomment to override the default image registry and repository
   defaultImageRegistry: "myregistry.example.com"  # Default: quay.io
   defaultImageRepository: "strimzi"  # Default: strimzi
-  defaultImageTag: 1.1.0
+  defaultImageTag: 1.2.0
   image:
     # Uses global.imagePullSecrets
     imagePullSecrets: *imagePullSecrets
     registry: myregistry.example.com
     repository: strimzi
     name: operator
-    tag: 1.1.0
+    tag: 1.2.0
 
 # =============================================================================
 # coherence-operator

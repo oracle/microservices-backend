@@ -80,6 +80,71 @@ In particular, check the following:
 
 ### Perform the Helm upgrade
 
+#### Update Strimzi CRDs before upgrading prerequisites
+
+If the target `obaas-prereqs` chart updates the Strimzi Kafka Operator, update
+the Strimzi CRDs once for the cluster before upgrading `obaas-prereqs`. Helm
+does not upgrade CRDs supplied by a chart dependency. This operation requires
+cluster-admin permissions and affects every Strimzi-managed Kafka resource in
+the cluster.
+
+First, check whether any installed Strimzi CRD still stores resources as
+`v1beta2`:
+
+```bash
+kubectl get crd kafkarebalances.kafka.strimzi.io \
+  -o jsonpath='{.status.storedVersions}{"\n"}'
+```
+
+If the output contains `v1beta2`, do **not** apply the Strimzi 1.2.0 CRD
+bundle yet. Convert every Strimzi custom resource in the cluster, then migrate
+the CRD storage version to `v1`. Run this migration while the existing CRDs
+still serve `v1beta2`:
+
+```bash
+curl -fL -O https://github.com/strimzi/strimzi-kafka-operator/releases/download/1.0.1/strimzi-v1-api-conversion-1.0.1.tar.gz
+tar -xzf strimzi-v1-api-conversion-1.0.1.tar.gz
+
+./v1-api-conversion-1.0.1/bin/v1-api-conversion.sh \
+  convert-resource --all-namespaces
+./v1-api-conversion-1.0.1/bin/v1-api-conversion.sh crd-upgrade
+```
+
+The conversion tool updates custom resources and CRD storage metadata; it
+requires permissions to list and update Strimzi resources in every namespace,
+and to update CRDs and their status. It requires Java 21. Back up the affected
+custom resources and review the conversion output before continuing. Verify
+that each Strimzi CRD
+now reports only `v1` in `status.storedVersions`, then continue with the 1.2.0
+bundle below. If `v1beta2` is absent from the initial check, skip this migration.
+
+For the Strimzi 1.2.0 update, apply the CRDs and wait for all of them to become
+established:
+
+```bash
+kubectl apply \
+  -f https://github.com/strimzi/strimzi-kafka-operator/releases/download/1.2.0/strimzi-crds-1.2.0.yaml
+
+kubectl wait --for=condition=Established --timeout=5m \
+  crd/kafkas.kafka.strimzi.io \
+  crd/kafkaconnects.kafka.strimzi.io \
+  crd/strimzipodsets.core.strimzi.io \
+  crd/kafkatopics.kafka.strimzi.io \
+  crd/kafkausers.kafka.strimzi.io \
+  crd/kafkanodepools.kafka.strimzi.io \
+  crd/kafkabridges.kafka.strimzi.io \
+  crd/kafkaconnectors.kafka.strimzi.io \
+  crd/kafkamirrormaker2s.kafka.strimzi.io \
+  crd/kafkarebalances.kafka.strimzi.io
+```
+
+Do not delete existing Strimzi CRDs or custom resources to perform this
+upgrade. After the CRDs are established, upgrade the `obaas-prereqs` release
+once in its platform namespace.
+
+For details of the Strimzi upgrade process, see
+[Upgrading Strimzi](https://strimzi.io/docs/operators/1.2.0/deploying.html#assembly-upgrade-str).
+
 You can perform the prerequisite upgrade using a command similar to this.
 Ensure that you use the correct chart name and namespace and your customized
 `values.yaml` file:

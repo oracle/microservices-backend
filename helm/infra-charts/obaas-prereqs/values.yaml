@@ -108,7 +108,7 @@ strimzi-kafka-operator:
     imagePullSecrets: *imagePullSecrets
   defaultImageRegistry: quay.io
   defaultImageRepository: strimzi
-  defaultImageTag: 1.1.0
+  defaultImageTag: 1.2.0
 
 coherence-operator:
   enabled: true
