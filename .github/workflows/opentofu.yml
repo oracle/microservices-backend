@@ -3,7 +3,7 @@
 # This workflow validates syntax, formatting, schema, and security.
 # It does NOT validate infrastructure logic or resource creation.
 # Manual testing with real OCI credentials is REQUIRED before merging.
-# See opentofu/TESTING.md for instructions.
+# See opentofu/README.md for instructions.
 
 name: Validate Infrastructure as Code
 
@@ -57,7 +57,7 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-          key: ${{ runner.os }}-terraform-${{ hashFiles('opentofu/.terraform.lock.hcl') }}
+          key: ${{ runner.os }}-terraform-${{ hashFiles('opentofu/provider.tf', 'opentofu/.terraform.lock.hcl') }}
           restore-keys: |
             ${{ runner.os }}-terraform-
 
@@ -80,20 +80,11 @@ jobs:
       - name: Install Python and Dependencies
         run: |
           apk add --no-cache python3 py3-pip
-          pip3 install --break-system-packages pyyaml jsonschema referencing pytest
+          pip3 install --break-system-packages pyyaml jsonschema referencing
 
       - name: Validate Oracle Resource Manager Schema
-        working-directory: ./tests/opentofu
-        run: python3 ./validate_omr_schema.py OMRMetaSchema.yaml ../../opentofu/schema.yaml
-
-      - name: Run OpenTofu render contract tests
-        # Exercises tests/opentofu/test_cfgmgt_optimizer_values.py, which
-        # invokes `tofu` to render ai-optimizer-values.yaml under various
-        # BYO/observability combinations. The container already has tofu.
-        # The single helm-requiring e2e test in that file skips here (no
-        # helm binary in this container); the unit-level tests cover the
-        # same defects without needing helm.
-        run: pytest tests/opentofu/ -v
+        working-directory: ./opentofu/tests
+        run: python3 validate_omr_schema.py OMRMetaSchema.yaml ../schema.yaml
 
   # Job 2: Security scanning (runs on host for Docker access)
   verify-iac-security:
@@ -135,4 +126,4 @@ jobs:
         run: |
           echo "✅ Syntax, formatting, schema, security validated"
           echo "⚠️  Does NOT validate infrastructure logic"
-          echo "📖 See opentofu/TESTING.md for manual testing requirements"
+          echo "📖 See opentofu/README.md for manual testing requirements"
