@@ -186,7 +186,7 @@ gateway-helm:
         # Specify image pull policy if default behavior isn't desired.
         # Default behavior: latest images will be Always else IfNotPresent.
         pullPolicy: Always
-        # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
+        # List of secrets in the same namespace that can pull the component image.
         pullSecrets: *imagePullSecrets
       envoyProxy:
         # Envoy proxy data plane image — override to use a private registry.
@@ -202,7 +202,7 @@ gateway-helm:
         # Specify image pull policy if default behavior isn't desired.
         # Default behavior: latest images will be Always else IfNotPresent.
         pullPolicy: IfNotPresent
-        # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
+        # List of secrets in the same namespace that can pull the component image.
         pullSecrets: *imagePullSecrets
 
   deployment:
@@ -346,9 +346,11 @@ apisix:
         # so APISIX can fail over within the same registry refresh cycle.
         eureka:
           host:
+            # yamllint disable rule:line-length
             - "http://{{ .Release.Name }}-eureka-0.{{ .Release.Name }}-eureka.{{ .Release.Namespace }}.svc.cluster.local:8761"
             - "http://{{ .Release.Name }}-eureka-1.{{ .Release.Name }}-eureka.{{ .Release.Namespace }}.svc.cluster.local:8761"
             - "http://{{ .Release.Name }}-eureka-2.{{ .Release.Name }}-eureka.{{ .Release.Namespace }}.svc.cluster.local:8761"
+            # yamllint enable rule:line-length
           prefix: "/eureka/"
           fetch_interval: 30
           timeout:
@@ -733,7 +735,7 @@ signoz:
           value: none
         - name: OTEL_EXPORTER_OTLP_PROTOCOL
           value: http/protobuf
-  
+
   # Change to override individual component images
   signoz:
     # Auto-provision root user in SigNoz backend

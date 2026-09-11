@@ -3,7 +3,9 @@ extends: default
 ignore: |
   .venv/
   .github/
+  helm/app-charts/**/templates/
   helm/infra-charts/**/templates/
+  helm/infra-charts/**/charts/
   opentofu/modules/*/templates/
 
 rules:
