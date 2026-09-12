@@ -74,11 +74,12 @@ jobs:
           helm repo add --force-update coherence https://oracle.github.io/coherence-operator/charts
           helm repo add --force-update opentelemetry https://open-telemetry.github.io/opentelemetry-helm-charts
           helm dependency build "$CHART_DIR"
-          operator_archive=$(find "$PREREQS_CHART_DIR/charts" -maxdepth 1 -type f -name 'oracle-database-operator-*.tgz' -print -quit)
-          if [ -z "$operator_archive" ]; then
+          operator_archive="$PREREQS_CHART_DIR/charts/oracle-database-operator-0.2.0.tgz"
+          if [ ! -f "$operator_archive" ]; then
             echo "::error::oracle-database-operator chart archive is missing"
             exit 1
           fi
+          rm -rf "$PREREQS_CHART_DIR/charts/oracle-database-operator"
           tar -xzf "$operator_archive" -C "$PREREQS_CHART_DIR/charts"
           helm dependency build "$PREREQS_CHART_DIR"
 
