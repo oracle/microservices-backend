@@ -68,6 +68,7 @@ jobs:
           helm repo add --force-update apisix https://apache.github.io/apisix-helm-chart
           helm repo add --force-update ai-optimizer https://oracle.github.io/ai-optimizer/helm
           helm repo add --force-update external-secrets https://charts.external-secrets.io
+          helm repo add --force-update metrics-server https://kubernetes-sigs.github.io/metrics-server/
           helm repo add --force-update prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo add --force-update strimzi https://strimzi.io/charts/
           helm repo add --force-update coherence https://oracle.github.io/coherence-operator/charts
