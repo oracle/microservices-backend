@@ -45,7 +45,7 @@ def select_profile_config(config_text: str, profile: Optional[str], config_path:
     try:
         parser.read_string(config_text)
     except configparser.Error as exc:
-        print(f"Error: Failed to parse config file {config_path}: {exc}")
+        print(f"Error: Failed to parse config file {config_path}: {exc}", file=sys.stderr)
         sys.exit(1)
 
     defaults = OrderedDict(parser.defaults())
@@ -57,7 +57,7 @@ def select_profile_config(config_text: str, profile: Optional[str], config_path:
         elif available_profiles:
             selected_profile = available_profiles[0]
         else:
-            print(f"Error: No profiles found in config file {config_path}")
+            print(f"Error: No profiles found in config file {config_path}", file=sys.stderr)
             sys.exit(1)
     else:
         selected_profile = profile
@@ -68,7 +68,8 @@ def select_profile_config(config_text: str, profile: Optional[str], config_path:
         print(
             "Error: Profile "
             f"'{selected_profile}' not found in {config_path}. Available profiles: "
-            + ", ".join(available_display)
+            + ", ".join(available_display),
+            file=sys.stderr,
         )
         sys.exit(1)
 
@@ -174,7 +175,7 @@ def ensure_namespace_exists(namespace: str) -> None:
             check=False,
         )
     except FileNotFoundError:
-        print("Error: kubectl not found in PATH. Please install kubectl and try again.")
+        print("Error: kubectl not found in PATH. Please install kubectl and try again.", file=sys.stderr)
         sys.exit(1)
 
     if check_result.returncode == 0:
@@ -188,7 +189,7 @@ def ensure_namespace_exists(namespace: str) -> None:
             check=False,
         )
     except FileNotFoundError:
-        print("Error: kubectl not found in PATH. Please install kubectl and try again.")
+        print("Error: kubectl not found in PATH. Please install kubectl and try again.", file=sys.stderr)
         sys.exit(1)
 
     if create_result.stdout:
@@ -233,7 +234,7 @@ def main():
     dry_run = args.dry_run
 
     if not config_path.exists():
-        print(f"Error: Config file not found: {config_path}")
+        print(f"Error: Config file not found: {config_path}", file=sys.stderr)
         sys.exit(1)
 
     # Read original config and extract key files
@@ -241,15 +242,15 @@ def main():
     selected_config_text = select_profile_config(original_config_text, profile, config_path)
     key_files = extract_key_files(selected_config_text)
     if not key_files:
-        print("Error: No key_file values found in the selected profile")
+        print("Error: No key_file values found in the selected profile", file=sys.stderr)
         sys.exit(1)
 
     # Check existence of all key files before proceeding
     missing_files = [str(f) for f in key_files if not f.exists()]
     if missing_files:
-        print("Error: The following key_file(s) do not exist:")
+        print("Error: The following key_file(s) do not exist:", file=sys.stderr)
         for f in missing_files:
-            print(f"  - {f}")
+            print(f"  - {f}", file=sys.stderr)
         sys.exit(1)
 
     # Rewrite key_file paths in the config content

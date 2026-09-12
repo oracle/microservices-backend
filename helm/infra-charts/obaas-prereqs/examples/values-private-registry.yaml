@@ -40,7 +40,7 @@ global:
 
   # Image pull secret for private registry authentication
   # This is automatically propagated to all subcharts via YAML anchors
-  imagePullSecrets: &imagePullSecrets 
+  imagePullSecrets: &imagePullSecrets
     - name: myregistry-secret
 
 # ------------------------------------
@@ -240,7 +240,7 @@ coherence-operator:
   resources: {}
 
 opentelemetry-operator:
-  enabled: true 
+  enabled: true
   # Uses global.imagePullSecrets
   imagePullSecrets: *imagePullSecrets
   manager:

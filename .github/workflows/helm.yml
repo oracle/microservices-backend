@@ -1,0 +1,179 @@
+# Workflow for validating the Helm chart and its contract tests
+# spell-checker: disable
+name: Helm Tests
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    paths:
+      - "helm/**"
+      - ".github/actions/setup-helm/**"
+      - ".github/workflows/helm.yml"
+
+  # Allows running this workflow manually
+  workflow_dispatch:
+
+concurrency:
+  group: helm-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-helm:
+    if: github.event.pull_request.draft == false || github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CHART_DIR: helm/infra-charts/obaas
+      PREREQS_CHART_DIR: helm/infra-charts/obaas-prereqs
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install Python tooling
+        run: pip install yamllint pytest pyyaml requests
+
+      - uses: ./.github/actions/setup-helm
+
+      - name: Run yamllint
+        run: yamllint helm/
+
+      # Cache the packaged subchart tarballs in both infrastructure charts.
+      # Key on Chart.lock so the cache is invalidated exactly when the
+      # locked dependency version changes (the only time we want a miss).
+      - name: Cache helm subcharts
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            helm/infra-charts/obaas/charts
+            helm/infra-charts/obaas-prereqs/charts
+          key: helm-charts-${{ hashFiles('helm/infra-charts/obaas/Chart.lock', 'helm/infra-charts/obaas-prereqs/Chart.lock') }}
+
+      - name: Build chart dependencies
+        # Pulls subchart tarballs into each chart's charts/ directory. The repo-add is
+        # required because `helm dependency build` resolves by repository
+        # URL via `helm repo list`, not by fetching the URL directly.
+        run: |
+          helm repo add --force-update ingress-nginx https://kubernetes.github.io/ingress-nginx
+          helm repo add --force-update signoz https://charts.signoz.io
+          helm repo add --force-update apisix https://apache.github.io/apisix-helm-chart
+          helm repo add --force-update ai-optimizer https://oracle.github.io/ai-optimizer/helm
+          helm repo add --force-update external-secrets https://charts.external-secrets.io
+          helm repo add --force-update metrics-server https://kubernetes-sigs.github.io/metrics-server/
+          helm repo add --force-update prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add --force-update strimzi https://strimzi.io/charts/
+          helm repo add --force-update coherence https://oracle.github.io/coherence-operator/charts
+          helm repo add --force-update opentelemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+          helm dependency build "$CHART_DIR"
+          operator_archive="$PREREQS_CHART_DIR/charts/oracle-database-operator-0.2.0.tgz"
+          if [ ! -f "$operator_archive" ]; then
+            echo "::error::oracle-database-operator chart archive is missing"
+            exit 1
+          fi
+          rm -rf "$PREREQS_CHART_DIR/charts/oracle-database-operator"
+          tar -xzf "$operator_archive" -C "$PREREQS_CHART_DIR/charts"
+          helm dependency build "$PREREQS_CHART_DIR"
+
+      - name: Run Helm Lint (strict, with required values)
+        run: >-
+          helm lint --strict "$CHART_DIR"
+          --set global.api.apiKey=test-api-key
+          --set client.cookieSecret=test-cookie-32-char-test-key-padding
+
+      - name: Run Helm Lint for prerequisites
+        run: helm lint --strict "$PREREQS_CHART_DIR"
+
+      - name: Run Helm Package (validate chart builds)
+        run: |
+          helm package "$CHART_DIR" --destination "$RUNNER_TEMP/helm-package"
+          helm package "$PREREQS_CHART_DIR" --destination "$RUNNER_TEMP/helm-package"
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+
+      # Render every example values file. CI overrides make examples that
+      # document external secrets self-contained for Helm's offline renderer.
+      - name: helm template against examples
+        run: |
+          shopt -s nullglob
+          failed=0
+          for f in "$CHART_DIR"/examples/*.yaml; do
+            ci_overrides=()
+            case "$f" in
+              *values-ai-optimizer.yaml)
+                ci_overrides=(
+                  --set "ai-optimizer.global.api.secretName="
+                  --set "ai-optimizer.global.api.secretKey="
+                  --set "database.type=SIDB-FREE"
+                  --set "database.privAuthN.secretName="
+                  --set "database.privAuthN.secretNamespace="
+                  --set "ai-optimizer.server.database.type=SIDB-FREE"
+                  --set "ai-optimizer.server.database.adb.useExisting=false"
+                  --set "ai-optimizer.server.database.privAuthN.secretName="
+                )
+                ;;
+              *values-byodb.yaml)
+                ci_overrides=(
+                  --set "database.type=SIDB-FREE"
+                  --set "database.privAuthN.secretName="
+                  --set "database.privAuthN.secretNamespace="
+                )
+                ;;
+              *values-existing-adb.yaml)
+                ci_overrides=(
+                  --set "database.type=SIDB-FREE"
+                  --set "database.privAuthN.secretName="
+                  --set "database.privAuthN.secretNamespace="
+                  --set "database.image.repository=container-registry.oracle.com/database/free"
+                  --set "database.image.tag=23.26.3.0"
+                )
+                ;;
+            esac
+            echo "::group::$f"
+            if ! helm template ci "$CHART_DIR" \
+                --values "$f" \
+                --set global.api.apiKey=ci-test \
+                --set client.cookieSecret=ci-cookie-32-char-test-key-padding \
+                --set server.database.adb.skipCrdCheck=true \
+                "${ci_overrides[@]}" >/dev/null; then
+              failed=1
+            fi
+            echo "::endgroup::"
+          done
+          exit "$failed"
+
+      # Validate the chart still renders at its declared Chart.yaml
+      # `kubeVersion` floor; a regression here would mean we've started
+      # using an API only available in a newer Kubernetes version.
+      - name: helm template at minimum kubeVersion (1.34.0)
+        run: >-
+          helm template ci "$CHART_DIR" --kube-version=1.34.0
+          --set global.api.apiKey=ci-test
+          --set client.cookieSecret=ci-cookie-32-char-test-key-padding
+
+      - name: helm template prerequisites at minimum kubeVersion (1.34.0)
+        run: helm template ci "$PREREQS_CHART_DIR" --namespace ci --kube-version=1.34.0
+
+      # Negative test: the schema must reject an invalid enum value.
+      # Inverts the exit code so the step passes only when helm fails.
+      - name: values.schema.json rejects invalid enum
+        run: |
+          if helm template ci "$CHART_DIR" \
+              --set signozUpgrade.stage=invalid \
+              --set global.api.apiKey=ci-test \
+              --set client.cookieSecret=ci-cookie-32-char-test-key-padding \
+              >/dev/null 2>&1; then
+            echo "::error::values.schema.json no longer rejects signozUpgrade.stage=invalid"
+            exit 1
+          fi
+
+      - name: Run Helm contract tests
+        run: pytest helm/tests/ -v

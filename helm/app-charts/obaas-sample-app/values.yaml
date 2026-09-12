@@ -54,7 +54,7 @@ database:
   #   usernameKey: "username"
   #   passwordKey: "password"
   #   serviceKey: "service"
-  #-- Specify privAuthN when you have pre-created this secret.
+  # -- Specify privAuthN when you have pre-created this secret.
   # privAuthN:
   #   secretName: ""
   #   usernameKey: "username"
