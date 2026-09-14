@@ -72,7 +72,7 @@ kubectl rollout status deployment/coherence-operator \
 kubectl get deployment/coherence-operator \
   -n "${OBAAS_PREREQS_NAMESPACE}" \
   -o jsonpath='{.spec.template.spec.containers[?(@.name=="manager")].image}{"\n"}' \
-  | grep -Fx 'container-registry.oracle.com/middleware/coherence-operator:3.5.16'
+  | grep -Fx 'container-registry.oracle.com/middleware/coherence-operator:3.5.17'
 
 kubectl wait --for=condition=Established \
   crd/coherence.coherence.oracle.com \

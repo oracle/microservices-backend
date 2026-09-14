@@ -193,7 +193,7 @@ coherence-operator:
   image:
     registry: "myregistry.example.com/middleware"
     name: "coherence-operator"
-    tag: "3.5.16"
+    tag: "3.5.17"
   # Default Coherence image for applications
   defaultCoherenceImage:
     registry: "myregistry.example.com/middleware"
