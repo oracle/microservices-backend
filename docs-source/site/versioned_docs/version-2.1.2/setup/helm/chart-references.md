@@ -38,9 +38,9 @@ component; do not copy the complete dependency values into OBaaS documentation.
     </tr>
     <tr>
       <th scope="row"><code>coherence-operator</code></th>
-      <td>3.5.16</td>
-      <td><a href="https://github.com/oracle/coherence-operator/blob/v3.5.16/helm-charts/coherence-operator/README.md" target="_blank" rel="noopener noreferrer">README</a></td>
-      <td><a href="https://github.com/oracle/coherence-operator/blob/v3.5.16/helm-charts/coherence-operator/values.yaml" target="_blank" rel="noopener noreferrer">values.yaml</a></td>
+      <td>3.5.17</td>
+      <td><a href="https://github.com/oracle/coherence-operator/blob/v3.5.17/helm-charts/coherence-operator/README.md" target="_blank" rel="noopener noreferrer">README</a></td>
+      <td><a href="https://github.com/oracle/coherence-operator/blob/v3.5.17/helm-charts/coherence-operator/values.yaml" target="_blank" rel="noopener noreferrer">values.yaml</a></td>
     </tr>
     <tr>
       <th scope="row"><code>external-secrets</code></th>

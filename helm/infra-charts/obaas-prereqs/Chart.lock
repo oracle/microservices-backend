@@ -13,12 +13,12 @@ dependencies:
   version: 1.2.0
 - name: coherence-operator
   repository: https://oracle.github.io/coherence-operator/charts
-  version: 3.5.16
+  version: 3.5.17
 - name: opentelemetry-operator
   repository: https://open-telemetry.github.io/opentelemetry-helm-charts
   version: 0.122.0
 - name: oracle-database-operator
   repository: file://charts/oracle-database-operator
   version: 0.2.0
-digest: sha256:eee1860494577a14ecd0a564588121001927da8ab7e4522b1b6016d31a6524ae
-generated: "2026-09-10T14:00:40.924197-07:00"
+digest: sha256:077f81335627b91c562fb4c18872a91b850cdd146895e940d2a2d72b14fa7391
+generated: "2026-09-14T13:42:00.062527-05:00"

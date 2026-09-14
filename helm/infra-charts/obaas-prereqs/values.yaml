@@ -107,7 +107,7 @@ coherence-operator:
   image:
     registry: "container-registry.oracle.com/middleware"
     name: "coherence-operator"
-    tag: "3.5.16"
+    tag: "3.5.17"
   # Default Coherence image for applications
   defaultCoherenceImage:
     registry: "container-registry.oracle.com/middleware"
