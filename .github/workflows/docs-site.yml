@@ -1,0 +1,52 @@
+# Validate the Docusaurus site, including dependency updates from Dependabot.
+name: Docs Site
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    paths:
+      - "docs-source/site/**"
+      - ".github/workflows/docs-site.yml"
+
+  workflow_dispatch:
+
+concurrency:
+  group: docs-site-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event.pull_request.draft == false || github.event_name != 'pull_request'
+    strategy:
+      matrix:
+        node-version: [18.x, 22.x]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: docs-source/site/package-lock.json
+
+      - name: Install dependencies
+        working-directory: docs-source/site
+        run: npm ci --include=optional
+
+      - name: Typecheck site
+        working-directory: docs-source/site
+        run: npm run typecheck
+
+      - name: Build site
+        working-directory: docs-source/site
+        run: npm run build
