@@ -25,7 +25,7 @@ signoz:
             - brokers
             - topics
             - consumers
-      
+
       service:
         pipelines:
           metrics:

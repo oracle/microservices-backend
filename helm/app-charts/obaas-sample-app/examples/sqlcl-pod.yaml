@@ -5,38 +5,38 @@ metadata:
 spec:
   restartPolicy: Never
   containers:
-  - name: sqlcl
-    image: container-registry.oracle.com/database/sqlcl:26.2.1
-    env:
-    # - name: TNS_ADMIN
-    #   value: /app/tns_admin
-    - name: DB_USERNAME
-      valueFrom:
-        secretKeyRef:
-          name: obaas-db-authn
-          key: username
-    - name: DB_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: obaas-db-authn
-          key: password
-    - name: DB_SERVICE
-      valueFrom:
-        secretKeyRef:
-          name: obaas-db-authn
-          key: service    
-    command: ["/bin/sh", "-c"]
-    args:
-      - | 
-        sql $DB_USERNAME/$DB_PASSWORD@$DB_SERVICE << SQL
-        -- list current config properties
-        select * from properties;
-        -- create some new config properties
-        insert into properties (application, profile, label, prop_key, value) values
-        ('billing', 'default', 'latest', 'apikey', 'abc123'),
-        ('billing', 'default', 'latest', 'subscription', 'xyz456');
-        SQL
-        exit 0
+    - name: sqlcl
+      image: container-registry.oracle.com/database/sqlcl:26.2.1
+      env:
+        # - name: TNS_ADMIN
+        #   value: /app/tns_admin
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: obaas-db-authn
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: obaas-db-authn
+              key: password
+        - name: DB_SERVICE
+          valueFrom:
+            secretKeyRef:
+              name: obaas-db-authn
+              key: service
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          sql $DB_USERNAME/$DB_PASSWORD@$DB_SERVICE << SQL
+          -- list current config properties
+          select * from properties;
+          -- create some new config properties
+          insert into properties (application, profile, label, prop_key, value) values
+          ('billing', 'default', 'latest', 'apikey', 'abc123'),
+          ('billing', 'default', 'latest', 'subscription', 'xyz456');
+          SQL
+          exit 0
   # If using wallet, need to mount the wallet secret
   #   volumeMounts:
   #   - name: tns-admin
