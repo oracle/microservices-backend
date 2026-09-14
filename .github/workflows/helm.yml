@@ -30,6 +30,7 @@ jobs:
     env:
       CHART_DIR: helm/infra-charts/obaas
       PREREQS_CHART_DIR: helm/infra-charts/obaas-prereqs
+      HELM_KUBE_VERSION: "1.36.0"
 
     steps:
       - name: Checkout Code
@@ -86,11 +87,12 @@ jobs:
       - name: Run Helm Lint (strict, with required values)
         run: >-
           helm lint --strict "$CHART_DIR"
+          --kube-version "$HELM_KUBE_VERSION"
           --set global.api.apiKey=test-api-key
           --set client.cookieSecret=test-cookie-32-char-test-key-padding
 
       - name: Run Helm Lint for prerequisites
-        run: helm lint --strict "$PREREQS_CHART_DIR"
+        run: helm lint --strict "$PREREQS_CHART_DIR" --kube-version "$HELM_KUBE_VERSION"
 
       - name: Run Helm Package (validate chart builds)
         run: |
@@ -139,6 +141,7 @@ jobs:
             esac
             echo "::group::$f"
             if ! helm template ci "$CHART_DIR" \
+                --kube-version "$HELM_KUBE_VERSION" \
                 --values "$f" \
                 --set global.api.apiKey=ci-test \
                 --set client.cookieSecret=ci-cookie-32-char-test-key-padding \
@@ -150,23 +153,22 @@ jobs:
           done
           exit "$failed"
 
-      # Validate the chart still renders at its declared Chart.yaml
-      # `kubeVersion` floor; a regression here would mean we've started
-      # using an API only available in a newer Kubernetes version.
-      - name: helm template at minimum kubeVersion (1.34.0)
+      # Render at the supported Kubernetes minimum.
+      - name: helm template at minimum kubeVersion
         run: >-
-          helm template ci "$CHART_DIR" --kube-version=1.34.0
+          helm template ci "$CHART_DIR" --kube-version "$HELM_KUBE_VERSION"
           --set global.api.apiKey=ci-test
           --set client.cookieSecret=ci-cookie-32-char-test-key-padding
 
-      - name: helm template prerequisites at minimum kubeVersion (1.34.0)
-        run: helm template ci "$PREREQS_CHART_DIR" --namespace ci --kube-version=1.34.0
+      - name: helm template prerequisites at minimum kubeVersion
+        run: helm template ci "$PREREQS_CHART_DIR" --namespace ci --kube-version "$HELM_KUBE_VERSION"
 
       # Negative test: the schema must reject an invalid enum value.
       # Inverts the exit code so the step passes only when helm fails.
       - name: values.schema.json rejects invalid enum
         run: |
           if helm template ci "$CHART_DIR" \
+              --kube-version "$HELM_KUBE_VERSION" \
               --set signozUpgrade.stage=invalid \
               --set global.api.apiKey=ci-test \
               --set client.cookieSecret=ci-cookie-32-char-test-key-padding \

@@ -1,5 +1,6 @@
 """Contract tests for the repository's OBaaS Helm charts."""
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -24,6 +25,8 @@ def _render(*sets: str, upgrade: bool = False) -> subprocess.CompletedProcess[st
         str(CHART_DIR),
         "--namespace",
         "contract",
+        "--kube-version",
+        os.environ.get("HELM_KUBE_VERSION", "1.36.0"),
         "--set",
         "global.api.apiKey=contract-api-key",
     ]
