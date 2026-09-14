@@ -79,13 +79,25 @@ spec:
           # Use JWT token for all subsequent requests
           AUTH_HEADER="Authorization: Bearer ${TOKEN}"
 
-          # Extract the top-level display name from a V2/Perses dashboard file.
-          # The first display object belongs to spec; panel display objects follow.
+          # Extract only the top-level spec.display.name from a V2/Perses
+          # dashboard file. Panel and variable display objects follow it.
           get_title() {
-            sed -n '/"display"[[:space:]]*:[[:space:]]*{/,/^[[:space:]]*}/{
-              s/^[[:space:]]*"name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p
-              /"name"[[:space:]]*:/q
-            }' "$1"
+            awk '
+              /"spec"[[:space:]]*:[[:space:]]*[{]/ {
+                in_dashboard_spec = 1
+                next
+              }
+              in_dashboard_spec && /"display"[[:space:]]*:[[:space:]]*[{]/ {
+                in_dashboard_display = 1
+                next
+              }
+              in_dashboard_display && /^[[:space:]]*"name"[[:space:]]*:/ {
+                sub(/^[[:space:]]*"name"[[:space:]]*:[[:space:]]*"/, "")
+                sub(/"[[:space:]]*,?[[:space:]]*$/, "")
+                print
+                exit
+              }
+            ' "$1"
           }
 
           # Fetch every V2 list page. The V2 response is wrapped in
@@ -112,24 +124,57 @@ spec:
             offset=$((offset + page_size))
           done
 
-          # Print every dashboard ID whose V2 summary display name equals the
-          # requested title. SigNoz serializes each summary with id before spec,
-          # and page boundaries are kept separate above, so this avoids relying
-          # on the retired V1 flat response format.
-          find_dashboard_uuids() {
-            local search_title="$1"
+          # The V2 list endpoint also returns unmigratable V1 dashboards as
+          # legacy=true records. Their summaries retain spec.display.name, so
+          # reconcile them through the V2 delete endpoint rather than calling
+          # the retired V1 API. Build the allowlist from the bundled files: a
+          # dashboard owned by a user cannot be selected unless it deliberately
+          # has the same name as an OBaaS system dashboard.
+          system_dashboard_titles=$(mktemp)
+          for dir in /signoz-dashboards-1 /signoz-dashboards-2; do
+            [ -d "$dir" ] || continue
+            for f in $(find -L "$dir" -maxdepth 1 -type f 2>/dev/null); do
+              title=$(get_title "$f")
+              [ -n "$title" ] && printf '%s\n' "$title"
+            done
+          done > "${system_dashboard_titles}"
+
+          find_system_dashboard_uuids() {
             while IFS= read -r page; do
               printf '%s' "${page}" | sed 's/},{"id":/}\n{"id":/g' | \
-                awk -v title="${search_title}" '
-                  index($0, "\"display\":{\"name\":\"" title "\"") {
-                    match($0, /"id":"[^"]+"/)
-                    if (RSTART > 0) {
-                      print substr($0, RSTART + 6, RLENGTH - 7)
+                awk -v titles_file="${system_dashboard_titles}" '
+                  BEGIN {
+                    while ((getline title < titles_file) > 0) {
+                      system_titles[title] = 1
+                    }
+                    close(titles_file)
+                  }
+                  {
+                    id = ""
+                    title = ""
+                    if (match($0, /"id":"[^"]+"/)) {
+                      id = substr($0, RSTART + 6, RLENGTH - 7)
+                    }
+                    if (match($0, /"display":[{]"name":"[^"]*"/)) {
+                      title = substr($0, RSTART + 19, RLENGTH - 20)
+                    }
+                    if (id != "" && title in system_titles) {
+                      print id
                     }
                   }
                 '
             done < "${dashboards_file}"
           }
+
+          # Delete every version of every bundled system dashboard first. This
+          # includes rows marked legacy by SigNoz after its V1-to-V2 migration,
+          # but leaves dashboards outside the bundled-title allowlist alone.
+          find_system_dashboard_uuids | while IFS= read -r uuid; do
+            [ -n "${uuid}" ] || continue
+            echo "Deleting existing system dashboard: ${uuid}"
+            curl -fsS -H "${AUTH_HEADER}" -X DELETE \
+              "${SIGNOZ_URL}/api/v2/dashboards/${uuid}"
+          done
 
           # Process dashboards from both directories
           for dir in /signoz-dashboards-1 /signoz-dashboards-2; do
@@ -138,15 +183,6 @@ spec:
               title=$(get_title "$f")
               [ -z "$title" ] && continue
               echo "Reconciling dashboard: $title"
-
-              # Delete every existing dashboard with the same display name.
-              # V2 uses stable IDs and may return results over several pages.
-              find_dashboard_uuids "$title" | while IFS= read -r uuid; do
-                [ -n "${uuid}" ] || continue
-                echo "  Deleting existing dashboard: ${uuid}"
-                curl -fsS -H "${AUTH_HEADER}" -X DELETE \
-                  "${SIGNOZ_URL}/api/v2/dashboards/${uuid}"
-              done
 
               # The bundled files are V2/Perses payloads (schemaVersion: v6).
               echo "  Creating dashboard..."
