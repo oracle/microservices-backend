@@ -72,7 +72,7 @@ global:
       image:
         registry: myregistry.example.com
         repository: alpine/k8s
-        tag: "1.36.2"
+        tag: "1.36.4"
     nginx:
       image:
         registry: myregistry.example.com
@@ -360,7 +360,7 @@ apisix:
   # Uses global.imagePullSecrets (expects string list format)
   global:
     imagePullSecrets: *imagePullSecrets
-    security: 
+    security:
       allowInsecureImages: true
 
   # RBAC required for Kubernetes service discovery
@@ -469,9 +469,12 @@ apisix:
         # so APISIX can fail over within the same registry refresh cycle.
         eureka:
           host:
-            - "http://{{ .Release.Name }}-eureka-0.{{ .Release.Name }}-eureka.{{ .Release.Namespace }}.svc.cluster.local:8761"
-            - "http://{{ .Release.Name }}-eureka-1.{{ .Release.Name }}-eureka.{{ .Release.Namespace }}.svc.cluster.local:8761"
-            - "http://{{ .Release.Name }}-eureka-2.{{ .Release.Name }}-eureka.{{ .Release.Namespace }}.svc.cluster.local:8761"
+            - "http://{{ .Release.Name }}-eureka-0.{{ .Release.Name }}-eureka.\
+              {{ .Release.Namespace }}.svc.cluster.local:8761"
+            - "http://{{ .Release.Name }}-eureka-1.{{ .Release.Name }}-eureka.\
+              {{ .Release.Namespace }}.svc.cluster.local:8761"
+            - "http://{{ .Release.Name }}-eureka-2.{{ .Release.Name }}-eureka.\
+              {{ .Release.Namespace }}.svc.cluster.local:8761"
           prefix: "/eureka/"
           fetch_interval: 30
           timeout:
@@ -674,7 +677,7 @@ signoz:
                     target_label: kubernetes_pod_name
                   - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
                     action: replace
-                    target_label: app                    
+                    target_label: app
       service:
         pipelines:
           logs:
