@@ -20,7 +20,7 @@ docker.io/apache/apisix:3.18.0-ubuntu
 docker.io/bitnamilegacy/etcd:3.6.1
 docker.io/busybox:1.37
 docker.io/clickhouse/clickhouse-server:25.12.5
-docker.io/curlimages/curl:8.20.0
+docker.io/curlimages/curl:8.22.0
 docker.io/envoyproxy/envoy:distroless-v1.38.3
 docker.io/envoyproxy/gateway:v1.8.2
 docker.io/envoyproxy/ratelimit:master
