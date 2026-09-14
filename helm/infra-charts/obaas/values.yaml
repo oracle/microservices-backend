@@ -704,7 +704,7 @@ signoz:
       image:
         registry: docker.io
         repository: curlimages/curl
-        tag: "8.20.0"
+        tag: "8.22.0"
     busybox:
       image:
         registry: docker.io
