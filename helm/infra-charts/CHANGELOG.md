@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Require Kubernetes 1.36–1.37 for `obaas` and `obaas-prereqs`.
+- Integrate the refreshed Oracle Database Operator 0.2.0 chart for operator 2.2.0, with strict values validation, `namespaceOverride`, a dedicated ServiceAccount, and release-specific cluster RBAC and webhook names.
 - Improve APISIX Eureka discovery resilience by configuring direct endpoints for all three Eureka replicas and increasing registry send and read timeouts.
 - Keep Eureka Jetty connections open for 90 seconds by default, longer than APISIX/OpenResty's pooled connection lifetime, to avoid intermittent registry refresh failures caused by stale keepalive connections.
 - Automatically register the required APISIX `opentelemetry` plugin_metadata via a sidecar container in the APISIX pod, eliminating the manual admin-API curl workaround and the recurring "plugin_metadata is required" warning.

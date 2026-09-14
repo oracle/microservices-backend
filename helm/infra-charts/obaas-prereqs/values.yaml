@@ -27,13 +27,14 @@ global:
 # -- SubChart Configuration
 oracle-database-operator:
   enabled: true
-  # Empty namespace will cause the use of .Release.Namespace
-  namespace: ""
+  # Empty namespaceOverride will cause the use of .Release.Namespace
+  namespaceOverride: ""
   replicas: 1
   # Image pull secrets for private registries
   imagePullSecrets: &imagePullSecrets []
   image:
-    repository: container-registry.oracle.com/database/operator
+    registry: container-registry.oracle.com
+    repository: database/operator
     # Specify a version tag for reproducible deployments
     tag: "2.2.0"
     pullPolicy: IfNotPresent
@@ -49,7 +50,7 @@ oracle-database-operator:
   pdb:
     enabled: true
     minAvailable: 1
-    # maxUnavailable: 1  # Alternative to minAvailable
+    # maxUnavailable: 1  # Requires minAvailable: null
 
 external-secrets:
   enabled: true

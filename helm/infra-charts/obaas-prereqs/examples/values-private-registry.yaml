@@ -21,6 +21,7 @@
 #        -n <namespace>
 #
 #   2. Mirror the required images to your private registry
+#   3. Configure images and pull secrets in the separate cert-manager installation
 #
 # Usage:
 #   helm install obaas-prereqs ./obaas-prereqs -n <namespace> -f examples/values-private-registry.yaml
@@ -59,23 +60,26 @@ global:
 # -------------------------
 
 # =============================================================================
-# Oracle Database Operatior (and its prereq cert-manager)
+# Oracle Database Operator
 # =============================================================================
-# Default registry: quay.io
-# Has multiple components, each needs registry override
+# Default operator registry: container-registry.oracle.com
+# Default CRD configuration Job registry: registry.k8s.io
 
 oracle-database-operator:
   enabled: true
   # Empty namespace will cause the use of .Release.Namespace
-  namespace: ""
+  namespaceOverride: ""
   replicas: 1
-  # Image pull secrets for private registries (shared with cert-manager subchart)
+  # Image pull secrets for the operator and CRD configuration Job
   imagePullSecrets: *imagePullSecrets
   image:
-    repository: myregistry.example.com/database/operator
+    registry: myregistry.example.com
+    repository: database/operator
     # Specify a version tag for reproducible deployments
-    tag: "2.1.0"
+    tag: "2.2.0"
     pullPolicy: IfNotPresent
+  crdConfiguration:
+    image: myregistry.example.com/kubectl:v1.36.3
   # Deployment scope configuration
   scope:
     mode: cluster
@@ -88,42 +92,7 @@ oracle-database-operator:
   pdb:
     enabled: true
     minAvailable: 1
-    # maxUnavailable: 1  # Alternative to minAvailable
-  # Wait job configuration for cert-manager webhook readiness (not passed to subchart)
-  certManagerWaitJob:
-    # Waits for cert-manager webhook before creating Issuer/Certificate resources
-    # Set to false only if cert-manager is known to be ready (e.g., pre-installed and running)
-    enabled: true
-    image:
-      repository: myregistry.example.com/kubectl
-      tag: "v1.28.0"
-      pullPolicy: IfNotPresent
-  # cert-manager subchart values (passed to subchart when enabled=true)
-  cert-manager:
-    enabled: true
-    # Empty namespace will cause the use of .Release.Namespace
-    namespace: ""
-    crds:
-      enabled: true
-      # Allow CRDs to be deleted on uninstall (WARNING: deletes all cert-manager resources)
-      keep: false
-    global:
-      imagePullSecrets: *imagePullSecrets
-    image:
-      repository: myregistry.example.com/jetstack/cert-manager-controller
-      tag: v1.21.1
-    webhook:
-      image:
-        repository: myregistry.example.com/jetstack/cert-manager-webhook
-        tag: v1.21.1
-    cainjector:
-      image:
-        repository: myregistry.example.com/jetstack/cert-manager-cainjector
-        tag: v1.21.1
-    startupapicheck:
-      image:
-        repository: myregistry.example.com/jetstack/cert-manager-startupapicheck
-        tag: v1.21.1
+    # maxUnavailable: 1  # Requires minAvailable: null
 
 # =============================================================================
 # external-secrets

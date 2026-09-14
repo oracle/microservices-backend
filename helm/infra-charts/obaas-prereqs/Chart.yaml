@@ -3,7 +3,7 @@
 apiVersion: v2
 type: application
 name: "obaas-prereqs"
-kubeVersion: ">= 1.34.0"
+kubeVersion: ">=1.36.0-0 <1.38.0-0"
 description: Prerequisites and cluster-singleton infrastructure for Oracle Backend as a Service
 home: https://oracle.github.io/microservices-backend
 maintainers:

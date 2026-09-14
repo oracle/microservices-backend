@@ -12,14 +12,14 @@ This chart must be installed **once per cluster** before installing any OBaaS in
 - **strimzi-kafka-operator** - Kafka cluster management via CRDs
 - **clickhouse-operator CRDs** - Custom Resource Definitions for ClickHouse management (operator runs per-tenant namespace)
 - **oracle-database-operator** - Oracle Database lifecycle management via CRDs
-- **cert-manager** - Certificate management and issuance.
 
 ## Installation
 
 ### Prerequisites
 
-- Kubernetes >= 1.34.0
+- Kubernetes 1.36–1.37
 - Helm 3.x
+- A healthy, separately installed cert-manager with its CRDs and cainjector.
 
 ### Install Prerequisites (once per cluster)
 
@@ -94,13 +94,18 @@ strimzi-kafka-operator:
 ```yaml
 oracle-database-operator:
   enabled: true
-  # Uncomment to override default image for air-gapped installations
+  # Uncomment to override images for air-gapped installations
   # image:
   #   registry: myregistry.example.com
   #   repository: database/operator
-  #   tag: "2.1.0"
-  # Uncomment to watch specific namespace instead of all namespaces
-  # watchNamespace: "tenant1"
+  #   tag: "2.2.0"
+  # crdConfiguration:
+  #   image: myregistry.example.com/kubectl:v1.36.3
+  # Uncomment to watch an existing namespace
+  # scope:
+  #   mode: namespace
+  #   watchNamespaces:
+  #     - tenant1
 ```
 
 **AKS-specific note for metrics-server:**
