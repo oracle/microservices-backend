@@ -6,6 +6,10 @@ sidebar_position: 5
 More details can be found in the [SigNoz Documentation](https://signoz.io/docs/introduction/).
 :::
 
+:::warning[SigNoz dashboard migration]
+SigNoz v0.135.0 deprecates the Dashboards V1 schema and retires the V1 dashboard API endpoints. User-supplied dashboards that use the V1 format must be migrated to the Dashboards V2/Perses-compatible schema before upgrading. Dashboards managed only through the SigNoz UI are migrated automatically, but verify that none remain marked `Legacy`. See the [SigNoz v0.135.0 upgrade guide](https://signoz.io/docs/operate/migration/upgrade-0-135/) for migration details.
+:::
+
 There are several dashboards that are pre-installed in SigNoz, for example:
 
 - [Spring Boot Observability](#spring-boot-observability)

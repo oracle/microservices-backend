@@ -48,7 +48,7 @@ otelCollectorEndpoint: "obaas-signoz-otel-collector:4318"
 # -- SigNoz Two-Stage Upgrade Workflow
 #
 # These values establish the contract for upgrading an existing SigNoz installation
-# to chart/application version 0.134.0. The default "standard" stage preserves the
+# to chart/application version 0.141.1. The default "standard" stage preserves the
 # current single-command install and upgrade behavior. The stage1 and stage2 profiles
 # implement the guarded two-command workflow for existing installations.
 signozUpgrade:
@@ -58,9 +58,9 @@ signozUpgrade:
   # Version contract recorded and checked by the two-stage workflow.
   # These are implementation values and should not be overridden by installations.
   target:
-    chartVersion: "0.134.0"
-    signozVersion: "v0.134.0"
-    otelCollectorVersion: "v0.144.6"
+    chartVersion: "0.141.1"
+    signozVersion: "v0.141.1"
+    otelCollectorVersion: "v0.144.9"
     clickhouseVersion: "25.12.5"
 
   backup:
