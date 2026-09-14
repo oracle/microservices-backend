@@ -9,8 +9,8 @@ CHART_DIR="${CHART_DIR:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 SNAPSHOT_SCRIPT="${CHART_DIR}/files/signoz-upgrade/create-snapshots.sh"
 MOCK_KUBECTL="${SCRIPT_DIR}/fixtures/signoz-upgrade/mock-kubectl.sh"
 DEFAULT_VALUES="${CHART_DIR}/examples/values-default.yaml"
-STAGE1_VALUES="${CHART_DIR}/examples/values-signoz-0.134-stage1.yaml"
-STAGE2_VALUES="${CHART_DIR}/examples/values-signoz-0.134-stage2.yaml"
+STAGE1_VALUES="${CHART_DIR}/examples/values-signoz-0.141.1-stage1.yaml"
+STAGE2_VALUES="${CHART_DIR}/examples/values-signoz-0.141.1-stage2.yaml"
 TEST_ROOT="$(mktemp -d)"
 
 cleanup() {
@@ -60,9 +60,9 @@ run_snapshot_script() {
     NAMESPACE="obaas-test" \
     RELEASE_NAME="obaas" \
     RELEASE_REVISION="7" \
-    TARGET_VERSION="0.134.0" \
+    TARGET_VERSION="0.141.1" \
     SNAPSHOT_TIMEOUT="20m" \
-    MARKER_SECRET_NAME="obaas-signoz-upgrade-0-134-stage1" \
+    MARKER_SECRET_NAME="obaas-signoz-upgrade-0-141-1-stage1" \
     SNAPSHOT_CLASS_NAME="${explicit_class}" \
     SNAPSHOT_CLASS_MAPPINGS="${mappings}" \
     /bin/sh "${SNAPSHOT_SCRIPT}" >"${case_dir}/output.log" 2>&1
@@ -131,7 +131,7 @@ assert_contains "${stage1_mapped}" $'oci-bv\toci-bv-snap'
 assert_contains "${stage1_upgrade}" 'image: docker.io/signoz/signoz:v0.113.0'
 assert_contains "${stage1_upgrade}" 'image: docker.io/signoz/signoz-otel-collector:v0.144.1'
 assert_contains "${stage1_upgrade}" 'image: docker.io/clickhouse/clickhouse-server:25.12.5'
-assert_not_contains "${stage1_upgrade}" 'image: docker.io/signoz/signoz:v0.134.0'
+assert_not_contains "${stage1_upgrade}" 'image: docker.io/signoz/signoz:v0.141.1'
 
 # Exercise the snapshot logic with a mocked Kubernetes API.
 run_snapshot_script "success" "success"
@@ -140,7 +140,7 @@ snapshot_count="$(find "${TEST_ROOT}/success" -name 'snapshot-*.yaml' | wc -l | 
 assert_contains "${TEST_ROOT}/success/output.log" 'All SigNoz Stage 1 CSI snapshots are ready.'
 assert_contains "${TEST_ROOT}/success/snapshot-1.yaml" 'helm.sh/resource-policy: keep'
 assert_contains "${TEST_ROOT}/success/snapshot-1.yaml" 'obaas.oracle.com/source-pvc-uid:'
-assert_contains "${TEST_ROOT}/success/snapshot-1.yaml" 'obaas.oracle.com/upgrade-target: "0.134.0"'
+assert_contains "${TEST_ROOT}/success/snapshot-1.yaml" 'obaas.oracle.com/upgrade-target: "0.141.1"'
 assert_contains "${TEST_ROOT}/success/snapshot-1.yaml" 'volumeSnapshotClassName: default-snap'
 
 mappings=$'fast-sc\tfast-snap\nblock-sc\tblock-snap'

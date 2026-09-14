@@ -11,7 +11,7 @@ PREPARE="${TOOLS_DIR}/prepare-oke-volume-snapshots.sh"
 DIAGNOSE="${TOOLS_DIR}/diagnose-signoz-upgrade.sh"
 RESTORE="${TOOLS_DIR}/validate-signoz-snapshot-restore.sh"
 MOCK="${SCRIPT_DIR}/fixtures/signoz-upgrade/mock-oke-preflight-kubectl.sh"
-OKE_VALUES="${CHART_DIR}/examples/values-signoz-0.134-stage1-oke.yaml"
+OKE_VALUES="${CHART_DIR}/examples/values-signoz-0.141.1-stage1-oke.yaml"
 TMP="$(mktemp -d)"
 trap 'rm -rf "${TMP}"' EXIT
 

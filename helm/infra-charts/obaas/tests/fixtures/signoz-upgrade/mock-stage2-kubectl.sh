@@ -10,13 +10,13 @@ if [[ "$1" == get && "$2" == secret ]]; then
   [[ "${SCENARIO}" == no-marker ]] && exit 1
   [[ "$*" != *go-template* ]] && exit 0
   case "$*" in
-    *'"workflow"'*) echo 'signoz-0.134.0-two-stage' ;;
+    *'"workflow"'*) echo 'signoz-0.141.1-two-stage' ;;
     *'"stage"'*) echo 'stage1' ;;
     *'"status"'*) [[ "${SCENARIO}" == malformed-marker ]] || echo 'complete' ;;
     *'"releaseName"'*) echo 'obaas' ;;
     *'"namespace"'*) echo 'obaas' ;;
     *'"helmRevision"'*) [[ "${SCENARIO}" == stale-marker ]] && echo 6 || echo 7 ;;
-    *'"targetVersion"'*) echo '0.134.0' ;;
+    *'"targetVersion"'*) echo '0.141.1' ;;
     *'"clickhouseVersion"'*) echo '25.12.5.44' ;;
     *'"snapshots"'*) printf 'clickhouse\tch-pvc\tuid-ch-pvc\tch-snap\nsignoz\tsignoz-pvc\tuid-signoz-pvc\tsignoz-snap\nzookeeper\tzk-pvc\tuid-zk-pvc\tzk-snap' ;;
     *) exit 1 ;;
