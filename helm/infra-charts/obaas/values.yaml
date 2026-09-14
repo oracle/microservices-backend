@@ -947,8 +947,8 @@ k8s-infra:
 
 kafka:
   enabled: false
-  version: 4.2.0
-  metadataVersion: 4.2-IV1
+  version: 4.3.1
+  metadataVersion: 4.3-IV0
 
 # Create a Coherence cluster in the OBaaS release namespace. The Coherence
 # Operator is installed once per cluster by the obaas-prereqs chart.
