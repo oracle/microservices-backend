@@ -2,6 +2,10 @@
 
 This guide tells an AI agent how to plan, prepare, install, and verify Oracle Backend for Microservices and AI, commonly called OBaaS, version 2.1.2. In the product documentation, this version is the `next` documentation stream.
 
+## Markdown Formatting
+
+- Format all tables in Markdown documentation as HTML `<table>` elements. Do not use pipe-delimited Markdown table syntax.
+
 ## Source Rules
 
 - Use only the OBaaS `next` documentation and chart sources:
