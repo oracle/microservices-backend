@@ -50,9 +50,9 @@ component; do not copy the complete dependency values into OBaaS documentation.
     </tr>
     <tr>
       <th scope="row"><code>gateway-helm</code></th>
-      <td>1.8.2</td>
-      <td><a href="https://github.com/envoyproxy/gateway/blob/6c2e80d5158926749b95e948d7aae36b9ae67669/charts/gateway-helm/README.md" target="_blank" rel="noopener noreferrer">README</a></td>
-      <td><a href="https://github.com/envoyproxy/gateway/blob/6c2e80d5158926749b95e948d7aae36b9ae67669/charts/gateway-helm/values.tmpl.yaml" target="_blank" rel="noopener noreferrer">values template</a></td>
+      <td>1.9.1</td>
+      <td><a href="https://github.com/envoyproxy/gateway/blob/0260554fd4f33b787aad77a129fc0ffeb00c1f29/charts/gateway-helm/README.md" target="_blank" rel="noopener noreferrer">README</a></td>
+      <td><a href="https://github.com/envoyproxy/gateway/blob/0260554fd4f33b787aad77a129fc0ffeb00c1f29/charts/gateway-helm/values.tmpl.yaml" target="_blank" rel="noopener noreferrer">values template</a></td>
     </tr>
     <tr>
       <th scope="row"><code>ingress-nginx</code></th>
