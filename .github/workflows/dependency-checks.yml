@@ -56,6 +56,9 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read
+    defaults:
+      run:
+        working-directory: docs-source/site
 
     steps:
       - name: Checkout Code
@@ -69,15 +72,12 @@ jobs:
           cache-dependency-path: docs-source/site/package-lock.json
 
       - name: Install dependencies
-        working-directory: docs-source/site
         run: npm ci --include=optional
 
       - name: Typecheck site
-        working-directory: docs-source/site
         run: npm run typecheck
 
       - name: Build site
-        working-directory: docs-source/site
         run: npm run build
 
   advisor:
