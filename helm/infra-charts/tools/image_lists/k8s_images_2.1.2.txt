@@ -11,7 +11,7 @@ container-registry.oracle.com/database/observability-exporter:2.5.0
 container-registry.oracle.com/database/operator:2.1.0
 container-registry.oracle.com/database/sqlcl:26.2.1
 container-registry.oracle.com/middleware/coherence-ce:22.06.13
-container-registry.oracle.com/middleware/coherence-operator:3.5.16
+container-registry.oracle.com/middleware/coherence-operator:3.5.17
 container-registry.oracle.com/obaas/dashboards:2.1.0
 docker.io/alpine/k8s:1.36.2
 docker.io/altinity/clickhouse-operator:0.21.2
