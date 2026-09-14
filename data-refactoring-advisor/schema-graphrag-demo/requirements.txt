@@ -10,10 +10,10 @@ jupyter==1.0.0
 matplotlib==3.8.4
 seaborn==0.13.2
 plotly==5.22.0
-streamlit==1.36.0
-python-dotenv==1.0.1
+streamlit==1.54.0
+python-dotenv==1.2.2
 pydantic-settings==2.3.3
 rich==13.7.1
-pytest==8.2.0
+pytest==9.0.3
 sqlglot==23.0.0
 anthropic>=0.25.0

@@ -1,0 +1,115 @@
+# Validate projects affected by source or dependency updates.
+name: Dependency Checks
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    paths:
+      - "docs-source/site/**"
+      - "data-refactoring-advisor/**"
+      - ".github/workflows/dependency-checks.yml"
+
+  workflow_dispatch:
+
+concurrency:
+  group: dependency-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    if: github.event.pull_request.draft == false || github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      docs: ${{ steps.paths.outputs.docs }}
+      advisor: ${{ steps.paths.outputs.advisor }}
+    steps:
+      - name: Select affected projects
+        id: paths
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          script: |
+            const files = context.eventName === 'pull_request'
+              ? await github.paginate(github.rest.pulls.listFiles, {
+                  ...context.repo,
+                  pull_number: context.issue.number,
+                  per_page: 100,
+                })
+              : [];
+            const paths = files.flatMap(file => [file.filename, file.previous_filename].filter(Boolean));
+            // The pull request files API returns at most 3,000 files.
+            const all = context.eventName === 'workflow_dispatch' || files.length >= 3000 ||
+              paths.includes('.github/workflows/dependency-checks.yml');
+            core.setOutput('docs', all || paths.some(path => path.startsWith('docs-source/site/')));
+            core.setOutput('advisor', all || paths.some(path => path.startsWith('data-refactoring-advisor/')));
+
+  docs:
+    name: Docs site
+    needs: changes
+    if: needs.changes.outputs.docs == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: docs-source/site
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22.x
+          cache: npm
+          cache-dependency-path: docs-source/site/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --include=optional
+
+      - name: Typecheck site
+        run: npm run typecheck
+
+      - name: Build site
+        run: npm run build
+
+  advisor:
+    name: Data refactoring advisor
+    needs: changes
+    if: needs.changes.outputs.advisor == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: data-refactoring-advisor/schema-graphrag-demo
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: data-refactoring-advisor/schema-graphrag-demo/requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Check dependency compatibility
+        run: python -m pip check
+
+      - name: Compile Python source
+        run: python -m compileall -q src app
+
+      - name: Run unit tests
+        run: python -m pytest tests/unit -v

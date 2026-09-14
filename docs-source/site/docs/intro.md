@@ -50,3 +50,7 @@ Ready to try Oracle Backend for Microservices and AI? Choose your path:
 
 - **[Setup →](./setup/index.md)** — Install the platform on your Kubernetes cluster
 - **[Deploy an Application →](./deploy/overview.md)** — Deploy your microservices to an existing OBaaS installation
+
+## Documentation Accessibility
+
+For information about Oracle's commitment to accessibility, visit the [Oracle Accessibility Program website](https://www.oracle.com/corporate/accessibility/).
