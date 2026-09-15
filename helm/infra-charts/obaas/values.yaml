@@ -623,6 +623,15 @@ database:
     repository: "container-registry.oracle.com/database/free"
     tag: "23.26.3.0"
 
+  # For SIDB-FREE/ADB-FREE: persistent storage for database files.
+  # Enabled by default; disable only when ephemeral database data is acceptable.
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 50Gi
+    accessModes:
+      - ReadWriteOnce
+
   # For ADB-S: OCI Autonomous Database OCID (exclude for SIDB-FREE/ADB-FREE/OTHER)
   oci:
     ocid: ""
