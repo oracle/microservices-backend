@@ -303,15 +303,15 @@ gateway-helm:
     imagePullSecrets: *imagePullSecrets
     images:
       envoyGateway:
-        image: "myregistry.example.com/envoyproxy/gateway:v1.8.2"
+        image: "myregistry.example.com/envoyproxy/gateway:v1.9.1"
         pullPolicy: Always
         pullSecrets: *imagePullSecrets
       envoyProxy:
-        image: "myregistry.example.com/envoyproxy/envoy:distroless-v1.38.3"
+        image: "myregistry.example.com/envoyproxy/envoy:distroless-v1.39.1"
         pullPolicy: IfNotPresent
         pullSecrets: *imagePullSecrets
       ratelimit:
-        image: "myregistry.example.com/envoyproxy/ratelimit:17b1956c"
+        image: "myregistry.example.com/envoyproxy/ratelimit:8fe6ea42"
         pullPolicy: IfNotPresent
         pullSecrets: *imagePullSecrets
 

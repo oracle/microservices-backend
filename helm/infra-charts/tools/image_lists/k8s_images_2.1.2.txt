@@ -21,9 +21,9 @@ docker.io/bitnamilegacy/etcd:3.6.1
 docker.io/busybox:1.37
 docker.io/clickhouse/clickhouse-server:25.12.5
 docker.io/curlimages/curl:8.22.0
-docker.io/envoyproxy/envoy:distroless-v1.38.3
-docker.io/envoyproxy/gateway:v1.8.2
-docker.io/envoyproxy/ratelimit:master
+docker.io/envoyproxy/envoy:distroless-v1.39.1
+docker.io/envoyproxy/gateway:v1.9.1
+docker.io/envoyproxy/ratelimit:8fe6ea42
 docker.io/otel/opentelemetry-collector-contrib:0.139.0
 docker.io/signoz/signoz-otel-collector:v0.144.9
 docker.io/signoz/signoz:v0.141.1
