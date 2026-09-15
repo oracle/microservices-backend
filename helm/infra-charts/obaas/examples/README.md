@@ -96,23 +96,6 @@ Example configuration for using Oracle Database Free as a container in the clust
 helm upgrade --install obaas . -f examples/values-sidb-free.yaml -n obaas --create-namespace
 ```
 
-SIDB-FREE and ADB-FREE persistent storage is enabled by default. The database
-PVC uses the cluster default StorageClass unless you select a storage class
-appropriate for a single-writer database volume:
-
-```yaml
-database:
-  persistence:
-    enabled: true
-    storageClass: "fast-ssd"
-    size: 250Gi
-```
-
-Set `database.persistence.enabled: false` only when ephemeral database data is
-acceptable. OBaaS deletes PVCs during
-Helm uninstall by default (`global.cleanupPVCs: true`). To retain the database
-PVC when the release is removed, set `global.cleanupPVCs: false`.
-
 ### 6. SigNoz Existing Secret (`values-signoz-existing-secret.yaml`)
 
 Use a pre-existing Kubernetes secret for SigNoz admin authentication instead of auto-generating one.
@@ -133,8 +116,7 @@ helm upgrade --install obaas . -f examples/values-signoz-existing-secret.yaml -n
 
 ### 7. Kafka Enabled Configuration (`values-kafka.yaml`)
 
-Create a Strimzi-managed Kafka cluster in the OBaaS release namespace, with full Kafka
-observability in SigNoz (the "Kafka Server Monitoring Dashboard") included by default.
+Create a Strimzi-managed Kafka cluster in the OBaaS release namespace.
 
 **Use case:** Kafka integration testing, CloudBank Helidon producer/consumer workloads, Kafka observability validation
 
@@ -147,6 +129,15 @@ observability in SigNoz (the "Kafka Server Monitoring Dashboard") included by de
 ```bash
 helm upgrade --install obaas . \
   -f examples/values-kafka.yaml \
+  -n obaas \
+  --create-namespace
+```
+
+**Optional Kafka metrics in SigNoz:**
+```bash
+helm upgrade --install obaas . \
+  -f examples/values-kafka.yaml \
+  -f extensions/kafka-metrics.yaml \
   -n obaas \
   --create-namespace
 ```
@@ -206,6 +197,23 @@ kubectl create secret docker-registry myregistry-secret \
 ```bash
 helm upgrade --install obaas . -f examples/values-private-registry.yaml
 ```
+
+### 9. SigNoz 0.141.1 Two-Stage Upgrade Profiles
+
+These files are upgrade profiles and must not be used for a fresh installation:
+
+| File | Purpose |
+|---|---|
+| `values-signoz-0.141.1-stage1.yaml` | Selects Stage 1 for a Kubernetes provider with a compatible CSI snapshot class |
+| `values-signoz-0.141.1-stage1-oke.yaml` | Adds the OKE OCI Block Volume snapshot class configuration to Stage 1 |
+| `values-signoz-0.141.1-stage2.yaml` | Selects the guarded SigNoz and telemetry-migration stage |
+
+Layer the selected profile after the customer's normal values files and use the
+same Helm release name and namespace for both stages. Do not use this README as
+the upgrade procedure. Follow [Upgrade SigNoz](../../../../docs-source/site/docs/observability/upgrade/index.md)
+to select a supported path and [Upgrade with protected recovery](../../../../docs-source/site/docs/observability/upgrade/protected-recovery.md)
+for the complete two-stage procedure, prerequisites, commands, validation, and
+recovery guidance.
 
 ## Customizing Examples
 

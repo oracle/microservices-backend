@@ -1,15 +1,10 @@
-# OBaaS 2.2.0 Installation Guide For AI Agents
+# OBaaS 2.1.2 Installation Guide For AI Agents
 
-This guide tells an AI agent how to plan, prepare, install, and verify Oracle Backend for Microservices and AI, commonly called OBaaS, version 2.2.0. In the product documentation, this version is the `next` documentation stream.
+This guide tells an AI agent how to plan, prepare, install, and verify Oracle Backend for Microservices and AI, commonly called OBaaS, version 2.1.2. In the product documentation, this version is the `next` documentation stream.
 
-Do not trust a hardcoded version number, including the ones in this guide, over the repository itself. Before relying on any version-specific instruction, confirm the current in-development version with:
+## Markdown Formatting
 
-```bash
-grep '^appVersion:' helm/infra-charts/obaas/Chart.yaml
-grep '^version:' helm/infra-charts/obaas/Chart.yaml
-```
-
-2.1.1 is now a released, versioned documentation snapshot (`docs-source/site/versioned_docs/version-2.1.1/`), not the in-development target. As of this writing, the `next` docs stream (`docs-source/site/docs/upgrade/index.mdx`, `docs-source/site/docs/rel_notes/index.mdx`) still hardcodes `OBAAS_VERSION = '2.1.1'` even though the chart sources have moved to 2.2.0; the Chart.yaml files, not the docs prose, are the source of truth for the target version number.
+- Format all tables in Markdown documentation as HTML `<table>` elements. Do not use pipe-delimited Markdown table syntax.
 
 ## Source Rules
 
@@ -21,7 +16,7 @@ grep '^version:' helm/infra-charts/obaas/Chart.yaml
 - Treat the public docs entry point as the same content represented locally under `docs-source/site/docs/intro.md` and the setup pages under `docs-source/site/docs/setup/helm/`.
 - Treat Helm chart defaults and examples under `helm/infra-charts` as the source of truth for chart value names and installable optional components.
 - For the currently in-development OBaaS version, install, render, lint, and test with the local chart paths under `helm/infra-charts`, not with public Helm repository references, unless the public Helm repository has already published charts whose `APP VERSION` or `appVersion` matches the target version.
-- OBaaS 2.2.0 is currently an in-development target in this repository. Its local charts are `helm/infra-charts/obaas-prereqs` and `helm/infra-charts/obaas`; do not install `obaas/obaas-prereqs` or `obaas/obaas` from the public repository for a 2.2.0 test while the public repository still advertises an older application version.
+- OBaaS 2.1.2 is currently an in-development target in this repository. Its local charts are `helm/infra-charts/obaas-prereqs` and `helm/infra-charts/obaas`; do not install `obaas/obaas-prereqs` or `obaas/obaas` from the public repository for a 2.1.2 test while the public repository still advertises an older application version.
 
 ## Before You Start
 
@@ -57,7 +52,7 @@ kubectl get nodes
 
 ### Kubernetes Cluster
 
-OBaaS 2.2.0 requires a CNCF-compliant Kubernetes cluster. The `next` prerequisites documentation states:
+OBaaS 2.1.2 requires a CNCF-compliant Kubernetes cluster. The `next` prerequisites documentation states:
 
 - Kubernetes 1.34 or later.
 - At least 3 worker nodes.
@@ -225,13 +220,7 @@ cd helm/infra-charts/tools
 ./mirror-images.sh myregistry.example.com
 ```
 
-Confirm the exact image list filename before mirroring rather than assuming one exists for the current in-development version:
-
-```bash
-ls helm/infra-charts/tools/image_lists/
-```
-
-The image list for this version is `k8s_images_2.2.0.txt`; `k8s_images_2.0.0.txt`, `k8s_images_2.1.0.txt`, and `k8s_images_2.1.1.txt` also exist for older versions. If no image list matching the current `appVersion` is present, treat that as a gap: either use the closest prior version's list as a starting point and diff it against `helm/infra-charts/obaas/values.yaml` and `helm/infra-charts/obaas-prereqs/values.yaml` image references, or flag the missing list to the operator before proceeding with an air-gapped install.
+The image list for this version is available under `helm/infra-charts/tools/image_lists/k8s_images_2.1.2.txt`.
 
 ## Planning The Installation
 
@@ -276,23 +265,12 @@ Use these scenario labels when asking clarifying questions:
 - AKS-specific install: `obaas-prereqs/examples/values-aks.yaml` and `obaas/examples/values-aks.yaml` together.
 - AI Optimizer install: `values-ai-optimizer.yaml`.
 - Custom APISIX plugins: `values-custom-apisix-plugins.yaml`.
-- Coherence: `values-coherence.yaml`.
-- Kafka: `values-kafka.yaml`.
-- Rancher JWT-based access: `values-rancher-jwt.yaml`.
-- ARM64/OCI test environments: `values-arm64-oci-test.yaml`.
 
 The examples are stored locally under:
 
 ```text
 helm/infra-charts/obaas-prereqs/examples/
 helm/infra-charts/obaas/examples/
-```
-
-`helm/infra-charts/obaas/examples/README.md` documents these scenarios in more detail than this guide, including current persistence guidance; check it for the freshest per-scenario notes, and re-list the directory contents rather than assuming this file's list is exhaustive:
-
-```bash
-ls helm/infra-charts/obaas/examples/
-ls helm/infra-charts/obaas-prereqs/examples/
 ```
 
 If the target version has been published and installing from the public Helm repository is appropriate, copy or reference prepared local values files. The `examples/...` paths only work from a checkout or environment where those files exist.
@@ -348,7 +326,7 @@ OBaaS uses two Helm charts.
 
 ### Choose And Layer Values Files
 
-Start from the closest example and add only the overrides needed for the environment. For an in-development version such as the current 2.2.0 work, use the local chart path:
+Start from the closest example and add only the overrides needed for the environment. For an in-development version such as the current 2.1.2 work, use the local chart path:
 
 ```bash
 helm upgrade --install <app-release> helm/infra-charts/obaas \
@@ -382,8 +360,7 @@ database:
 Notes:
 
 - Best for development, testing, and standalone evaluation.
-- Database data is persisted by default via a PersistentVolumeClaim (`database.persistence.enabled: true`, default `size: 250Gi`, `storageClass` empty to use the cluster default). Confirm a suitable RWX/RWO-capable storage class exists and has enough capacity before installing; set `database.persistence.storageClass` explicitly when the cluster default is unsuitable.
-- By default `global.cleanupPVCs: true` deletes this PVC — and its database data — on `helm uninstall`. Set `global.cleanupPVCs: false` if the operator wants database data to survive an uninstall.
+- Requires sufficient ephemeral node storage.
 - Privileged and application credentials can be auto-generated when not supplied.
 - The database container image defaults to Oracle Database Free.
 
@@ -397,7 +374,7 @@ database:
 Notes:
 
 - Best for development and testing when the operator wants the in-cluster Autonomous Database Free path rather than `SIDB-FREE`.
-- Like `SIDB-FREE`, it runs database infrastructure inside the Kubernetes cluster. Data is persisted by default through the same `database.persistence` PVC settings described for `SIDB-FREE` above (default `size: 250Gi`), and `global.cleanupPVCs: true` likewise deletes it on uninstall unless overridden.
+- Like `SIDB-FREE`, it runs database infrastructure inside the Kubernetes cluster and needs adequate node storage and capacity.
 - Privileged and application credentials can be auto-generated when not supplied.
 - The database container image is controlled by `database.image.repository` and `database.image.tag`, the same value path used by `SIDB-FREE`.
 - Private registry installs must override `database.image.repository` and `database.image.tag` when the database image is mirrored; see the private registry values section.
@@ -486,7 +463,7 @@ Before installing with `database.type: OTHER`, verify the privileged user has th
 
 ### Cluster Access Values
 
-OBaaS 2.2.0 supports both Gateway API through Envoy Gateway and Ingress API through ingress-nginx. Envoy Gateway is enabled by default. ingress-nginx is deprecated and disabled by default; enable it only when an environment still requires the legacy Ingress API path.
+OBaaS 2.1.2 supports both Gateway API through Envoy Gateway and Ingress API through ingress-nginx. Envoy Gateway is enabled by default. ingress-nginx is deprecated and disabled by default; enable it only when an environment still requires the legacy Ingress API path.
 
 Enable Envoy Gateway:
 
@@ -543,8 +520,6 @@ otmm:
     enabled: false
 ```
 
-The AI Optimizer subchart dependency is currently pinned to `ai-optimizer` chart `version: "2.4.1"` in `helm/infra-charts/obaas/Chart.yaml`; verify this before assuming any other version's values schema applies.
-
 AI Optimizer requires additional planning. The example expects:
 
 - `database.type: ADB-S`
@@ -584,18 +559,6 @@ Expected: the operator is configured for all namespaces, or it explicitly includ
 ### SigNoz Values
 
 SigNoz is enabled by default in the OBaaS values.
-
-**Upgrading an existing release with SigNoz enabled is destructive by default and requires explicit confirmation.** There is no non-destructive in-place upgrade path for SigNoz: `helm upgrade` against a release that already has SigNoz installed fails a `fail` guard in the chart templates unless both of the following are set:
-
-```yaml
-signozUpgrade:
-  mode: "destructive-replace"
-  confirmDataLoss: true
-```
-
-Setting these permanently deletes all existing SigNoZ telemetry, dashboards, users, alerts, ClickHouse data, and ZooKeeper data before reinstalling SigNoz fresh. Never set `confirmDataLoss: true` on behalf of an operator without their explicit, informed confirmation that data loss is acceptable — surface this requirement and stop for confirmation rather than assuming it during any `helm upgrade` that touches a namespace with an existing SigNoz install.
-
-ClickHouse diagnostic logging (`zookeeperLog`, `processorsProfileLog`) defaults to a 1-day TTL (`signoz.clickhouse.clickhouseOperator.zookeeperLog.ttl: 1`, `.processorsProfileLog.ttl: 1` in `helm/infra-charts/obaas/values.yaml`) to avoid high-volume disk usage. Existing installs need a Helm upgrade to pick up this default; increase the TTL values only when longer diagnostic retention is needed for an active investigation.
 
 To use an existing admin credential secret:
 
@@ -749,14 +712,14 @@ helm/infra-charts/obaas-prereqs
 helm/infra-charts/obaas
 ```
 
-For the current 2.2.0 development stream, the local charts have `appVersion: 2.2.0` and chart `version: 0.2.0`. Always re-verify these with the `grep` commands above rather than trusting this document, since the chart version bumps ahead of documentation updates. If the public Helm repository does not report `APP VERSION: 2.2.0`, do not install or test with `obaas/obaas-prereqs` or `obaas/obaas`; use the local chart paths above.
+For the current 2.1.2 development stream, the local charts have `appVersion: 2.1.2` and chart `version: 0.1.2`. If the public Helm repository does not report `APP VERSION: 2.1.2`, do not install or test with `obaas/obaas-prereqs` or `obaas/obaas`; use the local chart paths above.
 
 Once the public repository publishes charts whose `APP VERSION` matches the target version, public chart references may be used. Use the chart version that corresponds to the target OBaaS application version.
 
 For local chart installs, pin the repository checkout or commit and verify the `version` and `appVersion` fields in each local `Chart.yaml`. For public repository installs, where strict pinning is required after the target version has been published, add:
 
 ```bash
---version 0.2.0
+--version 0.1.2
 ```
 
 to the public chart install commands.
@@ -1295,6 +1258,5 @@ Consider installation successful when:
 - Duplicate CRD or operator conflicts: confirm `obaas-prereqs` was installed only once per cluster.
 - Missing ingress or gateway address: verify the cluster network provider supports the selected access API and that load balancers can be provisioned.
 - SigNoz setup failures: inspect Signoz, ClickHouse, and `signoz-setup` job logs; verify storage and credentials.
-- `helm upgrade` failing with a `signozUpgrade.confirmDataLoss` message: this is the expected guard on an existing SigNoz install, not a bug. Do not set `confirmDataLoss: true` to unblock the upgrade without the operator's explicit confirmation that existing SigNoz telemetry, dashboards, alerts, and ClickHouse/ZooKeeper data may be permanently deleted.
 - APISIX failures: inspect APISIX, etcd, and custom plugin configuration; verify plugin file mount paths.
 - Multi-tenant ingress conflicts: verify each tenant's ingress class, controller value, and election ID are unique.

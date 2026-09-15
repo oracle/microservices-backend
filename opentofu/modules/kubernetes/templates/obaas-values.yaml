@@ -1,0 +1,280 @@
+# Copyright (c) 2024, 2026, Oracle and/or its affiliates.
+# All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+# spell-checker: disable
+
+#-- Included in OKE as add-on
+ingress-nginx:
+  enabled: false
+
+#-- Deploy Envoy Gateway
+gateway-helm:
+  enabled: false
+
+# Deploy Kafka cluster
+kafka:
+  enabled: ${deploy_kafka}
+
+#-- Customizations
+signoz:
+  auth:
+    existingSecret: "${label}-signoz"
+  signoz:
+    env:
+      SIGNOZ_USER_ROOT_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: "${label}-signoz"
+            key: password
+      SIGNOZ_API_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: "${label}-signoz"
+            key: password
+      SIGNOZ_TOKENIZER_JWT_SECRET:
+        valueFrom:
+          secretKeyRef:
+            name: "${label}-signoz"
+            key: password
+%{ if byo_ocir_url != "" ~}
+  global:
+    imageRegistry: ${byo_ocir_url}
+  utilities:
+    curlJq:
+      image:
+        registry: ${byo_ocir_url}
+    busybox:
+      image:
+        registry: ${byo_ocir_url}
+    kubectl:
+      image:
+        registry: ${byo_ocir_url}
+  signoz:
+    image:
+      registry: ${byo_ocir_url}
+    initContainers:
+      init:
+        image:
+          registry: ${byo_ocir_url}
+  schemaMigrator:
+    image:
+      registry: ${byo_ocir_url}
+    initContainers:
+      init:
+        image:
+          registry: ${byo_ocir_url}
+      chReady:
+        image:
+          registry: ${byo_ocir_url}
+      wait:
+        image:
+          registry: ${byo_ocir_url}
+  otelCollector:
+    image:
+      registry: ${byo_ocir_url}
+  clickhouse:
+    image:
+      registry: ${byo_ocir_url}
+    zookeeper:
+      image:
+        registry: ${byo_ocir_url}
+    initContainers:
+      udf:
+        image:
+          registry: ${byo_ocir_url}
+    clickhouseOperator:
+      image:
+        registry: ${byo_ocir_url}
+      metricsExporter:
+        image:
+          registry: ${byo_ocir_url}
+%{ endif ~}
+
+%{ if byo_ocir_url != "" ~}
+eureka:
+  image:
+    repository: ${byo_ocir_url}/eureka
+
+admin-server:
+  image:
+    repository: ${byo_ocir_url}/admin-server
+
+conductor-server:
+  image:
+    repository: ${byo_ocir_url}/conductor-server
+
+otmm:
+  image:
+    repository: ${byo_ocir_url}/database/otmm
+
+otmm:
+  coordinator:
+    image:
+      repository: ${byo_ocir_url}/database/microtx-coordinator
+  workflowServer:
+    image:
+      repository: ${byo_ocir_url}/database/microtx-workflow
+  console:
+    image:
+      repository: ${byo_ocir_url}/database/microtx-console
+
+oracle-database-exporter:
+  image:
+    repository: ${byo_ocir_url}/database/observability-exporter
+  busybox:
+    repository: ${byo_ocir_url}/busybox
+
+coherence-operator:
+  image:
+    registry: ${byo_ocir_url}/middleware
+  defaultCoherenceImage:
+    registry: ${byo_ocir_url}/middleware
+%{ endif ~}
+
+# -- APISIX
+apisix:
+%{ if byo_ocir_url != "" ~}
+  global:
+    security:
+      allowInsecureImages: true
+  image:
+    repository: ${byo_ocir_url}/apache/apisix
+  initContainer:
+    image: ${byo_ocir_url}/busybox
+  etcd:
+    image:
+      registry: ${byo_ocir_url}
+  ingress-controller:
+    enabled: false
+    image:
+      repository: ${byo_ocir_url}/apache/apisix-ingress-controller
+%{ endif ~}
+  service:
+    type: NodePort
+    externalTrafficPolicy: Cluster
+    http:
+      enabled: true
+      servicePort: 80
+      containerPort: 9080
+      additionalContainerPorts: []
+  ingress:
+    enabled: true
+    className: native-ic
+    annotations:
+      oci-native-ingress.oraclecloud.com/http-listener-port: "80"
+      oci-native-ingress.oraclecloud.com/healthcheck-protocol: TCP
+    hosts:
+      - host: ""
+        paths:
+          - "/"
+
+# -- Oracle Database Configuration
+database:
+%{ if db_type == "OTHER" ~}
+  type: "OTHER"
+  other:
+    dsn: "${db_dsn}"
+%{ else ~}
+  type: "ADB-S"
+  oci:
+    ocid: "${db_ocid}"
+%{ endif ~}
+  authN:
+    secretName: "${db_name}-obaas-db-authn"
+  privAuthN:
+    secretName: "${db_name}-db-priv-authn"
+  oci_config:
+    oke: true
+    region: "${oci_region}"
+%{ if byo_ocir_url != "" ~}
+  sqlcl:
+    image:
+      repository: ${byo_ocir_url}/database/sqlcl
+%{ endif ~}
+
+%{ if deploy_optimizer ~}
+ai-optimizer:
+  enabled: true
+  global:
+    api:
+      secretName: "${label}-optimizer-api-key"
+
+  # -- API Server configuration
+  server:
+    image:
+      repository: ${repository_base}/ai-optimizer-server
+      tag: "latest"
+      pullPolicy: Always
+
+    ingress:
+      enabled: true
+      className: native-ic
+      annotations:
+        oci-native-ingress.oraclecloud.com/http-listener-port: "80"
+        oci-native-ingress.oraclecloud.com/healthcheck-protocol: HTTP
+        oci-native-ingress.oraclecloud.com/healthcheck-path: "/ai-optimizer/v1/readiness"
+
+    service:
+      type: "NodePort"
+
+    # -- Enable Workload Identity
+    oci_config:
+      oke: true
+      region: "${oci_region}"
+
+    # -- Oracle Database Configuration
+    database:
+%{ if db_type == "OTHER" ~}
+      type: "OTHER"
+      other:
+        dsn: "${db_dsn}"
+%{ else ~}
+      type: "ADB-S"
+      oci:
+        ocid: "${db_ocid}"
+      # Use existing obaas ADB secrets (created by parent chart)
+      adb:
+        useExisting: true
+%{ endif ~}
+      authN:
+        secretName: "${db_name}-optimizer-db-authn"
+      privAuthN:
+        secretName: "${db_name}-db-priv-authn"
+
+  client:
+    enable: true
+    image:
+      repository: ${repository_base}/ai-optimizer-client
+      tag: "latest"
+      pullPolicy: Always
+
+    ingress:
+      enabled: true
+      className: native-ic
+      annotations:
+        oci-native-ingress.oraclecloud.com/http-listener-port: "80"
+        oci-native-ingress.oraclecloud.com/healthcheck-protocol: HTTP
+        oci-native-ingress.oraclecloud.com/healthcheck-path: "/ai-optimizer/ping"
+
+    service:
+      type: "NodePort"
+
+    features:
+      disableTestbed: "false"
+      disableApi: "false"
+      disableTools: "false"
+      disableDbCfg: "false"
+      disableModelCfg: "false"
+      disableOciCfg: "false"
+      disableSettings: "false"
+
+  ollama:
+    enabled: ${node_pool_gpu_deploy}
+    models:
+      enabled: true
+      modelPullList:
+        - llama3.1
+        - mxbai-embed-large
+    resources:
+      limits:
+        nvidia.com/gpu: 1
+%{ endif ~}
