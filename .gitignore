@@ -2,6 +2,7 @@
 grabdish/inventory-micronaut/build/
 
 # Local agent instruction files used by Agents
+**/AGENTS.md
 **/CLAUDE.md
 **/GEMINI.md
 

@@ -18,6 +18,15 @@ database:
   #   repository: "container-registry.oracle.com/database/free"
   #   tag: "23.26.3.0"
 
+  # Persistent database storage is enabled by default. Disable it only when
+  # ephemeral database data is acceptable.
+  # persistence:
+  #   enabled: true
+  #   storageClass: "fast-ssd"
+  #   size: 250Gi
+  #   accessModes:
+  #     - ReadWriteOnce
+
   # Privileged user credentials (SYSTEM) - auto-generated if not provided
   # privAuthN:
 

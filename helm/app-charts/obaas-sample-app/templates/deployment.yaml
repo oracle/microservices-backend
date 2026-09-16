@@ -67,6 +67,14 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: {{ include "obaas-app.fullname" . | quote }}
             {{- end }}
+            - name: OTEL_TRACES_EXPORTER
+              value: "otlp"
+            - name: OTEL_METRICS_EXPORTER
+              value: "otlp"
+            - name: OTEL_LOGS_EXPORTER
+              value: "otlp"
+            - name: OTEL_INSTRUMENTATION_MICROMETER_ENABLED
+              value: {{ .Values.otel.micrometer.enabled | quote }}
           {{- end }}
 
           {{- /* ==================== Database Configuration ==================== */}}

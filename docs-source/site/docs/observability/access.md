@@ -18,19 +18,19 @@ If you deployed with Helm, it's the namespace you specified during installation 
 
 ### Retrieve SigNoz Credentials
 
-SigNoz admin credentials are stored in a Kubernetes secret named `<namespace>-signoz` in your OBaaS namespace.
+SigNoz admin credentials are stored in a Kubernetes secret named `signoz-authn` in your OBaaS namespace.
 
 **Get the admin email/username:**
 
 ```bash
-kubectl -n <namespace> get secret <namespace>-signoz \
+kubectl -n <namespace> get secret signoz-authn \
   -o jsonpath='{.data.email}' | base64 -d && echo
 ```
 
 **Get the admin password:**
 
 ```bash
-kubectl -n <namespace> get secret <namespace>-signoz \
+kubectl -n <namespace> get secret signoz-authn \
   -o jsonpath='{.data.password}' | base64 -d && echo
 ```
 

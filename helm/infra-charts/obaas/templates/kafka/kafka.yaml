@@ -40,6 +40,16 @@ spec:
       transaction.state.log.min.isr: 2
       default.replication.factor: 3
       min.insync.replicas: 2
+{{- if .Values.kafka.metricsEnabled }}
+    metricsConfig:
+      type: strimziMetricsReporter
+    template:
+      pod:
+        metadata:
+          annotations:
+            signoz.io/scrape: "true"
+            signoz.io/port: "9404"
+{{- end }}
   entityOperator:
     topicOperator: {}
     userOperator: {}

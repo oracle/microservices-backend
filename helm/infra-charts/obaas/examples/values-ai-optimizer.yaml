@@ -9,6 +9,8 @@
 #      - `ai-optimizer-api`   : contains the API key used by the ai-optimizer server and client
 #        (key: apiKey)
 #      - `db-priv-authn`      : contains privileged database credentials for user provisioning
+#      - `<ai-optimizer-cookie>`: contains a 32+ character Streamlit cookie-signing secret
+#        (key: cookieSecret)
 #      - `ai-optimizer-openai`: contains an OpenAI API key for third-party model access (key: apiKey) [optional]
 #   3. Ensure an Oracle Autonomous Database (ADB-S) is available and accessible from the cluster.
 #
@@ -57,7 +59,10 @@ ai-optimizer:
       type: "ADB-S"
       adb:
         useExisting: true
-      privAuthN:
+        existingWalletSource: obaas
+        # TNS alias from the ADB wallet (for example, mydb_tp).
+        serviceName: "<adb-tns-alias>"
+      privAuthn:
         secretName: "db-priv-authn"
 
     # Enable OpenAI integration via an existing secret (optional)
@@ -68,6 +73,8 @@ ai-optimizer:
 
   client:
     replicaCount: 1
+    # Existing Secret containing a 32+ character cookie-signing value under key `cookieSecret`.
+    cookieSecretName: "<ai-optimizer-cookie>"
 
   # Optionally deploy Ollama for on-cluster inference with preloaded models (GPU highly recommended)
   # ollama:

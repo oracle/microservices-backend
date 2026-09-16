@@ -49,6 +49,10 @@ spec:
                   name: {{ include "obaas.databasePrivSecret" . }}
                   key: {{ if .Values.database.privAuthN }}{{ default "password" .Values.database.privAuthN.passwordKey }}{{ else }}password{{ end }}
           volumeMounts:
+            {{- if .Values.database.persistence.enabled }}
+            - name: db-data
+              mountPath: "/opt/oracle/oradata"
+            {{- end }}
             - name: db-init-scripts
               mountPath: "/opt/oracle/scripts/startup"
           {{- else }}
@@ -66,12 +70,24 @@ spec:
                 secretKeyRef:
                   name: {{ include "obaas.databasePrivSecret" . }}
                   key: {{ if .Values.database.privAuthN }}{{ default "password" .Values.database.privAuthN.passwordKey }}{{ else }}password{{ end }}
+          {{- if .Values.database.persistence.enabled }}
+          volumeMounts:
+            - name: db-data
+              mountPath: "/u01/data"
           {{- end }}
-      {{- if eq (include "obaas.database.isSIDB" .) "true" }}
+          {{- end }}
+      {{- if or .Values.database.persistence.enabled (eq (include "obaas.database.isSIDB" .) "true") }}
       volumes:
+        {{- if .Values.database.persistence.enabled }}
+        - name: db-data
+          persistentVolumeClaim:
+            claimName: {{ include "obaas.database.dataPvcName" . }}
+        {{- end }}
+        {{- if eq (include "obaas.database.isSIDB" .) "true" }}
         - name: db-init-scripts
           configMap:
             name: {{ include "obaas.fullname" . }}-db-init
+        {{- end }}
       {{- end }}
 {{- end }}
 {{- end }}

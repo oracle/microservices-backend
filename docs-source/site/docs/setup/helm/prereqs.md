@@ -35,7 +35,7 @@ A CNCF-compliant Kubernetes cluster with the following specifications:
 You may need extra capacity:
 
 - If you are installing the OTMM workflow-server, allocate at least an additional 2 CPUs and 4Gi RAM per cluster.
-- If you are using the Single Instance Database (SIDB) option, which runs the Oracle AI Database in a container in the cluster, you may need more ephemeral storage on your nodes to allow space for the database file system.  We recommend at least 250GB of ephemeral node storage for this option.
+- If you are using the Single Instance Database (SIDB) option, which runs the Oracle AI Database in a container in the cluster, persistent storage is enabled by default. Plan a PersistentVolumeClaim of at least 250 GiB for SIDB-FREE or ADB-FREE. If you set `database.persistence.enabled` to `false`, database files use ephemeral node storage and SIDB-FREE requires at least 250GB of ephemeral node storage.
 
 **Capacity planning:**
 

@@ -464,6 +464,13 @@ Returns the short database type prefix (sidb or adb) for service naming.
 {{- end -}}
 
 {{/*
+Database Data PVC Name
+*/}}
+{{- define "obaas.database.dataPvcName" -}}
+{{- printf "%s-%s-data" (include "obaas.fullname" .) (include "obaas.database.dbName" .) -}}
+{{- end -}}
+
+{{/*
 Validate that if oci_config.configMapName is specified,
 then none of the other OCI config values (tenancy, user, fingerprint, region) should be provided.
 */}}
@@ -565,49 +572,25 @@ coordinator and workflowServer are disabled.
 {{- and .Values.otmm.console.enabled (or .Values.otmm.coordinator.enabled .Values.otmm.workflowServer.enabled) -}}
 {{- end -}}
 
-{{/*
-SigNoz two-stage upgrade helpers.
-These helpers define the workflow contract shared by the snapshot hook and the
-ClickHouse upgrade and stage-gate resources introduced in subsequent phases.
-*/}}
-{{- define "obaas.signozUpgrade.stage" -}}
-{{- .Values.signozUpgrade.stage | default "standard" -}}
-{{- end -}}
-
-{{- define "obaas.signozUpgrade.markerSecretName" -}}
-{{- $configuredName := .Values.signozUpgrade.validation.markerSecretName | default "" -}}
-{{- if $configuredName -}}
-{{- $configuredName -}}
-{{- else -}}
-{{- $targetVersion := .Values.signozUpgrade.target.chartVersion | replace "." "-" -}}
-{{- printf "%s-signoz-upgrade-%s-stage1" .Release.Name $targetVersion | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
-
-{{- define "obaas.signozUpgrade.requiresStage1Validation" -}}
-{{- and .Release.IsUpgrade (eq (include "obaas.signozUpgrade.stage" .) "stage2") -}}
-{{- end -}}
-
+{{/* Validate the only supported existing-release SigNoZ upgrade path. */}}
 {{- define "obaas.signozUpgrade.validate" -}}
-{{- $stage := include "obaas.signozUpgrade.stage" . -}}
-{{- $validStages := list "standard" "stage1" "stage2" -}}
-{{- if not (has $stage $validStages) -}}
-{{- fail (printf "signozUpgrade.stage must be one of: standard, stage1, stage2. Got: %q" $stage) -}}
+{{- if .Release.IsUpgrade -}}
+{{- if ne (.Values.signozUpgrade.mode | default "") "destructive-replace" -}}
+{{- fail `Destructive upgrade warning
+============
+SigNoZ upgrades are disabled by default in this optional patch release.
+
+To permanently delete and replace existing SigNoZ telemetry and configuration,
+set signozUpgrade.mode=destructive-replace and signozUpgrade.confirmDataLoss=true.
+
+This permanently deletes existing SigNoZ telemetry, dashboards, users, alerts,
+ClickHouse data, and ZooKeeper data.
+
+For the required procedure and data-loss details, see:
+https://oracle.github.io/microservices-backend/obaas/observability/upgrade/` -}}
 {{- end -}}
-{{- if and (ne $stage "standard") (not .Values.signoz.enabled) -}}
-{{- fail (printf "signozUpgrade.stage=%s requires signoz.enabled=true" $stage) -}}
-{{- end -}}
-{{- $namePattern := "^[a-z0-9]([-a-z0-9.]*[a-z0-9])?$" -}}
-{{- $snapshotClassName := .Values.signozUpgrade.backup.volumeSnapshotClassName | default "" -}}
-{{- if and $snapshotClassName (or (gt (len $snapshotClassName) 253) (not (regexMatch $namePattern $snapshotClassName))) -}}
-{{- fail "signozUpgrade.backup.volumeSnapshotClassName must be a valid Kubernetes DNS subdomain" -}}
-{{- end -}}
-{{- range $storageClass, $snapshotClass := .Values.signozUpgrade.backup.volumeSnapshotClassByStorageClass -}}
-{{- if or (gt (len $storageClass) 253) (not (regexMatch $namePattern $storageClass)) -}}
-{{- fail (printf "signozUpgrade backup StorageClass mapping key %q must be a valid Kubernetes DNS subdomain" $storageClass) -}}
-{{- end -}}
-{{- if or (gt (len $snapshotClass) 253) (not (regexMatch $namePattern $snapshotClass)) -}}
-{{- fail (printf "signozUpgrade snapshot class %q for StorageClass %q must be a valid Kubernetes DNS subdomain" $snapshotClass $storageClass) -}}
+{{- if not .Values.signozUpgrade.confirmDataLoss -}}
+{{- fail "signozUpgrade.confirmDataLoss=true is required for destructive SigNoZ replacement." -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}

@@ -2,7 +2,10 @@
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
 # Example: Kafka Enabled Configuration
 # This configuration enables the Strimzi-managed Kafka cluster created by the
-# obaas chart. All components deploy to the Helm release namespace.
+# obaas chart, plus full Kafka observability in SigNoz (broker/topic/consumer
+# facts via the OTel kafkametrics receiver, and broker JMX throughput/latency/
+# health metrics via Strimzi's strimziMetricsReporter). All components deploy
+# to the Helm release namespace.
 #
 # Prerequisites:
 #   Install obaas-prereqs chart once per cluster before installing this chart.
@@ -14,9 +17,6 @@
 #     -f examples/values-kafka.yaml \
 #     -n obaas \
 #     --create-namespace
-#
-# To scrape Kafka broker, topic, and consumer metrics into SigNoz, also include:
-#   -f extensions/kafka-metrics.yaml
 #
 # Kafka bootstrap services:
 #   Release "obaas" creates obaas-kafka-cluster-kafka-bootstrap:9092.
@@ -63,10 +63,6 @@ otmm:
 oracle-database-exporter:
   enabled: true
 
-# Observability
-signoz:
-  enabled: true
-
 # AI Optimizer (disabled by default)
 ai-optimizer:
   enabled: false
@@ -80,3 +76,48 @@ kafka:
   enabled: true
   version: 4.2.0
   metadataVersion: 4.2-IV1
+  # Enables Strimzi's strimziMetricsReporter, exposing broker JMX metrics
+  # (throughput, request latency, cluster health) that SigNoz scrapes
+  # automatically via the signoz.io/scrape pod annotation.
+  metricsEnabled: true
+
+# Observability
+# Scrape Kafka broker/topic/partition/consumer-group facts (broker count,
+# topic count, consumer lag, replicas, offsets) into SigNoz via the OTel
+# collector's kafkametrics receiver, for the "Kafka Server Monitoring
+# Dashboard".
+signoz:
+  enabled: true
+  otelCollector:
+    config:
+      receivers:
+        kafkametrics:
+          brokers:
+            - "kafka-bootstrap:9092"
+          protocol_version: "2.0.0"
+          scrapers:
+            - brokers
+            - topics
+            - consumers
+          # kafka.brokers and the kafka.consumer_group.* metrics are enabled by default,
+          # but the topic/partition metrics used by the "Kafka Server Monitoring Dashboard"
+          # are opt-in in this receiver and must be enabled explicitly.
+          metrics:
+            kafka.topic.partitions:
+              enabled: true
+            kafka.partition.current_offset:
+              enabled: true
+            kafka.partition.oldest_offset:
+              enabled: true
+            kafka.partition.replicas:
+              enabled: true
+            kafka.partition.replicas_in_sync:
+              enabled: true
+
+      service:
+        pipelines:
+          metrics:
+            receivers:
+              - otlp
+              - prometheus
+              - kafkametrics

@@ -4,52 +4,6 @@ Utility scripts for managing OBaaS Helm chart dependencies and container images 
 
 ## Scripts
 
-### prepare-oke-volume-snapshots.sh
-
-Prepares an existing OKE-hosted OBaaS release for the SigNoZ two-stage upgrade.
-It installs pinned Kubernetes snapshot CRDs, creates an explicit retained/full
-OCI Block Volume `VolumeSnapshotClass`, and validates the live SigNoZ storage.
-
-```bash
-./prepare-oke-volume-snapshots.sh --namespace obaas --release obaas
-./prepare-oke-volume-snapshots.sh --namespace obaas --release obaas --check-only
-```
-
-This is an OKE-specific cluster preparation tool. Other Kubernetes providers
-must install their supported snapshot controller, CSI snapshot implementation,
-and snapshot class.
-
----
-
-### validate-signoz-snapshot-restore.sh
-
-Performs an OKE restore smoke test after Stage 1. It restores the newest retained
-ClickHouse snapshot into a new PVC, mounts it read-only, and verifies that the
-volume contains ClickHouse data.
-
-```bash
-./validate-signoz-snapshot-restore.sh
-```
-
-The restored PVC is intentionally retained for inspection. The script prints
-the commands that remove the temporary pod and PVC.
-
----
-
-### diagnose-signoz-upgrade.sh
-
-Collects read-only diagnostics for either stage of the SigNoZ upgrade:
-
-```bash
-./diagnose-signoz-upgrade.sh obaas obaas
-```
-
-The output covers Helm revisions, live images, PVC/PV/OCI volume mappings,
-snapshot classes and backup handles, the Stage 1 completion marker, hook logs,
-and namespace events.
-
----
-
 ### download-dependencies.sh
 
 Downloads all Helm chart dependencies for both `obaas` and `obaas-prereqs` charts.

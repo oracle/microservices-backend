@@ -90,14 +90,17 @@ def test_oci_existing_config_cannot_mix_inline_values():
     assert "cannot also provide tenancy" in result.stderr
 
 
-def test_signoz_stage1_upgrade_hooks_render_only_for_upgrade():
-    install = _render("signozUpgrade.stage=stage1", "signoz.enabled=true")
-    upgrade = _render("signozUpgrade.stage=stage1", "signoz.enabled=true", upgrade=True)
-
-    assert install.returncode == 0, install.stderr[:500]
-    assert upgrade.returncode == 0, upgrade.stderr[:500]
-    assert "helm.sh/hook: post-upgrade" not in install.stdout
-    assert "helm.sh/hook: post-upgrade" in upgrade.stdout
+# TODO: stale test for the removed two-stage SigNoz upgrade workflow (superseded
+# by the destructive-replace design in aa5ddd7f). Commented out rather than deleted
+# pending decision on related cleanup.
+# def test_signoz_stage1_upgrade_hooks_render_only_for_upgrade():
+#     install = _render("signozUpgrade.stage=stage1", "signoz.enabled=true")
+#     upgrade = _render("signozUpgrade.stage=stage1", "signoz.enabled=true", upgrade=True)
+#
+#     assert install.returncode == 0, install.stderr[:500]
+#     assert upgrade.returncode == 0, upgrade.stderr[:500]
+#     assert "helm.sh/hook: post-upgrade" not in install.stdout
+#     assert "helm.sh/hook: post-upgrade" in upgrade.stdout
 
 
 def test_operator_dependency_archive_is_locked_to_0_2_0():

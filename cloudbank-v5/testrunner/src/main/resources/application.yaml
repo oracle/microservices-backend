@@ -1,4 +1,4 @@
-# Copyright (c) 2023, 2025, Oracle and/or its affiliates.
+# Copyright (c) 2023, 2026, Oracle and/or its affiliates.
 # Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/
 
 spring:
@@ -12,9 +12,10 @@ spring:
     oracleucp:
       connection-factory-class-name: oracle.jdbc.pool.OracleDataSource
       connection-pool-name: TestrunnerConnectionPool
-      initial-pool-size: 2
-      min-pool-size: 1
+      initial-pool-size: 4
+      min-pool-size: 4
       max-pool-size: 8
+      connection-wait-timeout: 15
   cloud:
     config:
       import-check:

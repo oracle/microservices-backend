@@ -1,3 +1,6 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/
+
 server:
   port: 8080
 
@@ -25,9 +28,10 @@ spring:
     oracleucp:
       connection-factory-class-name: oracle.jdbc.pool.OracleDataSource
       connection-pool-name: AznServerConnectionPool
-      initial-pool-size: 2
-      min-pool-size: 1
+      initial-pool-size: 4
+      min-pool-size: 4
       max-pool-size: 8
+      connection-wait-timeout: 15
 
   jpa:
     # Keep database access inside service/controller methods, not view rendering.
@@ -73,6 +77,9 @@ management:
       exposure:
         # Keep actuator surface small; SecurityConfig protects non-health/info endpoints.
         include: health,info
+  metrics:
+    tags:
+      application: ${spring.application.name}
   health:
     probes:
       enabled: true

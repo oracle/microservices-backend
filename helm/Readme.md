@@ -1,109 +1,78 @@
-# OBaaS Helm Charts - version 2.0.0 
+# OBaaS Helm Charts
 
 This directory contains the Helm charts for Oracle Backend for Microservices and AI (OBaaS).
 
-## Directory Structure
+The current development charts deploy OBaaS application version **2.2.0**:
 
-The `infra-charts` directory contains charts for installing OBaaS itself into a Kubernetes
-cluster.  The `app-charts` directory contains charts that can be used to deploy your own
-microservices applications into an existing OBaaS environment.
+- `infra-charts/obaas-prereqs` — cluster-singleton prerequisites; install once per cluster.
+- `infra-charts/obaas` — namespace-scoped OBaaS platform; install once per tenant or application namespace.
+- `app-charts/obaas-sample-app` — sample application deployment chart.
+- `infra-charts/tools` — utilities, including OCI configuration and image mirroring helpers.
 
-```
+## Chart layout
+
+```text
 helm/
-├── app-charts/           # Charts for deploying microservices applications into OBaaS
-|  └── obaas-sample-app/  # Chart to deploy a Spring Boot or Helidon microservice
-├── infra-charts/         # Charts for installing the OBaaS infrastructure itself
-   ├── obaas-prereqs/     # Cluster-singleton prerequisites (install once per cluster)
-   ├── obaas/             # OBaaS application chart (install N times in different namespaces)
-   └── tools/             # Supporting scripts and tools
+├── app-charts/
+│   └── obaas-sample-app/
+└── infra-charts/
+    ├── obaas-prereqs/
+    ├── obaas/
+    │   └── examples/
+    └── tools/
 ```
 
-## Infrastructure - Installation Order
+## Installation overview
 
-### Step 0: Configure Helm Repository
+Before installing OBaaS:
 
-Add the Helm repository to your local Helm installation using the following commands:
+1. Confirm cluster capacity, storage, database connectivity, and external-access requirements.
+2. Install and verify cert-manager.
+3. Install `obaas-prereqs` once for the cluster.
+4. Install `obaas` in each application namespace.
+
+For the current in-development version, use the local chart paths:
 
 ```bash
-helm repo add obaas https://oracle.github.io/microservices-backend/helm
-helm repo update
+helm upgrade --install obaas-prereqs helm/infra-charts/obaas-prereqs \
+  --namespace obaas-system \
+  --create-namespace \
+  --values helm/infra-charts/obaas-prereqs/examples/<values-file>.yaml
+
+helm upgrade --install obaas helm/infra-charts/obaas \
+  --namespace obaas \
+  --create-namespace \
+  --values helm/infra-charts/obaas/examples/<values-file>.yaml
 ```
 
-### Step 1: Install Prerequisites (Once Per Cluster)
+Use `values-sidb-free.yaml` for an in-cluster development database or `values-existing-adb.yaml` for an existing Autonomous Database. See [`infra-charts/obaas/examples/README.md`](infra-charts/obaas/examples/README.md) for all supported scenarios.
 
-The prerequisites chart contains cluster-scoped singleton components that should only be installed once:
+## Important behavior
 
-- **cert-manager** - Certificate management
-- **external-secrets** - External secrets management
-- **metrics-server** - Resource metrics
-- **kube-state-metrics** - Cluster state metrics
-- **strimzi-kafka-operator** - Kafka cluster management
-- **oraoperator** - Oracle Database Operator for Kubernetes
+- `obaas-prereqs` is cluster-singleton. Do not install it separately for each tenant.
+- Envoy Gateway is enabled by default.
+- ingress-nginx is deprecated and disabled by default; enable it only for legacy Ingress API environments.
+- SigNoz is enabled by default. Upgrading an existing release with SigNoz requires explicit destructive-replacement confirmation.
+- For `SIDB-FREE` and `ADB-FREE`, review PVC retention before uninstalling. `global.cleanupPVCs: true` removes database storage on uninstall.
 
-```bash
-helm upgrade --install obaas-prereqs obaas/obaas-prereqs -n obaas-system --create-namespace [--debug] [--values <path_to_custom_values>]
-```
+## Documentation and configuration
 
-### Step 2: Install OBaaS (Multiple Times)
+For complete prerequisites, database setup, cert-manager installation, OCI authentication, private-registry configuration, upgrade behavior, and verification steps, see the [Helm installation guide](https://oracle.github.io/microservices-backend/obaas/docs/setup/helm/).
 
-If you're installing OBaaS using an ADB-S and not using **workload identity**, you need to create the namespace for OBaas and the secret containing the API key. You also need to change `values.yaml` file. There is a helper script called `tools/oci_config` that generates the `kubectl` command needed to create the secret. The secret name will be `oci-config-file`.
+The chart values and examples are authoritative:
 
-Make sure you have cloned this GitHub repository and then run the following commands:
-
-```bash
-cd helm/infra-charts
-python3 tools/oci-config.py --namespace [namespace] 
-```
-
-After prerequisites are installed, you can install the OBaaS chart multiple times in different namespaces for multi-tenancy:
-
-```bash
-# Install for tenant 1
-helm upgrade --install obaas-tenant1 obaas/obaas -n tenant1 --create-namespace [--debug] [--values examples/values-tenant1.yaml]
-
-# Install for tenant 2
-helm upgrade --install obaas-tenant2 obaas/obaas -n tenant2 --create-namespace [--debug] [--values examples/values-tenant2.yaml]
-
-# Install for tenant N...
-helm upgrade --install obaas-tenantN obaas/obaas -n tenantN --create-namespace [--debug] [--values examples/values-tenantN.yaml]
-```
-
-Each OBaaS instance includes:
-
-- **ingress-nginx** - Ingress controller for the namespace (unless running on OCI)
-- **signoz** - Observability stack (with its own ClickHouse)
-- **Coherence Operator** - Coherence cluster operator
-- **Admin Server** - Admins server
-- **Eureka** - Service Discovery
-- **OTMM** - Oracle Transaction Manager for Microserveices (including MicroTX Workflow)
-- **APISIX** - APISIX API GW
-
-## Architecture
-
-**Why separate charts?**
-
-- **obaas-prereqs**: Contains operators and infrastructure that install CRDs (Custom Resource Definitions) which are cluster-scoped. Installing these multiple times would cause conflicts.
-
-- **obaas**: Contains namespace-scoped resources that can be installed multiple times. Each installation can create Kafka clusters via CRs (managed by the Strimzi operator from prereqs).
-
-## Configuration
-
-See individual chart directories for detailed configuration options:
-
-- [obaas-prereqs/README.md](obaas-prereqs/README.md)
-- [obaas/examples/](obaas/examples/) - Example configurations
+- [`infra-charts/obaas/values.yaml`](infra-charts/obaas/values.yaml)
+- [`infra-charts/obaas-prereqs/values.yaml`](infra-charts/obaas-prereqs/values.yaml)
+- [`infra-charts/obaas/examples/`](infra-charts/obaas/examples/)
+- [`infra-charts/obaas-prereqs/examples/`](infra-charts/obaas-prereqs/examples/)
 
 ## Uninstallation
 
-**Uninstall OBaaS instances first:**
+Uninstall all namespace-scoped OBaaS releases before uninstalling the shared prerequisites release:
+
 ```bash
-helm uninstall obaas-tenant1 -n tenant1
-helm uninstall obaas-tenant2 -n tenant2
+helm uninstall obaas --namespace obaas
+helm uninstall obaas-prereqs --namespace obaas-system
 ```
 
-**Then uninstall prerequisites:**
-```bash
-helm uninstall obaas-prereqs -n obaas-system
-```
-
-**Warning:** Uninstalling prerequisites will affect all OBaaS instances in the cluster.
+Uninstalling prerequisites affects every OBaaS instance in the cluster.

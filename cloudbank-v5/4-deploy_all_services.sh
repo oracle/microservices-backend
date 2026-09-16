@@ -362,6 +362,8 @@ deploy_service() {
         helm_command+=" --set image.pullPolicy=Never"
     fi
     helm_command+=" --set obaas.releaseName=$OBAAS_RELEASE"
+    helm_command+=" --set otel.enabled=true"
+    helm_command+=" --set otel.micrometer.enabled=true"
     helm_command+=" --set database.name=$DB_NAME"
     helm_command+=" --set database.authN.secretName=$db_secret_name"
     if [[ -n "$PRIV_SECRET" ]]; then

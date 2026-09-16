@@ -13,7 +13,16 @@ The Strimzi Kafka Operator is installed if `strimzi.enabled` is set to `true` in
 
 ### Creating a Kafka Cluster
 
-Follow these steps to create a single-node Kafka cluster named `my-cluster` in a given namespace.
+Follow these steps to create a 3-node Kafka cluster named `my-cluster` in a given namespace.
+
+:::tip
+If you're deploying Kafka as part of the OBaaS platform (rather than standing up a cluster by
+hand), use the `examples/values-kafka.yaml` example in the `obaas` Helm chart instead — it
+creates an equivalent, fully-observed cluster in one command. See
+[Kafka Observability](../observability/kafka.md) for details. The manual walkthrough below is
+useful for understanding what the platform does under the hood, or for deploying Kafka outside
+of an OBaaS-managed namespace.
+:::
 
 ### Prerequisites
 
@@ -29,11 +38,11 @@ Create a file named `kafka-cluster.yaml`. This defines a single-node KRaft-based
 apiVersion: kafka.strimzi.io/v1
 kind: Kafka
 metadata:
-  name: basic-kafka
+  name: my-cluster
 spec:
   kafka:
     version: 4.2.0
-    metadataVersion: "4.2"
+    metadataVersion: 4.2-IV1
     listeners:
       - name: plain
         port: 9092
@@ -52,9 +61,9 @@ spec:
 apiVersion: kafka.strimzi.io/v1
 kind: KafkaNodePool
 metadata:
-  name: pool-a
+  name: dual-role
   labels:
-    strimzi.io/cluster: basic-kafka
+    strimzi.io/cluster: my-cluster
 spec:
   replicas: 3
   roles:
@@ -67,9 +76,9 @@ spec:
 **Notes:**
 
 - This uses **KRaft mode** (Kafka Raft) — no ZooKeeper required
-- The `dual-role` node pool runs both controller and broker roles on a single node
-- Replication factors are set to 1 for single-node operation — for production, increase `replicas` and replication factors to 3+
-- Two listeners are configured: `plain` (port 9092, no TLS) and `tls` (port 9093, encrypted)
+- The `dual-role` node pool runs both controller and broker roles on each of its 3 nodes
+- Replication and min-ISR settings above are already production-appropriate (3 replicas, min-insync-replicas 2) — for a lighter-weight dev/test setup, you can lower `replicas` and the replication factors, but expect reduced fault tolerance
+- One listener is configured here: `plain` (port 9092, no TLS) — see [Configuring TLS](#configuring-tls) below to add an encrypted listener
 - The `entityOperator` enables the Topic Operator and User Operator for declarative topic and user management
 - `KafkaNodePool` names are scoped to the **namespace**, not to the cluster — if you run multiple Kafka clusters in the same namespace, each node pool must have a unique name (e.g. `cluster-a-pool`, `cluster-b-pool`)
 

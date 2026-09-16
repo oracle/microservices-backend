@@ -1,0 +1,87 @@
+{{- include "obaas.signozUpgrade.validate" . -}}
+{{- if and .Release.IsUpgrade (eq (.Values.signozUpgrade.mode | default "") "destructive-replace") .Values.signozUpgrade.confirmDataLoss }}
+{{- $name := printf "%s-signoz-destructive-replace" .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- $annotations := dict "helm.sh/hook" "pre-upgrade" "helm.sh/hook-weight" "-50" "helm.sh/hook-delete-policy" "before-hook-creation,hook-succeeded" }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $name }}
+  namespace: {{ .Release.Namespace }}
+  annotations: {{- toYaml $annotations | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ $name }}
+  namespace: {{ .Release.Namespace }}
+  annotations: {{- toYaml $annotations | nindent 4 }}
+rules:
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    resourceNames: [{{ printf "%s-signoz" .Release.Name | quote }}, {{ printf "%s-zookeeper" .Release.Name | quote }}]
+    verbs: ["get", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["list", "watch"]
+  - apiGroups: ["clickhouse.altinity.com"]
+    resources: ["clickhouseinstallations"]
+    resourceNames: [{{ printf "%s-clickhouse" .Release.Name | quote }}]
+    verbs: ["get", "delete"]
+  - apiGroups: ["clickhouse.altinity.com"]
+    resources: ["clickhouseinstallations"]
+    verbs: ["list", "watch"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "delete"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    resourceNames: [{{ printf "%s-signoz-setup" .Release.Name | quote }}, "signoz-telemetrystore-migrator"]
+    verbs: ["get", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $name }}
+  namespace: {{ .Release.Namespace }}
+  annotations: {{- toYaml $annotations | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ $name }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ $name }}
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $name }}
+  namespace: {{ .Release.Namespace }}
+  annotations: {{- toYaml $annotations | nindent 4 }}
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      serviceAccountName: {{ $name }}
+      restartPolicy: Never
+      containers:
+        - name: erase-observability-data
+          image: {{ .Values.global.utilities.kubectl.image.registry }}/{{ .Values.global.utilities.kubectl.image.repository }}:{{ .Values.global.utilities.kubectl.image.tag }}
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              kubectl delete chi {{ .Release.Name }}-clickhouse -n {{ .Release.Namespace }} --ignore-not-found --wait=true --timeout=7m
+              kubectl delete statefulset {{ .Release.Name }}-signoz {{ .Release.Name }}-zookeeper -n {{ .Release.Namespace }} --ignore-not-found --wait=true --timeout=3m
+              # The completed setup Job retains a pod reference to the SigNoZ PVC.
+              # Delete it before deleting the data PVC so PVC protection can release it.
+              kubectl delete job {{ .Release.Name }}-signoz-setup -n {{ .Release.Namespace }} --ignore-not-found --wait=true --timeout=2m
+              # Recreate the telemetry-store Job with the new collector version.
+              # Kubernetes does not permit updating an existing Job pod template.
+              kubectl delete job signoz-telemetrystore-migrator -n {{ .Release.Namespace }} --ignore-not-found --wait=true --timeout=2m
+              kubectl delete pvc -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/component=signoz --wait=true --timeout=4m
+              kubectl delete pvc -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/component=zookeeper --wait=true --timeout=4m
+              kubectl delete pvc -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/component=clickhouse --wait=true --timeout=4m
+
+{{- end }}

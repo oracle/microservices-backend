@@ -11,32 +11,36 @@ Kafka cluster metrics provide deep visibility into the health and performance of
 
 ### Enabling Cluster Metrics (Opt-in)
 
-Kafka infrastructure monitoring is an "opt-in" feature provided as a platform extension. It uses the native OpenTelemetry `kafkametrics` receiver to scrape metadata directly from the Kafka bootstrap service.
+Kafka infrastructure monitoring is an "opt-in" feature. It uses the native OpenTelemetry `kafkametrics` receiver to scrape metadata directly from the Kafka bootstrap service, plus Strimzi's `strimziMetricsReporter` for broker JMX metrics (throughput, request latency, cluster health).
 
-To enable cluster metrics, include the `kafka-metrics.yaml` extension from the source repository during your platform installation or upgrade:
+The `examples/values-kafka.yaml` example in the `obaas` Helm chart bundles both of these, so a single install or upgrade gives you a fully-observed Kafka cluster:
 
 ```bash
-helm upgrade obaas obaas/obaas \
+helm upgrade --install obaas obaas/obaas \
   -n obaas \
-  -f helm/infra-charts/obaas/extensions/kafka-metrics.yaml \
-  --reuse-values
+  -f helm/infra-charts/obaas/examples/values-kafka.yaml
 ```
+
+If you already have Kafka enabled through a different values file, add `kafka.metricsEnabled: true` and the `signoz.otelCollector.config.receivers.kafkametrics` block from `examples/values-kafka.yaml` to your own values file instead.
 
 ### Platform Automation for Infrastructure Metrics
 
 The OBaaS platform automates several complex tasks to ensure Kafka metrics flow correctly:
 
 - **Universal Metric Bridge**: The platform automatically creates an `ExternalName` service called `kafka-bootstrap` in your namespace. This acts as a stable alias for the internal Strimzi bootstrap service, ensuring the scraper doesn't need to change if the cluster is re-deployed.
-- **Collector Configuration**: The `kafkametrics` extension automatically updates the SigNoz OpenTelemetry Collector's configuration to include the Kafka scraper in its metrics pipeline.
+- **Collector Configuration**: The `kafkametrics` receiver config in `examples/values-kafka.yaml` automatically updates the SigNoz OpenTelemetry Collector's configuration to include the Kafka scraper in its metrics pipeline.
+- **Broker Metrics Scraping**: Setting `kafka.metricsEnabled: true` configures each broker with Strimzi's `strimziMetricsReporter` and a `signoz.io/scrape` pod annotation, so SigNoz's existing Prometheus receiver picks up broker JMX metrics automatically — no separate scrape config needed.
 - **Service Name Resolution**: The platform ensures that metrics are correctly tagged with the `service_name` of your application, allowing for easy filtering in SigNoz.
 
 ### Kafka Server Monitoring Dashboard
 
 Once enabled, the **Kafka Server Monitoring Dashboard** automatically populates in SigNoz. This dashboard provides a centralized view of:
 - **Broker Health**: Active broker count, controller status, and request handler pool utilization.
-- **Topic Metrics**: Total topic count and message throughput.
-- **Partition Details**: Current offsets, oldest offsets (retention), and replica status (ISR count).
+- **Topic Metrics**: Total topic count and message throughput (messages/bytes in and out per second, by topic).
+- **Partition Details**: Current offsets, oldest offsets (retention), replica status (ISR count), under-replicated and offline partition counts, and per-partition log size.
 - **Consumer Groups**: Real-time consumer group lag and member counts.
+- **Request Performance**: p99 request latency and failed request rate for produce/fetch requests.
+- **Broker Resource Usage**: JVM heap usage and CPU usage per broker.
 
 ![Kafka Dashboard](images/kafka-dashboard.png)
 
