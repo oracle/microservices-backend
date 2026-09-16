@@ -927,6 +927,14 @@ k8s-infra:
     cloud: others
     clusterName: obaas
     deploymentEnvironment: obaas
+
+  # Pin to latest until updated.
+  otelAgent:
+    image:
+      tag: "0.160.0"
+  otelDeployment:
+    image:
+      tag: "0.160.0"
   otelCollectorEndpoint: signoz-otel-collector:4317
   otelInsecure: true
   presets:
