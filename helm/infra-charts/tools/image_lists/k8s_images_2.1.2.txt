@@ -31,10 +31,10 @@ docker.io/signoz/zookeeper:3.7.1
 ghcr.io/external-secrets/external-secrets:v2.10.0
 ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:2.30.0
 ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator:0.158.0
-quay.io/jetstack/cert-manager-cainjector:v1.21.1
-quay.io/jetstack/cert-manager-controller:v1.21.1
-quay.io/jetstack/cert-manager-startupapicheck:v1.21.1
-quay.io/jetstack/cert-manager-webhook:v1.21.1
+quay.io/jetstack/cert-manager-cainjector:v1.21.2
+quay.io/jetstack/cert-manager-controller:v1.21.2
+quay.io/jetstack/cert-manager-startupapicheck:v1.21.2
+quay.io/jetstack/cert-manager-webhook:v1.21.2
 quay.io/strimzi/kafka:1.2.0-kafka-4.3.1
 quay.io/strimzi/operator:1.2.0
 registry.k8s.io/ingress-nginx/controller:v1.15.1
