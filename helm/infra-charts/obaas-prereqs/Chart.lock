@@ -10,7 +10,7 @@ dependencies:
   version: 6.4.1
 - name: strimzi-kafka-operator
   repository: https://strimzi.io/charts/
-  version: 1.1.0
+  version: 1.2.0
 - name: coherence-operator
   repository: https://oracle.github.io/coherence-operator/charts
   version: 3.5.14
@@ -20,5 +20,5 @@ dependencies:
 - name: oracle-database-operator
   repository: file://charts/oracle-database-operator
   version: 0.2.0
-digest: sha256:f4c4169af0b6436739e2b11e118697d8f54036d73cdf8c2746a8675f8ffdfa48
-generated: "2026-07-27T10:36:56.176704-05:00"
+digest: sha256:59221b2f140de1f100516d4657d1d0d2d06e02cc8a94f2b8c3f97366bc5fb075
+generated: "2026-09-17T15:43:26.357352465Z"
