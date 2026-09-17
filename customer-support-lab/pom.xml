@@ -16,7 +16,7 @@
 
 	<properties>
 		<oracle.starters.version>25.3.0</oracle.starters.version>
-		<oci.sdk.version>3.74.2</oci.sdk.version>
+		<oci.sdk.version>3.95.2</oci.sdk.version>
 		<java.version>21</java.version>
 	</properties>
 

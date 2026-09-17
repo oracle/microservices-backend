@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.helidon.applications</groupId>
         <artifactId>helidon-mp</artifactId>
-        <version>4.4.1</version>
+        <version>4.5.4</version>
         <relativePath/>
     </parent>
     <groupId>com.example</groupId>
@@ -14,8 +14,8 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <helidon-maven-plugin.version>4.0.14</helidon-maven-plugin.version>
-        <jkube.version>1.16.2</jkube.version>
+        <helidon-maven-plugin.version>4.0.30</helidon-maven-plugin.version>
+        <jkube.version>1.20.0</jkube.version>
         <image.registry>localhost</image.registry>
         <image.tag>${project.version}</image.tag>
         <jkube.generator.name>${image.registry}/${project.artifactId}:${image.tag}</jkube.generator.name>
@@ -61,12 +61,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.9</version>
+            <version>2.0.19</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.4.14</version>
+            <version>1.6.3</version>
         </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
@@ -76,7 +76,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-            <version>2.0.9</version>
+            <version>2.0.19</version>
         </dependency>
 
         <dependency>
