@@ -21,7 +21,7 @@ ADD src src
 RUN mvn package -DskipTests
 
 # 2nd stage, build the runtime image
-FROM ghcr.io/oracle/oracle-jdk-image-obaas:21
+FROM ghcr.io/oracle/oracle-jdk-image-obaas:25
 WORKDIR /helidon
 
 # Copy the application JAR and libs
