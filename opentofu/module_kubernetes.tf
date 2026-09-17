@@ -22,7 +22,13 @@ variable "k8s_use_local_charts" {
 
 //Deploy basic Kafka Cluster
 variable "k8s_deploy_kafka" {
-  description = "Deploy a cluster using the Strimzi operator."
+  description = "Deploy a cluster using the Strimzi Operator."
+  type        = bool
+  default     = false
+}
+
+variable "k8s_deploy_coherence" {
+  description = "Deploy a cluster using the Coherence Operator."
   type        = bool
   default     = false
 }
@@ -120,6 +126,7 @@ module "kubernetes" {
   optimizer_version          = "Stable"
   deploy_optimizer           = var.deploy_optimizer
   deploy_kafka               = var.k8s_deploy_kafka
+  deploy_coherence           = var.k8s_deploy_coherence
   providers = {
     oci.home_region = oci.home_region
   }

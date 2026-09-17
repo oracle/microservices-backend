@@ -95,6 +95,8 @@ byo_odb_service = "SERVICENAME"
 | `k8s_api_endpoint_allowed_cidrs` | CIDRs allowed to access K8s API | "0.0.0.0/0" |
 | `k8s_node_pool_gpu_deploy` | Deploy GPU node pool | false |
 | `k8s_gpu_node_pool_size` | Number of GPU worker nodes | 1 |
+| `k8s_deploy_kafka` | Deploy a Kafka cluster using the Strimzi operator | false |
+| `k8s_deploy_coherence` | Deploy a Coherence cluster using the Coherence Operator | false |
 | `k8s_run_cfgmgt` | Run configuration management | true |
 | `k8s_use_cluster_addons` | Install OKE cluster add-ons | true |
 | `k8s_use_local_charts` | Use local Helm charts from `helm/` instead of the remote Helm repository | false |
