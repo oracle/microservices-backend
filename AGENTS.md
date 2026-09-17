@@ -8,15 +8,16 @@ This guide tells an AI agent how to plan, prepare, install, and verify Oracle Ba
 
 ## Source Rules
 
-- Use only the OBaaS `next` documentation and chart sources:
+- Use the OBaaS `next` documentation and chart sources for OBaaS behavior:
   - `docs-source/site/docs`
   - `helm/infra-charts`
+- Use `opentofu/README.md`, its examples, Terraform sources, templates, and `cfgmgt/apply.py` for OCI provisioning and generated Kubernetes configuration. Use `TEST-AGENT.md` for provisioning test coverage, evidence, and reporting.
 - Do not use documentation for the previous 2.0.0 version.
 - Do not infer installation behavior from unrelated repository directories.
 - Treat the public docs entry point as the same content represented locally under `docs-source/site/docs/intro.md` and the setup pages under `docs-source/site/docs/setup/helm/`.
 - Treat Helm chart defaults and examples under `helm/infra-charts` as the source of truth for chart value names and installable optional components.
-- For the currently in-development OBaaS version, install, render, lint, and test with the local chart paths under `helm/infra-charts`, not with public Helm repository references, unless the public Helm repository has already published charts whose `APP VERSION` or `appVersion` matches the target version.
-- OBaaS 2.1.2 is currently an in-development target in this repository. Its local charts are `helm/infra-charts/obaas-prereqs` and `helm/infra-charts/obaas`; do not install `obaas/obaas-prereqs` or `obaas/obaas` from the public repository for a 2.1.2 test while the public repository still advertises an older application version.
+- For test runs, install, render, and lint using this checkout's `helm/infra-charts/obaas-prereqs` and `helm/infra-charts/obaas` charts. This applies even when matching versions are published.
+- For other installations of the in-development OBaaS version, use local charts unless the public Helm repository has published charts whose `APP VERSION` or `appVersion` matches the target version.
 
 ## Before You Start
 
@@ -149,9 +150,12 @@ EXECUTE WITH GRANT OPTION on:
 
 ### cert-manager
 
-OBaaS requires cert-manager. If cert-manager is not already installed and healthy in the cluster, install it before `obaas-prereqs`.
+OBaaS requires healthy cert-manager before `obaas-prereqs`. Verify an existing installation through its owner, or install cert-manager when absent.
 
-An installation is healthy only when both the Kubernetes components are ready and
+Record whether cert-manager is owned by a Helm release or the OKE `CertManager` add-on. For an OKE-owned installation, verify the add-on status through OCI, available cert-manager deployments, ready webhook endpoints, and cert-manager CRDs in Kubernetes. Discover its actual namespace and collect add-on diagnostics and namespace events on failure. Keep lifecycle management with OKE; a separate Helm release is not required for this ownership mode.
+
+For a Helm-owned installation, follow the checks and recovery procedure below.
+It is healthy only when both the Kubernetes components are ready and
 the Helm release reports `STATUS: deployed`. Healthy pods alone are not sufficient:
 cert-manager uses a post-install startup-check Job, and an interrupted Helm client
 can leave a release `pending-install` or leave running resources with no release
@@ -183,15 +187,15 @@ kubectl wait --for=condition=Available deployment --all \
 kubectl get crd | grep cert-manager
 ```
 
-Do not continue to `obaas-prereqs` unless `helm status` reports
+For Helm ownership, do not continue to `obaas-prereqs` unless `helm status` reports
 `STATUS: deployed`.
 
-If Helm reports `pending-install` or `release: not found`, stop before installing
+For a Helm-owned installation, if Helm reports `pending-install` or `release: not found`, stop before installing
 OBaaS prerequisites. Collect `helm status`, `helm history`, the cert-manager Job
 list and relevant Job logs, deployment readiness, and namespace events. Do not
 delete cert-manager workloads or CRDs merely to clear Helm state.
 
-When workloads are healthy but `helm status` reports `release: not found`, inspect
+When Helm-owned workloads are healthy but `helm status` reports `release: not found`, inspect
 the Helm ownership metadata before retrying `helm upgrade --install`:
 
 ```bash
@@ -274,6 +278,23 @@ helm/infra-charts/obaas/examples/
 ```
 
 If the target version has been published and installing from the public Helm repository is appropriate, copy or reference prepared local values files. The `examples/...` paths only work from a checkout or environment where those files exist.
+
+### OCI Provisioning With OpenTofu Or Terraform
+
+Use `opentofu/README.md` for initialization, planning, apply, and infrastructure cleanup. Select the mode in `TEST-AGENT.md` and record the state location and resource ownership before provisioning.
+
+With `k8s_run_cfgmgt=true` (the default), apply runs `cfgmgt/apply.py`, which applies the generated Kubernetes manifest and installs `obaas-prereqs` in `obaas-system` and `obaas` in the namespace returned by `app_name`. Verify these releases using the checks below before deploying workloads. Reapply reruns configuration management; use read-only health checks when validating an existing installation.
+
+For OCI test runs, explicitly set `k8s_use_local_charts=true` in the run's variable file before plan and apply. It selects this checkout's `helm/infra-charts/obaas-prereqs` and `helm/infra-charts/obaas` directories. Prepare dependencies using `opentofu/README.md` and verify both local chart paths exist before apply. Confirm the target versions from their `Chart.yaml` files and verify the installed release metadata; `opentofu/versions.tf` contains a release placeholder.
+
+With `k8s_run_cfgmgt=false`, apply still creates OCI resources, selected add-ons, and files under `opentofu/cfgmgt/stage/`. From a host with cluster API access, select the generated kubeconfig, review and apply the required namespaces, secrets, and ingress resources from `k8s-manifest.yaml`, and perform the operator setup defined in `cfgmgt/apply.py` when applicable. Then use the generated `obaas-prereqs-values.yaml` and `obaas-values.yaml` as the basis for the Helm steps below. Protect the staged files because the manifest contains credentials and private keys.
+
+Reconcile add-on ownership with chart values before installation:
+
+- `k8s_use_cluster_addons=true` creates OKE `CertManager`, `OracleDatabaseOperator`, and `NativeIngressController` add-ons. Verify each selected add-on and its Kubernetes components are healthy. Use the OKE cert-manager checks above.
+- The generated prerequisites values disable `oracle-database-operator`. Keep this setting when the OKE operator is healthy; enable the chart-managed operator when required and no existing operator supplies it.
+- The generated application values disable Envoy Gateway and ingress-nginx and route APISIX through OCI Native Ingress class `native-ic`. Verify the controller, IngressClass, load balancer, and endpoint. Record TLS configuration or an explicit access-policy waiver for HTTP test endpoints.
+- Setting `k8s_use_cluster_addons=false` leaves those template settings unchanged. Use infrastructure-only mode to prepare cert-manager, the required database operator, and the selected ingress controller before Helm installation, with corresponding values overrides.
 
 ### AKS-Specific Planning
 
@@ -694,40 +715,36 @@ Install `obaas-prereqs` only once per cluster.
 
 ### Step 2: Check Chart Source Availability
 
-For in-development releases, first compare the target local chart `appVersion` with the public Helm repository metadata:
+Record the repository checkout or commit and read the target versions from both local charts:
 
 ```bash
-grep '^appVersion:' helm/infra-charts/obaas/Chart.yaml
-grep '^appVersion:' helm/infra-charts/obaas-prereqs/Chart.yaml
-helm repo add obaas https://oracle.github.io/microservices-backend/helm
-helm repo update
-helm search repo obaas/obaas --versions
-helm search repo obaas/obaas-prereqs --versions
+grep -E '^(version|appVersion):' helm/infra-charts/obaas/Chart.yaml
+grep -E '^(version|appVersion):' helm/infra-charts/obaas-prereqs/Chart.yaml
 ```
 
-Use the local chart paths when the public repository does not show the target application version:
+Test runs use these local paths and continue to Step 3:
 
 ```text
 helm/infra-charts/obaas-prereqs
 helm/infra-charts/obaas
 ```
 
-For the current 2.1.2 development stream, the local charts have `appVersion: 2.1.2` and chart `version: 0.1.2`. If the public Helm repository does not report `APP VERSION: 2.1.2`, do not install or test with `obaas/obaas-prereqs` or `obaas/obaas`; use the local chart paths above.
-
-Once the public repository publishes charts whose `APP VERSION` matches the target version, public chart references may be used. Use the chart version that corresponds to the target OBaaS application version.
-
-For local chart installs, pin the repository checkout or commit and verify the `version` and `appVersion` fields in each local `Chart.yaml`. For public repository installs, where strict pinning is required after the target version has been published, add:
+For other installations using published charts, compare repository metadata with the target application version:
 
 ```bash
---version 0.1.2
+helm repo add obaas https://oracle.github.io/microservices-backend/helm
+helm repo update
+helm search repo obaas/obaas --versions
+helm search repo obaas/obaas-prereqs --versions
 ```
 
-to the public chart install commands.
+Use local paths if matching application versions are unavailable. For published charts, pin each selected chart version with `--version <chart-version>`.
 
 ### Step 3: Install cert-manager If Needed
 
-Skip this step only if cert-manager is already healthy and
-`helm status cert-manager -n cert-manager` reports `STATUS: deployed`.
+Verify existing cert-manager using the ownership-specific checks in the prerequisites section. An OKE-owned installation proceeds when the add-on and Kubernetes checks pass. A Helm-owned installation also requires `STATUS: deployed`.
+
+Install the following Helm release when cert-manager is absent and Helm is the selected owner:
 
 ```bash
 helm install \
@@ -748,10 +765,12 @@ kubectl wait --for=condition=Available deployment --all -n cert-manager --timeou
 kubectl get crd | grep cert-manager
 ```
 
-Do not install `obaas-prereqs` if the Helm release is pending, missing, or failed.
+For Helm ownership, do not install `obaas-prereqs` if the release is pending, missing, or failed.
 Follow the cert-manager recovery guidance above.
 
 ### Step 4: Install Cluster Prerequisites Once
+
+If OCI configuration management already installed this release, proceed to the verification commands below. Verify separately managed OKE operators as well as the release-owned components.
 
 Generic install:
 
@@ -834,6 +853,8 @@ kubectl get secrets -n <application-namespace>
 ```
 
 ### Step 6: Install OBaaS
+
+If OCI configuration management already installed this release, proceed to `Verification And Smoke Tests` and verify its chart version and effective values against the selected target.
 
 Generic install:
 
@@ -1236,6 +1257,7 @@ Expected:
 Consider installation successful when:
 
 - Helm releases are deployed.
+- cert-manager and any selected OKE add-ons pass their ownership-specific readiness checks.
 - All prerequisite pods are healthy.
 - All OBaaS pods are `Running` and init jobs are `Completed`.
 - Persistent volume claims are bound.
@@ -1246,7 +1268,7 @@ Consider installation successful when:
 - APISIX admin API responds when enabled.
 - Eureka UI works when enabled.
 - Spring Boot Admin UI works when enabled.
-- Envoy Gateway or ingress-nginx reports healthy resources when enabled.
+- The selected Envoy Gateway, ingress-nginx, or OCI Native Ingress controller reports healthy resources.
 - No relevant namespace events show active image pull, scheduling, storage, webhook, or authentication failures.
 
 ## Troubleshooting Pointers

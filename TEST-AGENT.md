@@ -2,6 +2,8 @@
 
 This guide tells an AI agent how to deploy, test, collect evidence, and report on Oracle Backend for Microservices and AI (OBaaS) 2.1.2 with the CloudBank v5 sample workload.
 
+Confirm the target chart and application versions from both local `Chart.yaml` files before each run. The Terraform `app_version` output comes from the release placeholder in `opentofu/versions.tf`; use the chart sources and installed Helm release metadata to identify the OBaaS build under test.
+
 The expected output of a test run is a completed report created from the template in this file, plus an evidence directory containing command output, logs, screenshots, and vulnerability scan results.
 
 ## Source Rules
@@ -12,6 +14,8 @@ Use only these sources for installation and test truth:
 - `CBV5-AGENT.md` for CloudBank v5 deployment, testing, and cleanup.
 - `docs-source/site/docs`, especially `intro.md`, `setup/helm/`, `platform/`, and `observability/`.
 - `helm/infra-charts/obaas-prereqs` and `helm/infra-charts/obaas`.
+- `opentofu/README.md`, `opentofu/examples/`, and the Terraform sources, templates, and `cfgmgt/apply.py` under `opentofu/` for OCI provisioning and its OBaaS installation path.
+- `.github/workflows/opentofu.yml` and `opentofu/tests/` for infrastructure static checks.
 - `cloudbank-v5/README.md`, `cloudbank-v5/cloudbank-v5-install.md`, and `cloudbank-v5/cloudbank-test-doc.md`.
 - `cloudbank-v5/customer-helidon/README.md` when a mixed Spring Boot and Helidon CloudBank workload is required for observability testing.
 - `cloudbank-v5/helidon-producer/README.md` and `cloudbank-v5/helidon-consumer/README.md` when Kafka observability or Helidon MP messaging telemetry must be validated.
@@ -20,42 +24,77 @@ Use only these sources for installation and test truth:
 
 Use only the OBaaS `next` documentation stream for 2.1.2. Do not use 2.1.0 or older behavior, older CloudBank documentation, or unrelated repository directories.
 
-Do not duplicate command syntax, values-file policy, secrets policy, or cleanup procedure from `AGENTS.md` or `CBV5-AGENT.md` in this file. If those guides conflict with this guide, treat them as canonical for deployment mechanics and treat this guide as canonical for test scope, evidence, and reporting.
+Use `opentofu/README.md` and its sources for provisioning mechanics, `AGENTS.md` for OBaaS installation and ownership checks, and `CBV5-AGENT.md` for CloudBank deployment and cleanup. Keep command syntax and deployment procedures in those sources. This guide owns test scope, evidence, and reporting.
+
+## Deployment Modes
+
+Select one mode independently of the `Full Validation` or `Local Functional` validation tier.
+
+<table>
+  <thead><tr><th>Mode</th><th>Configuration</th><th>Handoff</th></tr></thead>
+  <tbody>
+    <tr><td>Existing Cluster</td><td>Use the selected Kubernetes context.</td><td>Follow <code>AGENTS.md</code> to install or verify OBaaS.</td></tr>
+    <tr><td>OCI Infrastructure</td><td><code>k8s_run_cfgmgt=false</code></td><td>Provision OCI resources and selected OKE add-ons, then prepare Kubernetes resources and install OBaaS using <code>AGENTS.md</code>.</td></tr>
+    <tr><td>OCI Infrastructure And OBaaS</td><td><code>k8s_run_cfgmgt=true</code>, the default.</td><td>Verify the releases installed by <code>cfgmgt/apply.py</code>, then continue to CloudBank.</td></tr>
+  </tbody>
+</table>
+
+Both OCI modes create an OKE cluster. Existing VCN and database options reuse those resources. Use `Existing Cluster` for a cluster already available to the run.
 
 ## Required Inputs
 
-Collect and record these values before any mutating command:
+### Provisioning Inputs
 
-| Input | Description |
-| --- | --- |
-| `<kube-context>` | Kubernetes context selected for the run. |
-| `<cluster-type>` | OKE, AKS, Rancher Desktop, another public cloud, or on-premises Kubernetes. |
-| `<platform-system-namespace>` | Namespace for cluster-singleton prerequisites, for example `obaas-system`. |
-| `<prereqs-release>` | Helm release for `obaas-prereqs`, for example `obaas-prereqs`. |
-| `<application-namespace>` | Namespace for the OBaaS instance and CloudBank workload. |
-| `<app-release>` | Helm release for the OBaaS application chart, for example `obaas`. |
-| `<prereqs-values-file>` | Values file for the prerequisites chart, if any. |
-| `<app-values-file>` | Values file for the OBaaS application chart. |
-| `<obaas-chart-version>` | Expected local chart version, `0.1.2`, recorded from both local `Chart.yaml` files. |
-| `<database-type>` | `SIDB-FREE`, `ADB-FREE`, `ADB-S`, or `OTHER`. |
-| `<storage-class>` | StorageClass selected for persistent components. |
-| `<access-path>` | Envoy Gateway by default, deprecated ingress-nginx when explicitly enabled, both, existing external access, or port-forward-only. |
-| `<registry-mode>` | Public registries, private registry, air-gapped, OCIR, or local cluster images. |
-| `<cloudbank-dbname>` | Database prefix used by CloudBank scripts. |
-| `<cloudbank-image-tag>` | CloudBank image tag, default `0.0.1-SNAPSHOT`. |
-| `<cloudbank-registry>` | Explicit image registry path, if not using OCIR auto-detection. |
-| `<cloudbank-customer-implementation>` | `customer` for the Spring service, or `customer-helidon` when Helidon dashboard validation is required. |
-| `<kafka-load-workload>` | Kafka load source when Kafka dashboards are required, for example `helidon-producer` and `helidon-consumer`. |
-| `<eureka-replicas>` | Effective `eureka.replicas` value; default is `3`. |
-| `<coherence-enabled>` | Whether the optional, deprecated Coherence cluster is enabled through `coherence.enabled`. |
-| `<coherence-cluster-name>` | Effective Coherence CR name and persistence decision when Coherence is enabled. |
-| `<otmm-coordinator-enabled>` | Whether the optional OTMM/MicroTx coordinator is enabled through `otmm.coordinator.enabled`. |
-| `<otmm-workflow-server-enabled>` | Whether the optional MicroTx Workflow Server is enabled through `otmm.workflowServer.enabled`. |
-| `<otmm-console-enabled>` | Whether the optional OTMM console is requested through `otmm.console.enabled`; it renders only when `otmm.coordinator.enabled` or `otmm.workflowServer.enabled` is also true. |
-| `<priv-secret-name>` | Privileged DB secret, usually `<cloudbank-dbname>-db-priv-authn` unless customized. |
-| `<evidence-dir>` | Directory for all run evidence and reports. |
+Before provisioning, record:
 
-Do not proceed with installation until these choices are known. Use placeholders in examples, but never install with unresolved placeholders.
+- Deployment mode, validation tier, evidence directory, and authorized resource scope.
+- Selected CLI (`tofu` or `terraform`), version, provider versions, working directory, variable files, and state backend/workspace or local state path. Use the same CLI and state throughout the run.
+- OCI authentication profile, tenancy, compartment, region, and `label_prefix`; record credential references only.
+- New or existing VCN/subnets, API endpoint reachability and allowed CIDRs, node shape/count/capacity, storage requirements, and load balancer access.
+- Database scenario: new ADB (`byo_db_type=""`), existing ADB (`ADB-S`), or existing non-Autonomous database (`OTHER`). Both ADB scenarios map to chart `database.type: ADB-S`. Replace example database placeholders before applying.
+- Effective `k8s_run_cfgmgt`, `k8s_use_cluster_addons`, `k8s_use_local_charts`, `k8s_deploy_kafka`, `deploy_optimizer`, and registry settings.
+- Resource ownership and the retain/destroy decision, including ownership of resources retained after a failed apply.
+
+Check OCI access, quotas, supported node images/Kubernetes version, and planned capacity against `AGENTS.md` before apply. For a private API endpoint, follow the execution-location constraints in `opentofu/module_kubernetes.tf`.
+
+### Deployment Inputs
+
+Resolve deployment choices before the command that installs OBaaS. For a new cluster, record generated identifiers, context, and values-file paths after provisioning and verify them before further Kubernetes operations. In `OCI Infrastructure And OBaaS` mode, review the template-derived choices before apply because it also installs OBaaS.
+
+<table>
+  <thead><tr><th>Input</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>&lt;kube-context&gt;</code></td><td>Kubernetes context selected for the run.</td></tr>
+    <tr><td><code>&lt;cluster-type&gt;</code></td><td>OKE, AKS, Rancher Desktop, another public cloud, or on-premises Kubernetes.</td></tr>
+    <tr><td><code>&lt;platform-system-namespace&gt;</code></td><td>Namespace for cluster-singleton prerequisites, for example <code>obaas-system</code>.</td></tr>
+    <tr><td><code>&lt;prereqs-release&gt;</code></td><td>Helm release for <code>obaas-prereqs</code>, for example <code>obaas-prereqs</code>.</td></tr>
+    <tr><td><code>&lt;application-namespace&gt;</code></td><td>Namespace for the OBaaS instance and CloudBank workload.</td></tr>
+    <tr><td><code>&lt;app-release&gt;</code></td><td>Helm release for the OBaaS application chart, for example <code>obaas</code>.</td></tr>
+    <tr><td><code>&lt;prereqs-values-file&gt;</code></td><td>Values file for the prerequisites chart, if any.</td></tr>
+    <tr><td><code>&lt;app-values-file&gt;</code></td><td>Values file for the OBaaS application chart.</td></tr>
+    <tr><td><code>&lt;obaas-chart-version&gt;</code></td><td>Expected chart version and app version, recorded from both local <code>Chart.yaml</code> files.</td></tr>
+    <tr><td><code>&lt;cert-manager-owner&gt;</code></td><td>Helm release or OKE <code>CertManager</code> add-on; record the actual namespace and owner.</td></tr>
+    <tr><td><code>&lt;database-type&gt;</code></td><td><code>SIDB-FREE</code>, <code>ADB-FREE</code>, <code>ADB-S</code>, or <code>OTHER</code>.</td></tr>
+    <tr><td><code>&lt;storage-class&gt;</code></td><td>StorageClass selected for persistent components.</td></tr>
+    <tr><td><code>&lt;access-path&gt;</code></td><td>Envoy Gateway by default, deprecated ingress-nginx when explicitly enabled, both, OCI Native Ingress, other existing external access, or port-forward-only.</td></tr>
+    <tr><td><code>&lt;registry-mode&gt;</code></td><td>Public registries, private registry, air-gapped, OCIR, or local cluster images.</td></tr>
+    <tr><td><code>&lt;cloudbank-dbname&gt;</code></td><td>Database prefix used by CloudBank scripts.</td></tr>
+    <tr><td><code>&lt;cloudbank-image-tag&gt;</code></td><td>CloudBank image tag, default <code>0.0.1-SNAPSHOT</code>.</td></tr>
+    <tr><td><code>&lt;cloudbank-registry&gt;</code></td><td>Explicit image registry path, if not using OCIR auto-detection.</td></tr>
+    <tr><td><code>&lt;cloudbank-customer-implementation&gt;</code></td><td><code>customer</code> for the Spring service, or <code>customer-helidon</code> when Helidon dashboard validation is required.</td></tr>
+    <tr><td><code>&lt;kafka-load-workload&gt;</code></td><td>Kafka load source when Kafka dashboards are required, for example <code>helidon-producer</code> and <code>helidon-consumer</code>.</td></tr>
+    <tr><td><code>&lt;eureka-replicas&gt;</code></td><td>Effective <code>eureka.replicas</code> value; default is <code>3</code>.</td></tr>
+    <tr><td><code>&lt;coherence-enabled&gt;</code></td><td>Whether the optional, deprecated Coherence cluster is enabled through <code>coherence.enabled</code>.</td></tr>
+    <tr><td><code>&lt;coherence-cluster-name&gt;</code></td><td>Effective Coherence CR name and persistence decision when Coherence is enabled.</td></tr>
+    <tr><td><code>&lt;otmm-coordinator-enabled&gt;</code></td><td>Whether the optional OTMM/MicroTx coordinator is enabled through <code>otmm.coordinator.enabled</code>.</td></tr>
+    <tr><td><code>&lt;otmm-workflow-server-enabled&gt;</code></td><td>Whether the optional MicroTx Workflow Server is enabled through <code>otmm.workflowServer.enabled</code>.</td></tr>
+    <tr><td><code>&lt;otmm-console-enabled&gt;</code></td><td>Whether the optional OTMM console is requested through <code>otmm.console.enabled</code>; it renders only when <code>otmm.coordinator.enabled</code> or <code>otmm.workflowServer.enabled</code> is also true.</td></tr>
+    <tr><td><code>&lt;priv-secret-name&gt;</code></td><td>Privileged DB secret, usually <code>&lt;cloudbank-dbname&gt;-db-priv-authn</code> unless customized.</td></tr>
+    <tr><td><code>&lt;evidence-dir&gt;</code></td><td>Directory for all run evidence and reports.</td></tr>
+  </tbody>
+</table>
+
+Use placeholders in examples, but never install with unresolved configuration inputs. Verify generated identifiers against the selected environment at the provisioning handoff.
 
 ## Cluster Policy
 
@@ -76,6 +115,7 @@ Create a fresh evidence directory before running tests:
 ```bash
 export EVIDENCE_DIR=<evidence-dir>
 mkdir -p \
+  "$EVIDENCE_DIR/infrastructure" \
   "$EVIDENCE_DIR/cluster" \
   "$EVIDENCE_DIR/helm" \
   "$EVIDENCE_DIR/obaas" \
@@ -86,7 +126,7 @@ mkdir -p \
   "$EVIDENCE_DIR/failures"
 ```
 
-Capture stdout and stderr for every command that proves a result:
+Capture stdout, stderr, and exit status for every command that proves a result. Use protected storage for output containing secrets and attach sanitized copies to the evidence directory. Keep state, saved plans, credential files, kubeconfig, and generated `cfgmgt/stage/k8s-manifest.yaml` in protected storage outside the shared report bundle.
 
 ```bash
 run_and_capture() {
@@ -105,8 +145,8 @@ For failures, also capture:
 - Current and previous pod logs.
 - Related jobs and job logs.
 - For cert-manager install failures, Helm status and history, cert-manager Job
-  status/logs, deployment readiness, and cert-manager namespace events. Do not
-  treat healthy pods as a passing result when the Helm release is pending or absent.
+  status/logs, deployment readiness, and cert-manager namespace events for a Helm-owned install.
+  For OKE ownership, capture add-on status and diagnostics plus Kubernetes readiness and events.
 - For MicroTx Workflow Server failures, workflow server logs, health endpoint output, service/endpoints output, Helm values, latest `obaas-run-sql-*` job logs, and database privilege diagnostics for the application user.
 - Namespace events sorted by time.
 - Helm release status.
@@ -115,91 +155,114 @@ For failures, also capture:
 
 ## Execution Flow
 
-This file does not own deployment mechanics. Use it to decide what must be tested and what evidence must be captured.
+1. Select the deployment mode and validation tier; prepare the evidence directory and report skeleton.
+2. For an OCI mode, complete the infrastructure checks below, review the plan, and apply within the authorized scope using `opentofu/README.md`. Record results after each phase. For `Existing Cluster`, mark `INF-001` through `INF-005` as `Not Applicable` with the mode as the reason.
+3. Verify the generated context and deployment inputs, then run cluster preflight using `AGENTS.md`. For an automatic OBaaS install, complete chart-source checks before apply and verify the resulting release versions afterward.
+4. Follow the selected mode's handoff. Use `AGENTS.md` to install missing components or verify those already installed. Record all `PRE-*`, `INST-*`, and platform results; successful apply alone is insufficient evidence of OBaaS health.
+5. Continue only when required OBaaS health checks pass or are explicitly waived. Use `CBV5-AGENT.md` for CloudBank prerequisite checks, images, secrets, deployment, routes, and functional tests, recording evidence after each phase.
+6. Complete the observability, security, lifecycle, and isolation coverage required for the run.
+7. Complete infrastructure retention or authorized teardown after workload tests and evidence capture.
+8. Finish the report, including failed provisioning, blocked dependent tests, and retained resources.
 
-1. Prepare the evidence directory and report skeleton from this file.
-2. Use `AGENTS.md` for all OBaaS preflight, chart-source selection, values preparation, cert-manager, `obaas-prereqs`, OBaaS install, uninstall, and reinstall commands.
-3. After each OBaaS phase, return to the master test matrix in this file and record status, evidence paths, and failures.
-4. Use `CBV5-AGENT.md` for all CloudBank v5 prerequisite checks, image handling, secret creation, service deployment, APISIX route creation, smoke tests, manual endpoint tests, and cleanup commands.
-5. After each CloudBank phase, return to the master test matrix in this file and record status, evidence paths, and failures.
-6. Use the observability, security, lifecycle, isolation, and report sections in this file for test coverage that is broader than either deployment guide.
-7. Do not continue from OBaaS installation to CloudBank deployment until all required OBaaS health checks in the matrix are passing or explicitly waived.
-8. Do not mark a test run complete until the report template in this file is filled out and all required evidence has been captured.
+### Infrastructure Checks And Handoff
 
-The exact commands, flags, values files, secret names, and cleanup procedures must come from `AGENTS.md` and `CBV5-AGENT.md` at execution time.
+Use the static checks in `.github/workflows/opentofu.yml`: backend-free initialization, configuration validation, recursive formatting check, ORM schema validation, and Trivy configuration scanning. Preserve findings and their disposition; the workflow's scanner exit code permits findings. Initialize the selected run backend separately before planning deployment.
+
+Review the selected scenario's plan for resource scope, capacity, networking, database ownership, and unexpected replacements or deletions. Preserve the plan identity, sanitized summary, apply output, and exit status in `infrastructure/`. The example `manual-test.sh` supplies planning evidence: it rewrites formatting, sets `TF_VAR_compartment_ocid` to the tenancy root, and plans both examples. Use explicit run inputs for deployment; its successful plans do not satisfy `INF-003` or the application checks.
+
+All test runs use this checkout's `helm/infra-charts/obaas-prereqs` and `helm/infra-charts/obaas` charts. For OCI test runs, explicitly set `k8s_use_local_charts=true` in the run's variable file before plan and apply. This makes `cfgmgt/apply.py` resolve both charts from the local `helm/` directory. Prepare dependencies as described in `opentofu/README.md`; missing local charts fail preflight rather than falling back to published OBaaS charts. Keep the release placeholder in `opentofu/versions.tf` unchanged.
+
+At handoff, verify:
+
+- `app_name` matches the application namespace, and the `kubeconfig_cmd` output or generated `cfgmgt/stage/kubeconfig` selects the intended cluster and authentication profile.
+- The generated `obaas-prereqs-values.yaml` and `obaas-values.yaml` match the database, secret names, registry, access path, and optional components. Run `PRE-008` on the generated values when available.
+- Automatic installation uses release `obaas-prereqs` in `obaas-system` and release `obaas` in the `app_name` namespace. Record those identities and verify them before CloudBank deployment.
+- OKE add-on ownership and readiness meet `AGENTS.md`. The templates use OCI Native Ingress (`native-ic`) and disable the bundled Envoy Gateway and ingress-nginx controllers. Verify the native controller, IngressClass, load balancer, and gateway route for this access path.
+
+Use `OCI Infrastructure` mode when values need adjustment or cluster preflight must complete before the first Helm install. This mode generates the staged files while leaving Kubernetes manifest application and Helm installation to the operator. Follow the OCI provisioning handoff in `AGENTS.md` before installing charts.
+
+Reapplying with configuration management enabled runs `apply.py` again because its provisioner uses a timestamp trigger. Review the resulting Helm operations and preserve failure evidence before retrying; retries can delete existing Jobs. Verify existing releases at handoff instead of reapplying solely to collect health evidence.
 
 ## Master Test Matrix
 
-Use this matrix as the master list for each run. Mark each test `Pass`, `Fail`, `Waived`, or `Not Applicable`.
+Use this matrix as the master list for each run. Mark each test `Pass`, `Fail`, `Waived`, `Not Applicable`, or `Blocked`. Use `Blocked` when a failed prerequisite prevents execution, and name that prerequisite in the report. Complete `INF-005` at the end of the run, including after a failed apply.
 
-| ID | Category | Test | Expected Result | Evidence |
-| --- | --- | --- | --- | --- |
-| PRE-001 | Preflight | Verify current Kubernetes context. | Context equals `<kube-context>`. | `kubectl config current-context` |
-| PRE-002 | Preflight | Verify cluster API access. | `kubectl get nodes` succeeds. | node list |
-| PRE-003 | Preflight | Verify Helm access. | `helm version` and `helm list -A` succeed. | Helm output |
-| PRE-004 | Preflight | Verify cluster capacity policy. | Full validation meets requirements, or local deviations are recorded. | node describe |
-| PRE-005 | Preflight | Verify storage classes and RWX support decision. | Selected storage class and RWX status are recorded. | storageclass output |
-| PRE-006 | Preflight | Verify external access strategy. | Envoy Gateway default, explicit ingress-nginx opt-in, both, or port-forward-only path is documented. | service, ingress, gateway output |
-| PRE-007 | Preflight | Verify chart source and version. | Both local charts report chart version `0.1.2` and app version `2.1.2`; local paths are used unless public charts report app version `2.1.2`. | Chart.yaml and Helm search output |
-| PRE-008 | Preflight | Render selected chart values. | `helm lint` and `helm template` succeed for both charts; rendered output reflects selected optional components. | lint and rendered-manifest output |
-| INST-001 | Install | Install or verify cert-manager. | Helm reports `deployed`; cert-manager deployments are available; CRDs exist. A pending or missing Helm release is a failure even if pods are running. | Helm status, pod, wait, CRD output; on failure also capture Job logs and events |
-| INST-002 | Install | Install `obaas-prereqs` once. | Release deployed and prerequisite pods healthy. | Helm status and pod output |
-| INST-003 | Install | Install OBaaS. | Release deployed and OBaaS pods healthy. | Helm status and pod output |
-| INST-004 | Install | Verify no unexpected failed jobs or PVC problems. | Jobs succeeded and PVCs bound. | jobs, PVCs, events |
-| PLAT-001 | Platform | Verify APISIX gateway. | Gateway service has external address or working port-forward. | service output, curl result |
-| PLAT-002 | Platform | Verify APISIX admin API. | Admin routes endpoint responds with valid admin key. | curl output |
-| PLAT-003 | Platform | Verify Eureka. | Eureka UI/API is reachable. | screenshot and HTTP output |
-| PLAT-004 | Platform | Verify Config Server. | `/<application>/<profile>` returns JSON property source response. | curl output |
-| PLAT-005 | Platform | Verify Spring Boot Admin. | Admin UI is reachable and services appear. | screenshot |
-| PLAT-006 | Platform | Verify database exporter. | Exporter pod/service is healthy and metrics scrape target exists. | pod, service, logs |
-| PLAT-007 | Platform | Verify optional OTMM/MicroTx coordinator runtime. | When enabled, OTMM service is healthy and CloudBank transfer can use the LRA coordinator; otherwise marked `Not Applicable` with values evidence. | Helm values, pod output, CloudBank transfer evidence |
-| PLAT-008 | Platform | Verify optional Kafka. | Kafka CRs and dashboard data exist when Kafka is enabled. | Strimzi/Kafka output |
-| PLAT-009 | Platform | Verify optional AI Optimizer. | AI Optimizer pods and required secrets exist when enabled. | pod, secret output |
-| PLAT-010 | Platform | Verify optional MicroTx Workflow Server. | When enabled, workflow server is healthy, Flyway migration succeeds, and no Oracle privilege error is present; otherwise marked `Not Applicable` with values evidence. | Helm values, pod, service, health endpoint, logs |
-| PLAT-011 | Platform | Verify optional OTMM console. | When `otmm.console.enabled=true` and either coordinator or workflow server is enabled, console is healthy and reachable at `/consoleui/`; otherwise marked `Not Applicable` with values evidence. | Helm values, pod, service, `/consoleui/` HTTP output, screenshot |
-| PLAT-012 | Platform | Verify APISIX OpenTelemetry runtime metadata. | The `apisix-plugin-metadata` sidecar reports success and the APISIX Admin API returns OpenTelemetry plugin metadata. | sidecar logs and Admin API output |
-| PLAT-013 | Platform | Verify Eureka/APISIX replica alignment. | The APISIX Eureka discovery host list contains one StatefulSet-pod endpoint for every effective Eureka replica. | Helm values, rendered ConfigMap, running ConfigMap |
-| PLAT-014 | Platform | Verify optional Coherence cluster. | When enabled, the operator and CRD are ready and the release-owned Coherence CR reaches its requested member count; otherwise marked `Not Applicable` with values evidence. | Helm values, CRD/operator, Coherence CR and pod output |
-| CB-001 | CloudBank | Run CloudBank prerequisite checks. | Build and deploy checks pass. | script output |
-| CB-002 | CloudBank | Build and publish or load images. | Images for the selected CloudBank services are available to the cluster. | build/push output |
-| CB-003 | CloudBank | Create CloudBank secrets. | Expected DB, OAuth, and signing-key secrets exist. | secret list |
-| CB-004 | CloudBank | Deploy seven services. | `azn-server`, `account`, selected customer implementation, `creditscore`, `transfer`, `checks`, `testrunner` are running. | Helm and pod output |
-| CB-005 | CloudBank | Create APISIX routes. | Required routes created and sensitive routes blocked. | route script output |
-| CB-006 | CloudBank | Run secured smoke test. | Smoke test passes. | smoke script output |
-| CB-007 | CloudBank | Check OAuth metadata and JWKS. | Metadata is public and JWKS exposes a key ID. | curl output |
-| CB-008 | CloudBank | Check unauthorized access. | Protected endpoint without token returns `401`. | curl output |
-| CB-009 | CloudBank | Check read access. | Read token can call account, customer, and creditscore APIs. | curl output |
-| CB-010 | CloudBank | Check wrong-scope access. | Wrong token scope returns `403`. | curl output |
-| CB-011 | CloudBank | Check deposit workflow. | Deposit returns success and check service logs show receipt. | curl and logs |
-| CB-012 | CloudBank | Check journal and clearance workflow. | Journal moves from pending to deposit after clear. | curl and logs |
-| CB-013 | CloudBank | Check transfer workflow. | Balances change correctly and transfer logs show LRA lifecycle. | curl and logs |
-| CB-014 | CloudBank | Run full all-services validation. | `7-test_all_services.sh` passes for `Full Validation`; local-functional runs may mark it `Not Applicable` with tier evidence. | full script output |
-| OBS-001 | Observability | Log in to SigNoz. | SigNoz UI login succeeds. | screenshot |
-| OBS-002 | Observability | Verify SigNoz Services view. | Platform and CloudBank services appear for recent time window. | screenshot |
-| OBS-003 | Observability | Verify Services table columns. | P99 latency, error rate, and operations per second are populated. | screenshot |
-| OBS-004 | Observability | Verify traces. | CloudBank request traces appear and can be opened. | screenshot |
-| OBS-005 | Observability | Verify logs. | CloudBank and platform logs appear and can be filtered by namespace/pod/service. | screenshot |
-| OBS-006 | Observability | Verify metrics. | Service metrics are visible for CloudBank and platform services. | screenshot |
-| OBS-007 | Observability | Verify infra monitoring. | Kubernetes node, pod, PVC, and host metrics are visible where supported. | screenshot |
-| OBS-008 | Observability | Verify dashboards are installed. | Expected preinstalled dashboards are present. | screenshot and dashboard list |
-| OBS-009 | Observability | Verify dashboard population. | Key dashboards show current data after generated traffic. | screenshots |
-| OBS-010 | Observability | Verify DB observability. | Oracle Database and DB Calls dashboards show data. | screenshots |
-| OBS-011 | Observability | Verify APISIX observability. | APISIX dashboard shows gateway request data. | screenshot |
-| OBS-012 | Observability | Verify JVM/Spring observability. | Spring Boot and JVM dashboards show CloudBank data. | screenshots |
-| OBS-013 | Observability | Verify optional MicroTx observability. | When `otmm.coordinator.enabled=true`, MicroTx dashboard shows data after transfer workflow or waiver explains absence; when disabled, mark `Not Applicable` with values evidence. | screenshot or values evidence |
-| OBS-014 | Observability | Verify messaging queues view. | Messaging Queues view is accessible and populated when queue/Kafka data exists. | screenshot |
-| OBS-015 | Observability | Verify telemetry data before dashboard capture. | Metrics, logs, and traces exist for required services in the selected time window before screenshots are taken. | curl/API/SQL output |
-| OBS-016 | Observability | Validate captured screenshots. | Screenshot guardrails prove the expected page was captured and required dashboards contain data. | validation report |
-| OBS-017 | Observability | Verify collector scrape health. | Collector logs show EndpointSlice-based kube-state-metrics discovery with no repeated collector self-scrape or deprecated v1 endpoint warnings. | current and previous collector logs, scrape evidence |
-| SEC-001 | Security | Scan OBaaS images. | Scanner completes and critical/high findings are triaged. | scan report |
-| SEC-002 | Security | Scan CloudBank images. | Scanner completes and critical/high findings are triaged. | scan report |
-| SEC-003 | Security | Record scanner metadata. | Scanner name, version, DB date, image tags, and digests are recorded. | scan output |
-| LIFE-001 | Lifecycle | Uninstall OBaaS chart when explicitly approved. | Namespace-scoped resources are removed or expected retained resources are documented. | Helm/kubectl output |
-| LIFE-002 | Lifecycle | Reinstall OBaaS into same namespace. | Install succeeds after cleanup. | Helm/kubectl output |
-| MT-001 | Multi-OBaaS | Install second OBaaS in different namespace. | Second release is healthy. | Helm/kubectl output |
-| MT-002 | Multi-OBaaS | Verify Eureka isolation. | Each Eureka instance sees only its namespace's services. | screenshots |
-| MT-003 | Multi-OBaaS | Verify SigNoz isolation. | Each SigNoz instance shows only its namespace's telemetry. | screenshots |
-| DB-001 | BYODB | Test `database.type: OTHER` when available. | OBaaS installs against BYODB and required grants are verified. | SQL and Helm output |
+<table>
+  <thead><tr><th>ID</th><th>Category</th><th>Test</th><th>Expected Result</th><th>Evidence</th></tr></thead>
+  <tbody>
+    <tr><td>INF-001</td><td>Infrastructure</td><td>Validate infrastructure configuration.</td><td>Formatting, configuration, and ORM schema checks pass; IaC security findings are triaged.</td><td>CLI/provider versions, validation output, scan findings and disposition</td></tr>
+    <tr><td>INF-002</td><td>Infrastructure</td><td>Review the deployment plan.</td><td>Planned resources match the selected scenario and authorized scope; replacements and deletions are accounted for.</td><td>state reference, input references, sanitized plan summary and identity</td></tr>
+    <tr><td>INF-003</td><td>Infrastructure</td><td>Provision OCI resources.</td><td>Apply succeeds; cluster, node pools, and selected add-ons are ready.</td><td>apply output/status, OCI resource and add-on readiness</td></tr>
+    <tr><td>INF-004</td><td>Infrastructure</td><td>Verify deployment handoff.</td><td>Context, namespaces, chart versions, generated values, database references, and component ownership match the run inputs.</td><td>sanitized outputs/values, context and release metadata</td></tr>
+    <tr><td>INF-005</td><td>Infrastructure</td><td>Verify retention or authorized teardown.</td><td>Run-owned resources are retained with an owner or removed as agreed; residual resources and follow-up are recorded.</td><td>resource inventory, retention decision or destroy evidence</td></tr>
+    <tr><td>PRE-001</td><td>Preflight</td><td>Verify current Kubernetes context.</td><td>Context equals <code>&lt;kube-context&gt;</code>.</td><td><code>kubectl config current-context</code></td></tr>
+    <tr><td>PRE-002</td><td>Preflight</td><td>Verify cluster API access.</td><td><code>kubectl get nodes</code> succeeds.</td><td>node list</td></tr>
+    <tr><td>PRE-003</td><td>Preflight</td><td>Verify Helm access.</td><td><code>helm version</code> and <code>helm list -A</code> succeed.</td><td>Helm output</td></tr>
+    <tr><td>PRE-004</td><td>Preflight</td><td>Verify cluster capacity policy.</td><td>Full validation meets requirements, or local deviations are recorded.</td><td>node describe</td></tr>
+    <tr><td>PRE-005</td><td>Preflight</td><td>Verify storage classes and RWX support decision.</td><td>Selected storage class and RWX status are recorded.</td><td>storageclass output</td></tr>
+    <tr><td>PRE-006</td><td>Preflight</td><td>Verify external access strategy.</td><td>Envoy Gateway, explicit ingress-nginx opt-in, both, OCI Native Ingress, other existing access, or port-forward-only path is verified.</td><td>service, ingress, gateway, controller and load balancer evidence</td></tr>
+    <tr><td>PRE-007</td><td>Preflight</td><td>Verify chart source and version.</td><td>Both charts are installed from this checkout's <code>helm/infra-charts/</code> paths and match the recorded chart and app versions. OCI test inputs set <code>k8s_use_local_charts=true</code>.</td><td>Chart.yaml, effective test inputs, Helm command/chart-path output and installed release metadata</td></tr>
+    <tr><td>PRE-008</td><td>Preflight</td><td>Render selected chart values.</td><td><code>helm lint</code> and <code>helm template</code> succeed for both charts; rendered output reflects selected optional components.</td><td>lint and rendered-manifest output</td></tr>
+    <tr><td>INST-001</td><td>Install</td><td>Install or verify cert-manager.</td><td>Owner-specific checks in AGENTS.md pass: Helm release deployed or OKE CertManager add-on healthy; deployments available and CRDs present. A pending or missing Helm release fails a Helm-owned install.</td><td>ownership, Helm or OKE add-on status, readiness and CRDs; failure logs/events</td></tr>
+    <tr><td>INST-002</td><td>Install</td><td>Install or verify <code>obaas-prereqs</code> once.</td><td>Release deployed and prerequisite pods healthy, including separately managed operators.</td><td>Helm status, pod and add-on output</td></tr>
+    <tr><td>INST-003</td><td>Install</td><td>Install or verify OBaaS.</td><td>Release deployed and OBaaS pods healthy.</td><td>Helm status and pod output</td></tr>
+    <tr><td>INST-004</td><td>Install</td><td>Verify no unexpected failed jobs or PVC problems.</td><td>Jobs succeeded and PVCs bound.</td><td>jobs, PVCs, events</td></tr>
+    <tr><td>PLAT-001</td><td>Platform</td><td>Verify APISIX gateway.</td><td>Gateway service has external address or working port-forward.</td><td>service output, curl result</td></tr>
+    <tr><td>PLAT-002</td><td>Platform</td><td>Verify APISIX admin API.</td><td>Admin routes endpoint responds with valid admin key.</td><td>curl output</td></tr>
+    <tr><td>PLAT-003</td><td>Platform</td><td>Verify Eureka.</td><td>Eureka UI/API is reachable.</td><td>screenshot and HTTP output</td></tr>
+    <tr><td>PLAT-004</td><td>Platform</td><td>Verify Config Server.</td><td><code>/&lt;application&gt;/&lt;profile&gt;</code> returns JSON property source response.</td><td>curl output</td></tr>
+    <tr><td>PLAT-005</td><td>Platform</td><td>Verify Spring Boot Admin.</td><td>Admin UI is reachable and services appear.</td><td>screenshot</td></tr>
+    <tr><td>PLAT-006</td><td>Platform</td><td>Verify database exporter.</td><td>Exporter pod/service is healthy and metrics scrape target exists.</td><td>pod, service, logs</td></tr>
+    <tr><td>PLAT-007</td><td>Platform</td><td>Verify optional OTMM/MicroTx coordinator runtime.</td><td>When enabled, OTMM service is healthy and CloudBank transfer can use the LRA coordinator; otherwise marked <code>Not Applicable</code> with values evidence.</td><td>Helm values, pod output, CloudBank transfer evidence</td></tr>
+    <tr><td>PLAT-008</td><td>Platform</td><td>Verify optional Kafka.</td><td>Kafka CRs and dashboard data exist when Kafka is enabled.</td><td>Strimzi/Kafka output</td></tr>
+    <tr><td>PLAT-009</td><td>Platform</td><td>Verify optional AI Optimizer.</td><td>AI Optimizer pods and required secrets exist when enabled.</td><td>pod, secret output</td></tr>
+    <tr><td>PLAT-010</td><td>Platform</td><td>Verify optional MicroTx Workflow Server.</td><td>When enabled, workflow server is healthy, Flyway migration succeeds, and no Oracle privilege error is present; otherwise marked <code>Not Applicable</code> with values evidence.</td><td>Helm values, pod, service, health endpoint, logs</td></tr>
+    <tr><td>PLAT-011</td><td>Platform</td><td>Verify optional OTMM console.</td><td>When <code>otmm.console.enabled=true</code> and either coordinator or workflow server is enabled, console is healthy and reachable at <code>/consoleui/</code>; otherwise marked <code>Not Applicable</code> with values evidence.</td><td>Helm values, pod, service, <code>/consoleui/</code> HTTP output, screenshot</td></tr>
+    <tr><td>PLAT-012</td><td>Platform</td><td>Verify APISIX OpenTelemetry runtime metadata.</td><td>The <code>apisix-plugin-metadata</code> sidecar reports success and the APISIX Admin API returns OpenTelemetry plugin metadata.</td><td>sidecar logs and Admin API output</td></tr>
+    <tr><td>PLAT-013</td><td>Platform</td><td>Verify Eureka/APISIX replica alignment.</td><td>The APISIX Eureka discovery host list contains one StatefulSet-pod endpoint for every effective Eureka replica.</td><td>Helm values, rendered ConfigMap, running ConfigMap</td></tr>
+    <tr><td>PLAT-014</td><td>Platform</td><td>Verify optional Coherence cluster.</td><td>When enabled, the operator and CRD are ready and the release-owned Coherence CR reaches its requested member count; otherwise marked <code>Not Applicable</code> with values evidence.</td><td>Helm values, CRD/operator, Coherence CR and pod output</td></tr>
+    <tr><td>CB-001</td><td>CloudBank</td><td>Run CloudBank prerequisite checks.</td><td>Build and deploy checks pass.</td><td>script output</td></tr>
+    <tr><td>CB-002</td><td>CloudBank</td><td>Build and publish or load images.</td><td>Images for the selected CloudBank services are available to the cluster.</td><td>build/push output</td></tr>
+    <tr><td>CB-003</td><td>CloudBank</td><td>Create CloudBank secrets.</td><td>Expected DB, OAuth, and signing-key secrets exist.</td><td>secret list</td></tr>
+    <tr><td>CB-004</td><td>CloudBank</td><td>Deploy seven services.</td><td><code>azn-server</code>, <code>account</code>, selected customer implementation, <code>creditscore</code>, <code>transfer</code>, <code>checks</code>, <code>testrunner</code> are running.</td><td>Helm and pod output</td></tr>
+    <tr><td>CB-005</td><td>CloudBank</td><td>Create APISIX routes.</td><td>Required routes created and sensitive routes blocked.</td><td>route script output</td></tr>
+    <tr><td>CB-006</td><td>CloudBank</td><td>Run secured smoke test.</td><td>Smoke test passes.</td><td>smoke script output</td></tr>
+    <tr><td>CB-007</td><td>CloudBank</td><td>Check OAuth metadata and JWKS.</td><td>Metadata is public and JWKS exposes a key ID.</td><td>curl output</td></tr>
+    <tr><td>CB-008</td><td>CloudBank</td><td>Check unauthorized access.</td><td>Protected endpoint without token returns <code>401</code>.</td><td>curl output</td></tr>
+    <tr><td>CB-009</td><td>CloudBank</td><td>Check read access.</td><td>Read token can call account, customer, and creditscore APIs.</td><td>curl output</td></tr>
+    <tr><td>CB-010</td><td>CloudBank</td><td>Check wrong-scope access.</td><td>Wrong token scope returns <code>403</code>.</td><td>curl output</td></tr>
+    <tr><td>CB-011</td><td>CloudBank</td><td>Check deposit workflow.</td><td>Deposit returns success and check service logs show receipt.</td><td>curl and logs</td></tr>
+    <tr><td>CB-012</td><td>CloudBank</td><td>Check journal and clearance workflow.</td><td>Journal moves from pending to deposit after clear.</td><td>curl and logs</td></tr>
+    <tr><td>CB-013</td><td>CloudBank</td><td>Check transfer workflow.</td><td>Balances change correctly and transfer logs show LRA lifecycle.</td><td>curl and logs</td></tr>
+    <tr><td>CB-014</td><td>CloudBank</td><td>Run full all-services validation.</td><td><code>7-test_all_services.sh</code> passes for <code>Full Validation</code>; local-functional runs may mark it <code>Not Applicable</code> with tier evidence.</td><td>full script output</td></tr>
+    <tr><td>OBS-001</td><td>Observability</td><td>Log in to SigNoz.</td><td>SigNoz UI login succeeds.</td><td>screenshot</td></tr>
+    <tr><td>OBS-002</td><td>Observability</td><td>Verify SigNoz Services view.</td><td>Platform and CloudBank services appear for recent time window.</td><td>screenshot</td></tr>
+    <tr><td>OBS-003</td><td>Observability</td><td>Verify Services table columns.</td><td>P99 latency, error rate, and operations per second are populated.</td><td>screenshot</td></tr>
+    <tr><td>OBS-004</td><td>Observability</td><td>Verify traces.</td><td>CloudBank request traces appear and can be opened.</td><td>screenshot</td></tr>
+    <tr><td>OBS-005</td><td>Observability</td><td>Verify logs.</td><td>CloudBank and platform logs appear and can be filtered by namespace/pod/service.</td><td>screenshot</td></tr>
+    <tr><td>OBS-006</td><td>Observability</td><td>Verify metrics.</td><td>Service metrics are visible for CloudBank and platform services.</td><td>screenshot</td></tr>
+    <tr><td>OBS-007</td><td>Observability</td><td>Verify infra monitoring.</td><td>Kubernetes node, pod, PVC, and host metrics are visible where supported.</td><td>screenshot</td></tr>
+    <tr><td>OBS-008</td><td>Observability</td><td>Verify dashboards are installed.</td><td>Expected preinstalled dashboards are present.</td><td>screenshot and dashboard list</td></tr>
+    <tr><td>OBS-009</td><td>Observability</td><td>Verify dashboard population.</td><td>Key dashboards show current data after generated traffic.</td><td>screenshots</td></tr>
+    <tr><td>OBS-010</td><td>Observability</td><td>Verify DB observability.</td><td>Oracle Database and DB Calls dashboards show data.</td><td>screenshots</td></tr>
+    <tr><td>OBS-011</td><td>Observability</td><td>Verify APISIX observability.</td><td>APISIX dashboard shows gateway request data.</td><td>screenshot</td></tr>
+    <tr><td>OBS-012</td><td>Observability</td><td>Verify JVM/Spring observability.</td><td>Spring Boot and JVM dashboards show CloudBank data.</td><td>screenshots</td></tr>
+    <tr><td>OBS-013</td><td>Observability</td><td>Verify optional MicroTx observability.</td><td>When <code>otmm.coordinator.enabled=true</code>, MicroTx dashboard shows data after transfer workflow or waiver explains absence; when disabled, mark <code>Not Applicable</code> with values evidence.</td><td>screenshot or values evidence</td></tr>
+    <tr><td>OBS-014</td><td>Observability</td><td>Verify messaging queues view.</td><td>Messaging Queues view is accessible and populated when queue/Kafka data exists.</td><td>screenshot</td></tr>
+    <tr><td>OBS-015</td><td>Observability</td><td>Verify telemetry data before dashboard capture.</td><td>Metrics, logs, and traces exist for required services in the selected time window before screenshots are taken.</td><td>curl/API/SQL output</td></tr>
+    <tr><td>OBS-016</td><td>Observability</td><td>Validate captured screenshots.</td><td>Screenshot guardrails prove the expected page was captured and required dashboards contain data.</td><td>validation report</td></tr>
+    <tr><td>OBS-017</td><td>Observability</td><td>Verify collector scrape health.</td><td>Collector logs show EndpointSlice-based kube-state-metrics discovery with no repeated collector self-scrape or deprecated v1 endpoint warnings.</td><td>current and previous collector logs, scrape evidence</td></tr>
+    <tr><td>SEC-001</td><td>Security</td><td>Scan OBaaS images.</td><td>Scanner completes and critical/high findings are triaged.</td><td>scan report</td></tr>
+    <tr><td>SEC-002</td><td>Security</td><td>Scan CloudBank images.</td><td>Scanner completes and critical/high findings are triaged.</td><td>scan report</td></tr>
+    <tr><td>SEC-003</td><td>Security</td><td>Record scanner metadata.</td><td>Scanner name, version, DB date, image tags, and digests are recorded.</td><td>scan output</td></tr>
+    <tr><td>LIFE-001</td><td>Lifecycle</td><td>Uninstall OBaaS chart when explicitly approved.</td><td>Namespace-scoped resources are removed or expected retained resources are documented.</td><td>Helm/kubectl output</td></tr>
+    <tr><td>LIFE-002</td><td>Lifecycle</td><td>Reinstall OBaaS into same namespace.</td><td>Install succeeds after cleanup.</td><td>Helm/kubectl output</td></tr>
+    <tr><td>MT-001</td><td>Multi-OBaaS</td><td>Install second OBaaS in different namespace.</td><td>Second release is healthy.</td><td>Helm/kubectl output</td></tr>
+    <tr><td>MT-002</td><td>Multi-OBaaS</td><td>Verify Eureka isolation.</td><td>Each Eureka instance sees only its namespace's services.</td><td>screenshots</td></tr>
+    <tr><td>MT-003</td><td>Multi-OBaaS</td><td>Verify SigNoz isolation.</td><td>Each SigNoz instance shows only its namespace's telemetry.</td><td>screenshots</td></tr>
+    <tr><td>DB-001</td><td>BYODB</td><td>Test <code>database.type: OTHER</code> when available.</td><td>OBaaS installs against BYODB and required grants are verified.</td><td>SQL and Helm output</td></tr>
+  </tbody>
+</table>
 
 ## Functional Test Guidance
 
@@ -285,18 +348,21 @@ Use CloudBank traffic first because it exercises the most useful path through AP
 
 Map generated load to dashboard expectations:
 
-| Dashboard or View | Data To Generate Before Capture |
-| --- | --- |
-| SigNoz Services, APM Metrics, HTTP API Monitoring | Repeated CloudBank API requests through APISIX. |
-| Apache APISIX and Envoy Gateway by default; NGINX only when ingress-nginx is explicitly enabled | Gateway-routed CloudBank API requests. |
-| Spring Boot Observability, Spring Boot 3.x Statistics, JVM Metrics | CloudBank service requests plus actuator or metrics scraping evidence. |
-| DB Calls Monitoring, Oracle Database Dashboard | CloudBank account, deposit, journal, and transfer operations that touch the database. |
-| MicroTx | CloudBank transfer workflow for coordinator/LRA telemetry when `otmm.coordinator.enabled=true`; MicroTx Workflow Server health, logs, and metrics when `otmm.workflowServer.enabled=true`. |
-| Logs and Traces | CloudBank smoke and workflow requests with trace propagation enabled. |
-| Kubernetes Pod, Node, PVC, Host, kube-state-metrics | Wait for collector scrape intervals and verify pod/node/PVC metrics directly. |
-| Kafka Server Monitoring Dashboard | Kafka producer/consumer traffic when Kafka is enabled. Prefer `helidon-producer` and `helidon-consumer` with repeated `POST /post` requests to `my-topic`. |
-| Helidon MP dashboards | `customer-helidon` customer API requests, `helidon-producer` Kafka publish requests, or `helidon-consumer` message consumption when those workloads are deployed. |
-| Helidon SE dashboards | A real Helidon SE workload. If none is deployed, mark the dashboard `Not Applicable` or `Waived` with the reason `no Helidon SE example/workload in this run`. |
+<table>
+  <thead><tr><th>Dashboard or View</th><th>Data To Generate Before Capture</th></tr></thead>
+  <tbody>
+    <tr><td>SigNoz Services, APM Metrics, HTTP API Monitoring</td><td>Repeated CloudBank API requests through APISIX.</td></tr>
+    <tr><td>Apache APISIX and Envoy Gateway by default; NGINX only when ingress-nginx is explicitly enabled</td><td>Gateway-routed CloudBank API requests.</td></tr>
+    <tr><td>Spring Boot Observability, Spring Boot 3.x Statistics, JVM Metrics</td><td>CloudBank service requests plus actuator or metrics scraping evidence.</td></tr>
+    <tr><td>DB Calls Monitoring, Oracle Database Dashboard</td><td>CloudBank account, deposit, journal, and transfer operations that touch the database.</td></tr>
+    <tr><td>MicroTx</td><td>CloudBank transfer workflow for coordinator/LRA telemetry when <code>otmm.coordinator.enabled=true</code>; MicroTx Workflow Server health, logs, and metrics when <code>otmm.workflowServer.enabled=true</code>.</td></tr>
+    <tr><td>Logs and Traces</td><td>CloudBank smoke and workflow requests with trace propagation enabled.</td></tr>
+    <tr><td>Kubernetes Pod, Node, PVC, Host, kube-state-metrics</td><td>Wait for collector scrape intervals and verify pod/node/PVC metrics directly.</td></tr>
+    <tr><td>Kafka Server Monitoring Dashboard</td><td>Kafka producer/consumer traffic when Kafka is enabled. Prefer <code>helidon-producer</code> and <code>helidon-consumer</code> with repeated <code>POST /post</code> requests to <code>my-topic</code>.</td></tr>
+    <tr><td>Helidon MP dashboards</td><td><code>customer-helidon</code> customer API requests, <code>helidon-producer</code> Kafka publish requests, or <code>helidon-consumer</code> message consumption when those workloads are deployed.</td></tr>
+    <tr><td>Helidon SE dashboards</td><td>A real Helidon SE workload. If none is deployed, mark the dashboard <code>Not Applicable</code> or <code>Waived</code> with the reason <code>no Helidon SE example/workload in this run</code>.</td></tr>
+  </tbody>
+</table>
 
 After load generation, wait for the collector and SigNoz ingestion lag to settle, then rerun telemetry readiness checks. A typical wait is 1 to 3 minutes on a local cluster, but use observed ingestion behavior rather than a fixed assumption.
 
@@ -566,6 +632,14 @@ Run destructive lifecycle tests only with explicit operator approval and only af
 4. Reinstall OBaaS into the same namespace using the same values.
 5. Rerun platform and CloudBank smoke tests, plus `7-test_all_services.sh` when the validation tier is `Full Validation`.
 
+### Infrastructure Retention And Teardown
+
+Finish workload lifecycle tests and export evidence while the cluster is available. For OCI modes, inventory resources owned by the selected state separately from BYO networking, databases, and Kubernetes-created cloud resources.
+
+For retention, record resource identifiers, the state reference, an owner, and the intended cleanup date. For teardown, obtain explicit approval covering the reviewed destruction scope and database/storage loss; approval for Helm uninstall alone covers only that lifecycle test. Clean up workloads using the deployment guides, then use `opentofu/README.md` with the same CLI, inputs, and state to destroy the approved infrastructure. Verify cloud resources, volumes, and load balancers against the inventory and record residual resources and their owner.
+
+After a partial apply or failed destroy, preserve state and diagnostics, reconcile the remaining resources, and record their disposition in `INF-005`. Use `Fail` when the agreed cleanup outcome is unmet.
+
 ### Multi-OBaaS
 
 Install a second OBaaS instance in a different namespace using the multi-tenant guidance and values policy in `AGENTS.md`.
@@ -592,8 +666,10 @@ Expected:
 
 ## Failure Evidence
 
-When any test fails, collect the relevant diagnostics from `AGENTS.md`, `CBV5-AGENT.md`, and the local platform docs, then attach them to the report. At minimum, evidence should cover:
+When any test fails, collect the relevant diagnostics from the provisioning sources, `AGENTS.md`, `CBV5-AGENT.md`, and the local platform docs, then attach sanitized evidence to the report. At minimum, evidence should cover:
 
+- For infrastructure failures, CLI/provider versions, input and state references, plan identity, apply or destroy exit status, failing resource addresses, OCI work request diagnostics, and the remaining resource inventory. Include configuration-management output when Helm or manifest application failed.
+- For OKE add-on failures, add-on status and work request diagnostics plus the affected Kubernetes workloads and events.
 - Current namespace workload state.
 - Relevant Helm release status.
 - Current and previous logs for failing pods.
@@ -623,34 +699,39 @@ Use this template:
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID |  |
-| Start Time |  |
-| End Time |  |
-| Tester / Agent |  |
-| Repository Commit |  |
-| Kubernetes Context |  |
-| Cluster Type |  |
-| Validation Tier | Full Validation / Local Functional |
-| Platform Namespace |  |
-| Prereqs Release |  |
-| Application Namespace |  |
-| OBaaS Release |  |
-| OBaaS Chart Version |  |
-| OBaaS App Version |  |
-| Database Type |  |
-| Access Path |  |
-| Eureka Replicas |  |
-| Coherence Enabled / Cluster Name / Persistence |  |
-| CloudBank DB Name |  |
-| CloudBank Image Tag |  |
-| CloudBank Customer Implementation | `customer` / `customer-helidon` |
-| Kafka Load Workload | `helidon-producer` / `helidon-consumer` / other / not enabled |
-| OTMM Coordinator Enabled | true / false |
-| OTMM Workflow Server Enabled | true / false |
-| OTMM Console Requested / Effective | true / false |
-| Evidence Directory |  |
+<table>
+  <thead><tr><th>Field</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Run ID</td><td></td></tr>
+    <tr><td>Start Time</td><td></td></tr>
+    <tr><td>End Time</td><td></td></tr>
+    <tr><td>Tester / Agent</td><td></td></tr>
+    <tr><td>Repository Commit</td><td></td></tr>
+    <tr><td>Deployment Mode</td><td>Existing Cluster / OCI Infrastructure / OCI Infrastructure And OBaaS</td></tr>
+    <tr><td>Kubernetes Context</td><td></td></tr>
+    <tr><td>Cluster Type</td><td></td></tr>
+    <tr><td>Validation Tier</td><td>Full Validation / Local Functional</td></tr>
+    <tr><td>Platform Namespace</td><td></td></tr>
+    <tr><td>Prereqs Release</td><td></td></tr>
+    <tr><td>Application Namespace</td><td></td></tr>
+    <tr><td>OBaaS Release</td><td></td></tr>
+    <tr><td>OBaaS Chart Version</td><td></td></tr>
+    <tr><td>OBaaS App Version</td><td></td></tr>
+    <tr><td>Database Type</td><td></td></tr>
+    <tr><td>Access Path</td><td></td></tr>
+    <tr><td>cert-manager Owner / Namespace</td><td></td></tr>
+    <tr><td>Eureka Replicas</td><td></td></tr>
+    <tr><td>Coherence Enabled / Cluster Name / Persistence</td><td></td></tr>
+    <tr><td>CloudBank DB Name</td><td></td></tr>
+    <tr><td>CloudBank Image Tag</td><td></td></tr>
+    <tr><td>CloudBank Customer Implementation</td><td><code>customer</code> / <code>customer-helidon</code></td></tr>
+    <tr><td>Kafka Load Workload</td><td><code>helidon-producer</code> / <code>helidon-consumer</code> / other / not enabled</td></tr>
+    <tr><td>OTMM Coordinator Enabled</td><td>true / false</td></tr>
+    <tr><td>OTMM Workflow Server Enabled</td><td>true / false</td></tr>
+    <tr><td>OTMM Console Requested / Effective</td><td>true / false</td></tr>
+    <tr><td>Evidence Directory</td><td></td></tr>
+  </tbody>
+</table>
 
 ## Executive Summary
 
@@ -658,7 +739,7 @@ Overall Status: Pass / Fail
 
 Traffic-Light Rating: Green / Amber / Red
 
-Pass Rate: `<passed>/<executed>` (`<percent>%`)
+Pass Rate: `<passed>/<executed>` (`<percent>%`), where executed is `Pass` plus `Fail`. Report `N/A` when no tests executed; list blocked tests separately.
 
 Summary:
 
@@ -666,9 +747,24 @@ Summary:
 
 Rating rules:
 
-- Green: all required tests pass, no unwaived critical/high image findings, no required evidence missing.
+- Green: all required tests pass, no unwaived critical/high security findings, no required evidence missing.
 - Amber: only waived, local-capacity, optional-component, or non-blocking evidence issues remain.
-- Red: any required install, platform, CloudBank, observability, isolation, or security test fails.
+- Red: any required infrastructure, install, platform, CloudBank, observability, isolation, or security test fails or is blocked.
+
+## Infrastructure Evidence Summary
+
+- CLI/version and provider versions:
+- OCI profile, tenancy, compartment, and region:
+- Working directory, variable-file references, and state backend/workspace or local state path:
+- Resource prefix, cluster identity, network and database scenario:
+- Configuration-management, local-chart, and OKE add-on settings:
+- Local chart paths and chart/app versions:
+- Static checks and IaC scan findings/disposition:
+- Reviewed plan identity and sanitized evidence:
+- Apply outcome and handoff evidence:
+- Failed prerequisite and blocked test IDs:
+- Retain/destroy decision and destruction approval, when applicable:
+- Remaining resources, owner, cleanup date, and follow-up:
 
 ## Environment Summary
 
@@ -690,93 +786,104 @@ Known deviations or waivers:
 
 ## Test Results
 
-| ID | Category | Status | Expected | Actual | Evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- |
-| PRE-001 | Preflight |  |  |  |  |  |
-| PRE-002 | Preflight |  |  |  |  |  |
-| PRE-003 | Preflight |  |  |  |  |  |
-| PRE-004 | Preflight |  |  |  |  |  |
-| PRE-005 | Preflight |  |  |  |  |  |
-| PRE-006 | Preflight |  |  |  |  |  |
-| PRE-007 | Preflight |  |  |  |  |  |
-| PRE-008 | Preflight |  |  |  |  |  |
-| INST-001 | Install |  |  |  |  |  |
-| INST-002 | Install |  |  |  |  |  |
-| INST-003 | Install |  |  |  |  |  |
-| INST-004 | Install |  |  |  |  |  |
-| PLAT-001 | Platform |  |  |  |  |  |
-| PLAT-002 | Platform |  |  |  |  |  |
-| PLAT-003 | Platform |  |  |  |  |  |
-| PLAT-004 | Platform |  |  |  |  |  |
-| PLAT-005 | Platform |  |  |  |  |  |
-| PLAT-006 | Platform |  |  |  |  |  |
-| PLAT-007 | Platform |  |  |  |  |  |
-| PLAT-008 | Platform |  |  |  |  |  |
-| PLAT-009 | Platform |  |  |  |  |  |
-| PLAT-010 | Platform |  |  |  |  |  |
-| PLAT-011 | Platform |  |  |  |  |  |
-| PLAT-012 | Platform |  |  |  |  |  |
-| PLAT-013 | Platform |  |  |  |  |  |
-| PLAT-014 | Platform |  |  |  |  |  |
-| CB-001 | CloudBank |  |  |  |  |  |
-| CB-002 | CloudBank |  |  |  |  |  |
-| CB-003 | CloudBank |  |  |  |  |  |
-| CB-004 | CloudBank |  |  |  |  |  |
-| CB-005 | CloudBank |  |  |  |  |  |
-| CB-006 | CloudBank |  |  |  |  |  |
-| CB-007 | CloudBank |  |  |  |  |  |
-| CB-008 | CloudBank |  |  |  |  |  |
-| CB-009 | CloudBank |  |  |  |  |  |
-| CB-010 | CloudBank |  |  |  |  |  |
-| CB-011 | CloudBank |  |  |  |  |  |
-| CB-012 | CloudBank |  |  |  |  |  |
-| CB-013 | CloudBank |  |  |  |  |  |
-| CB-014 | CloudBank |  |  |  |  |  |
-| OBS-001 | Observability |  |  |  |  |  |
-| OBS-002 | Observability |  |  |  |  |  |
-| OBS-003 | Observability |  |  |  |  |  |
-| OBS-004 | Observability |  |  |  |  |  |
-| OBS-005 | Observability |  |  |  |  |  |
-| OBS-006 | Observability |  |  |  |  |  |
-| OBS-007 | Observability |  |  |  |  |  |
-| OBS-008 | Observability |  |  |  |  |  |
-| OBS-009 | Observability |  |  |  |  |  |
-| OBS-010 | Observability |  |  |  |  |  |
-| OBS-011 | Observability |  |  |  |  |  |
-| OBS-012 | Observability |  |  |  |  |  |
-| OBS-013 | Observability |  |  |  |  |  |
-| OBS-014 | Observability |  |  |  |  |  |
-| OBS-015 | Observability |  |  |  |  |  |
-| OBS-016 | Observability |  |  |  |  |  |
-| OBS-017 | Observability |  |  |  |  |  |
-| SEC-001 | Security |  |  |  |  |  |
-| SEC-002 | Security |  |  |  |  |  |
-| SEC-003 | Security |  |  |  |  |  |
-| LIFE-001 | Lifecycle |  |  |  |  |  |
-| LIFE-002 | Lifecycle |  |  |  |  |  |
-| MT-001 | Multi-OBaaS |  |  |  |  |  |
-| MT-002 | Multi-OBaaS |  |  |  |  |  |
-| MT-003 | Multi-OBaaS |  |  |  |  |  |
-| DB-001 | BYODB |  |  |  |  |  |
+<table>
+  <thead><tr><th>ID</th><th>Category</th><th>Status</th><th>Expected</th><th>Actual</th><th>Evidence</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>INF-001</td><td>Infrastructure</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>INF-002</td><td>Infrastructure</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>INF-003</td><td>Infrastructure</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>INF-004</td><td>Infrastructure</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>INF-005</td><td>Infrastructure</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PRE-001</td><td>Preflight</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PRE-002</td><td>Preflight</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PRE-003</td><td>Preflight</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PRE-004</td><td>Preflight</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PRE-005</td><td>Preflight</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PRE-006</td><td>Preflight</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PRE-007</td><td>Preflight</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PRE-008</td><td>Preflight</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>INST-001</td><td>Install</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>INST-002</td><td>Install</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>INST-003</td><td>Install</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>INST-004</td><td>Install</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-001</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-002</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-003</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-004</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-005</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-006</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-007</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-008</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-009</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-010</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-011</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-012</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-013</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>PLAT-014</td><td>Platform</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-001</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-002</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-003</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-004</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-005</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-006</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-007</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-008</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-009</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-010</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-011</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-012</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-013</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>CB-014</td><td>CloudBank</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-001</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-002</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-003</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-004</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-005</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-006</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-007</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-008</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-009</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-010</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-011</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-012</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-013</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-014</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-015</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-016</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>OBS-017</td><td>Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>SEC-001</td><td>Security</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>SEC-002</td><td>Security</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>SEC-003</td><td>Security</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>LIFE-001</td><td>Lifecycle</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>LIFE-002</td><td>Lifecycle</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>MT-001</td><td>Multi-OBaaS</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>MT-002</td><td>Multi-OBaaS</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>MT-003</td><td>Multi-OBaaS</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>DB-001</td><td>BYODB</td><td></td><td></td><td></td><td></td><td></td></tr>
+  </tbody>
+</table>
 
 ## Platform Evidence Summary
 
-| Component | Status | Evidence | Notes |
-| --- | --- | --- | --- |
-| APISIX Gateway Service |  |  |  |
-| APISIX Admin API Routes |  |  |  |
-| APISIX OpenTelemetry Runtime Metadata |  |  |  |
-| Eureka UI/API |  |  |  |
-| Eureka/APISIX Replica Alignment |  |  |  |
-| Config Server |  |  |  |
-| Spring Boot Admin UI |  |  |  |
-| Oracle Database Exporter |  |  |  |
-| OTMM/MicroTx Runtime |  |  | Optional; required only when `otmm.coordinator.enabled=true`; include version-specific known failures instead of omitting this row. |
-| MicroTx Transfer Workflow |  |  | Optional; required only when `otmm.coordinator.enabled=true`; include CloudBank transfer evidence and failure diagnostics when failing. |
-| MicroTx Workflow Server |  |  | Optional; required only when `otmm.workflowServer.enabled=true`; include deployment, pod, service, endpoint, and health evidence. |
-| Workflow Server Flyway DB Initialization |  |  | Optional; required only when workflow server is enabled; include migration logs and any Oracle privilege diagnostics. |
-| OTMM Console |  |  | Optional; required only when `otmm.console.enabled=true` and either coordinator or workflow server is enabled; verify `/consoleui/`, not service root `/`; do not use as workflow server evidence. |
-| Coherence Cluster |  |  | Optional and deprecated; when enabled, include operator/CRD, CR, member-count, namespace-watch, and persistence evidence. |
+<table>
+  <thead><tr><th>Component</th><th>Status</th><th>Evidence</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>APISIX Gateway Service</td><td></td><td></td><td></td></tr>
+    <tr><td>APISIX Admin API Routes</td><td></td><td></td><td></td></tr>
+    <tr><td>APISIX OpenTelemetry Runtime Metadata</td><td></td><td></td><td></td></tr>
+    <tr><td>Eureka UI/API</td><td></td><td></td><td></td></tr>
+    <tr><td>Eureka/APISIX Replica Alignment</td><td></td><td></td><td></td></tr>
+    <tr><td>Config Server</td><td></td><td></td><td></td></tr>
+    <tr><td>Spring Boot Admin UI</td><td></td><td></td><td></td></tr>
+    <tr><td>Oracle Database Exporter</td><td></td><td></td><td></td></tr>
+    <tr><td>OTMM/MicroTx Runtime</td><td></td><td></td><td>Optional; required only when <code>otmm.coordinator.enabled=true</code>; include version-specific known failures instead of omitting this row.</td></tr>
+    <tr><td>MicroTx Transfer Workflow</td><td></td><td></td><td>Optional; required only when <code>otmm.coordinator.enabled=true</code>; include CloudBank transfer evidence and failure diagnostics when failing.</td></tr>
+    <tr><td>MicroTx Workflow Server</td><td></td><td></td><td>Optional; required only when <code>otmm.workflowServer.enabled=true</code>; include deployment, pod, service, endpoint, and health evidence.</td></tr>
+    <tr><td>Workflow Server Flyway DB Initialization</td><td></td><td></td><td>Optional; required only when workflow server is enabled; include migration logs and any Oracle privilege diagnostics.</td></tr>
+    <tr><td>OTMM Console</td><td></td><td></td><td>Optional; required only when <code>otmm.console.enabled=true</code> and either coordinator or workflow server is enabled; verify <code>/consoleui/</code>, not service root <code>/</code>; do not use as workflow server evidence.</td></tr>
+    <tr><td>Coherence Cluster</td><td></td><td></td><td>Optional and deprecated; when enabled, include operator/CRD, CR, member-count, namespace-watch, and persistence evidence.</td></tr>
+  </tbody>
+</table>
 
 ## Observability Evidence Summary
 
@@ -790,75 +897,97 @@ Telemetry readiness summary:
 - Screenshot validation evidence:
 - Collector scrape health evidence:
 
-| View / Dashboard | Telemetry Data Present Before Capture | Screenshot Validation | Status | Evidence | Notes |
-| --- | --- | --- | --- | --- | --- |
-| SigNoz Services |  |  |  |  |  |
-| Services P99/Error Rate/OPS Columns |  |  |  |  |  |
-| Traces |  |  |  |  |  |
-| Logs |  |  |  |  |  |
-| Metrics |  |  |  |  |  |
-| Infra Monitoring |  |  |  |  |  |
-| Dashboards List |  |  |  |  |  |
-| Spring Boot Observability |  |  |  |  |  |
-| Spring Boot Statistics |  |  |  |  |  |
-| Oracle Database Dashboard |  |  |  |  |  |
-| APISIX Dashboard |  |  |  |  | Gateway/service health belongs in Platform Evidence Summary; this row is for SigNoz APISIX observability. |
-| HTTP API Monitoring |  |  |  |  |  |
-| DB Calls Monitoring |  |  |  |  |  |
-| JVM Metrics |  |  |  |  |  |
-| MicroTx |  |  |  |  | Optional; if `otmm.coordinator.enabled=true`, record coordinator/LRA evidence and workflow-server telemetry when workflow server is enabled. If disabled, mark `Not Applicable` with values evidence. |
-| Kafka Server Monitoring Dashboard |  |  |  |  |  |
-| Helidon Main Dashboard |  |  |  |  |  |
-| Helidon MP Details |  |  |  |  |  |
-| Helidon SE Details |  |  |  |  |  |
-| Helidon JVM Details |  |  |  |  |  |
-| Helidon JVM Peak Virtual Threads |  |  |  |  | Validate `Peak Active Virtual Threads` and `Peak Pinned Virtual Threads` as window maxima. |
-| Collector Scrape Health |  |  |  |  | EndpointSlice discovery and no repeated self-scrape/deprecated-v1 warnings. |
+<table>
+  <thead><tr><th>View / Dashboard</th><th>Telemetry Data Present Before Capture</th><th>Screenshot Validation</th><th>Status</th><th>Evidence</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>SigNoz Services</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Services P99/Error Rate/OPS Columns</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Traces</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Logs</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Metrics</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Infra Monitoring</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Dashboards List</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Spring Boot Observability</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Spring Boot Statistics</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Oracle Database Dashboard</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>APISIX Dashboard</td><td></td><td></td><td></td><td></td><td>Gateway/service health belongs in Platform Evidence Summary; this row is for SigNoz APISIX observability.</td></tr>
+    <tr><td>HTTP API Monitoring</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>DB Calls Monitoring</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>JVM Metrics</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>MicroTx</td><td></td><td></td><td></td><td></td><td>Optional; if <code>otmm.coordinator.enabled=true</code>, record coordinator/LRA evidence and workflow-server telemetry when workflow server is enabled. If disabled, mark <code>Not Applicable</code> with values evidence.</td></tr>
+    <tr><td>Kafka Server Monitoring Dashboard</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Helidon Main Dashboard</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Helidon MP Details</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Helidon SE Details</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Helidon JVM Details</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Helidon JVM Peak Virtual Threads</td><td></td><td></td><td></td><td></td><td>Validate <code>Peak Active Virtual Threads</code> and <code>Peak Pinned Virtual Threads</code> as window maxima.</td></tr>
+    <tr><td>Collector Scrape Health</td><td></td><td></td><td></td><td></td><td>EndpointSlice discovery and no repeated self-scrape/deprecated-v1 warnings.</td></tr>
+  </tbody>
+</table>
 
 ## Security Scan Summary
 
-| Image | Scanner | Digest | Critical | High | Medium | Low | Status | Evidence |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-|  |  |  |  |  |  |  |  |  |
+<table>
+  <thead><tr><th>Image</th><th>Scanner</th><th>Digest</th><th>Critical</th><th>High</th><th>Medium</th><th>Low</th><th>Status</th><th>Evidence</th></tr></thead>
+  <tbody>
+    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </tbody>
+</table>
 
 Exceptions:
 
-| Image | CVE | Severity | Reason | Approver | Expiration |
-| --- | --- | --- | --- | --- | --- |
-|  |  |  |  |  |  |
+<table>
+  <thead><tr><th>Image</th><th>CVE</th><th>Severity</th><th>Reason</th><th>Approver</th><th>Expiration</th></tr></thead>
+  <tbody>
+    <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </tbody>
+</table>
 
 Medium finding triage:
 
-| Image | CVE | Reason / Disposition | Evidence |
-| --- | --- | --- | --- |
-|  |  |  |  |
+<table>
+  <thead><tr><th>Image</th><th>CVE</th><th>Reason / Disposition</th><th>Evidence</th></tr></thead>
+  <tbody>
+    <tr><td></td><td></td><td></td><td></td></tr>
+  </tbody>
+</table>
 
 ## Failure Diagnostics
 
-| Test ID | Symptom | Evidence | Likely Cause | Recommended Action |
-| --- | --- | --- | --- | --- |
-|  |  |  |  |  |
+<table>
+  <thead><tr><th>Test ID</th><th>Symptom</th><th>Evidence</th><th>Likely Cause</th><th>Recommended Action</th></tr></thead>
+  <tbody>
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  </tbody>
+</table>
 
 ## Sign-Off
 
-| Role | Name | Date | Notes |
-| --- | --- | --- | --- |
-| Tester |  |  |  |
-| Reviewer |  |  |  |
-| Operator Approval For Waivers |  |  |  |
+<table>
+  <thead><tr><th>Role</th><th>Name</th><th>Date</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Tester</td><td></td><td></td><td></td></tr>
+    <tr><td>Reviewer</td><td></td><td></td><td></td></tr>
+    <tr><td>Operator Approval For Waivers</td><td></td><td></td><td></td></tr>
+    <tr><td>Operator Approval For Infrastructure Destruction</td><td></td><td></td><td>Scope and evidence, when applicable.</td></tr>
+  </tbody>
+</table>
 ```
 
 ## Completion Criteria
 
 A run is complete only when:
 
-- The selected installation tier is explicitly recorded.
+- The selected deployment mode and validation tier are explicitly recorded.
+- Applicable infrastructure checks have recorded outcomes, and retained or residual resources have an owner and follow-up.
 - Required install and platform tests are complete.
 - CloudBank deployment and smoke tests are complete; `7-test_all_services.sh` is also complete for `Full Validation`.
 - Observability readiness checks prove required telemetry existed before screenshots were captured, or load generation was run and the checks were repeated.
 - Collector scrape health is verified, including EndpointSlice discovery and the absence of repeated collector self-scrape or deprecated-v1 warnings.
 - Observability evidence includes SigNoz Services, traces, logs, metrics, dashboards, dashboard-population screenshots, load-generation output, and dashboard validation metadata that distinguishes populated, partial, empty, zero-only, and not-applicable dashboards.
 - Screenshot validation guardrails pass for every required UI evidence file.
-- Vulnerability scans are complete; medium findings are triaged, and critical/high findings are resolved or explicitly waived by the operator.
+- Image scans and applicable IaC scans are complete; medium findings are triaged, and critical/high findings are resolved or explicitly waived by the operator.
 - Every failure has logs, events, command output, and a recommended next action.
 - The run report contains an overall pass/fail result, pass rate, traffic-light rating, and evidence links.
+
+When a failed prerequisite prevents later checks, finalize a failed report with those checks marked `Blocked` and the dependency identified. A failed provisioning run still requires failure evidence and resource disposition.
