@@ -9,6 +9,6 @@
   "author": "",
   "license": "UPL-1.0",
   "dependencies": {
-    "oracledb": "^5.4.0"
+    "oracledb": "^7.0.1"
   }
 }
