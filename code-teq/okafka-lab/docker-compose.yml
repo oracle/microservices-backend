@@ -1,6 +1,6 @@
 services:
   okafkadb:
-    image: gvenzl/oracle-free:23.26.0-slim-faststart
+    image: gvenzl/oracle-free:23.26.3-slim-faststart
     container_name: okafkadb
     ports:
       - 9092:1521
