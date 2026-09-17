@@ -1,0 +1,94 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Licensed under the Universal Permissive License v1.0 as shown at https://oss.oracle.com/licenses/upl.
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    # Composite action dependencies require explicit directories.
+    directories:
+      - "/"
+      - "/.github/actions/process-image"
+      - "/.github/actions/process-image-oracle-jdk-no-fee"
+    schedule:
+      interval: weekly
+    groups:
+      actions-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: "/docs-source/site"
+    schedule:
+      interval: weekly
+    groups:
+      docusaurus:
+        patterns: ["@docusaurus/*"]
+      react:
+        patterns: ["react", "react-dom"]
+      docs-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: "/code-teq/nodeTeq"
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: maven
+    directories:
+      # The root POM covers its declared CloudBank modules.
+      - "/cloudbank-v5"
+      # These Helidon projects have independent parent POMs.
+      - "/cloudbank-v5/customer-helidon"
+      - "/cloudbank-v5/helidon-consumer"
+      - "/cloudbank-v5/helidon-producer"
+      - "/code-teq/javaTeq"
+      - "/code-teq/okafka-lab"
+      - "/customer-support-lab"
+    schedule:
+      interval: weekly
+    groups:
+      maven-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: pip
+    directory: "/data-refactoring-advisor/schema-graphrag-demo"
+    schedule:
+      interval: weekly
+    groups:
+      python-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: docker
+    directories:
+      - "/cloudbank-v5/customer-helidon"
+      - "/cloudbank-v5/helidon-consumer"
+      - "/cloudbank-v5/helidon-producer"
+      - "/helm/infra-charts/obaas/signoz-histogram"
+    schedule:
+      interval: weekly
+    groups:
+      docker-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: docker-compose
+    directory: "/code-teq/okafka-lab"
+    schedule:
+      interval: weekly
+
+  # Chart update PRs also need charts/*.tgz refreshed with
+  # helm/infra-charts/tools/download-dependencies.sh before merging.
+  - package-ecosystem: helm
+    directories:
+      - "/helm/infra-charts/obaas"
+      - "/helm/infra-charts/obaas-prereqs"
+      - "/helm/app-charts/obaas-sample-app"
+    schedule:
+      interval: weekly
+    ignore:
+      # These file:// dependencies are maintained with their local chart sources.
+      - dependency-name: gateway-helm
+      - dependency-name: oracle-database-operator
