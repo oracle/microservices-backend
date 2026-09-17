@@ -1,4 +1,4 @@
-FROM alpine:3.18
+FROM alpine:3.24
 RUN apk add --no-cache tar
 ENV HISTOGRAM_QUANTILE_VERSION=v0.0.1
 RUN mkdir -p /usr/local/bin/histogram-quantile
