@@ -738,12 +738,12 @@ k8s-infra:
     image:
       registry: myregistry.example.com
       repository: otel/opentelemetry-collector-contrib
-      tag: 0.139.0
+      tag: 0.160.0
   otelDeployment:
     image:
       registry: myregistry.example.com
       repository: otel/opentelemetry-collector-contrib
-      tag: 0.139.0
+      tag: 0.160.0
   presets:
     otlpExporter:
       enabled: true
