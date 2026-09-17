@@ -44,7 +44,7 @@
         <oracle-springboot-starter.version>26.2.0</oracle-springboot-starter.version>
         <oracle-springboot-aqjms-starter.version>26.0.1</oracle-springboot-aqjms-starter.version>
 	    <oracle-microtx-starter.version>24.4.1</oracle-microtx-starter.version>
-	    <liquibase.version>4.31.1</liquibase.version>
+	    <liquibase.version>5.0.4</liquibase.version>
 
         <!-- JKube -->
         <jkube.version>1.18.2</jkube.version>
