@@ -10,12 +10,12 @@ dependencies:
   version: 0.15.0
 - name: signoz
   repository: https://charts.signoz.io
-  version: 0.134.0
+  version: 0.142.0
 - name: apisix
   repository: https://apache.github.io/apisix-helm-chart
   version: 2.16.0
 - name: ai-optimizer
   repository: https://oracle.github.io/ai-optimizer/helm
   version: 2.4.1
-digest: sha256:de18c535fc3f7ff47a2499a66b6a106b4d429b0b2408c29844fd63ffc7511613
-generated: "2026-08-20T15:08:32.107175+01:00"
+digest: sha256:a3631df33b0925489d15e3b460cb45113afc097f4b7a135a352d57a448706eb1
+generated: "2026-09-17T15:42:53.951153581Z"
