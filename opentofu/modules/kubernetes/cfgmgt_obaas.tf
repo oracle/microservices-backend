@@ -22,6 +22,7 @@ locals {
     node_pool_gpu_deploy = var.node_pool_gpu_deploy
     byo_ocir_url         = var.byo_ocir_url
     deploy_kafka         = var.deploy_kafka
+    deploy_coherence     = var.deploy_coherence
   })
 }
 

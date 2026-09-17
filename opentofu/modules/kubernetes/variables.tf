@@ -154,3 +154,9 @@ variable "deploy_kafka" {
   type    = bool
   default = false
 }
+
+variable "deploy_coherence" {
+  description = "Deploy a cluster using the Coherence Operator."
+  type        = bool
+  default     = false
+}

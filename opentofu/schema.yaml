@@ -59,6 +59,7 @@ variableGroups:
       - k8s_byo_ocir
       - k8s_byo_ocir_url
       - k8s_deploy_kafka
+      - k8s_deploy_coherence
 
   #########################################################################
   # Compute Options
@@ -177,6 +178,13 @@ variables:
     type: boolean
     title: "Deploy Kafka Cluster?"
     description: "Create a Kafka cluster using the Strimzi operator."
+    default: false
+    required: true
+
+  k8s_deploy_coherence:
+    type: boolean
+    title: "Deploy Coherence Cluster?"
+    description: "Create a Coherence cluster using the Coherence Operator."
     default: false
     required: true
 
