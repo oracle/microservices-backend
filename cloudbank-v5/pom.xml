@@ -57,7 +57,7 @@
         <maven-checkstyle-plugin-version>3.3.1</maven-checkstyle-plugin-version>
         <checkstyle-version>10.14.1</checkstyle-version>
         <checkstyle.config.location>${project.basedir}/checkstyle/checkstyle.xml</checkstyle.config.location>
-        <dependency-check-version>9.0.9</dependency-check-version>
+        <dependency-check-version>13.0.0</dependency-check-version>
     </properties>
 
     <dependencies>
