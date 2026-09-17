@@ -32,9 +32,9 @@ component; do not copy the complete dependency values into OBaaS documentation.
     </tr>
     <tr>
       <th scope="row"><code>cert-manager</code></th>
-      <td>v1.21.1</td>
-      <td><a href="https://github.com/cert-manager/cert-manager/blob/v1.21.1/deploy/charts/cert-manager/README.template.md" target="_blank" rel="noopener noreferrer">README template</a></td>
-      <td><a href="https://github.com/cert-manager/cert-manager/blob/v1.21.1/deploy/charts/cert-manager/values.yaml" target="_blank" rel="noopener noreferrer">values.yaml</a></td>
+      <td>v1.21.2</td>
+      <td><a href="https://github.com/cert-manager/cert-manager/blob/v1.21.2/deploy/charts/cert-manager/README.template.md" target="_blank" rel="noopener noreferrer">README template</a></td>
+      <td><a href="https://github.com/cert-manager/cert-manager/blob/v1.21.2/deploy/charts/cert-manager/values.yaml" target="_blank" rel="noopener noreferrer">values.yaml</a></td>
     </tr>
     <tr>
       <th scope="row"><code>coherence-operator</code></th>
