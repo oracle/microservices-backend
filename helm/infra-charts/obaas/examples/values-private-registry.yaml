@@ -164,7 +164,7 @@ otmm:
     replicas: 1
     image:
       repository: myregistry.example.com/database/microtx-coordinator
-      tag: "26.1.1"
+      tag: "26.1.2"
     # Override default resources if needed (defaults: cpu 250m, memory 1Gi)
     # resources: {}
   workflowServer:
@@ -172,12 +172,12 @@ otmm:
     replicas: 1
     image:
       repository: myregistry.example.com/database/microtx-workflow
-      tag: "26.1.1"
+      tag: "26.1.2"
   console:
     enabled: true
     image:
       repository: myregistry.example.com/database/microtx-console
-      tag: "26.1.1"
+      tag: "26.1.2"
 
 # Oracle Database Exporter (Prometheus metrics for Oracle Database)
 oracle-database-exporter:
