@@ -4,7 +4,8 @@ This guide tells an AI agent how to plan, prepare, install, and verify Oracle Ba
 
 ## Markdown Formatting
 
-- Format all tables in Markdown documentation as HTML `<table>` elements. Do not use pipe-delimited Markdown table syntax.
+- Under `docs-source/`, format tables in Markdown documentation as HTML `<table>` elements.
+- Use pipe-delimited Markdown tables in agent instructions and runbooks, including `AGENTS.md`, `TEST-AGENT.md`, and `CBV5-AGENT.md`.
 
 ## Source Rules
 
