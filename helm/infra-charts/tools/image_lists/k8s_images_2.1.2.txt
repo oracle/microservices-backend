@@ -4,9 +4,9 @@
 # ============================================================================
 
 container-registry.oracle.com/database/free:23.26.3.0
-container-registry.oracle.com/database/microtx-console:26.1.1
-container-registry.oracle.com/database/microtx-coordinator:26.1.1
-container-registry.oracle.com/database/microtx-workflow:26.1.1
+container-registry.oracle.com/database/microtx-console:26.1.2
+container-registry.oracle.com/database/microtx-coordinator:26.1.2
+container-registry.oracle.com/database/microtx-workflow:26.1.2
 container-registry.oracle.com/database/observability-exporter:2.5.0
 container-registry.oracle.com/database/operator:2.1.0
 container-registry.oracle.com/database/sqlcl:26.2.1
