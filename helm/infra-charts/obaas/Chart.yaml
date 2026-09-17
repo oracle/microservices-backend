@@ -29,7 +29,7 @@ dependencies:
     repository: https://kubernetes.github.io/ingress-nginx
     condition: ingress-nginx.enabled
   - name: k8s-infra
-    version: "0.15.0"
+    version: 0.17.1
     repository: https://charts.signoz.io
     condition: signoz.enabled
   - name: signoz

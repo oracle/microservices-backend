@@ -7,7 +7,7 @@ dependencies:
   version: 4.15.1
 - name: k8s-infra
   repository: https://charts.signoz.io
-  version: 0.15.0
+  version: 0.17.1
 - name: signoz
   repository: https://charts.signoz.io
   version: 0.134.0
@@ -17,5 +17,5 @@ dependencies:
 - name: ai-optimizer
   repository: https://oracle.github.io/ai-optimizer/helm
   version: 2.4.1
-digest: sha256:de18c535fc3f7ff47a2499a66b6a106b4d429b0b2408c29844fd63ffc7511613
-generated: "2026-08-20T15:08:32.107175+01:00"
+digest: sha256:be634ddfa10d1d1273e62268b24116fd3c5b7ea19cdc7d418acb7d215ba97a0a
+generated: "2026-09-17T15:43:12.684237409Z"
