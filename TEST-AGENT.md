@@ -1,8 +1,8 @@
 # OBaaS And CloudBank Test Agent Runbook
 
-This guide tells an AI agent how to deploy, test, collect evidence, and report on Oracle Backend for Microservices and AI (OBaaS) 2.2.0 with the CloudBank v5 sample workload.
+This guide tells an AI agent how to deploy, test, collect evidence, and report on Oracle Backend for Microservices and AI (OBaaS) 2.1.2 with the CloudBank v5 sample workload.
 
-Do not trust a hardcoded version number, including the ones in this guide, over the repository itself. Before relying on any version-specific instruction, confirm the current in-development version with `grep '^appVersion:' helm/infra-charts/obaas/Chart.yaml` and `grep '^version:' helm/infra-charts/obaas/Chart.yaml`. The `next` docs stream (`OBAAS_VERSION` in `docs-source/site/docs/upgrade/index.mdx` and `docs-source/site/docs/rel_notes/index.mdx`) can lag behind the chart sources; treat `Chart.yaml` as the source of truth for the target version number.
+Confirm the target chart and application versions from both local `Chart.yaml` files before each run. The Terraform `app_version` output comes from the release placeholder in `opentofu/versions.tf`; use the chart sources and installed Helm release metadata to identify the OBaaS build under test.
 
 The expected output of a test run is a completed report created from the template in this file, plus an evidence directory containing command output, logs, screenshots, and vulnerability scan results.
 
@@ -10,23 +10,53 @@ The expected output of a test run is a completed report created from the templat
 
 Use only these sources for installation and test truth:
 
-- `AGENTS.md` for OBaaS 2.2.0 planning, installation, and verification.
+- `AGENTS.md` for OBaaS 2.1.2 planning, installation, and verification.
 - `CBV5-AGENT.md` for CloudBank v5 deployment, testing, and cleanup.
 - `docs-source/site/docs`, especially `intro.md`, `setup/helm/`, `platform/`, and `observability/`.
 - `helm/infra-charts/obaas-prereqs` and `helm/infra-charts/obaas`.
+- `opentofu/README.md`, `opentofu/examples/`, and the Terraform sources, templates, and `cfgmgt/apply.py` under `opentofu/` for OCI provisioning and its OBaaS installation path.
+- `.github/workflows/opentofu.yml` and `opentofu/tests/` for infrastructure static checks.
 - `cloudbank-v5/README.md`, `cloudbank-v5/cloudbank-v5-install.md`, and `cloudbank-v5/cloudbank-test-doc.md`.
 - `cloudbank-v5/customer-helidon/README.md` when a mixed Spring Boot and Helidon CloudBank workload is required for observability testing.
 - `cloudbank-v5/helidon-producer/README.md` and `cloudbank-v5/helidon-consumer/README.md` when Kafka observability or Helidon MP messaging telemetry must be validated.
 - The task list provided with this guide.
 - The SigNoz Services evidence checklist in this guide.
 
-Use only the OBaaS `next` documentation stream for 2.2.0. Do not use 2.1.1 or older behavior, older CloudBank documentation, or unrelated repository directories.
+Use only the OBaaS `next` documentation stream for 2.1.2. Do not use 2.1.0 or older behavior, older CloudBank documentation, or unrelated repository directories.
 
-Do not duplicate command syntax, values-file policy, secrets policy, or cleanup procedure from `AGENTS.md` or `CBV5-AGENT.md` in this file. If those guides conflict with this guide, treat them as canonical for deployment mechanics and treat this guide as canonical for test scope, evidence, and reporting.
+Use `opentofu/README.md` and its sources for provisioning mechanics, `AGENTS.md` for OBaaS installation and ownership checks, and `CBV5-AGENT.md` for CloudBank deployment and cleanup. Keep command syntax and deployment procedures in those sources. This guide owns test scope, evidence, and reporting.
+
+## Deployment Modes
+
+Select one mode independently of the `Full Validation` or `Local Functional` validation tier.
+
+| Mode | Configuration | Handoff |
+| --- | --- | --- |
+| Existing Cluster | Use the selected Kubernetes context. | Follow `AGENTS.md` to install or verify OBaaS. |
+| OCI Infrastructure | `k8s_run_cfgmgt=false` | Provision OCI resources and selected OKE add-ons, then prepare Kubernetes resources and install OBaaS using `AGENTS.md`. |
+| OCI Infrastructure And OBaaS | `k8s_run_cfgmgt=true`, the default. | Verify the releases installed by `cfgmgt/apply.py`, then continue to CloudBank. |
+
+Both OCI modes create an OKE cluster. Existing VCN and database options reuse those resources. Use `Existing Cluster` for a cluster already available to the run.
 
 ## Required Inputs
 
-Collect and record these values before any mutating command:
+### Provisioning Inputs
+
+Before provisioning, record:
+
+- Deployment mode, validation tier, evidence directory, and authorized resource scope.
+- Selected CLI (`tofu` or `terraform`), version, provider versions, working directory, variable files, and state backend/workspace or local state path. Use the same CLI and state throughout the run.
+- OCI authentication profile, tenancy, compartment, region, and `label_prefix`; record credential references only.
+- New or existing VCN/subnets, API endpoint reachability and allowed CIDRs, node shape/count/capacity, storage requirements, and load balancer access.
+- Database scenario: new ADB (`byo_db_type=""`), existing ADB (`ADB-S`), or existing non-Autonomous database (`OTHER`). Both ADB scenarios map to chart `database.type: ADB-S`. Replace example database placeholders before applying.
+- Effective `k8s_run_cfgmgt`, `k8s_use_cluster_addons`, `k8s_use_local_charts`, `k8s_deploy_kafka`, `deploy_optimizer`, and registry settings.
+- Resource ownership and the retain/destroy decision, including ownership of resources retained after a failed apply.
+
+Check OCI access, quotas, supported node images/Kubernetes version, and planned capacity against `AGENTS.md` before apply. For a private API endpoint, follow the execution-location constraints in `opentofu/module_kubernetes.tf`.
+
+### Deployment Inputs
+
+Resolve deployment choices before the command that installs OBaaS. For a new cluster, record generated identifiers, context, and values-file paths after provisioning and verify them before further Kubernetes operations. In `OCI Infrastructure And OBaaS` mode, review the template-derived choices before apply because it also installs OBaaS.
 
 | Input | Description |
 | --- | --- |
@@ -38,11 +68,11 @@ Collect and record these values before any mutating command:
 | `<app-release>` | Helm release for the OBaaS application chart, for example `obaas`. |
 | `<prereqs-values-file>` | Values file for the prerequisites chart, if any. |
 | `<app-values-file>` | Values file for the OBaaS application chart. |
-| `<obaas-chart-version>` | Expected local chart version, `0.2.0`, recorded from both local `Chart.yaml` files. Reconfirm with `grep` rather than trusting this table, since the chart version can move ahead of documentation updates. |
-| `<database-persistence>` | Effective `database.persistence.enabled`, `storageClass`, and `size` for `SIDB-FREE`/`ADB-FREE`, plus the effective `global.cleanupPVCs` value. |
+| `<obaas-chart-version>` | Expected chart version and app version, recorded from both local `Chart.yaml` files. |
+| `<cert-manager-owner>` | Helm release or OKE `CertManager` add-on; record the actual namespace and owner. |
 | `<database-type>` | `SIDB-FREE`, `ADB-FREE`, `ADB-S`, or `OTHER`. |
 | `<storage-class>` | StorageClass selected for persistent components. |
-| `<access-path>` | Envoy Gateway by default, deprecated ingress-nginx when explicitly enabled, both, existing external access, or port-forward-only. |
+| `<access-path>` | Envoy Gateway by default, deprecated ingress-nginx when explicitly enabled, both, OCI Native Ingress, other existing external access, or port-forward-only. |
 | `<registry-mode>` | Public registries, private registry, air-gapped, OCIR, or local cluster images. |
 | `<cloudbank-dbname>` | Database prefix used by CloudBank scripts. |
 | `<cloudbank-image-tag>` | CloudBank image tag, default `0.0.1-SNAPSHOT`. |
@@ -58,7 +88,7 @@ Collect and record these values before any mutating command:
 | `<priv-secret-name>` | Privileged DB secret, usually `<cloudbank-dbname>-db-priv-authn` unless customized. |
 | `<evidence-dir>` | Directory for all run evidence and reports. |
 
-Do not proceed with installation until these choices are known. Use placeholders in examples, but never install with unresolved placeholders.
+Use placeholders in examples, but never install with unresolved configuration inputs. Verify generated identifiers against the selected environment at the provisioning handoff.
 
 ## Cluster Policy
 
@@ -79,6 +109,7 @@ Create a fresh evidence directory before running tests:
 ```bash
 export EVIDENCE_DIR=<evidence-dir>
 mkdir -p \
+  "$EVIDENCE_DIR/infrastructure" \
   "$EVIDENCE_DIR/cluster" \
   "$EVIDENCE_DIR/helm" \
   "$EVIDENCE_DIR/obaas" \
@@ -89,7 +120,7 @@ mkdir -p \
   "$EVIDENCE_DIR/failures"
 ```
 
-Capture stdout and stderr for every command that proves a result:
+Capture stdout, stderr, and exit status for every command that proves a result. Use protected storage for output containing secrets and attach sanitized copies to the evidence directory. Keep state, saved plans, credential files, kubeconfig, and generated `cfgmgt/stage/k8s-manifest.yaml` in protected storage outside the shared report bundle.
 
 ```bash
 run_and_capture() {
@@ -108,8 +139,8 @@ For failures, also capture:
 - Current and previous pod logs.
 - Related jobs and job logs.
 - For cert-manager install failures, Helm status and history, cert-manager Job
-  status/logs, deployment readiness, and cert-manager namespace events. Do not
-  treat healthy pods as a passing result when the Helm release is pending or absent.
+  status/logs, deployment readiness, and cert-manager namespace events for a Helm-owned install.
+  For OKE ownership, capture add-on status and diagnostics plus Kubernetes readiness and events.
 - For MicroTx Workflow Server failures, workflow server logs, health endpoint output, service/endpoints output, Helm values, latest `obaas-run-sql-*` job logs, and database privilege diagnostics for the application user.
 - Namespace events sorted by time.
 - Helm release status.
@@ -118,37 +149,57 @@ For failures, also capture:
 
 ## Execution Flow
 
-This file does not own deployment mechanics. Use it to decide what must be tested and what evidence must be captured.
+1. Select the deployment mode and validation tier; prepare the evidence directory and report skeleton.
+2. For an OCI mode, complete the infrastructure checks below, review the plan, and apply within the authorized scope using `opentofu/README.md`. Record results after each phase. For `Existing Cluster`, mark `INF-001` through `INF-005` as `Not Applicable` with the mode as the reason.
+3. Verify the generated context and deployment inputs, then run cluster preflight using `AGENTS.md`. For an automatic OBaaS install, complete chart-source checks before apply and verify the resulting release versions afterward.
+4. Follow the selected mode's handoff. Use `AGENTS.md` to install missing components or verify those already installed. Record all `PRE-*`, `INST-*`, and platform results; successful apply alone is insufficient evidence of OBaaS health.
+5. Continue only when required OBaaS health checks pass or are explicitly waived. Use `CBV5-AGENT.md` for CloudBank prerequisite checks, images, secrets, deployment, routes, and functional tests, recording evidence after each phase.
+6. Complete the observability, security, lifecycle, and isolation coverage required for the run.
+7. Complete infrastructure retention or authorized teardown after workload tests and evidence capture.
+8. Finish the report, including failed provisioning, blocked dependent tests, and retained resources.
 
-1. Prepare the evidence directory and report skeleton from this file.
-2. Use `AGENTS.md` for all OBaaS preflight, chart-source selection, values preparation, cert-manager, `obaas-prereqs`, OBaaS install, uninstall, and reinstall commands.
-3. After each OBaaS phase, return to the master test matrix in this file and record status, evidence paths, and failures.
-4. Use `CBV5-AGENT.md` for all CloudBank v5 prerequisite checks, image handling, secret creation, service deployment, APISIX route creation, smoke tests, manual endpoint tests, and cleanup commands.
-5. After each CloudBank phase, return to the master test matrix in this file and record status, evidence paths, and failures.
-6. Use the observability, security, lifecycle, isolation, and report sections in this file for test coverage that is broader than either deployment guide.
-7. Do not continue from OBaaS installation to CloudBank deployment until all required OBaaS health checks in the matrix are passing or explicitly waived.
-8. Do not mark a test run complete until the report template in this file is filled out and all required evidence has been captured.
+### Infrastructure Checks And Handoff
 
-The exact commands, flags, values files, secret names, and cleanup procedures must come from `AGENTS.md` and `CBV5-AGENT.md` at execution time.
+Use the static checks in `.github/workflows/opentofu.yml`: backend-free initialization, configuration validation, recursive formatting check, ORM schema validation, and Trivy configuration scanning. Preserve findings and their disposition; the workflow's scanner exit code permits findings. Initialize the selected run backend separately before planning deployment.
+
+Review the selected scenario's plan for resource scope, capacity, networking, database ownership, and unexpected replacements or deletions. Preserve the plan identity, sanitized summary, apply output, and exit status in `infrastructure/`. The example `manual-test.sh` supplies planning evidence: it rewrites formatting, sets `TF_VAR_compartment_ocid` to the tenancy root, and plans both examples. Use explicit run inputs for deployment; its successful plans do not satisfy `INF-003` or the application checks.
+
+All test runs use this checkout's `helm/infra-charts/obaas-prereqs` and `helm/infra-charts/obaas` charts. For OCI test runs, explicitly set `k8s_use_local_charts=true` in the run's variable file before plan and apply. This makes `cfgmgt/apply.py` resolve both charts from the local `helm/` directory. Prepare dependencies as described in `opentofu/README.md`; missing local charts fail preflight rather than falling back to published OBaaS charts. Keep the release placeholder in `opentofu/versions.tf` unchanged.
+
+At handoff, verify:
+
+- `app_name` matches the application namespace, and the `kubeconfig_cmd` output or generated `cfgmgt/stage/kubeconfig` selects the intended cluster and authentication profile.
+- The generated `obaas-prereqs-values.yaml` and `obaas-values.yaml` match the database, secret names, registry, access path, and optional components. Run `PRE-008` on the generated values when available.
+- Automatic installation uses release `obaas-prereqs` in `obaas-system` and release `obaas` in the `app_name` namespace. Record those identities and verify them before CloudBank deployment.
+- OKE add-on ownership and readiness meet `AGENTS.md`. The templates use OCI Native Ingress (`native-ic`) and disable the bundled Envoy Gateway and ingress-nginx controllers. Verify the native controller, IngressClass, load balancer, and gateway route for this access path.
+
+Use `OCI Infrastructure` mode when values need adjustment or cluster preflight must complete before the first Helm install. This mode generates the staged files while leaving Kubernetes manifest application and Helm installation to the operator. Follow the OCI provisioning handoff in `AGENTS.md` before installing charts.
+
+Reapplying with configuration management enabled runs `apply.py` again because its provisioner uses a timestamp trigger. Review the resulting Helm operations and preserve failure evidence before retrying; retries can delete existing Jobs. Verify existing releases at handoff instead of reapplying solely to collect health evidence.
 
 ## Master Test Matrix
 
-Use this matrix as the master list for each run. Mark each test `Pass`, `Fail`, `Waived`, or `Not Applicable`.
+Use this matrix as the master list for each run. Mark each test `Pass`, `Fail`, `Waived`, `Not Applicable`, or `Blocked`. Use `Blocked` when a failed prerequisite prevents execution, and name that prerequisite in the report. Complete `INF-005` at the end of the run, including after a failed apply.
 
 | ID | Category | Test | Expected Result | Evidence |
 | --- | --- | --- | --- | --- |
+| INF-001 | Infrastructure | Validate infrastructure configuration. | Formatting, configuration, and ORM schema checks pass; IaC security findings are triaged. | CLI/provider versions, validation output, scan findings and disposition |
+| INF-002 | Infrastructure | Review the deployment plan. | Planned resources match the selected scenario and authorized scope; replacements and deletions are accounted for. | state reference, input references, sanitized plan summary and identity |
+| INF-003 | Infrastructure | Provision OCI resources. | Apply succeeds; cluster, node pools, and selected add-ons are ready. | apply output/status, OCI resource and add-on readiness |
+| INF-004 | Infrastructure | Verify deployment handoff. | Context, namespaces, chart versions, generated values, database references, and component ownership match the run inputs. | sanitized outputs/values, context and release metadata |
+| INF-005 | Infrastructure | Verify retention or authorized teardown. | Run-owned resources are retained with an owner or removed as agreed; residual resources and follow-up are recorded. | resource inventory, retention decision or destroy evidence |
 | PRE-001 | Preflight | Verify current Kubernetes context. | Context equals `<kube-context>`. | `kubectl config current-context` |
 | PRE-002 | Preflight | Verify cluster API access. | `kubectl get nodes` succeeds. | node list |
 | PRE-003 | Preflight | Verify Helm access. | `helm version` and `helm list -A` succeed. | Helm output |
 | PRE-004 | Preflight | Verify cluster capacity policy. | Full validation meets requirements, or local deviations are recorded. | node describe |
 | PRE-005 | Preflight | Verify storage classes and RWX support decision. | Selected storage class and RWX status are recorded. | storageclass output |
-| PRE-006 | Preflight | Verify external access strategy. | Envoy Gateway default, explicit ingress-nginx opt-in, both, or port-forward-only path is documented. | service, ingress, gateway output |
-| PRE-007 | Preflight | Verify chart source and version. | Both local charts report chart version `0.2.0` and app version `2.2.0` (reconfirm from `Chart.yaml` rather than assuming this row); local paths are used unless public charts report the matching app version. | Chart.yaml and Helm search output |
+| PRE-006 | Preflight | Verify external access strategy. | Envoy Gateway, explicit ingress-nginx opt-in, both, OCI Native Ingress, other existing access, or port-forward-only path is verified. | service, ingress, gateway, controller and load balancer evidence |
+| PRE-007 | Preflight | Verify chart source and version. | Both charts are installed from this checkout's `helm/infra-charts/` paths and match the recorded chart and app versions. OCI test inputs set `k8s_use_local_charts=true`. | Chart.yaml, effective test inputs, Helm command/chart-path output and installed release metadata |
 | PRE-008 | Preflight | Render selected chart values. | `helm lint` and `helm template` succeed for both charts; rendered output reflects selected optional components. | lint and rendered-manifest output |
-| INST-001 | Install | Install or verify cert-manager. | Helm reports `deployed`; cert-manager deployments are available; CRDs exist. A pending or missing Helm release is a failure even if pods are running. | Helm status, pod, wait, CRD output; on failure also capture Job logs and events |
-| INST-002 | Install | Install `obaas-prereqs` once. | Release deployed and prerequisite pods healthy. | Helm status and pod output |
-| INST-003 | Install | Install OBaaS. | Release deployed and OBaaS pods healthy. | Helm status and pod output |
-| INST-004 | Install | Verify no unexpected failed jobs or PVC problems. | Jobs succeeded and PVCs bound, including the database data PVC for `SIDB-FREE`/`ADB-FREE` when `database.persistence.enabled` (default `true`). | jobs, PVCs, events |
+| INST-001 | Install | Install or verify cert-manager. | Owner-specific checks in AGENTS.md pass: Helm release deployed or OKE CertManager add-on healthy; deployments available and CRDs present. A pending or missing Helm release fails a Helm-owned install. | ownership, Helm or OKE add-on status, readiness and CRDs; failure logs/events |
+| INST-002 | Install | Install or verify `obaas-prereqs` once. | Release deployed and prerequisite pods healthy, including separately managed operators. | Helm status, pod and add-on output |
+| INST-003 | Install | Install or verify OBaaS. | Release deployed and OBaaS pods healthy. | Helm status and pod output |
+| INST-004 | Install | Verify no unexpected failed jobs or PVC problems. | Jobs succeeded and PVCs bound. | jobs, PVCs, events |
 | PLAT-001 | Platform | Verify APISIX gateway. | Gateway service has external address or working port-forward. | service output, curl result |
 | PLAT-002 | Platform | Verify APISIX admin API. | Admin routes endpoint responds with valid admin key. | curl output |
 | PLAT-003 | Platform | Verify Eureka. | Eureka UI/API is reachable. | screenshot and HTTP output |
@@ -222,7 +273,6 @@ Platform checks:
 - The MicroTx Workflow Server uses the OBaaS application database secret and application schema. If Flyway DDL fails, collect the latest `obaas-run-sql-*` job logs and verify the application user has schema DDL privileges and quota before marking the issue as an application failure.
 - Treat the optional OTMM console as a separate component. The console web UI is served from `/consoleui/` on the `obaas-otmm-console` service, not from the service root. For example, from inside the cluster use `http://obaas-otmm-console.<application-namespace>.svc.cluster.local:5001/consoleui/`; with a local port-forward use `kubectl -n <application-namespace> port-forward svc/obaas-otmm-console 15001:5001` and open `http://127.0.0.1:15001/consoleui/`. The service root `/` may return `404 Endpoint not found` and should not by itself be treated as console failure. Do not use a healthy console screenshot as evidence that the workflow server is installed or that workflow database migrations succeeded.
 - Coherence is optional and deprecated. When `coherence.enabled=true`, verify the cluster-wide Coherence Operator deployment and CRD before installing, then verify the release-owned Coherence CR, requested member pods, namespace watch scope, and persistence decision. When disabled, mark `PLAT-014` as `Not Applicable` with values evidence.
-- For `SIDB-FREE` and `ADB-FREE`, database data is persisted by default (`database.persistence.enabled: true`, default `size: 250Gi`). Verify the database data PVC is `Bound` as part of `INST-004`, and record the effective `storageClass` and size. Record `global.cleanupPVCs` (default `true`), since it determines whether that PVC and its data are deleted on `helm uninstall`.
 
 CloudBank checks:
 
@@ -250,8 +300,6 @@ Use the following SigNoz Services checklist as the minimum UI evidence requireme
 ### Telemetry Data Readiness
 
 Do not start dashboard screenshot capture until the run has proved that relevant telemetry exists for the selected time window. Empty dashboards are not acceptable evidence for required observability tests unless the dashboard is for an optional component that was not installed or the report includes an explicit waiver.
-
-ClickHouse diagnostic logs (`signoz.clickhouse.clickhouseOperator.zookeeperLog` and `.processorsProfileLog`) default to a 1-day TTL. If a run needs longer-lived diagnostic retention to investigate a failure across multiple days, ask the operator to raise these values before the run rather than assuming default retention covers the full investigation window.
 
 Before UI capture, use curl, SigNoz API calls from an authenticated browser/session, ClickHouse queries, service metrics endpoints, or other direct telemetry checks to prove data is present. Save all command output under `$EVIDENCE_DIR/observability`.
 
@@ -572,20 +620,13 @@ Run destructive lifecycle tests only with explicit operator approval and only af
 4. Reinstall OBaaS into the same namespace using the same values.
 5. Rerun platform and CloudBank smoke tests, plus `7-test_all_services.sh` when the validation tier is `Full Validation`.
 
-Database data survival across this cycle depends on `global.cleanupPVCs` (default `true`),
-which deletes the database data PVC on uninstall. Record the effective value before step 2.
-When `cleanupPVCs` defaulted to `true`, the reinstalled database starting empty is expected
-behavior, not an unexplained data-loss failure; only treat it as a failure if `cleanupPVCs`
-was explicitly set to `false` and data still did not survive.
+### Infrastructure Retention And Teardown
 
-Do not perform a full uninstall/reinstall to test SigNoz upgrade behavior; instead test the
-in-place `helm upgrade` path separately. Re-running `helm upgrade` against a namespace with
-an existing SigNoz release fails a `signozUpgrade.confirmDataLoss` guard unless
-`signozUpgrade.mode=destructive-replace` and `confirmDataLoss=true` are both set, and setting
-them permanently deletes all existing SigNoz telemetry, dashboards, alerts, and
-ClickHouse/ZooKeeper data. Treat this the same as any other destructive lifecycle test: do
-not set `confirmDataLoss=true` without explicit, recorded operator approval, and record that
-approval — along with the resulting data loss — in the report.
+Finish workload lifecycle tests and export evidence while the cluster is available. For OCI modes, inventory resources owned by the selected state separately from BYO networking, databases, and Kubernetes-created cloud resources.
+
+For retention, record resource identifiers, the state reference, an owner, and the intended cleanup date. For teardown, obtain explicit approval covering the reviewed destruction scope and database/storage loss; approval for Helm uninstall alone covers only that lifecycle test. Clean up workloads using the deployment guides, then use `opentofu/README.md` with the same CLI, inputs, and state to destroy the approved infrastructure. Verify cloud resources, volumes, and load balancers against the inventory and record residual resources and their owner.
+
+After a partial apply or failed destroy, preserve state and diagnostics, reconcile the remaining resources, and record their disposition in `INF-005`. Use `Fail` when the agreed cleanup outcome is unmet.
 
 ### Multi-OBaaS
 
@@ -613,8 +654,10 @@ Expected:
 
 ## Failure Evidence
 
-When any test fails, collect the relevant diagnostics from `AGENTS.md`, `CBV5-AGENT.md`, and the local platform docs, then attach them to the report. At minimum, evidence should cover:
+When any test fails, collect the relevant diagnostics from the provisioning sources, `AGENTS.md`, `CBV5-AGENT.md`, and the local platform docs, then attach sanitized evidence to the report. At minimum, evidence should cover:
 
+- For infrastructure failures, CLI/provider versions, input and state references, plan identity, apply or destroy exit status, failing resource addresses, OCI work request diagnostics, and the remaining resource inventory. Include configuration-management output when Helm or manifest application failed.
+- For OKE add-on failures, add-on status and work request diagnostics plus the affected Kubernetes workloads and events.
 - Current namespace workload state.
 - Relevant Helm release status.
 - Current and previous logs for failing pods.
@@ -651,6 +694,7 @@ Use this template:
 | End Time |  |
 | Tester / Agent |  |
 | Repository Commit |  |
+| Deployment Mode | Existing Cluster / OCI Infrastructure / OCI Infrastructure And OBaaS |
 | Kubernetes Context |  |
 | Cluster Type |  |
 | Validation Tier | Full Validation / Local Functional |
@@ -662,6 +706,7 @@ Use this template:
 | OBaaS App Version |  |
 | Database Type |  |
 | Access Path |  |
+| cert-manager Owner / Namespace |  |
 | Eureka Replicas |  |
 | Coherence Enabled / Cluster Name / Persistence |  |
 | CloudBank DB Name |  |
@@ -679,7 +724,7 @@ Overall Status: Pass / Fail
 
 Traffic-Light Rating: Green / Amber / Red
 
-Pass Rate: `<passed>/<executed>` (`<percent>%`)
+Pass Rate: `<passed>/<executed>` (`<percent>%`), where executed is `Pass` plus `Fail`. Report `N/A` when no tests executed; list blocked tests separately.
 
 Summary:
 
@@ -687,9 +732,24 @@ Summary:
 
 Rating rules:
 
-- Green: all required tests pass, no unwaived critical/high image findings, no required evidence missing.
+- Green: all required tests pass, no unwaived critical/high security findings, no required evidence missing.
 - Amber: only waived, local-capacity, optional-component, or non-blocking evidence issues remain.
-- Red: any required install, platform, CloudBank, observability, isolation, or security test fails.
+- Red: any required infrastructure, install, platform, CloudBank, observability, isolation, or security test fails or is blocked.
+
+## Infrastructure Evidence Summary
+
+- CLI/version and provider versions:
+- OCI profile, tenancy, compartment, and region:
+- Working directory, variable-file references, and state backend/workspace or local state path:
+- Resource prefix, cluster identity, network and database scenario:
+- Configuration-management, local-chart, and OKE add-on settings:
+- Local chart paths and chart/app versions:
+- Static checks and IaC scan findings/disposition:
+- Reviewed plan identity and sanitized evidence:
+- Apply outcome and handoff evidence:
+- Failed prerequisite and blocked test IDs:
+- Retain/destroy decision and destruction approval, when applicable:
+- Remaining resources, owner, cleanup date, and follow-up:
 
 ## Environment Summary
 
@@ -713,6 +773,11 @@ Known deviations or waivers:
 
 | ID | Category | Status | Expected | Actual | Evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
+| INF-001 | Infrastructure |  |  |  |  |  |
+| INF-002 | Infrastructure |  |  |  |  |  |
+| INF-003 | Infrastructure |  |  |  |  |  |
+| INF-004 | Infrastructure |  |  |  |  |  |
+| INF-005 | Infrastructure |  |  |  |  |  |
 | PRE-001 | Preflight |  |  |  |  |  |
 | PRE-002 | Preflight |  |  |  |  |  |
 | PRE-003 | Preflight |  |  |  |  |  |
@@ -867,19 +932,23 @@ Medium finding triage:
 | Tester |  |  |  |
 | Reviewer |  |  |  |
 | Operator Approval For Waivers |  |  |  |
+| Operator Approval For Infrastructure Destruction |  |  | Scope and evidence, when applicable. |
 ```
 
 ## Completion Criteria
 
 A run is complete only when:
 
-- The selected installation tier is explicitly recorded.
+- The selected deployment mode and validation tier are explicitly recorded.
+- Applicable infrastructure checks have recorded outcomes, and retained or residual resources have an owner and follow-up.
 - Required install and platform tests are complete.
 - CloudBank deployment and smoke tests are complete; `7-test_all_services.sh` is also complete for `Full Validation`.
 - Observability readiness checks prove required telemetry existed before screenshots were captured, or load generation was run and the checks were repeated.
 - Collector scrape health is verified, including EndpointSlice discovery and the absence of repeated collector self-scrape or deprecated-v1 warnings.
 - Observability evidence includes SigNoz Services, traces, logs, metrics, dashboards, dashboard-population screenshots, load-generation output, and dashboard validation metadata that distinguishes populated, partial, empty, zero-only, and not-applicable dashboards.
 - Screenshot validation guardrails pass for every required UI evidence file.
-- Vulnerability scans are complete; medium findings are triaged, and critical/high findings are resolved or explicitly waived by the operator.
+- Image scans and applicable IaC scans are complete; medium findings are triaged, and critical/high findings are resolved or explicitly waived by the operator.
 - Every failure has logs, events, command output, and a recommended next action.
 - The run report contains an overall pass/fail result, pass rate, traffic-light rating, and evidence links.
+
+When a failed prerequisite prevents later checks, finalize a failed report with those checks marked `Blocked` and the dependency identified. A failed provisioning run still requires failure evidence and resource disposition.
