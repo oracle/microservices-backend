@@ -1,6 +1,6 @@
 ## Copyright (c) 2026, Oracle and/or its affiliates.
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
-# SigNoz 0.141.1 two-stage upgrade: Stage 1 profile.
+# SigNoz 0.142.1 two-stage upgrade: Stage 1 profile.
 #
 # Creates retained CSI snapshots, upgrades ClickHouse to 25.12.5, validates the live
 # version and snapshot/PVC identities, and writes the completion marker required by
@@ -17,13 +17,13 @@ signozUpgrade:
   # backup:
   #   volumeSnapshotClassName: example-snapshot-class
   # OKE users should prepare the cluster with tools/prepare-oke-volume-snapshots.sh
-  # and layer examples/values-signoz-0.141.1-stage1-oke.yaml after this file.
+  # and layer examples/values-signoz-0.142.1-stage1-oke.yaml after this file.
   # Or map heterogeneous PVC StorageClasses to their snapshot classes:
   #   volumeSnapshotClassByStorageClass:
   #     example-storage-class: example-snapshot-class
 
 # Keep SigNoz on the OBaaS 2.1.0 intermediate version during Stage 1 while
-# ClickHouse is upgraded to the version required by SigNoz 0.141.1. An OBaaS
+# ClickHouse is upgraded to the version required by SigNoz 0.142.1. An OBaaS
 # 2.0.0 source installation therefore passes through this intermediate version.
 signoz:
   signoz:

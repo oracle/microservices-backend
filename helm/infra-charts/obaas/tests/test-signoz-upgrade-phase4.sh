@@ -8,7 +8,7 @@ CHART_DIR="${CHART_DIR:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 GATE_SCRIPT="${CHART_DIR}/files/signoz-upgrade/enforce-stage2.sh"
 MOCK="${SCRIPT_DIR}/fixtures/signoz-upgrade/mock-stage2-kubectl.sh"
 DEFAULT="${CHART_DIR}/examples/values-default.yaml"
-STAGE2="${CHART_DIR}/examples/values-signoz-0.141.1-stage2.yaml"
+STAGE2="${CHART_DIR}/examples/values-signoz-0.142.1-stage2.yaml"
 TMP="$(mktemp -d)"
 trap 'rm -rf "${TMP}"' EXIT
 
@@ -18,8 +18,8 @@ assert_not_contains() { ! grep -Fq -- "$2" "$1" || { echo "Unexpected $2 in $1" 
 run_gate() {
   local scenario="$1"
   env KUBECTL="${MOCK}" MOCK_SCENARIO="${scenario}" NAMESPACE=obaas RELEASE_NAME=obaas \
-    RELEASE_REVISION=8 TARGET_VERSION=0.141.1 CLICKHOUSE_VERSION=25.12.5 \
-    VALIDATION_TIMEOUT=10m MARKER_SECRET_NAME=obaas-signoz-upgrade-0-141-1-stage1 \
+    RELEASE_REVISION=8 TARGET_VERSION=0.142.1 CLICKHOUSE_VERSION=25.12.5 \
+    VALIDATION_TIMEOUT=10m MARKER_SECRET_NAME=obaas-signoz-upgrade-0-142-1-stage1 \
     /bin/sh "${GATE_SCRIPT}" >"${TMP}/${scenario}.log" 2>&1
 }
 

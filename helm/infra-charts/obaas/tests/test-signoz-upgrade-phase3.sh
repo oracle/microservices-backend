@@ -9,8 +9,8 @@ CHART_DIR="${CHART_DIR:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 VALIDATION_SCRIPT="${CHART_DIR}/files/signoz-upgrade/validate-clickhouse.sh"
 MOCK_KUBECTL="${SCRIPT_DIR}/fixtures/signoz-upgrade/mock-validation-kubectl.sh"
 DEFAULT_VALUES="${CHART_DIR}/examples/values-default.yaml"
-STAGE1_VALUES="${CHART_DIR}/examples/values-signoz-0.141.1-stage1.yaml"
-STAGE2_VALUES="${CHART_DIR}/examples/values-signoz-0.141.1-stage2.yaml"
+STAGE1_VALUES="${CHART_DIR}/examples/values-signoz-0.142.1-stage1.yaml"
+STAGE2_VALUES="${CHART_DIR}/examples/values-signoz-0.142.1-stage2.yaml"
 IMAGE_LIST="${CHART_DIR}/../tools/image_lists/k8s_images_2.1.2.txt"
 TEST_ROOT="$(mktemp -d)"
 trap 'rm -rf "${TEST_ROOT}"' EXIT
@@ -28,9 +28,9 @@ run_validation() {
   local case_dir="${TEST_ROOT}/${scenario}"
   mkdir -p "${case_dir}"
   env KUBECTL="${MOCK_KUBECTL}" MOCK_SCENARIO="${scenario}" MOCK_OUTPUT_DIR="${case_dir}" \
-    NAMESPACE=obaas RELEASE_NAME=obaas RELEASE_REVISION=7 TARGET_VERSION=0.141.1 \
+    NAMESPACE=obaas RELEASE_NAME=obaas RELEASE_REVISION=7 TARGET_VERSION=0.142.1 \
     CLICKHOUSE_VERSION=25.12.5 VALIDATION_TIMEOUT=10m \
-    MARKER_SECRET_NAME=obaas-signoz-upgrade-0-141-1-stage1 \
+    MARKER_SECRET_NAME=obaas-signoz-upgrade-0-142-1-stage1 \
     /bin/sh "${VALIDATION_SCRIPT}" >"${case_dir}/output.log" 2>&1
 }
 

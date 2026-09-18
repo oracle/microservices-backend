@@ -7,8 +7,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHART_DIR="${CHART_DIR:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 DEFAULT_VALUES="${CHART_DIR}/examples/values-default.yaml"
-STAGE1_VALUES="${CHART_DIR}/examples/values-signoz-0.141.1-stage1.yaml"
-STAGE2_VALUES="${CHART_DIR}/examples/values-signoz-0.141.1-stage2.yaml"
+STAGE1_VALUES="${CHART_DIR}/examples/values-signoz-0.142.1-stage1.yaml"
+STAGE2_VALUES="${CHART_DIR}/examples/values-signoz-0.142.1-stage2.yaml"
 STANDARD_RENDER="$(mktemp)"
 STAGE1_RENDER="$(mktemp)"
 STAGE2_INSTALL_RENDER="$(mktemp)"
@@ -93,24 +93,24 @@ for render in \
   "${STANDARD_RENDER}" \
   "${STAGE2_INSTALL_RENDER}" \
   "${STAGE2_UPGRADE_RENDER}"; do
-  assert_contains "${render}" 'image: docker.io/signoz/signoz:v0.141.1'
-  assert_contains "${render}" 'image: docker.io/signoz/signoz-otel-collector:v0.144.9'
+  assert_contains "${render}" 'image: docker.io/signoz/signoz:v0.142.1'
+  assert_contains "${render}" 'image: docker.io/signoz/signoz-otel-collector:v0.144.10'
   assert_contains "${render}" 'image: docker.io/clickhouse/clickhouse-server:25.12.5'
   assert_not_contains "${render}" 'kind: VolumeSnapshot'
 done
 
-  assert_not_contains "${STANDARD_RENDER}" 'signoz-upgrade-0-141-1-stage1'
-  assert_not_contains "${STAGE2_INSTALL_RENDER}" 'signoz-upgrade-0-141-1-stage1'
+  assert_not_contains "${STANDARD_RENDER}" 'signoz-upgrade-0-142-1-stage1'
+  assert_not_contains "${STAGE2_INSTALL_RENDER}" 'signoz-upgrade-0-142-1-stage1'
 assert_contains "${STAGE2_UPGRADE_RENDER}" 'app.kubernetes.io/name: signoz-stage2-gate'
 
 # Stage 1 keeps SigNoz and its collector fixed while upgrading only ClickHouse.
 assert_contains "${STAGE1_RENDER}" 'image: docker.io/signoz/signoz:v0.113.0'
 assert_contains "${STAGE1_RENDER}" 'image: docker.io/signoz/signoz-otel-collector:v0.144.1'
 assert_contains "${STAGE1_RENDER}" 'image: docker.io/clickhouse/clickhouse-server:25.12.5'
-assert_not_contains "${STAGE1_RENDER}" 'image: docker.io/signoz/signoz:v0.141.1'
-assert_not_contains "${STAGE1_RENDER}" 'image: docker.io/signoz/signoz-otel-collector:v0.144.9'
+assert_not_contains "${STAGE1_RENDER}" 'image: docker.io/signoz/signoz:v0.142.1'
+assert_not_contains "${STAGE1_RENDER}" 'image: docker.io/signoz/signoz-otel-collector:v0.144.10'
 assert_not_contains "${STAGE1_RENDER}" 'kind: VolumeSnapshot'
-assert_not_contains "${STAGE1_RENDER}" 'signoz-upgrade-0-141-1-stage1'
+assert_not_contains "${STAGE1_RENDER}" 'signoz-upgrade-0-142-1-stage1'
 
 # Schema validation rejects malformed workflow configuration.
 assert_template_fails "at '/signozUpgrade/stage': value must be one of 'standard', 'stage1', 'stage2'" \
@@ -119,9 +119,9 @@ assert_template_fails "at '/signozUpgrade/backup/provider': value must be 'csi'"
   --set signozUpgrade.backup.provider=filesystem
 assert_template_fails "at '/signozUpgrade/backup/timeout': 'forever' does not match pattern" \
   --set signozUpgrade.backup.timeout=forever
-assert_template_fails "at '/signozUpgrade/target/chartVersion': value must be '0.141.1'" \
+assert_template_fails "at '/signozUpgrade/target/chartVersion': value must be '0.142.1'" \
   --set signozUpgrade.target.chartVersion=0.133.0
-assert_template_fails "at '/signozUpgrade/target/signozVersion': value must be 'v0.141.1'" \
+assert_template_fails "at '/signozUpgrade/target/signozVersion': value must be 'v0.142.1'" \
   --set signozUpgrade.target.signozVersion=v0.133.0
 
 # Cross-field validation prevents selecting an upgrade stage without SigNoz.

@@ -14,24 +14,16 @@ Before performing any upgrade, we recommend that you make a backup of your envir
 ## Upgrading from OBaaS 2.0.0
 
 OBaaS {OBAAS_VERSION} is an optional patch release. Upgrading an existing
-OBaaS release replaces SigNoZ rather than migrating it.
-
-The replacement permanently deletes all existing SigNoZ telemetry, dashboards,
-users, alerts, ClickHouse data, and ZooKeeper data. It does not affect the
-application database or other OBaaS services.
-
-This release has no in-place or data-preserving SigNoZ upgrade path. Users who
-need to preserve historical observability data must follow SigNoZ's own
-migration documentation; that migration path is not provided by OBaaS
-{OBAAS_VERSION}.
+OBaaS release upgrades SigNoZ in place and retains existing telemetry,
+dashboards, users, alerts, ClickHouse data, and ZooKeeper data. The application
+database and other OBaaS services are unchanged.
 
 The general process is as follows:
 
 - Get the new Helm charts for OBaaS {OBAAS_VERSION}
 - Review your configuration (`values.yaml` files)
-- Perform the prerequisite and application Helm upgrades. If SigNoZ is enabled,
-  the application upgrade must explicitly acknowledge the destructive SigNoZ
-  replacement.
+- Perform the prerequisite and application Helm upgrades. SigNoZ uses the same
+  in-place application-chart upgrade when it is enabled.
 
 The following sections provide more detail.
 
@@ -153,30 +145,18 @@ Ensure that you use the correct chart name and namespace and your customized
 helm upgrade --install obaas-prereqs -n obaas-system obaas/obaas-prereqs -f values.yaml [--debug]
 ```
 
-If SigNoZ is disabled, perform the normal application-chart upgrade:
-
-```
-helm upgrade --install obaas -n obaas obaas/obaas -f values.yaml [--debug]
-```
-
-If SigNoZ is enabled, use the replacement procedure in
-[Replace SigNoZ during upgrade](../observability/upgrade/index.md):
+Perform the normal application-chart upgrade whether SigNoZ is enabled or
+disabled:
 
 ```bash
-helm upgrade obaas helm/infra-charts/obaas \
+helm upgrade --install obaas helm/infra-charts/obaas \
   -n obaas \
   --timeout 30m \
-  -f values.yaml \
-  --set signozUpgrade.mode=destructive-replace \
-  --set signozUpgrade.confirmDataLoss=true
+  -f values.yaml
 ```
 
 Use the complete values file for the installed release and adjust the release,
 namespace, chart path, and values-file path for your environment.
-
-If these destructive-replace settings are omitted when upgrading an existing
-release, Helm fails before changing any OBaaS resources. Fresh installations do
-not require these settings.
 
 ## Upgrading from versions before OBaaS 2.0.0
 

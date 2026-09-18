@@ -198,15 +198,15 @@ kubectl create secret docker-registry myregistry-secret \
 helm upgrade --install obaas . -f examples/values-private-registry.yaml
 ```
 
-### 9. SigNoz 0.141.1 Two-Stage Upgrade Profiles
+### 9. SigNoz 0.142.1 Two-Stage Upgrade Profiles
 
 These files are upgrade profiles and must not be used for a fresh installation:
 
 | File | Purpose |
 |---|---|
-| `values-signoz-0.141.1-stage1.yaml` | Selects Stage 1 for a Kubernetes provider with a compatible CSI snapshot class |
-| `values-signoz-0.141.1-stage1-oke.yaml` | Adds the OKE OCI Block Volume snapshot class configuration to Stage 1 |
-| `values-signoz-0.141.1-stage2.yaml` | Selects the guarded SigNoz and telemetry-migration stage |
+| `values-signoz-0.142.1-stage1.yaml` | Selects Stage 1 for a Kubernetes provider with a compatible CSI snapshot class |
+| `values-signoz-0.142.1-stage1-oke.yaml` | Adds the OKE OCI Block Volume snapshot class configuration to Stage 1 |
+| `values-signoz-0.142.1-stage2.yaml` | Selects the guarded SigNoz and telemetry-migration stage |
 
 Layer the selected profile after the customer's normal values files and use the
 same Helm release name and namespace for both stages. Do not use this README as

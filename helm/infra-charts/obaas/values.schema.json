@@ -26,14 +26,19 @@
           "type": "string",
           "enum": ["standard", "stage1", "stage2"]
         },
+        "mode": {
+          "type": "string",
+          "enum": ["destructive-replace"]
+        },
+        "confirmDataLoss": { "type": "boolean" },
         "target": {
           "type": "object",
           "additionalProperties": false,
           "required": ["chartVersion", "signozVersion", "otelCollectorVersion", "clickhouseVersion"],
           "properties": {
-            "chartVersion": { "type": "string", "enum": ["0.141.1"] },
-            "signozVersion": { "type": "string", "enum": ["v0.141.1"] },
-            "otelCollectorVersion": { "type": "string", "enum": ["v0.144.9"] },
+            "chartVersion": { "type": "string", "enum": ["0.142.1"] },
+            "signozVersion": { "type": "string", "enum": ["v0.142.1"] },
+            "otelCollectorVersion": { "type": "string", "enum": ["v0.144.10"] },
             "clickhouseVersion": { "type": "string", "enum": ["25.12.5"] }
           }
         },

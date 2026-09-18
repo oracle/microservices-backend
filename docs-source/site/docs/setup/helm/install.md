@@ -637,35 +637,21 @@ kubectl create secret generic my-signoz-secret \
 helm upgrade --install <app-release> obaas/obaas -f examples/values-signoz-existing-secret.yaml -n <application-namespace> [--debug]
 ```
 
-#### Replace SigNoZ during an existing-release upgrade
+#### Upgrade SigNoZ during an existing-release upgrade
 
-OBaaS 2.1.1 replaces SigNoZ rather than migrating it when upgrading an
-existing release. The procedure permanently deletes all existing SigNoZ
-telemetry, dashboards, users, alerts, ClickHouse data, and ZooKeeper data. It
-does not affect the application database or other OBaaS services.
+The optional OBaaS patch release upgrades SigNoZ in place. Existing telemetry,
+dashboards, users, alerts, ClickHouse data, and ZooKeeper data are retained.
 
-This release has no in-place or data-preserving SigNoZ upgrade path. Back up any
-observability data that must be retained before proceeding. A data-preserving
-migration using SigNoZ's own documentation is not supported by OBaaS 2.1.1.
-
-Use the complete values file for the installed release and explicitly
-acknowledge the data loss:
+Use the complete values file for the installed release:
 
 ```bash
 helm upgrade <app-release> helm/infra-charts/obaas \
   -n <application-namespace> \
   --timeout 30m \
-  -f <customer-values-file> \
-  --set signozUpgrade.mode=destructive-replace \
-  --set signozUpgrade.confirmDataLoss=true
+  -f <customer-values-file>
 ```
 
-If these settings are omitted when upgrading an existing release, Helm fails
-before changing any OBaaS resources. Fresh installations do not require these
-settings.
-
-See [Replace SigNoZ during upgrade](../../observability/upgrade/index.md) for
-the complete procedure.
+Do not set `signozUpgrade.mode=destructive-replace` for this patch upgrade.
 
 #### SigNoz Cold Storage (`values-signoz-cold-storage.yaml`)
 

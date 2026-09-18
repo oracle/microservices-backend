@@ -1,38 +1,25 @@
 ---
-title: Replace SigNoZ during upgrade
+title: Upgrade SigNoZ in place
 sidebar_position: 9
 ---
 
-# Replace SigNoZ during upgrade
+# Upgrade SigNoZ in place
 
-## Warning: This permanently deletes observability data
+## In-place patch upgrade
 
-Upgrading an existing OBaaS release to this optional 2.1.1 patch release
-replaces SigNoZ rather than migrating it.
-The procedure permanently deletes all existing SigNoZ telemetry, dashboards,
-users, alerts, ClickHouse data, and ZooKeeper data. It does not affect the
-application database or other OBaaS services.
+The optional OBaaS 2.1.2 patch release upgrades SigNoZ in place. Existing
+telemetry, dashboards, users, alerts, ClickHouse data, and ZooKeeper data are
+retained. The application database and other OBaaS services are unchanged.
 
-This release has no in-place or data-preserving SigNoZ upgrade path.
-
-If the destructive-replace settings are omitted from an existing-release
-upgrade, Helm fails before changing any OBaaS resources. Users who require
-a data-preserving upgrade are encouraged to follow SigNoZ's own documentation;
-that path is
-not supported by OBaaS 2.1.1.
+Do not set `signozUpgrade.mode=destructive-replace` for this patch upgrade.
 
 ## Upgrade command
 
-Use the complete values file for the installed release and explicitly acknowledge
-data loss:
+Use the complete values file for the installed release:
 
 ```bash
 helm upgrade <app-release> helm/infra-charts/obaas \
   -n <application-namespace> \
   --timeout 30m \
-  -f <customer-values-file> \
-  --set signozUpgrade.mode=destructive-replace \
-  --set signozUpgrade.confirmDataLoss=true
+  -f <customer-values-file>
 ```
-
-Fresh installations do not need these settings.

@@ -1,6 +1,6 @@
 ## Copyright (c) 2026, Oracle and/or its affiliates.
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
-# OKE overlay for the SigNoz 0.141.1 Stage 1 profile.
+# OKE overlay for the SigNoz 0.142.1 Stage 1 profile.
 #
 # Run tools/prepare-oke-volume-snapshots.sh before using this file. The explicit
 # class avoids changing or depending on the cluster-wide default snapshot class.
