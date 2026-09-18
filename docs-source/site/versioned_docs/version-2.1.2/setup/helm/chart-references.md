@@ -63,8 +63,8 @@ component; do not copy the complete dependency values into OBaaS documentation.
     <tr>
       <th scope="row"><code>k8s-infra</code></th>
       <td>0.15.0</td>
-      <td><a href="https://github.com/SigNoz/charts/blob/signoz-0.134.0/charts/k8s-infra/README.md" target="_blank" rel="noopener noreferrer">README</a></td>
-      <td><a href="https://github.com/SigNoz/charts/blob/signoz-0.134.0/charts/k8s-infra/values.yaml" target="_blank" rel="noopener noreferrer">values.yaml</a></td>
+      <td><a href="https://github.com/SigNoz/charts/blob/signoz-0.142.1/charts/k8s-infra/README.md" target="_blank" rel="noopener noreferrer">README</a></td>
+      <td><a href="https://github.com/SigNoz/charts/blob/signoz-0.142.1/charts/k8s-infra/values.yaml" target="_blank" rel="noopener noreferrer">values.yaml</a></td>
     </tr>
     <tr>
       <th scope="row"><code>kube-state-metrics</code></th>
@@ -86,9 +86,9 @@ component; do not copy the complete dependency values into OBaaS documentation.
     </tr>
     <tr>
       <th scope="row"><code>signoz</code></th>
-      <td>0.134.0</td>
-      <td><a href="https://github.com/SigNoz/charts/blob/signoz-0.134.0/charts/signoz/README.md" target="_blank" rel="noopener noreferrer">README</a></td>
-      <td><a href="https://github.com/SigNoz/charts/blob/signoz-0.134.0/charts/signoz/values.yaml" target="_blank" rel="noopener noreferrer">values.yaml</a></td>
+      <td>0.142.1</td>
+      <td><a href="https://github.com/SigNoz/charts/blob/signoz-0.142.1/charts/signoz/README.md" target="_blank" rel="noopener noreferrer">README</a></td>
+      <td><a href="https://github.com/SigNoz/charts/blob/signoz-0.142.1/charts/signoz/values.yaml" target="_blank" rel="noopener noreferrer">values.yaml</a></td>
     </tr>
     <tr>
       <th scope="row"><code>strimzi-kafka-operator</code></th>

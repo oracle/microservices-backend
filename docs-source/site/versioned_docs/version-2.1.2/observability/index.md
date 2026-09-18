@@ -60,8 +60,8 @@ Oracle Backend for Microservices and AI ships with a fully integrated observabil
       <td>Configure Online and Cold Storage</td>
     </tr>
     <tr>
-      <th scope="row"><a href="./upgrade/index">Replace SigNoZ during upgrade</a></th>
-      <td>Replace SigNoZ during an optional OBaaS 2.1.2 upgrade; existing observability data is permanently deleted</td>
+      <th scope="row"><a href="./upgrade/index">Upgrade SigNoZ in place</a></th>
+      <td>Upgrade SigNoZ in place during an optional OBaaS 2.1.2 patch release</td>
     </tr>
   </tbody>
 </table>

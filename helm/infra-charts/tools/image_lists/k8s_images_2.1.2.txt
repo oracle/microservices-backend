@@ -25,8 +25,8 @@ docker.io/envoyproxy/envoy:distroless-v1.39.1
 docker.io/envoyproxy/gateway:v1.9.1
 docker.io/envoyproxy/ratelimit:8fe6ea42
 docker.io/otel/opentelemetry-collector-contrib:0.160.0
-docker.io/signoz/signoz-otel-collector:v0.144.9
-docker.io/signoz/signoz:v0.141.1
+docker.io/signoz/signoz-otel-collector:v0.144.10
+docker.io/signoz/signoz:v0.142.1
 docker.io/signoz/zookeeper:3.7.1
 ghcr.io/external-secrets/external-secrets:v2.10.0
 ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:2.30.0

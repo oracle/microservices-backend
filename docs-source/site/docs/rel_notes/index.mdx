@@ -42,13 +42,11 @@ The OBaaS {OBAAS_VERSION} Helm charts use the following chart and application ve
   </tbody>
 </table>
 
-> **Optional upgrade and SigNoz data loss**
+> **SigNoz patch upgrade**
 >
-> OBaaS 2.1.1 is an optional patch release. Upgrading an existing OBaaS installation replaces the existing SigNoz deployment; it does not migrate or preserve SigNoz data. Users who need to preserve historical observability data must follow SigNoZ's own migration documentation; that migration path is not provided by OBaaS
+> OBaaS 2.1.2 is an optional patch release. Upgrading an existing OBaaS installation upgrades SigNoz in place and preserves existing telemetry, dashboards, users, alerts, ClickHouse data, and ZooKeeper data.
 >
-> The upgrade permanently deletes all existing SigNoz telemetry, dashboards, users, alerts, ClickHouse data, and ZooKeeper data. It does not affect the application database or other OBaaS services.
->
-> This release does not provide an in-place or data-preserving SigNoz upgrade path. Back up any required observability data before upgrading.
+> Use the standard Helm upgrade command with the complete values file for the installed release.
 
 ### Additions in this Release
 
@@ -60,7 +58,7 @@ The OBaaS {OBAAS_VERSION} Helm charts use the following chart and application ve
 * Kafka cluster resources can be enabled in the OBaaS application chart and are reconciled by Strimzi from the prerequisite chart.
 * AI Optimizer is available as an optional component through the `ai-optimizer` subchart.
 * APISIX custom plugins can be supplied through `extraConfigMaps` and `apisix.apisix.customPlugins`.
-* SigNoz is upgraded to chart/application version 0.134.0. Existing SigNoz data is not preserved during the upgrade; see the upgrade warning above.
+* SigNoz is upgraded to chart/application version 0.142.1 in place.
 
 ### Deprecations in this Release 
 
@@ -264,12 +262,12 @@ The following table lists container images for OBaaS {OBAAS_VERSION} (sorted alp
     <tr>
       <th scope="row">Signoz</th>
       <td><code>docker.io/signoz/signoz</code></td>
-      <td>v0.134.0</td>
+      <td>v0.142.1</td>
     </tr>
     <tr>
       <th scope="row">Signoz OpenTelemetry Collector</th>
       <td><code>docker.io/signoz/signoz-otel-collector</code></td>
-      <td>v0.144.6</td>
+      <td>v0.144.10</td>
     </tr>
     <tr>
       <th scope="row">SQLcl</th>

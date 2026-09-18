@@ -3,7 +3,7 @@ title: Upgrade with protected recovery
 sidebar_position: 1
 ---
 
-# Upgrade to SigNoZ 0.134.0 with protected recovery
+# Upgrade to SigNoZ 0.142.1 with protected recovery
 
 This is the recommended upgrade procedure. It uses two Helm commands. Stage 1
 creates retained Kubernetes CSI snapshots and upgrades ClickHouse. Stage 2
@@ -252,8 +252,8 @@ kubectl get pods,jobs -n <application-namespace>
 
 Confirm:
 
-- SigNoZ is running `v0.134.0`.
-- The SigNoZ collector is running `v0.144.6`.
+- SigNoZ is running `v0.142.1`.
+- The SigNoZ collector is running `v0.144.10`.
 - ClickHouse is running `25.12.5`.
 - The telemetry-store migrator and SigNoZ setup Jobs completed.
 - Existing users can sign in.

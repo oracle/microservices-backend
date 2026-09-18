@@ -10,8 +10,8 @@ CLEANUP_SCRIPT="${CHART_DIR}/files/signoz-upgrade/cleanup-signoz-oidc-mock.sh"
 MOCK_KUBECTL="${SCRIPT_DIR}/fixtures/signoz-upgrade/mock-phase6-kubectl.sh"
 DEFAULT="${CHART_DIR}/examples/values-default.yaml"
 PRIVATE="${CHART_DIR}/examples/values-private-registry.yaml"
-STAGE1="${CHART_DIR}/examples/values-signoz-0.141.1-stage1.yaml"
-STAGE2="${CHART_DIR}/examples/values-signoz-0.141.1-stage2.yaml"
+STAGE1="${CHART_DIR}/examples/values-signoz-0.142.1-stage1.yaml"
+STAGE2="${CHART_DIR}/examples/values-signoz-0.142.1-stage2.yaml"
 IMAGE_LIST="${CHART_DIR}/../tools/image_lists/k8s_images_2.1.2.txt"
 TMP="$(mktemp -d)"
 trap 'rm -rf "${TMP}"' EXIT
@@ -29,8 +29,8 @@ helm template phase6 "${CHART_DIR}" -n phase6 --is-upgrade -f "${DEFAULT}" -f "$
 helm template phase6 "${CHART_DIR}" -n phase6 --is-upgrade -f "${DEFAULT}" -f "${STAGE2}" >"${stage2_render}"
 
 # Fresh installs contain only the final stack and do not run upgrade-only hooks.
-assert_contains "${fresh_render}" 'image: docker.io/signoz/signoz:v0.141.1'
-assert_contains "${fresh_render}" 'image: docker.io/signoz/signoz-otel-collector:v0.144.9'
+assert_contains "${fresh_render}" 'image: docker.io/signoz/signoz:v0.142.1'
+assert_contains "${fresh_render}" 'image: docker.io/signoz/signoz-otel-collector:v0.144.10'
 assert_contains "${fresh_render}" 'image: docker.io/clickhouse/clickhouse-server:25.12.5'
 assert_contains "${fresh_render}" 'volumeClaimTemplates:'
 assert_contains "${fresh_render}" 'kind: ClickHouseInstallation'
@@ -61,8 +61,8 @@ assert_contains "${stage1_render}" 'image: docker.io/signoz/signoz:v0.113.0'
 assert_contains "${stage1_render}" 'image: docker.io/signoz/signoz-otel-collector:v0.144.1'
 assert_contains "${stage1_render}" 'app.kubernetes.io/name: signoz-upgrade-snapshot'
 assert_not_contains "${stage1_render}" 'app.kubernetes.io/name: signoz-upgrade-cleanup'
-assert_contains "${stage2_render}" 'image: docker.io/signoz/signoz:v0.141.1'
-assert_contains "${stage2_render}" 'image: docker.io/signoz/signoz-otel-collector:v0.144.9'
+assert_contains "${stage2_render}" 'image: docker.io/signoz/signoz:v0.142.1'
+assert_contains "${stage2_render}" 'image: docker.io/signoz/signoz-otel-collector:v0.144.10'
 assert_contains "${stage2_render}" 'app.kubernetes.io/name: signoz-upgrade-cleanup'
 assert_contains "${stage2_render}" '"helm.sh/hook-weight": "-37"'
 assert_contains "${stage2_render}" 'hook-delete-policy: before-hook-creation,hook-succeeded'

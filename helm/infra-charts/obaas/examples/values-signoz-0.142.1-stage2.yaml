@@ -1,9 +1,9 @@
 ## Copyright (c) 2026, Oracle and/or its affiliates.
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
-# SigNoz 0.141.1 two-stage upgrade: Stage 2 profile.
+# SigNoz 0.142.1 two-stage upgrade: Stage 2 profile.
 #
-# Enforces the Stage 1 result, upgrades SigNoz to 0.141.1 and the collector to
-# 0.144.9, runs telemetry migrations, removes obsolete OIDC mock resources, reruns
+# Enforces the Stage 1 result, upgrades SigNoz to 0.142.1 and the collector to
+# 0.144.10, runs telemetry migrations, removes obsolete OIDC mock resources, reruns
 # login/dashboard setup, and validates historical plus newly ingested telemetry.
 #
 # Layer this file after the customer's normal values files and use the same Helm

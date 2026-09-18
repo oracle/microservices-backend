@@ -3,7 +3,7 @@ title: Upgrade without protected recovery
 sidebar_position: 2
 ---
 
-# Upgrade to SigNoZ 0.134.0 without protected recovery
+# Upgrade to SigNoZ 0.142.1 without protected recovery
 
 This procedure uses one Helm command and does not create Kubernetes volume
 snapshots.
@@ -67,8 +67,8 @@ helm status <app-release> -n <application-namespace>
 
 Confirm:
 
-- SigNoZ is running `v0.134.0`.
-- The SigNoZ collector is running `v0.144.6`.
+- SigNoZ is running `v0.142.1`.
+- The SigNoZ collector is running `v0.144.10`.
 - ClickHouse is running `25.12.5`.
 - The telemetry-store migrator and SigNoZ setup Jobs completed.
 - Users can sign in and dashboards load.
