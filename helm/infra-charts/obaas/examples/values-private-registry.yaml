@@ -695,6 +695,7 @@ signoz:
       image:
         registry: myregistry.example.com
         repository: signoz/zookeeper
+        tag: 3.8.4
     image:
       registry: myregistry.example.com
       repository: clickhouse/clickhouse-server

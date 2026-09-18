@@ -890,6 +890,7 @@ signoz:
       image:
         registry: docker.io
         repository: signoz/zookeeper
+        tag: 3.8.4
     image:
       registry: docker.io
       repository: clickhouse/clickhouse-server
