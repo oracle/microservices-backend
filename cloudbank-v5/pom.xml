@@ -40,7 +40,7 @@
         <spring-cloud.version>2025.0.3</spring-cloud.version>
         <org.springdoc-version>2.4.0</org.springdoc-version>
         <lombok.version>1.18.46</lombok.version>
-        <bouncycastle.version>1.84</bouncycastle.version>
+        <bouncycastle.version>1.85</bouncycastle.version>
         <oracle-springboot-starter.version>26.2.0</oracle-springboot-starter.version>
         <oracle-springboot-aqjms-starter.version>26.0.1</oracle-springboot-aqjms-starter.version>
 	    <oracle-microtx-starter.version>24.4.1</oracle-microtx-starter.version>
