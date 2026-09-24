@@ -107,6 +107,79 @@ APISIX has an embedded dashboard that can be accessed after a tunnel is establis
 
 You can configure and update the APISIX gateway using the provided APIs.  Pleas refer to the [API Documentation](https://apisix.apache.org/docs/apisix/getting-started/README/) for detailed information.
 
+## Tracing requests through APISIX
+
+When SigNoz and APISIX are enabled, OBaaS configures APISIX with the built-in
+`opentelemetry` plugin and exports spans to the in-cluster SigNoz OpenTelemetry
+collector. APISIX uses the service name `APISIX`, writes its trace context to
+JSON access logs, and propagates W3C `traceparent` headers to upstream services.
+
+This makes the plugin available, but it does **not** enable tracing on every
+route. Add the plugin to each route that you want to trace, or attach it through
+an APISIX GlobalRule when every route should be traced. The OBaaS chart does not
+create a tracing route or GlobalRule for you.
+
+For a short validation window, configure an existing or new route with an
+always-on sampler:
+
+```yaml
+plugins:
+  opentelemetry:
+    sampler:
+      name: always_on
+```
+
+For production, use parent-based sampling and sample a fraction of new traces.
+This preserves the sampling decision of an incoming trace while reducing the
+volume of traces that originate at the gateway:
+
+```yaml
+plugins:
+  opentelemetry:
+    sampler:
+      name: parent_base
+      options:
+        root:
+          name: trace_id_ratio
+          options:
+            fraction: 0.1
+```
+
+Apply the route or GlobalRule through your normal APISIX configuration workflow.
+If you use the Admin API, retrieve the current object first and preserve its
+matching rules, upstream, authentication, and other plugins when adding the
+`opentelemetry` block.
+
+The APISIX span is the gateway portion of the trace. To continue the same trace
+in an upstream Java service, the service must be OpenTelemetry-instrumented and
+configured to export to SigNoz. Instrumentation is described in
+[Configure Applications for SigNoz](../observability/configure.md). Kafka and
+database spans likewise depend on instrumentation in the backend service; an
+APISIX span alone is not proof of a complete end-to-end trace.
+
+### Find APISIX spans and correlated logs in SigNoz
+
+Port-forward the SigNoz UI service, then open [http://localhost:8080](http://localhost:8080):
+
+```shell
+kubectl -n <application-namespace> port-forward \
+  svc/<app-release>-signoz 8080:8080
+```
+
+The OpenTelemetry collector's port `8888` exposes Prometheus metrics. It is not
+the SigNoz UI and cannot be used to browse traces.
+
+In **Traces** > **Trace Explorer**, select a recent time range and filter on
+service name `APISIX`. To locate one request, filter on its trace ID, for example
+the `trace_id` from the APISIX access log. Open a matching trace to inspect the
+gateway span and any child spans from instrumented services.
+
+APISIX access logs include `trace_id`, `span_id`, and `traceparent`. In **Logs
+Explorer**, filter on the `trace_id` field to find the matching gateway log
+entry. This requires the deployed file-log receiver and parser to preserve the
+JSON `trace_id` field; if the trace is present but the log is not, verify that
+collector configuration separately.
+
 ## Using custom plugins
 
 You can install custom plugins in APISIS using the Helm charts.

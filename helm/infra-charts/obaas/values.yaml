@@ -248,6 +248,10 @@ apisix:
 
   # APISIX configuration
   apisix:
+    # Emit spans for the complete APISIX request lifecycle, not only the
+    # gateway request span.
+    tracing: true
+
     # Minimal plugins list - only what routes actually use
     # (prometheus is in APISIX defaults, but opentelemetry is not)
     plugins:
@@ -382,7 +386,9 @@ apisix:
           batch_timeout: 2
           inactive_timeout: 1
           max_export_batch_size: 16
-        set_ngx_var: false
+        # Expose trace context as NGINX variables for JSON access-log
+        # correlation in the cluster filelog receiver.
+        set_ngx_var: true
       prometheus:
         export_uri: /metrics
         metric_prefix: apisix_
@@ -396,6 +402,11 @@ apisix:
       envs:
         - KUBERNETES_SERVICE_HOST
         - KUBERNETES_SERVICE_PORT
+      logs:
+        enableAccessLog: true
+        accessLogFormat: >-
+          {"time":"$time_iso8601","trace_id":"$opentelemetry_trace_id","span_id":"$opentelemetry_span_id","traceparent":"$opentelemetry_context_traceparent","request_method":"$request_method","uri":"$uri","status":$status}
+        accessLogFormatEscape: json
 
   # etcd configuration
   etcd:
