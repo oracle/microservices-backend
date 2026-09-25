@@ -16,6 +16,8 @@ This guide covers:
 - OBaaS Java auto-instrumentation for observability
 - Security scan status and residual findings in `security-posture-plan.md`
 
+For the Helidon customer variant, see **[customer-helidon/README.md](customer-helidon/README.md)** for its build and deployment settings.
+
 ### 🧪 Testing Guide
 
 For comprehensive testing procedures, see **[cloudbank-test-doc.md](cloudbank-test-doc.md)**

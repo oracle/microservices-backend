@@ -349,6 +349,20 @@ export REGISTRY="<your-registry-region>.ocir.io/<your-tenancy>/<your-repo>"
 mvn clean package k8s:build k8s:push -Dimage.registry=$REGISTRY -Dimage.tag=5.0-SNAPSHOT
 ```
 
+When building on an ARM-based workstation for AMD64 OKE worker nodes, use JKube to generate the Docker build context, then build and push the AMD64 image with Buildx:
+
+```bash
+export REGISTRY="<your-registry-region>.ocir.io/<your-tenancy>/<your-repo>"
+export IMAGE="$REGISTRY/customer-helidon:5.0-SNAPSHOT"
+mvn clean package
+mvn k8s:build -Dimage.registry="$REGISTRY"
+docker buildx build --platform linux/amd64 --push \
+  --tag "$IMAGE" \
+  "target/docker/$REGISTRY/customer-helidon/5.0-SNAPSHOT/build"
+```
+
+Confirm the OKE node architecture with `kubectl get nodes -o custom-columns=NAME:.metadata.name,ARCH:.status.nodeInfo.architecture` before choosing the platform. Registry write access is needed for the push, even when the repository allows public pulls. A local image is not available to OKE until it is pushed to a registry the cluster can pull from. Set `image.repository` and `image.tag` in the Helm values to the pushed image.
+
 ### 4. Deploy using Helm
 Deploy the service using the shared `obaas-sample-app` chart:
 
@@ -357,6 +371,18 @@ helm upgrade --install customer-helidon ../../helm/app-charts/obaas-sample-app \
   -f values.yaml \
   -n tenant1
 ```
+
+Helidon MP JWT requires both the authorization server's JWKS URL and the exact issuer in its access tokens. Add these environment variables through your Helm values (replace `<namespace>` and use the issuer configured for your `azn-server`):
+
+```yaml
+env:
+  - name: CLOUDBANK_SECURITY_JWK_SET_URI
+    value: "http://azn-server.<namespace>.svc.cluster.local:8080/oauth2/jwks"
+  - name: mp.jwt.verify.issuer
+    value: "http://azn-server.<namespace>.svc.cluster.local:8080"
+```
+
+The issuer value must match the token's `iss` claim; do not assume it is the service URL if `azn-server` uses a different issuer. During the OKE deployment, the first pod restarted because `mp.jwt.verify.issuer` was missing. Supplying it with a Helm values override resolved startup. The JWKS URL points Helidon at `azn-server`'s signing keys.
 
 ### 5. Verification
 After deployment, verify the service using the provided test script:
