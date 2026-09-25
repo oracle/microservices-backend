@@ -51,7 +51,7 @@
         <image.registry>localhost</image.registry>
 
         <!-- Spring AI -->
-        <spring-ai.version>1.0.5</spring-ai.version>
+        <spring-ai.version>1.0.9</spring-ai.version>
 
         <!-- Code quality tools -->
         <maven-checkstyle-plugin-version>3.6.0</maven-checkstyle-plugin-version>
