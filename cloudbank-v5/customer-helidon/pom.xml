@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.helidon.applications</groupId>
         <artifactId>helidon-mp</artifactId>
-        <version>4.3.4</version>
+        <version>4.5.5</version>
         <relativePath/>
     </parent>
     <groupId>com.example</groupId>
@@ -14,8 +14,8 @@
     <version>5.0-SNAPSHOT</version>
 
     <properties>
-        <helidon-maven-plugin.version>4.0.14</helidon-maven-plugin.version>
-        <jkube.version>1.16.2</jkube.version>
+        <helidon-maven-plugin.version>4.0.30</helidon-maven-plugin.version>
+        <jkube.version>1.20.0</jkube.version>
         <image.registry>localhost</image.registry>
         <jkube.generator.name>${image.registry}/${project.artifactId}:${project.version}</jkube.generator.name>
     </properties>
@@ -70,11 +70,6 @@
             <artifactId>hibernate-core</artifactId>
             <version>${version.lib.hibernate}</version>
         </dependency>
-        <!--dependency>
-            <groupId>io.helidon.logging</groupId>
-            <artifactId>helidon-logging-jul</artifactId>
-            <scope>runtime</scope>
-        </dependency-->
         <dependency>
             <groupId>io.helidon.microprofile.openapi</groupId>
             <artifactId>helidon-microprofile-openapi</artifactId>
@@ -100,18 +95,18 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.9</version>
+            <version>2.0.19</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.4.14</version>
+            <version>1.6.3</version>
         </dependency>
         <!-- Bridge internal Helidon JUL logs to SLF4J/Logback -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-            <version>2.0.9</version>
+            <version>2.0.19</version>
         </dependency>
         <!-- Structural JSON Logging -->
         <dependency>
@@ -158,13 +153,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.5.0</version>
+            <version>5.23.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.5.0</version>
+            <version>5.23.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -192,7 +187,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.4.2</version>
+                <version>3.8.0</version>
                 <configuration>
                     <descriptors>
                         <descriptor>src/assembly/jib-ready.xml</descriptor>
@@ -275,9 +270,6 @@
                         </execution>
                     </executions>
                 </plugin>
-
-                <!-- ... -->
-
             </plugins>
         </pluginManagement>
     </build>
