@@ -4,12 +4,15 @@
 package com.oracle.demo.lab.ticket;
 
 import com.oracle.spring.json.jsonb.JSONB;
-import com.oracle.spring.json.jsonb.JSONBRowMapper;
+import jakarta.json.Json;
+import jakarta.json.stream.JsonParser;
 import oracle.jdbc.OracleTypes;
 import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 
+import java.io.StringReader;
 import java.sql.*;
 import java.util.List;
 import java.util.Optional;
@@ -22,18 +25,28 @@ public class JSONTicketStore implements TicketStore {
             where v.data."_id" = ?
             """;
     private static final String BY_ID_SQL = """
-            select * from ticket_dv v
+            select json_serialize(v.data returning clob) from ticket_dv v
             where v.data."_id" = ?
+            """;
+    private static final String ALL_SQL = """
+            select json_serialize(v.data returning clob) from ticket_dv v
             """;
 
     private final JdbcClient jdbcClient;
     private final JSONB jsonb;
-    private final JSONBRowMapper<SupportTicket> rowMapper;
+    private final RowMapper<SupportTicket> rowMapper;
 
     public JSONTicketStore(JdbcClient jdbcClient, JSONB jsonb) {
         this.jdbcClient = jdbcClient;
         this.jsonb = jsonb;
-        this.rowMapper = new JSONBRowMapper<>(jsonb, SupportTicket.class);
+        this.rowMapper = this::mapTextJson;
+    }
+
+    SupportTicket mapTextJson(ResultSet rs, int rowNum) throws SQLException {
+        // Text JSON exposes the duality view's native vector as a numeric array.
+        try (JsonParser parser = Json.createParser(new StringReader(rs.getString(1)))) {
+            return jsonb.fromOSON(parser, SupportTicket.class);
+        }
     }
 
     @Override
@@ -50,7 +63,7 @@ public class JSONTicketStore implements TicketStore {
 
     @Override
     public List<SupportTicket> getAllTickets() {
-        return jdbcClient.sql("select * from ticket_dv")
+        return jdbcClient.sql(ALL_SQL)
                 .query(rowMapper)
                 .list();
     }
