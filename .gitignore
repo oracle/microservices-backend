@@ -535,3 +535,18 @@ docs-source/**/public
 .oca/
 .oca/*
 .env
+
+##############################################################################
+# Terraform
+##############################################################################
+opentofu/**/terraform.tfvars*
+opentofu/**/.terraform*
+opentofu/**/terraform.tfstate*
+opentofu/**/backend.conf
+opentofu/**/backend.tf
+opentofu/**/*.auto.tfvars
+# OCI auto.tfvars is generated for ORM
+!opentofu/oci/*.auto.tfvars
+# Local Helm chart development symlink
+opentofu/**/cfgmgt/helm
+opentofu/cfgmgt/stage/*
