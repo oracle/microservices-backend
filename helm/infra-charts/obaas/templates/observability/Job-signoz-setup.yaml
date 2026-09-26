@@ -79,22 +79,102 @@ spec:
           # Use JWT token for all subsequent requests
           AUTH_HEADER="Authorization: Bearer ${TOKEN}"
 
-          # Function to extract title from dashboard JSON file
+          # Extract only the top-level spec.display.name from a V2/Perses
+          # dashboard file. Panel and variable display objects follow it.
           get_title() {
-            grep -o '"title"[[:space:]]*:[[:space:]]*"[^"]*"' "$1" | head -1 | sed 's/.*:[[:space:]]*"\([^"]*\)".*/\1/'
+            awk '
+              /"spec"[[:space:]]*:[[:space:]]*[{]/ {
+                in_dashboard_spec = 1
+                next
+              }
+              in_dashboard_spec && /"display"[[:space:]]*:[[:space:]]*[{]/ {
+                in_dashboard_display = 1
+                next
+              }
+              in_dashboard_display && /^[[:space:]]*"name"[[:space:]]*:/ {
+                sub(/^[[:space:]]*"name"[[:space:]]*:[[:space:]]*"/, "")
+                sub(/"[[:space:]]*,?[[:space:]]*$/, "")
+                print
+                exit
+              }
+            ' "$1"
           }
 
-          # Function to find dashboard UUID by title from API response
-          find_dashboard_uuid() {
-            local search_title="$1"
-            local response="$2"
-            # Extract id that appears before matching title in the response
-            echo "$response" | tr '{}' '\n' | grep -B1 "\"title\":\"${search_title}\"" | grep '"id"' | sed 's/.*"id":"\([^"]*\)".*/\1/' | head -1
-          }
-
-          # Get existing dashboards
+          # Fetch every V2 list page. The V2 response is wrapped in
+          # {status, data}; dashboard summaries are in data.dashboards and the
+          # total applies across pages. Keep the JSON pages intact because the
+          # curl utility image intentionally has no JSON parser.
+          dashboards_file=$(mktemp)
+          offset=0
+          page_size=200
+          total=1
           echo "Fetching existing dashboards..."
-          dashboards_response=$(curl -sf -H "${AUTH_HEADER}" "${SIGNOZ_URL}/api/v1/dashboards")
+          while [ "${offset}" -lt "${total}" ]; do
+            page=$(curl -fsS -H "${AUTH_HEADER}" \
+              "${SIGNOZ_URL}/api/v2/dashboards?limit=${page_size}&offset=${offset}")
+            page_total=$(printf '%s' "${page}" | sed -n 's/.*"total":\([0-9][0-9]*\).*/\1/p')
+            case "${page_total}" in
+              ''|*[!0-9]*)
+                echo "ERROR: SigNoz returned an invalid V2 dashboard list response"
+                exit 1
+                ;;
+            esac
+            printf '%s\n' "${page}" >> "${dashboards_file}"
+            total="${page_total}"
+            offset=$((offset + page_size))
+          done
+
+          # The V2 list endpoint also returns unmigratable V1 dashboards as
+          # legacy=true records. Their summaries retain spec.display.name, so
+          # reconcile them through the V2 delete endpoint rather than calling
+          # the retired V1 API. Build the allowlist from the bundled files: a
+          # dashboard owned by a user cannot be selected unless it deliberately
+          # has the same name as an OBaaS system dashboard.
+          system_dashboard_titles=$(mktemp)
+          for dir in /signoz-dashboards-1 /signoz-dashboards-2; do
+            [ -d "$dir" ] || continue
+            for f in $(find -L "$dir" -maxdepth 1 -type f 2>/dev/null); do
+              title=$(get_title "$f")
+              [ -n "$title" ] && printf '%s\n' "$title"
+            done
+          done > "${system_dashboard_titles}"
+
+          find_system_dashboard_uuids() {
+            while IFS= read -r page; do
+              printf '%s' "${page}" | sed 's/},{"id":/}\n{"id":/g' | \
+                awk -v titles_file="${system_dashboard_titles}" '
+                  BEGIN {
+                    while ((getline title < titles_file) > 0) {
+                      system_titles[title] = 1
+                    }
+                    close(titles_file)
+                  }
+                  {
+                    id = ""
+                    title = ""
+                    if (match($0, /"id":"[^"]+"/)) {
+                      id = substr($0, RSTART + 6, RLENGTH - 7)
+                    }
+                    if (match($0, /"display":[{]"name":"[^"]*"/)) {
+                      title = substr($0, RSTART + 19, RLENGTH - 20)
+                    }
+                    if (id != "" && title in system_titles) {
+                      print id
+                    }
+                  }
+                '
+            done < "${dashboards_file}"
+          }
+
+          # Delete every version of every bundled system dashboard first. This
+          # includes rows marked legacy by SigNoz after its V1-to-V2 migration,
+          # but leaves dashboards outside the bundled-title allowlist alone.
+          find_system_dashboard_uuids | while IFS= read -r uuid; do
+            [ -n "${uuid}" ] || continue
+            echo "Deleting existing system dashboard: ${uuid}"
+            curl -fsS -H "${AUTH_HEADER}" -X DELETE \
+              "${SIGNOZ_URL}/api/v2/dashboards/${uuid}"
+          done
 
           # Process dashboards from both directories
           for dir in /signoz-dashboards-1 /signoz-dashboards-2; do
@@ -104,17 +184,11 @@ spec:
               [ -z "$title" ] && continue
               echo "Reconciling dashboard: $title"
 
-              # Find and delete existing dashboard with same title
-              uuid=$(find_dashboard_uuid "$title" "$dashboards_response")
-              if [ -n "$uuid" ]; then
-                echo "  Deleting existing dashboard: $uuid"
-                curl -sf -H "${AUTH_HEADER}" -X DELETE "${SIGNOZ_URL}/api/v1/dashboards/$uuid" || true
-              fi
-
-              # Create new dashboard
+              # The bundled files are V2/Perses payloads (schemaVersion: v6).
               echo "  Creating dashboard..."
-              curl -sf -H "${AUTH_HEADER}" -H 'Content-Type: application/json' \
-                -d @"${f}" "${SIGNOZ_URL}/api/v1/dashboards" && echo "  Done" || echo "  Failed"
+              curl -fsS -H "${AUTH_HEADER}" -H 'Content-Type: application/json' \
+                -d @"${f}" "${SIGNOZ_URL}/api/v2/dashboards"
+              echo "  Done"
             done
           done
 

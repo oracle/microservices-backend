@@ -40,15 +40,44 @@ global:
       image:
         registry: docker.io
         repository: alpine/k8s
-        tag: "1.36.2"
+        tag: "1.36.4"
 # OBAAS PLATFORM CONFIGURATION
 otelCollectorEndpoint: "obaas-signoz-otel-collector:4318"
 
-# SigNoZ upgrades from the pre-0.134.0 stack are destructive replacements.
-# Fresh installations do not use these values.
+# -----------------------
+# -- SigNoz Two-Stage Upgrade Workflow
+#
+# These values establish the contract for upgrading an existing SigNoz installation
+# to chart/application version 0.142.1. The default "standard" stage performs the
+# normal in-place upgrade. The stage1 and stage2 profiles remain available for the
+# optional staged workflow.
 signozUpgrade:
-  mode: ""
-  confirmDataLoss: false
+  # Supported values: standard, stage1, stage2
+  stage: standard
+
+  # Version contract recorded and checked by the two-stage workflow.
+  # These are implementation values and should not be overridden by installations.
+  target:
+    chartVersion: "0.142.1"
+    signozVersion: "v0.142.1"
+    otelCollectorVersion: "v0.144.10"
+    clickhouseVersion: "25.12.5"
+
+  backup:
+    # CSI VolumeSnapshot is the provider-neutral backup mechanism for this workflow.
+    provider: csi
+    # Leave empty to use the cluster's default VolumeSnapshotClass. Set this when
+    # the cluster has no default or when a specific snapshot class is required.
+    volumeSnapshotClassName: ""
+    # Optional per-StorageClass overrides for clusters where the SigNoz,
+    # ClickHouse, and ZooKeeper PVCs use different CSI drivers.
+    volumeSnapshotClassByStorageClass: {}
+    timeout: 20m
+
+  validation:
+    timeout: 10m
+    # Leave empty to derive a release-scoped marker Secret name.
+    markerSecretName: ""
 
 # -----------------------
 # -- Network Policy Configuration
@@ -128,7 +157,7 @@ eureka:
   connectionIdleTimeout: 90s
   image:
     repository: container-registry.oracle.com/obaas/service-registry
-    tag: "2.1.1"
+    tag: "2.1.0"
   # Override default resources if needed (defaults: cpu 250m-500m, memory 1Gi-1200Mi)
   resources: {}
 
@@ -153,27 +182,27 @@ gateway-helm:
     images:
       envoyGateway:
         # This is the full image name including the hub, repo, and tag.
-        image: "docker.io/envoyproxy/gateway:v1.8.2"
+        image: "docker.io/envoyproxy/gateway:v1.9.1"
         # Specify image pull policy if default behavior isn't desired.
         # Default behavior: latest images will be Always else IfNotPresent.
         pullPolicy: Always
-        # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
+        # List of secrets in the same namespace that can pull the component image.
         pullSecrets: *imagePullSecrets
       envoyProxy:
         # Envoy proxy data plane image — override to use a private registry.
         # Legacy overrides under config.envoyGateway.provider.kubernetes.envoyDeployment
         # are still honored by OBaaS templates when this value is empty.
-        image: "docker.io/envoyproxy/envoy:distroless-v1.38.3"
+        image: "docker.io/envoyproxy/envoy:distroless-v1.39.1"
         pullPolicy: IfNotPresent
         # List of secrets in the same namespace that can pull the Envoy proxy image.
         pullSecrets: *imagePullSecrets
       ratelimit:
         # This is the full image name including the hub, repo, and tag.
-        image: "docker.io/envoyproxy/ratelimit:17b1956c"
+        image: "docker.io/envoyproxy/ratelimit:8fe6ea42"
         # Specify image pull policy if default behavior isn't desired.
         # Default behavior: latest images will be Always else IfNotPresent.
         pullPolicy: IfNotPresent
-        # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
+        # List of secrets in the same namespace that can pull the component image.
         pullSecrets: *imagePullSecrets
 
   deployment:
@@ -219,6 +248,10 @@ apisix:
 
   # APISIX configuration
   apisix:
+    # Emit spans for the complete APISIX request lifecycle, not only the
+    # gateway request span.
+    tracing: true
+
     # Minimal plugins list - only what routes actually use
     # (prometheus is in APISIX defaults, but opentelemetry is not)
     plugins:
@@ -317,9 +350,11 @@ apisix:
         # so APISIX can fail over within the same registry refresh cycle.
         eureka:
           host:
+            # yamllint disable rule:line-length
             - "http://{{ .Release.Name }}-eureka-0.{{ .Release.Name }}-eureka.{{ .Release.Namespace }}.svc.cluster.local:8761"
             - "http://{{ .Release.Name }}-eureka-1.{{ .Release.Name }}-eureka.{{ .Release.Namespace }}.svc.cluster.local:8761"
             - "http://{{ .Release.Name }}-eureka-2.{{ .Release.Name }}-eureka.{{ .Release.Namespace }}.svc.cluster.local:8761"
+            # yamllint enable rule:line-length
           prefix: "/eureka/"
           fetch_interval: 30
           timeout:
@@ -351,7 +386,9 @@ apisix:
           batch_timeout: 2
           inactive_timeout: 1
           max_export_batch_size: 16
-        set_ngx_var: false
+        # Expose trace context as NGINX variables for JSON access-log
+        # correlation in the cluster filelog receiver.
+        set_ngx_var: true
       prometheus:
         export_uri: /metrics
         metric_prefix: apisix_
@@ -365,6 +402,11 @@ apisix:
       envs:
         - KUBERNETES_SERVICE_HOST
         - KUBERNETES_SERVICE_PORT
+      logs:
+        enableAccessLog: true
+        accessLogFormat: >-
+          {"time":"$time_iso8601","trace_id":"$opentelemetry_trace_id","span_id":"$opentelemetry_span_id","traceparent":"$opentelemetry_context_traceparent","request_method":"$request_method","uri":"$uri","status":$status}
+        accessLogFormatEscape: json
 
   # etcd configuration
   etcd:
@@ -383,7 +425,7 @@ apisix:
   # Full registry path required for clusters with short name mode enforcing
   image:
     repository: "docker.io/apache/apisix"
-    tag: "3.17.0-ubuntu"
+    tag: "3.18.0-ubuntu"
 
   # Init container image
   initContainer:
@@ -400,7 +442,7 @@ apisix:
   # source of truth instead of a duplicated payload here.
   extraContainers:
     - name: apisix-plugin-metadata
-      image: "docker.io/alpine/k8s:1.36.2"
+      image: "docker.io/alpine/k8s:1.36.4"
       command: ["sh", "-c"]
       args:
         - |
@@ -444,7 +486,7 @@ admin-server:
   replicas: 1
   image:
     repository: container-registry.oracle.com/obaas/admin-server
-    tag: "2.1.1"
+    tag: "2.1.0"
   # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
   # resources: {}
 
@@ -454,7 +496,7 @@ config-server:
   replicas: 1
   image:
     repository: container-registry.oracle.com/obaas/config-server
-    tag: "2.1.1"
+    tag: "2.1.0"
   # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
   # resources: {}
 
@@ -489,7 +531,7 @@ otmm:
     replicas: 1
     image:
       repository: container-registry.oracle.com/database/microtx-coordinator
-      tag: "26.1.1"
+      tag: "26.1.2"
       pullPolicy: IfNotPresent
     metrics:
       enabled: true
@@ -543,7 +585,7 @@ otmm:
         fileSystem: {}
     image:
       repository: container-registry.oracle.com/database/microtx-workflow
-      tag: "26.1.1"
+      tag: "26.1.2"
       pullPolicy: IfNotPresent
     replicas: 1
     resources:
@@ -557,7 +599,7 @@ otmm:
     enabled: true
     image:
       repository: container-registry.oracle.com/database/microtx-console
-      tag: "26.1.1"
+      tag: "26.1.2"
       pullPolicy: IfNotPresent
   # Override default resources if needed (defaults: cpu 250m, memory 1Gi)
   # resources: {}
@@ -568,7 +610,7 @@ oracle-database-exporter:
   replicas: 1
   image:
     repository: container-registry.oracle.com/database/observability-exporter
-    tag: "2.4.2"
+    tag: "2.5.0"
   # Busybox sidecar for tailing alert.log
   busybox:
     repository: docker.io/busybox
@@ -585,22 +627,19 @@ database:
   sqlcl:
     image:
       repository: container-registry.oracle.com/database/sqlcl
-      tag: "26.2.0"
+      tag: "26.2.1"
 
   # For SIDB-FREE/ADB-FREE: container image configuration (exclude for ADB-S)
   image:
     repository: "container-registry.oracle.com/database/free"
-    tag: "23.26.2.0"
+    tag: "23.26.3.0"
 
-  # Persistent storage for SIDB-FREE and ADB-FREE data files.
-  # Enabled by default, so database data persists when the Pod is replaced.
+  # For SIDB-FREE/ADB-FREE: persistent storage for database files.
+  # Enabled by default; disable only when ephemeral database data is acceptable.
   persistence:
     enabled: true
-    # StorageClass to request. Leave empty to use the cluster default.
     storageClass: ""
-    # Requested size for the data PersistentVolumeClaim.
-    size: 250Gi
-    # Kubernetes access modes for the data PersistentVolumeClaim.
+    size: 50Gi
     accessModes:
       - ReadWriteOnce
 
@@ -685,7 +724,7 @@ signoz:
       image:
         registry: docker.io
         repository: curlimages/curl
-        tag: "8.20.0"
+        tag: "8.22.0"
     busybox:
       image:
         registry: docker.io
@@ -716,7 +755,7 @@ signoz:
           value: none
         - name: OTEL_EXPORTER_OTLP_PROTOCOL
           value: http/protobuf
-  
+
   # Change to override individual component images
   signoz:
     # Auto-provision root user in SigNoz backend
@@ -750,10 +789,6 @@ signoz:
           tag: "1.37"
   telemetryStoreMigrator:
     enabled: true
-    # The migrator initializes the telemetry schema for a replacement ClickHouse
-    # instance.  It must be a regular Job so a destructive replacement creates
-    # ClickHouse before the migrator runs.
-    upgradeHelmHooks: false
   otelCollector:
     image:
       registry: docker.io
@@ -866,6 +901,7 @@ signoz:
       image:
         registry: docker.io
         repository: signoz/zookeeper
+        tag: 3.8.4
     image:
       registry: docker.io
       repository: clickhouse/clickhouse-server
@@ -875,7 +911,7 @@ signoz:
         image:
           registry: container-registry.oracle.com
           repository: obaas/dashboards
-          tag: "2.1.1"
+          tag: "2.1.0"
         command:
           - sh
           - -c
@@ -890,13 +926,6 @@ signoz:
             chmod +x "$dst"
             echo "histogram-quantile installed successfully"
     clickhouseOperator:
-      # Keep high-volume ClickHouse diagnostic logs for one day. These logs are
-      # useful during short-lived investigations, but longer retention can put
-      # substantial write, merge, and storage pressure on ClickHouse.
-      zookeeperLog:
-        ttl: 1
-      processorsProfileLog:
-        ttl: 1
       image:
         registry: docker.io
         repository: altinity/clickhouse-operator
@@ -910,6 +939,14 @@ k8s-infra:
     cloud: others
     clusterName: obaas
     deploymentEnvironment: obaas
+
+  # Pin to latest until updated.
+  otelAgent:
+    image:
+      tag: "0.160.0"
+  otelDeployment:
+    image:
+      tag: "0.160.0"
   otelCollectorEndpoint: signoz-otel-collector:4317
   otelInsecure: true
   presets:
@@ -939,9 +976,8 @@ k8s-infra:
 
 kafka:
   enabled: false
-  version: 4.2.0
-  metadataVersion: 4.2-IV1
-  metricsEnabled: false
+  version: 4.3.1
+  metadataVersion: 4.3-IV0
 
 # Create a Coherence cluster in the OBaaS release namespace. The Coherence
 # Operator is installed once per cluster by the obaas-prereqs chart.

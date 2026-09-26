@@ -572,25 +572,9 @@ coordinator and workflowServer are disabled.
 {{- and .Values.otmm.console.enabled (or .Values.otmm.coordinator.enabled .Values.otmm.workflowServer.enabled) -}}
 {{- end -}}
 
-{{/* Validate the only supported existing-release SigNoZ upgrade path. */}}
+{{/* Validate only explicitly requested destructive SigNoZ replacement. */}}
 {{- define "obaas.signozUpgrade.validate" -}}
-{{- if .Release.IsUpgrade -}}
-{{- if ne (.Values.signozUpgrade.mode | default "") "destructive-replace" -}}
-{{- fail `Destructive upgrade warning
-============
-SigNoZ upgrades are disabled by default in this optional patch release.
-
-To permanently delete and replace existing SigNoZ telemetry and configuration,
-set signozUpgrade.mode=destructive-replace and signozUpgrade.confirmDataLoss=true.
-
-This permanently deletes existing SigNoZ telemetry, dashboards, users, alerts,
-ClickHouse data, and ZooKeeper data.
-
-For the required procedure and data-loss details, see:
-https://oracle.github.io/microservices-backend/obaas/observability/upgrade/` -}}
-{{- end -}}
-{{- if not .Values.signozUpgrade.confirmDataLoss -}}
+{{- if and .Release.IsUpgrade (eq (.Values.signozUpgrade.mode | default "") "destructive-replace") (not .Values.signozUpgrade.confirmDataLoss) -}}
 {{- fail "signozUpgrade.confirmDataLoss=true is required for destructive SigNoZ replacement." -}}
-{{- end -}}
 {{- end -}}
 {{- end -}}

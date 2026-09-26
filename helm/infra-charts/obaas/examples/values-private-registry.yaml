@@ -72,7 +72,7 @@ global:
       image:
         registry: myregistry.example.com
         repository: alpine/k8s
-        tag: "1.36.2"
+        tag: "1.36.4"
     nginx:
       image:
         registry: myregistry.example.com
@@ -124,7 +124,7 @@ eureka:
   connectionIdleTimeout: 90s
   image:
     repository: myregistry.example.com/obaas/service-registry
-    tag: "2.1.1"
+    tag: "2.1.2"
   # Override default resources if needed (defaults: cpu 250m-500m, memory 1Gi-1200Mi)
   resources: {}
 
@@ -136,7 +136,7 @@ admin-server:
   replicas: 1
   image:
     repository: myregistry.example.com/obaas/admin-server
-    tag: "2.1.1"
+    tag: "2.1.2"
   # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
   # resources: {}
 
@@ -148,7 +148,7 @@ config-server:
   replicas: 1
   image:
     repository: myregistry.example.com/obaas/config-server
-    tag: "2.1.1"
+    tag: "2.1.2"
   # Override default resources if needed (defaults: cpu 250m-500m, memory 256Mi-512Mi)
   # resources: {}
 
@@ -164,7 +164,7 @@ otmm:
     replicas: 1
     image:
       repository: myregistry.example.com/database/microtx-coordinator
-      tag: "26.1.1"
+      tag: "26.1.2"
     # Override default resources if needed (defaults: cpu 250m, memory 1Gi)
     # resources: {}
   workflowServer:
@@ -172,12 +172,12 @@ otmm:
     replicas: 1
     image:
       repository: myregistry.example.com/database/microtx-workflow
-      tag: "26.1.1"
+      tag: "26.1.2"
   console:
     enabled: true
     image:
       repository: myregistry.example.com/database/microtx-console
-      tag: "26.1.1"
+      tag: "26.1.2"
 
 # Oracle Database Exporter (Prometheus metrics for Oracle Database)
 oracle-database-exporter:
@@ -210,12 +210,12 @@ database:
   sqlcl:
     image:
       repository: myregistry.example.com/database/sqlcl
-      tag: "26.2.0"
+      tag: "26.2.1"
 
   # For SIDB-FREE/ADB-FREE: container image configuration (exclude for ADB-S)
   image:
     repository: "myregistry.example.com/database/free"
-    tag: "23.26.2.0"
+    tag: "23.26.3.0"
 
   # For ADB-S: OCI Autonomous Database OCID (exclude for SIDB-FREE/ADB-FREE/OTHER)
   oci:
@@ -303,15 +303,15 @@ gateway-helm:
     imagePullSecrets: *imagePullSecrets
     images:
       envoyGateway:
-        image: "myregistry.example.com/envoyproxy/gateway:v1.8.2"
+        image: "myregistry.example.com/envoyproxy/gateway:v1.9.1"
         pullPolicy: Always
         pullSecrets: *imagePullSecrets
       envoyProxy:
-        image: "myregistry.example.com/envoyproxy/envoy:distroless-v1.38.3"
+        image: "myregistry.example.com/envoyproxy/envoy:distroless-v1.39.1"
         pullPolicy: IfNotPresent
         pullSecrets: *imagePullSecrets
       ratelimit:
-        image: "myregistry.example.com/envoyproxy/ratelimit:17b1956c"
+        image: "myregistry.example.com/envoyproxy/ratelimit:8fe6ea42"
         pullPolicy: IfNotPresent
         pullSecrets: *imagePullSecrets
 
@@ -360,7 +360,7 @@ apisix:
   # Uses global.imagePullSecrets (expects string list format)
   global:
     imagePullSecrets: *imagePullSecrets
-    security: 
+    security:
       allowInsecureImages: true
 
   # RBAC required for Kubernetes service discovery
@@ -469,9 +469,12 @@ apisix:
         # so APISIX can fail over within the same registry refresh cycle.
         eureka:
           host:
-            - "http://{{ .Release.Name }}-eureka-0.{{ .Release.Name }}-eureka.{{ .Release.Namespace }}.svc.cluster.local:8761"
-            - "http://{{ .Release.Name }}-eureka-1.{{ .Release.Name }}-eureka.{{ .Release.Namespace }}.svc.cluster.local:8761"
-            - "http://{{ .Release.Name }}-eureka-2.{{ .Release.Name }}-eureka.{{ .Release.Namespace }}.svc.cluster.local:8761"
+            - "http://{{ .Release.Name }}-eureka-0.{{ .Release.Name }}-eureka.\
+              {{ .Release.Namespace }}.svc.cluster.local:8761"
+            - "http://{{ .Release.Name }}-eureka-1.{{ .Release.Name }}-eureka.\
+              {{ .Release.Namespace }}.svc.cluster.local:8761"
+            - "http://{{ .Release.Name }}-eureka-2.{{ .Release.Name }}-eureka.\
+              {{ .Release.Namespace }}.svc.cluster.local:8761"
           prefix: "/eureka/"
           fetch_interval: 30
           timeout:
@@ -521,7 +524,7 @@ apisix:
   # Full registry path required for clusters with short name mode enforcing
   image:
     repository: "myregistry.example.com/apache/apisix"
-    tag: "3.17.0-ubuntu"
+    tag: "3.18.0-ubuntu"
 
   # Init container image
   initContainer:
@@ -545,7 +548,7 @@ signoz:
       image:
         registry: myregistry.example.com
         repository: curlimages/curl
-        tag: "8.20.0"
+        tag: "8.22.0"
     busybox:
       image:
         registry: myregistry.example.com
@@ -674,7 +677,7 @@ signoz:
                     target_label: kubernetes_pod_name
                   - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
                     action: replace
-                    target_label: app                    
+                    target_label: app
       service:
         pipelines:
           logs:
@@ -692,6 +695,7 @@ signoz:
       image:
         registry: myregistry.example.com
         repository: signoz/zookeeper
+        tag: 3.8.4
     image:
       registry: myregistry.example.com
       repository: clickhouse/clickhouse-server
@@ -735,12 +739,12 @@ k8s-infra:
     image:
       registry: myregistry.example.com
       repository: otel/opentelemetry-collector-contrib
-      tag: 0.139.0
+      tag: 0.160.0
   otelDeployment:
     image:
       registry: myregistry.example.com
       repository: otel/opentelemetry-collector-contrib
-      tag: 0.139.0
+      tag: 0.160.0
   presets:
     otlpExporter:
       enabled: true

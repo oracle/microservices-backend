@@ -17,6 +17,73 @@
         }
       }
     },
+    "signozUpgrade": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "target", "backup", "validation"],
+      "properties": {
+        "stage": {
+          "type": "string",
+          "enum": ["standard", "stage1", "stage2"]
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["destructive-replace"]
+        },
+        "confirmDataLoss": { "type": "boolean" },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["chartVersion", "signozVersion", "otelCollectorVersion", "clickhouseVersion"],
+          "properties": {
+            "chartVersion": { "type": "string", "enum": ["0.142.1"] },
+            "signozVersion": { "type": "string", "enum": ["v0.142.1"] },
+            "otelCollectorVersion": { "type": "string", "enum": ["v0.144.10"] },
+            "clickhouseVersion": { "type": "string", "enum": ["25.12.5"] }
+          }
+        },
+        "backup": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provider", "volumeSnapshotClassName", "volumeSnapshotClassByStorageClass", "timeout"],
+          "properties": {
+            "provider": { "type": "string", "enum": ["csi"] },
+            "volumeSnapshotClassName": {
+              "type": "string",
+              "maxLength": 253,
+              "pattern": "^$|^[a-z0-9]([-a-z0-9.]*[a-z0-9])?$"
+            },
+            "volumeSnapshotClassByStorageClass": {
+              "type": "object",
+              "propertyNames": {
+                "maxLength": 253,
+                "pattern": "^[a-z0-9]([-a-z0-9.]*[a-z0-9])?$"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 253,
+                "pattern": "^[a-z0-9]([-a-z0-9.]*[a-z0-9])?$"
+              }
+            },
+            "timeout": { "type": "string", "pattern": "^[1-9][0-9]*[smh]$" }
+          }
+        },
+        "validation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["timeout", "markerSecretName"],
+          "properties": {
+            "timeout": { "type": "string", "pattern": "^[1-9][0-9]*[smh]$" },
+            "markerSecretName": {
+              "type": "string",
+              "maxLength": 63,
+              "pattern": "^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+            }
+          }
+        }
+      }
+    },
     "networkPolicy": {
       "type": "object",
       "properties": {
