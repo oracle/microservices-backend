@@ -1,7 +1,7 @@
 oracledb==2.3.0
 pandas==2.2.0
 numpy==1.26.4
-faker==24.0.0
+faker==40.39.0
 networkx==3.3
 python-louvain==0.16
 pyvis==0.3.2
