@@ -5,6 +5,8 @@ package com.oracle.demo.lab.config;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.mock.env.MockEnvironment;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -42,5 +44,21 @@ class DatabaseCredentialsEnvironmentPostProcessorTest {
         env.setProperty("APP_DB_USERNAME", "lab_user");
         env.setProperty("APP_DB_PASSWORD", "s3cr3t");
         assertThatNoException().isThrownBy(() -> processor.postProcessEnvironment(env, application));
+    }
+
+    @Test
+    void registeredProcessorRejectsStartupWithoutCredentials() {
+        SpringApplication application = new SpringApplication(EmptyConfiguration.class);
+        application.setWebApplicationType(WebApplicationType.NONE);
+        application.setEnvironment(new MockEnvironment());
+
+        assertThatThrownBy(application::run)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("APP_DB_USERNAME")
+                .hasMessageContaining("APP_DB_PASSWORD");
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class EmptyConfiguration {
     }
 }

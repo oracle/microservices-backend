@@ -83,6 +83,13 @@ Enables reads through a JSON Relational Duality View (`ticket_dv`). Requires `ev
 With `ai`, tickets are also written back through the duality view in a single round-trip
 (embedding + related tickets + ticket data).
 
+The JSON read path uses `JSON_SERIALIZE` before mapping the result. Oracle's
+`com.oracle.spring.json.jsonb.JSONBRowMapper` is usable for JSON without vector
+values, but its direct binary-JSON parser fails with `ORA-26318` when it reads
+this view's vector embedding. Serialization exposes the vector as an ordinary
+JSON number array that the ticket mapper can read. Writes still use Oracle JSONB
+and binary JSON (OSON); this workaround adds a text conversion only on reads.
+
 ```bash
 # Minimum — reads via ticket_dv, writes via direct SQL
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=events,json
