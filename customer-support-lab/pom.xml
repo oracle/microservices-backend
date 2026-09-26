@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.14</version>
+		<version>4.1.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.oracle.demo</groupId>
@@ -15,8 +15,8 @@
 	<description>Everything You Never Knew About Oracle</description>
 
 	<properties>
-		<oracle.starters.version>25.3.0</oracle.starters.version>
-		<oci.sdk.version>3.74.2</oci.sdk.version>
+		<oracle.starters.version>26.3.0</oracle.starters.version>
+		<oci.sdk.version>3.97.0</oci.sdk.version>
 		<java.version>21</java.version>
 	</properties>
 
@@ -32,7 +32,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
 
 <!--		Oracle Spring Boot starters-->

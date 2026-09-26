@@ -1,0 +1,1 @@
+org.springframework.boot.EnvironmentPostProcessor=com.oracle.demo.lab.config.DatabaseCredentialsEnvironmentPostProcessor
