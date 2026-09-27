@@ -117,7 +117,7 @@ public class DbUserRepoController {
             return new ResponseEntity<>(users, HttpStatus.OK);
 
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -152,7 +152,7 @@ public class DbUserRepoController {
 
         if (!isValidPassword(user.getPassword())) {
             return new ResponseEntity<>("Password does not meet complexity requirements",
-                    HttpStatus.UNPROCESSABLE_ENTITY);
+                    HttpStatus.UNPROCESSABLE_CONTENT);
         }
 
         if (StringUtils.isNotEmpty(user.getEmail())) {
@@ -176,10 +176,10 @@ public class DbUserRepoController {
                         user.getRoles(), user.getEmail()));
                 return new ResponseEntity<>(users, HttpStatus.CREATED);
             } catch (Exception e) {
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         } else {
-            return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).build();
         }
     }
 
@@ -203,7 +203,7 @@ public class DbUserRepoController {
     public ResponseEntity<User> changePassword(@RequestBody UserInfoDto userInfo) {
 
         if (!isValidPassword(userInfo.password())) {
-            return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).build();
         }
 
         // Check if the user is a user with ADMIN
@@ -226,15 +226,15 @@ public class DbUserRepoController {
                 if (user.isPresent()) {
                     user.get().setPassword(passwordEncoder.encode(userInfo.password()));
                     userRepository.saveAndFlush(user.get());
-                    return new ResponseEntity<>(null, HttpStatus.OK);
+                    return ResponseEntity.status(HttpStatus.OK).build();
                 } else {
-                    return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+                    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
                 }
             } catch (Exception e) {
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         } else {
-            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 
@@ -271,15 +271,15 @@ public class DbUserRepoController {
                     log.debug("Requested role update: {}", user.getRoles());
                     userToUpdate.get().setRoles(user.getRoles());
                     userRepository.saveAndFlush(userToUpdate.get());
-                    return new ResponseEntity<>(null, HttpStatus.OK);
+                    return ResponseEntity.status(HttpStatus.OK).build();
                 } else {
-                    return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+                    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
                 }
             } catch (Exception e) {
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         } else {
-            return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).build();
         }
     }
 
@@ -308,7 +308,7 @@ public class DbUserRepoController {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
     }
@@ -460,7 +460,7 @@ public class DbUserRepoController {
                     if (userAlreadyAssociatedWithEMail.isPresent()
                             && !userAlreadyAssociatedWithEMail.get().getUsername().equals(user.getUsername())) {
                         log.debug("User exists");
-                        return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+                        return ResponseEntity.status(HttpStatus.CONFLICT).build();
                     }
                 }
 
@@ -470,15 +470,15 @@ public class DbUserRepoController {
                     log.debug("Requested email update: {}", user.getEmail());
                     userToUpdate.get().setEmail(user.getEmail());
                     userRepository.saveAndFlush(userToUpdate.get());
-                    return new ResponseEntity<>(null, HttpStatus.OK);
+                    return ResponseEntity.status(HttpStatus.OK).build();
                 } else {
-                    return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+                    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
                 }
             } catch (Exception e) {
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         } else {
-            return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).build();
         }
     }
 
@@ -518,7 +518,7 @@ public class DbUserRepoController {
                     new UserInfoDto(user.get().getUsername(), null, user.get().getEmail()),
                     HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
     }
@@ -548,14 +548,13 @@ public class DbUserRepoController {
                 }
                 user.get().setOtp(passwordEncoder.encode(inUser.getOtp()));
                 userRepository.saveAndFlush(user.get());
-                return new ResponseEntity<>(null,
-                        HttpStatus.OK);
+                return ResponseEntity.status(HttpStatus.OK).build();
             } catch (Exception e) {
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
 
         } else {
-            return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).build();
         }
     }
 
@@ -581,7 +580,7 @@ public class DbUserRepoController {
                 && StringUtils.isNotEmpty(inUser.getPassword())) {
             if (!isValidPassword(inUser.getPassword())) {
                 return new ResponseEntity<>("Password does not meet complexity requirements",
-                        HttpStatus.UNPROCESSABLE_ENTITY);
+                        HttpStatus.UNPROCESSABLE_CONTENT);
             }
             try {
                 Optional<User> user = userRepository.findByUsernameIgnoreCase(inUser.getUsername());
@@ -612,11 +611,11 @@ public class DbUserRepoController {
                 return new ResponseEntity<>("Password successfully changed.",
                         HttpStatus.OK);
             } catch (Exception e) {
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
 
         } else {
-            return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).build();
         }
     }
 

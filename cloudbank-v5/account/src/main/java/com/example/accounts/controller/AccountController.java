@@ -99,7 +99,7 @@ public class AccountController {
             return accountData.map(account -> accountResponse(account, authentication))
                     .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -123,7 +123,7 @@ public class AccountController {
             }
             return new ResponseEntity<>(accountData, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -164,7 +164,7 @@ public class AccountController {
             }
             return new ResponseEntity<>(transactions, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -187,7 +187,7 @@ public class AccountController {
                 Journal newJournalEntry = journalRepository.saveAndFlush(journalEntry);
                 return new ResponseEntity<>(newJournalEntry, HttpStatus.CREATED);
             } catch (Exception e) {
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         } else {
             return new ResponseEntity<>(journalEntry, HttpStatus.CONFLICT);
@@ -234,7 +234,7 @@ public class AccountController {
                 return new ResponseEntity<Journal>(new Journal(), HttpStatus.ACCEPTED);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

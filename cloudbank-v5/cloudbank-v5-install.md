@@ -14,7 +14,7 @@ CloudBank v5 is a reference application demonstrating cloud-native microservices
 | **testrunner** | Test harness for workflows (AQ producer) |
 | **azn-server** | Spring Authorization Server for CloudBank OAuth2/JWT tokens |
 
-**Technology Stack:** Spring Boot 3.5, Spring Security, Spring Authorization Server, Oracle Database, MicroTx, Oracle AQ, OBaaS Java auto-instrumentation
+**Technology Stack:** Spring Boot 4.1.1, Spring Security, Spring Authorization Server, Oracle Database, MicroTx, Oracle AQ, OBaaS Java auto-instrumentation
 
 ---
 
@@ -50,7 +50,7 @@ Each step must be completed in order, as later steps depend on earlier ones.
 ### Required Software
 - **Oracle Backend as a Service (OBaaS)** installed
 - **Oracle Autonomous Database** (23ai or 19c)
-- **Java 21**, **Maven 3.6+**
+- **Java 21**, **Maven 3.6.3+**
 - **kubectl** connected to your cluster
 - **Docker** or compatible runtime (Rancher Desktop, Docker Desktop)
 - **jq** for the verification commands
@@ -65,7 +65,7 @@ Each step must be completed in order, as later steps depend on earlier ones.
 Or manually:
 ```bash
 java --version          # Should be 21
-mvn --version           # Should be 3.6+
+mvn --version           # Should be 3.6.3+
 kubectl get nodes       # Should show cluster nodes
 docker ps               # Should not error
 oci --version           # If using OCI Registry
@@ -704,13 +704,15 @@ Repository deletion is optional and removes stored images whether the repositori
 
 ## Notes
 
+- Run `mvn -Djkube.skip=true verify` from `cloudbank-v5` before building images. This runs unit tests and the Oracle Testcontainers integration tests; Docker must be available.
 - CloudBank must be installed in the **same namespace** as OBaaS
 - CloudBank v5 has only been tested with Java 21
-- All Spring services use Spring Boot 3.5.x with Spring Cloud 2025.x
+- All Spring services use Spring Boot 4.1.1 with Spring Cloud 2025.1.2
 - Secured APIs validate JWTs from `azn-server`; APISIX also validates and forwards bearer tokens for externally routed CloudBank APIs
 - OBaaS 2.1.0-build.12 supplies Java telemetry through auto-injected instrumentation
 - Database migrations for account and customer services are managed by Liquibase
 - Distributed transactions use Oracle MicroTx LRA (Long Running Actions) pattern
+- The Oracle MicroTx LRA starter remains pinned to 24.4.1. After this Spring Boot 4 upgrade, validate transfer enlistment, completion, and compensation callbacks against a real MicroTx coordinator in staging before deployment.
 - Event-driven workflows use Oracle Advanced Queuing (AQ) with JMS
 
 ---

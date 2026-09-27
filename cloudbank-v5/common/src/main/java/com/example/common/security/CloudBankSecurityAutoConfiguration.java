@@ -2,10 +2,8 @@
 
 package com.example.common.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -14,7 +12,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.client.RestTemplateCustomizer;
+import org.springframework.boot.restclient.RestTemplateCustomizer;
+import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,6 +22,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.client.RestClient;
+import tools.jackson.databind.ObjectMapper;
 
 @AutoConfiguration
 @ConditionalOnClass(SecurityFilterChain.class)
@@ -118,7 +118,7 @@ public class CloudBankSecurityAutoConfiguration {
     public RestTemplateCustomizer cloudBankServiceTokenRestTemplateCustomizer(
             CloudBankServiceTokenProvider tokenProvider) {
         return restTemplate -> restTemplate.getInterceptors().add((request, body, execution) -> {
-            if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+            if (request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION) == null) {
                 request.getHeaders().set(HttpHeaders.AUTHORIZATION, tokenProvider.getAuthorizationHeader());
             }
             return execution.execute(request, body);

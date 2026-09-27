@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
+import org.hibernate.generator.EventType;
 
 @SuppressWarnings("deprecation")
 @Entity
@@ -32,7 +32,7 @@ public class Customers {
     @Column(name = "CUSTOMER_EMAIL")
     private String customerEmail;
 
-    @Generated(GenerationTime.INSERT)
+    @Generated(event = EventType.INSERT)
     @Column(name = "DATE_BECAME_CUSTOMER", updatable = false, insertable = false)
     private Date dateBecameCustomer;
 
