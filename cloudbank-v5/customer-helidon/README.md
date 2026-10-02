@@ -89,7 +89,7 @@ To run against a local Oracle Docker container, simply:
    ```bash
    docker run -d --name oracle-db -p 1521:1521 \
        -e ORACLE_PWD=Welcome12345 \
-       container-registry.oracle.com/database/free:23.26.2.0
+       container-registry.oracle.com/database/free:23.26.3.0
    ```
 
 2. **Uncomment database configuration** in `src/main/resources/application.yaml`:

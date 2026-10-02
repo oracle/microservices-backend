@@ -120,10 +120,27 @@ helm/infra-charts/
 
 During installation, the Helm chart sets up two database users with different privilege levels:
 
-| User | Purpose | Created by |
-|------|---------|------------|
-| **SYSTEM** (non-ADB) or **ADMIN** (ADB) | Privileged user for one-time database initialization | Pre-exists (external DBs) or auto-generated (container DBs) |
-| **OBAAS_USER** | Application-level user for runtime platform operations | Created by the init script during first install |
+<table aria-label="Application &amp; Privileged Database User table">
+  <thead>
+    <tr>
+      <th scope="col">User</th>
+      <th scope="col">Purpose</th>
+      <th scope="col">Created by</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><strong>SYSTEM</strong> (non-ADB) or <strong>ADMIN</strong> (ADB)</th>
+      <td>Privileged user for one-time database initialization</td>
+      <td>Pre-exists (external DBs) or auto-generated (container DBs)</td>
+    </tr>
+    <tr>
+      <th scope="row"><strong>OBAAS_USER</strong></th>
+      <td>Application-level user for runtime platform operations</td>
+      <td>Created by the init script during first install</td>
+    </tr>
+  </tbody>
+</table>
 
 **OBAAS_USER** is the unprivileged database identity used by OBaaS components at runtime. The privileged user is only used once — to create OBAAS_USER and grant it the
 minimum permissions the platform needs.
@@ -240,6 +257,19 @@ kubectl get pods -n <platform-system-namespace>
 
 All pods should reach `Running` status within 2-3 minutes.
 
+To verify that Metrics Server is serving resource metrics, check its aggregated
+APIService and query node or pod usage:
+
+```bash
+kubectl get apiservice v1beta1.metrics.k8s.io
+kubectl top nodes
+kubectl top pods -n <application-namespace>
+```
+
+The APIService should report `Available=True`. A temporarily empty `kubectl
+top` result can be normal immediately after startup while the first scrape
+completes.
+
 #### Step 3: Choose a Values File and Install OBaaS
 
 Choose an example configuration that matches your deployment scenario and install:
@@ -278,19 +308,84 @@ kubectl get pods -A
 
 Several example configurations are provided for comparison.
 
-| Values file | Best for | External DB required | Notes |
-|---|---|---|---|
-| `values-default.yaml` | Minimal evaluation | No | Uses chart defaults |
-| `values-sidb-free.yaml` | Development and testing | No | Runs Oracle Database Free in the cluster |
-| `values-existing-adb.yaml` | OCI production | Yes | Uses Autonomous Database |
-| `values-byodb.yaml` | Existing Oracle Database | Yes | Non-Autonomous Oracle Database only |
-| `values-tenant1.yaml`, `values-tenant2.yaml` | Multi-tenant setups | Depends | Requires unique ingress settings per tenant |
-| `values-namespace-override.yaml` | Namespace watch tuning | Depends | Adjusts ingress scope |
-| `values-signoz-existing-secret.yaml` | GitOps and pre-created credentials | Depends | Uses an existing SigNoz secret |
-| `values-signoz-cold-storage.yaml` | Long-term observability retention | Depends | Uses S3-compatible object storage |
-| `values-kafka.yaml` | Kafka workloads and observability testing | Depends | Creates a Strimzi-managed Kafka cluster |
-| `values-coherence.yaml` | Coherence integration and distributed-cache testing | Depends | Creates a Coherence Operator-managed cluster |
-| `values-private-registry.yaml` | Air-gapped and private registry installs | Depends | Mirrors images to a private registry |
+<table aria-label="Example Configurations table">
+  <thead>
+    <tr>
+      <th scope="col">Values file</th>
+      <th scope="col">Best for</th>
+      <th scope="col">External DB required</th>
+      <th scope="col">Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><code>values-default.yaml</code></th>
+      <td>Minimal evaluation</td>
+      <td>No</td>
+      <td>Uses chart defaults</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>values-sidb-free.yaml</code></th>
+      <td>Development and testing</td>
+      <td>No</td>
+      <td>Runs Oracle Database Free in the cluster</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>values-existing-adb.yaml</code></th>
+      <td>OCI production</td>
+      <td>Yes</td>
+      <td>Uses Autonomous Database</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>values-byodb.yaml</code></th>
+      <td>Existing Oracle Database</td>
+      <td>Yes</td>
+      <td>Non-Autonomous Oracle Database only</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>values-tenant1.yaml</code>, <code>values-tenant2.yaml</code></th>
+      <td>Multi-tenant setups</td>
+      <td>Depends</td>
+      <td>Requires unique ingress settings per tenant</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>values-namespace-override.yaml</code></th>
+      <td>Namespace watch tuning</td>
+      <td>Depends</td>
+      <td>Adjusts ingress scope</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>values-signoz-existing-secret.yaml</code></th>
+      <td>GitOps and pre-created credentials</td>
+      <td>Depends</td>
+      <td>Uses an existing SigNoz secret</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>values-signoz-cold-storage.yaml</code></th>
+      <td>Long-term observability retention</td>
+      <td>Depends</td>
+      <td>Uses S3-compatible object storage</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>values-kafka.yaml</code></th>
+      <td>Kafka workloads and observability testing</td>
+      <td>Depends</td>
+      <td>Creates a Strimzi-managed Kafka cluster</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>values-coherence.yaml</code></th>
+      <td>Coherence integration and distributed-cache testing</td>
+      <td>Depends</td>
+      <td>Creates a Coherence Operator-managed cluster</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>values-private-registry.yaml</code></th>
+      <td>Air-gapped and private registry installs</td>
+      <td>Depends</td>
+      <td>Mirrors images to a private registry</td>
+    </tr>
+  </tbody>
+</table>
 
 The OBaaS chart selects the database mode with `database.type`. The supported values are `SIDB-FREE`, `ADB-FREE`, `ADB-S`, and `OTHER`; choose the example values file that matches the database deployment you plan to use.
 
@@ -309,7 +404,7 @@ helm upgrade --install <app-release> obaas/obaas -f examples/values-default.yaml
 #### SIDB-FREE Database (`values-sidb-free.yaml`)
 
 :::warning[Important]
-Persistent storage is enabled by default for SIDB-FREE and ADB-FREE. Please refer to [prerequisites](./prereqs.md) for capacity requirements.
+If you use SIDB, you may need more ephemeral storage on your nodes.  Please refer to [prerequisites](./prereqs.md) for details.
 :::
 
 Uses Oracle Database Free as an in-cluster container. This is the default database type.
@@ -321,22 +416,6 @@ Uses Oracle Database Free as an in-cluster container. This is the default databa
 ```bash
 helm upgrade --install <app-release> obaas/obaas -f examples/values-sidb-free.yaml -n <application-namespace> --create-namespace [--debug]
 ```
-
-In-cluster database data is retained when the database Pod is replaced. The same `database.persistence` settings apply to `SIDB-FREE` and `ADB-FREE`:
-
-```yaml
-database:
-  persistence:
-    enabled: true
-    storageClass: "fast-ssd"
-    size: 250Gi
-    accessModes:
-      - ReadWriteOnce
-```
-
-Leave `storageClass` empty to use the cluster default. Set `database.persistence.enabled: false` only when ephemeral database data is acceptable.
-
-OBaaS deletes PVCs during Helm uninstall by default (`global.cleanupPVCs: true`). To retain the database PVC after an uninstall, set `global.cleanupPVCs: false`.
 
 #### Existing Oracle AI Autonomous Database Configuration (`values-existing-adb.yaml`)
 
@@ -394,13 +473,36 @@ tools/get-adb-ocid.sh -r <region> (-c <compartment-name> | --compartment-ocid <o
 
 ###### Parameters
 
-| Parameter | Description                                                  |
-|---|--------------------------------------------------------------|
-| `-r <region>` | OCI region where the Oracle AI Autonomous Database is deployed |
-| `-c <compartment-name>` | Name of the OCI compartment containing the database          |
-| `--compartment-ocid <ocid>` | OCID of the OCI compartment containing the database          |
-| `-dbname <adb-display-name>` | Display name of the existing Oracle AI Autonomous Database   |
-| `[options]` | Additional optional parameters supported by the script       |
+<table aria-label="Parameters table">
+  <thead>
+    <tr>
+      <th scope="col">Parameter</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><code>-r &lt;region&gt;</code></th>
+      <td>OCI region where the Oracle AI Autonomous Database is deployed</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>-c &lt;compartment-name&gt;</code></th>
+      <td>Name of the OCI compartment containing the database</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>--compartment-ocid &lt;ocid&gt;</code></th>
+      <td>OCID of the OCI compartment containing the database</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>-dbname &lt;adb-display-name&gt;</code></th>
+      <td>Display name of the existing Oracle AI Autonomous Database</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>[options]</code></th>
+      <td>Additional optional parameters supported by the script</td>
+    </tr>
+  </tbody>
+</table>
 
 ##### Example
 
@@ -535,51 +637,21 @@ kubectl create secret generic my-signoz-secret \
 helm upgrade --install <app-release> obaas/obaas -f examples/values-signoz-existing-secret.yaml -n <application-namespace> [--debug]
 ```
 
-#### Replace SigNoZ during an existing-release upgrade
+#### Upgrade SigNoZ during an existing-release upgrade
 
-OBaaS 2.1.1 replaces SigNoZ rather than migrating it when upgrading an
-existing release. The procedure permanently deletes all existing SigNoZ
-telemetry, dashboards, users, alerts, ClickHouse data, and ZooKeeper data. It
-does not affect the application database or other OBaaS services.
+The optional OBaaS patch release upgrades SigNoZ in place. Existing telemetry,
+dashboards, users, alerts, ClickHouse data, and ZooKeeper data are retained.
 
-This release has no in-place or data-preserving SigNoZ upgrade path. Back up any
-observability data that must be retained before proceeding. A data-preserving
-migration using SigNoZ's own documentation is not supported by OBaaS 2.1.1.
-
-Use the complete values file for the installed release and explicitly
-acknowledge the data loss:
+Use the complete values file for the installed release:
 
 ```bash
 helm upgrade <app-release> helm/infra-charts/obaas \
   -n <application-namespace> \
   --timeout 30m \
-  -f <customer-values-file> \
-  --set signozUpgrade.mode=destructive-replace \
-  --set signozUpgrade.confirmDataLoss=true
+  -f <customer-values-file>
 ```
 
-If these settings are omitted when upgrading an existing release, Helm fails
-before changing any OBaaS resources. Fresh installations do not require these
-settings.
-
-See [Replace SigNoZ during upgrade](../../observability/upgrade/index.md) for
-the complete procedure.
-
-#### ClickHouse Internal Diagnostic Retention
-
-OBaaS retains the high-volume ClickHouse `zookeeper_log` and
-`processors_profile_log` diagnostic tables for one day. These tables are useful
-for short-lived ClickHouse or ZooKeeper investigations, but longer retention can
-create substantial ClickHouse write, merge, and storage pressure under sustained
-telemetry load.
-
-The one-day retention is set in the OBaaS chart defaults. An operator can
-temporarily increase either retention period through
-`signoz.clickhouse.clickhouseOperator.zookeeperLog.ttl` or
-`signoz.clickhouse.clickhouseOperator.processorsProfileLog.ttl`; return it to
-one day after the investigation. Existing installations need a Helm upgrade to
-receive the new configuration. This configuration does not immediately delete
-diagnostic rows already stored in ClickHouse.
+Do not set `signozUpgrade.mode=destructive-replace` for this patch upgrade.
 
 #### SigNoz Cold Storage (`values-signoz-cold-storage.yaml`)
 
@@ -624,12 +696,19 @@ Creates a Strimzi-managed Kafka cluster in the OBaaS release namespace. This is 
 
 **Installation:**
 
-This example includes full Kafka observability in SigNoz (the "Kafka Server Monitoring
-Dashboard") by default — no separate extension file needed.
+```bash
+helm upgrade --install <app-release> obaas/obaas \
+  -f examples/values-kafka.yaml \
+  -n <application-namespace> \
+  --create-namespace [--debug]
+```
+
+**Optional Kafka metrics in SigNoz:**
 
 ```bash
 helm upgrade --install <app-release> obaas/obaas \
   -f examples/values-kafka.yaml \
+  -f extensions/kafka-metrics.yaml \
   -n <application-namespace> \
   --create-namespace [--debug]
 ```

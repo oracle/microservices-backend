@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
 
 # Base URL for the Customer Helidon Service
 BASE_URL="http://localhost:8080/api/v1/customer"

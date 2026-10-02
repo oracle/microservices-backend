@@ -21,6 +21,7 @@
 #        -n <namespace>
 #
 #   2. Mirror the required images to your private registry
+#   3. Configure images and pull secrets in the separate cert-manager installation
 #
 # Usage:
 #   helm install obaas-prereqs ./obaas-prereqs -n <namespace> -f examples/values-private-registry.yaml
@@ -40,7 +41,7 @@ global:
 
   # Image pull secret for private registry authentication
   # This is automatically propagated to all subcharts via YAML anchors
-  imagePullSecrets: &imagePullSecrets 
+  imagePullSecrets: &imagePullSecrets
     - name: myregistry-secret
 
 # ------------------------------------
@@ -59,23 +60,26 @@ global:
 # -------------------------
 
 # =============================================================================
-# Oracle Database Operatior (and its prereq cert-manager)
+# Oracle Database Operator
 # =============================================================================
-# Default registry: quay.io
-# Has multiple components, each needs registry override
+# Default operator registry: container-registry.oracle.com
+# Default CRD configuration Job registry: registry.k8s.io
 
 oracle-database-operator:
   enabled: true
   # Empty namespace will cause the use of .Release.Namespace
-  namespace: ""
+  namespaceOverride: ""
   replicas: 1
-  # Image pull secrets for private registries (shared with cert-manager subchart)
+  # Image pull secrets for the operator and CRD configuration Job
   imagePullSecrets: *imagePullSecrets
   image:
-    repository: myregistry.example.com/database/operator
+    registry: myregistry.example.com
+    repository: database/operator
     # Specify a version tag for reproducible deployments
-    tag: "2.1.0"
+    tag: "2.2.0"
     pullPolicy: IfNotPresent
+  crdConfiguration:
+    image: myregistry.example.com/kubectl:v1.36.3
   # Deployment scope configuration
   scope:
     mode: cluster
@@ -88,42 +92,7 @@ oracle-database-operator:
   pdb:
     enabled: true
     minAvailable: 1
-    # maxUnavailable: 1  # Alternative to minAvailable
-  # Wait job configuration for cert-manager webhook readiness (not passed to subchart)
-  certManagerWaitJob:
-    # Waits for cert-manager webhook before creating Issuer/Certificate resources
-    # Set to false only if cert-manager is known to be ready (e.g., pre-installed and running)
-    enabled: true
-    image:
-      repository: myregistry.example.com/kubectl
-      tag: "v1.28.0"
-      pullPolicy: IfNotPresent
-  # cert-manager subchart values (passed to subchart when enabled=true)
-  cert-manager:
-    enabled: true
-    # Empty namespace will cause the use of .Release.Namespace
-    namespace: ""
-    crds:
-      enabled: true
-      # Allow CRDs to be deleted on uninstall (WARNING: deletes all cert-manager resources)
-      keep: false
-    global:
-      imagePullSecrets: *imagePullSecrets
-    image:
-      repository: myregistry.example.com/jetstack/cert-manager-controller
-      tag: v1.21.1
-    webhook:
-      image:
-        repository: myregistry.example.com/jetstack/cert-manager-webhook
-        tag: v1.21.1
-    cainjector:
-      image:
-        repository: myregistry.example.com/jetstack/cert-manager-cainjector
-        tag: v1.21.1
-    startupapicheck:
-      image:
-        repository: myregistry.example.com/jetstack/cert-manager-startupapicheck
-        tag: v1.21.1
+    # maxUnavailable: 1  # Requires minAvailable: null
 
 # =============================================================================
 # external-secrets
@@ -202,14 +171,14 @@ strimzi-kafka-operator:
   # Uncomment to override the default image registry and repository
   defaultImageRegistry: "myregistry.example.com"  # Default: quay.io
   defaultImageRepository: "strimzi"  # Default: strimzi
-  defaultImageTag: 1.1.0
+  defaultImageTag: 1.2.0
   image:
     # Uses global.imagePullSecrets
     imagePullSecrets: *imagePullSecrets
     registry: myregistry.example.com
     repository: strimzi
     name: operator
-    tag: 1.1.0
+    tag: 1.2.0
 
 # =============================================================================
 # coherence-operator
@@ -224,14 +193,15 @@ coherence-operator:
   image:
     registry: "myregistry.example.com/middleware"
     name: "coherence-operator"
-    tag: "3.5.14"
+    tag: "3.5.17"
   # Default Coherence image for applications
   defaultCoherenceImage:
     registry: "myregistry.example.com/middleware"
     name: "coherence-ce"
-    tag: "22.06.13"
-  # Operator replicas (HA by default)
-  replicas: 3
+    tag: "26.04"
+  # One operator replica is sufficient for evaluation/development clusters.
+  # Increase to 3 for highly available operator reconciliation.
+  replicas: 1
   # Namespaces to watch (empty string = all namespaces)
   # Override to limit operator scope: "namespace1,namespace2"
   watchNamespaces: ""
@@ -239,13 +209,13 @@ coherence-operator:
   resources: {}
 
 opentelemetry-operator:
-  enabled: true 
+  enabled: true
   # Uses global.imagePullSecrets
   imagePullSecrets: *imagePullSecrets
   manager:
     collectorImage:
       repository: "myregistry.example.com/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s"
-      tag: "0.154.0"
+      tag: "0.158.0"
     image:
       repository: "myregistry.example.com/open-telemetry/opentelemetry-operator"
-      tag: "0.154.0"
+      tag: "0.158.0"

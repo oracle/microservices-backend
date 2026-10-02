@@ -1,1 +1,620 @@
-{ "collapsableRowsMigrated": true, "description": "", "dotMigrated": true, "layout": [ { "h": 7, "i": "e16d581d-1da9-49ff-9c3b-1bb51c2f7730", "moved": false, "static": false, "w": 6, "x": 0, "y": 0 }, { "h": 7, "i": "18c1653b-f826-460d-9302-90bc6d3f5e52", "moved": false, "static": false, "w": 6, "x": 6, "y": 0 }, { "h": 7, "i": "a2cd4e4a-0b81-4a85-937f-48ca5c9f183b", "moved": false, "static": false, "w": 6, "x": 0, "y": 7 }, { "h": 7, "i": "1406e6b6-0c99-46d4-9782-530f6e7e053a", "moved": false, "static": false, "w": 6, "x": 6, "y": 7 } ], "name": "", "panelMap": {}, "tags": [ "pod", "k8s" ], "title": "Kubernetes Pod Metrics - Overall", "uploadedGrafana": false, "variables": { "05610c74-c8f3-495b-a7dc-8ec6e64f8bdb": { "allSelected": true, "customValue": "", "description": "The k8s node name.", "id": "05610c74-c8f3-495b-a7dc-8ec6e64f8bdb", "key": "05610c74-c8f3-495b-a7dc-8ec6e64f8bdb", "modificationUUID": "3506211c-4fd4-4873-a01e-d1ef986fb9d5", "multiSelect": true, "name": "k8s.node.name", "order": 1, "queryValue": "SELECT JSONExtractString(labels, 'k8s.node.name') AS `k8s.node.name` FROM signoz_metrics.distributed_time_series_v4_1day WHERE `metric_name` = 'k8s.node.cpu.time' AND JSONExtractString(labels, 'k8s.cluster.name') = $k8s.cluster.name GROUP BY `k8s.node.name`", "selectedValue": [ "default" ], "showALLOption": true, "sort": "ASC", "textboxValue": "", "type": "QUERY" }, "3c276fb0-b95b-42f8-b209-9953dd46d62c": { "allSelected": false, "customValue": "", "description": "The k8s namespace name", "id": "3c276fb0-b95b-42f8-b209-9953dd46d62c", "modificationUUID": "0923a01a-7e96-406b-ba9e-1a8c3610e65b", "multiSelect": false, "name": "k8s.namespace.name", "order": 2, "queryValue": "SELECT JSONExtractString(labels, 'k8s.namespace.name') AS `k8s.namespace.name` FROM signoz_metrics.distributed_time_series_v4_1day WHERE `metric_name` = 'k8s.pod.cpu.time' AND JSONExtractString(labels, 'k8s.cluster.name') IN $k8s.cluster.name AND JSONExtractString(labels, 'k8s.node.name') IN $k8s.node.name GROUP BY `k8s.namespace.name`", "selectedValue": "default", "showALLOption": false, "sort": "ASC", "textboxValue": "", "type": "QUERY" }, "4349d5be-eea6-41d2-9c8f-853ca85f018d": { "allSelected": false, "customValue": "", "description": "Name of the cluster", "id": "4349d5be-eea6-41d2-9c8f-853ca85f018d", "key": "4349d5be-eea6-41d2-9c8f-853ca85f018d", "modificationUUID": "2173224d-ec4e-4ede-b177-e1bacb34c8ea", "multiSelect": false, "name": "k8s.cluster.name", "order": 0, "queryValue": "SELECT JSONExtractString(labels, 'k8s.cluster.name') AS `k8s.cluster.name` FROM signoz_metrics.distributed_time_series_v4_1day WHERE `metric_name` = 'k8s.node.cpu.time' GROUP BY `k8s.cluster.name`", "selectedValue": "default", "showALLOption": false, "sort": "DISABLED", "textboxValue": "", "type": "QUERY" } }, "version": "v4", "widgets": [ { "bucketCount": 30, "bucketWidth": 0, "columnUnits": {}, "description": "", "fillSpans": false, "id": "e16d581d-1da9-49ff-9c3b-1bb51c2f7730", "isStacked": false, "mergeAllActiveQueries": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "query": { "builder": { "queryData": [ { "aggregateAttribute": { "dataType": "float64", "id": "k8s.pod.cpu.time--float64--Sum--true", "isColumn": true, "isJSON": false, "key": "k8s.pod.cpu.time", "type": "Sum" }, "aggregateOperator": "rate", "dataSource": "metrics", "disabled": false, "expression": "A", "filters": { "items": [ { "id": "877385bf", "key": { "dataType": "string", "id": "k8s.cluster.name--string--tag--false", "isColumn": false, "key": "k8s.cluster.name", "type": "tag" }, "op": "=", "value": "{{.k8s.cluster.name}}" }, { "id": "877385bf", "key": { "dataType": "string", "id": "k8s.node.name--string--tag--false", "isColumn": false, "key": "k8s.node.name", "type": "tag" }, "op": "in", "value": [ "{{.k8s.node.name}}" ] }, { "id": "61f9230d", "key": { "dataType": "string", "id": "k8s.namespace.name--string--tag--false", "isColumn": false, "key": "k8s.namespace.name", "type": "tag" }, "op": "in", "value": [ "{{.k8s.namespace.name}}" ] } ], "op": "AND" }, "functions": [], "groupBy": [ { "dataType": "string", "id": "k8s.node.name--string--tag--false", "isColumn": false, "key": "k8s.node.name", "type": "tag" }, { "dataType": "string", "id": "k8s.pod.name--string--tag--false", "isColumn": false, "key": "k8s.pod.name", "type": "tag" }, { "dataType": "string", "id": "k8s.namespace.name--string--tag--false", "isColumn": false, "key": "k8s.namespace.name", "type": "tag" } ], "having": [], "legend": "{{k8s.namespace.name}}-{{k8s.pod.name}}", "limit": null, "orderBy": [], "queryName": "A", "reduceTo": "sum", "spaceAggregation": "sum", "stepInterval": 60, "timeAggregation": "rate" } ], "queryFormulas": [] }, "clickhouse_sql": [ { "disabled": false, "legend": "", "name": "A", "query": "" } ], "id": "8bc531e9-41fc-4989-9e45-75691903aafe", "promql": [ { "disabled": false, "legend": "", "name": "A", "query": "" } ], "queryType": "builder" }, "selectedLogFields": [], "selectedTracesFields": [], "softMax": 0, "softMin": 0, "stackedBarChart": false, "thresholds": [], "timePreferance": "GLOBAL_TIME", "title": "Pod CPU usage", "yAxisUnit": "none" }, { "bucketCount": 30, "bucketWidth": 0, "columnUnits": {}, "description": "", "fillSpans": false, "id": "1406e6b6-0c99-46d4-9782-530f6e7e053a", "isStacked": false, "mergeAllActiveQueries": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "query": { "builder": { "queryData": [ { "aggregateAttribute": { "dataType": "float64", "id": "k8s.pod.filesystem.available--float64--Gauge--true", "isColumn": true, "isJSON": false, "key": "k8s.pod.filesystem.available", "type": "Gauge" }, "aggregateOperator": "avg", "dataSource": "metrics", "disabled": true, "expression": "A", "filters": { "items": [ { "id": "877385bf", "key": { "dataType": "string", "id": "k8s.cluster.name--string--tag--false", "isColumn": false, "key": "k8s.cluster.name", "type": "tag" }, "op": "=", "value": "{{.k8s.cluster.name}}" }, { "id": "cfd49200", "key": { "dataType": "string", "id": "k8s.node.name--string--tag--false", "isColumn": false, "key": "k8s.node.name", "type": "tag" }, "op": "in", "value": [ "{{.k8s.node.name}}" ] }, { "id": "a9fb8a7e", "key": { "dataType": "string", "id": "k8s.namespace.name--string--tag--false", "isColumn": false, "key": "k8s.namespace.name", "type": "tag" }, "op": "in", "value": [ "{{.k8s.namespace.name}}" ] } ], "op": "AND" }, "functions": [], "groupBy": [ { "dataType": "string", "id": "k8s.node.name--string--tag--false", "isColumn": false, "key": "k8s.node.name", "type": "tag" }, { "dataType": "string", "id": "k8s.namespace.name--string--tag--false", "isColumn": false, "key": "k8s.namespace.name", "type": "tag" }, { "dataType": "string", "id": "k8s.pod.name--string--tag--false", "isColumn": false, "key": "k8s.pod.name", "type": "tag" } ], "having": [], "legend": "", "limit": null, "orderBy": [], "queryName": "A", "reduceTo": "sum", "spaceAggregation": "sum", "stepInterval": 60, "timeAggregation": "avg" }, { "aggregateAttribute": { "dataType": "float64", "id": "k8s.pod.filesystem.capacity--float64--Gauge--true", "isColumn": true, "isJSON": false, "key": "k8s.pod.filesystem.capacity", "type": "Gauge" }, "aggregateOperator": "avg", "dataSource": "metrics", "disabled": true, "expression": "B", "filters": { "items": [ { "id": "877385bf", "key": { "dataType": "string", "id": "k8s.cluster.name--string--tag--false", "isColumn": false, "key": "k8s.cluster.name", "type": "tag" }, "op": "=", "value": "{{.k8s.cluster.name}}" }, { "id": "c70ccfc4", "key": { "dataType": "string", "id": "k8s.node.name--string--tag--false", "isColumn": false, "key": "k8s.node.name", "type": "tag" }, "op": "in", "value": [ "{{.k8s.node.name}}" ] }, { "id": "58740964", "key": { "dataType": "string", "id": "k8s.namespace.name--string--tag--false", "isColumn": false, "key": "k8s.namespace.name", "type": "tag" }, "op": "in", "value": [ "{{.k8s.namespace.name}}" ] } ], "op": "AND" }, "functions": [], "groupBy": [ { "dataType": "string", "id": "k8s.node.name--string--tag--false", "isColumn": false, "key": "k8s.node.name", "type": "tag" }, { "dataType": "string", "id": "k8s.namespace.name--string--tag--false", "isColumn": false, "key": "k8s.namespace.name", "type": "tag" }, { "dataType": "string", "id": "k8s.pod.name--string--tag--false", "isColumn": false, "key": "k8s.pod.name", "type": "tag" } ], "having": [], "legend": "", "limit": null, "orderBy": [], "queryName": "B", "reduceTo": "sum", "spaceAggregation": "sum", "stepInterval": 60, "timeAggregation": "avg" } ], "queryFormulas": [ { "disabled": false, "expression": "(B-A)/B", "legend": "{{k8s.node.name}}-{{k8s.namespace.name}}-{{k8s.pod.name}}", "queryName": "F1" } ] }, "clickhouse_sql": [ { "disabled": false, "legend": "", "name": "A", "query": "" } ], "id": "16908d4e-1565-4847-8d87-01ebb8fc494a", "promql": [ { "disabled": false, "legend": "", "name": "A", "query": "" } ], "queryType": "builder" }, "selectedLogFields": [], "selectedTracesFields": [], "softMax": 0, "softMin": 0, "stackedBarChart": false, "thresholds": [], "timePreferance": "GLOBAL_TIME", "title": "Pod filesystem usage", "yAxisUnit": "percentunit" }, { "bucketCount": 30, "bucketWidth": 0, "columnUnits": {}, "description": "", "fillSpans": false, "id": "18c1653b-f826-460d-9302-90bc6d3f5e52", "isStacked": false, "mergeAllActiveQueries": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "query": { "builder": { "queryData": [ { "aggregateAttribute": { "dataType": "float64", "id": "k8s.pod.memory.working_set--float64--Gauge--true", "isColumn": true, "isJSON": false, "key": "k8s.pod.memory.working_set", "type": "Gauge" }, "aggregateOperator": "avg", "dataSource": "metrics", "disabled": false, "expression": "A", "filters": { "items": [ { "id": "877385bf", "key": { "dataType": "string", "id": "k8s.cluster.name--string--tag--false", "isColumn": false, "key": "k8s.cluster.name", "type": "tag" }, "op": "=", "value": "{{.k8s.cluster.name}}" }, { "id": "c6107830", "key": { "dataType": "string", "id": "k8s.node.name--string--tag--false", "isColumn": false, "key": "k8s.node.name", "type": "tag" }, "op": "in", "value": [ "{{.k8s.node.name}}" ] }, { "id": "9e3c50e2", "key": { "dataType": "string", "id": "k8s.namespace.name--string--tag--false", "isColumn": false, "key": "k8s.namespace.name", "type": "tag" }, "op": "in", "value": [ "{{.k8s.namespace.name}}" ] } ], "op": "AND" }, "functions": [], "groupBy": [ { "dataType": "string", "id": "k8s.node.name--string--tag--false", "isColumn": false, "key": "k8s.node.name", "type": "tag" }, { "dataType": "string", "id": "k8s.namespace.name--string--tag--false", "isColumn": false, "key": "k8s.namespace.name", "type": "tag" }, { "dataType": "string", "id": "k8s.pod.name--string--tag--false", "isColumn": false, "key": "k8s.pod.name", "type": "tag" } ], "having": [], "legend": "{{k8s.namespace.name}}-{{k8s.pod.name}}", "limit": null, "orderBy": [], "queryName": "A", "reduceTo": "sum", "spaceAggregation": "sum", "stepInterval": 60, "timeAggregation": "avg" } ], "queryFormulas": [] }, "clickhouse_sql": [ { "disabled": false, "legend": "", "name": "A", "query": "" } ], "id": "103626b5-910c-4262-88ed-0a136d0a0f0f", "promql": [ { "disabled": false, "legend": "", "name": "A", "query": "" } ], "queryType": "builder" }, "selectedLogFields": [], "selectedTracesFields": [], "softMax": 0, "softMin": 0, "stackedBarChart": false, "thresholds": [], "timePreferance": "GLOBAL_TIME", "title": "Pod memory usage (WSS)", "yAxisUnit": "bytes" }, { "bucketCount": 30, "bucketWidth": 0, "columnUnits": {}, "description": "", "fillSpans": false, "id": "a2cd4e4a-0b81-4a85-937f-48ca5c9f183b", "isStacked": false, "mergeAllActiveQueries": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "query": { "builder": { "queryData": [ { "aggregateAttribute": { "dataType": "float64", "id": "k8s.pod.network.io--float64--Sum--true", "isColumn": true, "isJSON": false, "key": "k8s.pod.network.io", "type": "Sum" }, "aggregateOperator": "rate", "dataSource": "metrics", "disabled": false, "expression": "A", "filters": { "items": [ { "id": "877385bf", "key": { "dataType": "string", "id": "k8s.cluster.name--string--tag--false", "isColumn": false, "key": "k8s.cluster.name", "type": "tag" }, "op": "=", "value": "{{.k8s.cluster.name}}" }, { "id": "9613b4da", "key": { "dataType": "string", "id": "k8s.node.name--string--tag--false", "isColumn": false, "key": "k8s.node.name", "type": "tag" }, "op": "in", "value": [ "{{.k8s.node.name}}" ] }, { "id": "7605354f", "key": { "dataType": "string", "id": "k8s.namespace.name--string--tag--false", "isColumn": false, "key": "k8s.namespace.name", "type": "tag" }, "op": "in", "value": [ "{{.k8s.namespace.name}}" ] } ], "op": "AND" }, "functions": [], "groupBy": [ { "dataType": "string", "id": "interface--string--tag--false", "isColumn": false, "key": "interface", "type": "tag" }, { "dataType": "string", "id": "direction--string--tag--false", "isColumn": false, "key": "direction", "type": "tag" }, { "dataType": "string", "id": "k8s.node.name--string--tag--false", "isColumn": false, "key": "k8s.node.name", "type": "tag" }, { "dataType": "string", "id": "k8s.namespace.name--string--tag--false", "isColumn": false, "key": "k8s.namespace.name", "type": "tag" }, { "dataType": "string", "id": "k8s.pod.name--string--tag--false", "isColumn": false, "key": "k8s.pod.name", "type": "tag" } ], "having": [], "legend": "{{k8s.namespace.name}}-{{k8s.pod.name}}-{{interface}}-{{direction}}", "limit": null, "orderBy": [], "queryName": "A", "reduceTo": "sum", "spaceAggregation": "sum", "stepInterval": 60, "timeAggregation": "rate" } ], "queryFormulas": [] }, "clickhouse_sql": [ { "disabled": false, "legend": "", "name": "A", "query": "" } ], "id": "4b255d6d-4cde-474d-8866-f4418583c18b", "promql": [ { "disabled": false, "legend": "", "name": "A", "query": "" } ], "queryType": "builder" }, "selectedLogFields": [], "selectedTracesFields": [], "softMax": 0, "softMin": 0, "stackedBarChart": false, "thresholds": [], "timePreferance": "GLOBAL_TIME", "title": "Pod network IO", "yAxisUnit": "bytes" } ] }
+{
+  "schemaVersion": "v6",
+  "image": "",
+  "name": "",
+  "generateName": true,
+  "tags": [
+    {
+      "key": "tag",
+      "value": "pod"
+    },
+    {
+      "key": "tag",
+      "value": "k8s"
+    }
+  ],
+  "spec": {
+    "display": {
+      "name": "Kubernetes Pod Metrics - Overall",
+      "description": ""
+    },
+    "variables": [
+      {
+        "kind": "ListVariable",
+        "spec": {
+          "display": {
+            "name": "k8s.cluster.name",
+            "description": "Name of the cluster"
+          },
+          "defaultValue": "default",
+          "allowAllValue": false,
+          "allowMultiple": false,
+          "customAllValue": "",
+          "capturingRegexp": "",
+          "sort": "none",
+          "plugin": {
+            "kind": "signoz/QueryVariable",
+            "spec": {
+              "queryValue": "SELECT JSONExtractString(labels, 'k8s.cluster.name') AS `k8s.cluster.name` FROM signoz_metrics.distributed_time_series_v4_1day WHERE `metric_name` = 'k8s.node.cpu.time' GROUP BY `k8s.cluster.name`"
+            }
+          },
+          "name": "k8s.cluster.name"
+        }
+      },
+      {
+        "kind": "ListVariable",
+        "spec": {
+          "display": {
+            "name": "k8s.node.name",
+            "description": "The k8s node name."
+          },
+          "defaultValue": [
+            "default"
+          ],
+          "allowAllValue": true,
+          "allowMultiple": true,
+          "customAllValue": "",
+          "capturingRegexp": "",
+          "sort": "alphabetical-asc",
+          "plugin": {
+            "kind": "signoz/QueryVariable",
+            "spec": {
+              "queryValue": "SELECT JSONExtractString(labels, 'k8s.node.name') AS `k8s.node.name` FROM signoz_metrics.distributed_time_series_v4_1day WHERE `metric_name` = 'k8s.node.cpu.time' AND JSONExtractString(labels, 'k8s.cluster.name') = $k8s.cluster.name GROUP BY `k8s.node.name`"
+            }
+          },
+          "name": "k8s.node.name"
+        }
+      },
+      {
+        "kind": "ListVariable",
+        "spec": {
+          "display": {
+            "name": "k8s.namespace.name",
+            "description": "The k8s namespace name"
+          },
+          "defaultValue": "default",
+          "allowAllValue": false,
+          "allowMultiple": false,
+          "customAllValue": "",
+          "capturingRegexp": "",
+          "sort": "alphabetical-asc",
+          "plugin": {
+            "kind": "signoz/QueryVariable",
+            "spec": {
+              "queryValue": "SELECT JSONExtractString(labels, 'k8s.namespace.name') AS `k8s.namespace.name` FROM signoz_metrics.distributed_time_series_v4_1day WHERE `metric_name` = 'k8s.pod.cpu.time' AND JSONExtractString(labels, 'k8s.cluster.name') IN $k8s.cluster.name AND JSONExtractString(labels, 'k8s.node.name') IN $k8s.node.name GROUP BY `k8s.namespace.name`"
+            }
+          },
+          "name": "k8s.namespace.name"
+        }
+      }
+    ],
+    "panels": {
+      "1406e6b6-0c99-46d4-9782-530f6e7e053a": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Pod filesystem usage",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": false
+              },
+              "formatting": {
+                "unit": "percentunit",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/CompositeQuery",
+                  "spec": {
+                    "queries": [
+                      {
+                        "type": "builder_query",
+                        "spec": {
+                          "name": "A",
+                          "stepInterval": 60,
+                          "signal": "metrics",
+                          "source": "",
+                          "aggregations": [
+                            {
+                              "metricName": "k8s.pod.filesystem.available",
+                              "temporality": "",
+                              "timeAggregation": "avg",
+                              "spaceAggregation": "sum",
+                              "reduceTo": "sum"
+                            }
+                          ],
+                          "disabled": true,
+                          "filter": {
+                            "expression": "(k8s.cluster.name = $k8s.cluster.name AND k8s.node.name IN $k8s.node.name AND k8s.namespace.name IN $k8s.namespace.name)"
+                          },
+                          "groupBy": [
+                            {
+                              "name": "k8s.node.name",
+                              "signal": "",
+                              "fieldContext": "attribute",
+                              "fieldDataType": "string"
+                            },
+                            {
+                              "name": "k8s.namespace.name",
+                              "signal": "",
+                              "fieldContext": "attribute",
+                              "fieldDataType": "string"
+                            },
+                            {
+                              "name": "k8s.pod.name",
+                              "signal": "",
+                              "fieldContext": "attribute",
+                              "fieldDataType": "string"
+                            }
+                          ],
+                          "order": [],
+                          "having": {
+                            "expression": ""
+                          },
+                          "functions": [],
+                          "legend": ""
+                        }
+                      },
+                      {
+                        "type": "builder_query",
+                        "spec": {
+                          "name": "B",
+                          "stepInterval": 60,
+                          "signal": "metrics",
+                          "source": "",
+                          "aggregations": [
+                            {
+                              "metricName": "k8s.pod.filesystem.capacity",
+                              "temporality": "",
+                              "timeAggregation": "avg",
+                              "spaceAggregation": "sum",
+                              "reduceTo": "sum"
+                            }
+                          ],
+                          "disabled": true,
+                          "filter": {
+                            "expression": "(k8s.cluster.name = $k8s.cluster.name AND k8s.node.name IN $k8s.node.name AND k8s.namespace.name IN $k8s.namespace.name)"
+                          },
+                          "groupBy": [
+                            {
+                              "name": "k8s.node.name",
+                              "signal": "",
+                              "fieldContext": "attribute",
+                              "fieldDataType": "string"
+                            },
+                            {
+                              "name": "k8s.namespace.name",
+                              "signal": "",
+                              "fieldContext": "attribute",
+                              "fieldDataType": "string"
+                            },
+                            {
+                              "name": "k8s.pod.name",
+                              "signal": "",
+                              "fieldContext": "attribute",
+                              "fieldDataType": "string"
+                            }
+                          ],
+                          "order": [],
+                          "having": {
+                            "expression": ""
+                          },
+                          "functions": [],
+                          "legend": ""
+                        }
+                      },
+                      {
+                        "type": "builder_formula",
+                        "spec": {
+                          "name": "F1",
+                          "expression": "(B-A)/B",
+                          "disabled": false,
+                          "having": {
+                            "expression": ""
+                          },
+                          "legend": "{{k8s.node.name}}-{{k8s.namespace.name}}-{{k8s.pod.name}}"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "18c1653b-f826-460d-9302-90bc6d3f5e52": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Pod memory usage (WSS)",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": false
+              },
+              "formatting": {
+                "unit": "bytes",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "k8s.pod.memory.working_set",
+                        "temporality": "",
+                        "timeAggregation": "avg",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "sum"
+                      }
+                    ],
+                    "disabled": false,
+                    "filter": {
+                      "expression": "(k8s.cluster.name = $k8s.cluster.name AND k8s.node.name IN $k8s.node.name AND k8s.namespace.name IN $k8s.namespace.name)"
+                    },
+                    "groupBy": [
+                      {
+                        "name": "k8s.node.name",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      },
+                      {
+                        "name": "k8s.namespace.name",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      },
+                      {
+                        "name": "k8s.pod.name",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      }
+                    ],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": "{{k8s.namespace.name}}-{{k8s.pod.name}}"
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "a2cd4e4a-0b81-4a85-937f-48ca5c9f183b": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Pod network IO",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": false
+              },
+              "formatting": {
+                "unit": "bytes",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "k8s.pod.network.io",
+                        "temporality": "",
+                        "timeAggregation": "rate",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "sum"
+                      }
+                    ],
+                    "disabled": false,
+                    "filter": {
+                      "expression": "(k8s.cluster.name = $k8s.cluster.name AND k8s.node.name IN $k8s.node.name AND k8s.namespace.name IN $k8s.namespace.name)"
+                    },
+                    "groupBy": [
+                      {
+                        "name": "interface",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      },
+                      {
+                        "name": "direction",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      },
+                      {
+                        "name": "k8s.node.name",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      },
+                      {
+                        "name": "k8s.namespace.name",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      },
+                      {
+                        "name": "k8s.pod.name",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      }
+                    ],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": "{{k8s.namespace.name}}-{{k8s.pod.name}}-{{interface}}-{{direction}}"
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "e16d581d-1da9-49ff-9c3b-1bb51c2f7730": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Pod CPU usage",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": false
+              },
+              "formatting": {
+                "unit": "none",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "k8s.pod.cpu.time",
+                        "temporality": "",
+                        "timeAggregation": "rate",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "sum"
+                      }
+                    ],
+                    "disabled": false,
+                    "filter": {
+                      "expression": "(k8s.cluster.name = $k8s.cluster.name AND k8s.node.name IN $k8s.node.name AND k8s.namespace.name IN $k8s.namespace.name)"
+                    },
+                    "groupBy": [
+                      {
+                        "name": "k8s.node.name",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      },
+                      {
+                        "name": "k8s.pod.name",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      },
+                      {
+                        "name": "k8s.namespace.name",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      }
+                    ],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": "{{k8s.namespace.name}}-{{k8s.pod.name}}"
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      }
+    },
+    "layouts": [
+      {
+        "kind": "Grid",
+        "spec": {
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 6,
+              "height": 7,
+              "content": {
+                "$ref": "#/spec/panels/e16d581d-1da9-49ff-9c3b-1bb51c2f7730"
+              }
+            },
+            {
+              "x": 6,
+              "y": 0,
+              "width": 6,
+              "height": 7,
+              "content": {
+                "$ref": "#/spec/panels/18c1653b-f826-460d-9302-90bc6d3f5e52"
+              }
+            },
+            {
+              "x": 0,
+              "y": 7,
+              "width": 6,
+              "height": 7,
+              "content": {
+                "$ref": "#/spec/panels/a2cd4e4a-0b81-4a85-937f-48ca5c9f183b"
+              }
+            },
+            {
+              "x": 6,
+              "y": 7,
+              "width": 6,
+              "height": 7,
+              "content": {
+                "$ref": "#/spec/panels/1406e6b6-0c99-46d4-9782-530f6e7e053a"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "duration": "",
+    "refreshInterval": "",
+    "links": []
+  }
+}

@@ -63,10 +63,6 @@ otmm:
 oracle-database-exporter:
   enabled: true
 
-# Observability
-signoz:
-  enabled: true
-
 # AI Optimizer (disabled by default)
 ai-optimizer:
   enabled: false
@@ -85,11 +81,13 @@ kafka:
   # automatically via the signoz.io/scrape pod annotation.
   metricsEnabled: true
 
+# Observability
 # Scrape Kafka broker/topic/partition/consumer-group facts (broker count,
 # topic count, consumer lag, replicas, offsets) into SigNoz via the OTel
 # collector's kafkametrics receiver, for the "Kafka Server Monitoring
 # Dashboard".
 signoz:
+  enabled: true
   otelCollector:
     config:
       receivers:
