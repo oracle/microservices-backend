@@ -202,7 +202,8 @@ resource "oci_containerengine_node_pool" "cpu_node_pool_details" {
     boot_volume_size_in_gbs = 100
   }
   node_metadata = {
-    user_data = data.cloudinit_config.workers.rendered
+    user_data                      = data.cloudinit_config.workers.rendered
+    areLegacyImdsEndpointsDisabled = "true"
   }
   lifecycle {
     ignore_changes = [defined_tags, freeform_tags, node_config_details[0].size]
@@ -250,7 +251,8 @@ resource "oci_containerengine_node_pool" "gpu_node_pool_details" {
     boot_volume_size_in_gbs = 100
   }
   node_metadata = {
-    user_data = data.cloudinit_config.workers.rendered
+    user_data                      = data.cloudinit_config.workers.rendered
+    areLegacyImdsEndpointsDisabled = "true"
   }
   lifecycle {
     ignore_changes = [defined_tags, freeform_tags, node_config_details[0].size]
