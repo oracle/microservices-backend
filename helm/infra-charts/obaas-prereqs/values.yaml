@@ -27,15 +27,16 @@ global:
 # -- SubChart Configuration
 oracle-database-operator:
   enabled: true
-  # Empty namespace will cause the use of .Release.Namespace
-  namespace: ""
+  # Empty namespaceOverride will cause the use of .Release.Namespace
+  namespaceOverride: ""
   replicas: 1
-  # Image pull secrets for private registries (shared with cert-manager subchart)
+  # Image pull secrets for private registries
   imagePullSecrets: &imagePullSecrets []
   image:
-    repository: container-registry.oracle.com/database/operator
+    registry: container-registry.oracle.com
+    repository: database/operator
     # Specify a version tag for reproducible deployments
-    tag: "2.1.0"
+    tag: "2.2.0"
     pullPolicy: IfNotPresent
   # Deployment scope configuration
   scope:
@@ -49,19 +50,7 @@ oracle-database-operator:
   pdb:
     enabled: true
     minAvailable: 1
-    # maxUnavailable: 1  # Alternative to minAvailable
-  # Wait job configuration for cert-manager webhook readiness (not passed to subchart)
-  certManagerWaitJob:
-    # Waits for cert-manager webhook before creating Issuer/Certificate resources
-    # Set to false only if cert-manager is known to be ready (e.g., pre-installed and running)
-    enabled: true
-    image:
-      repository: registry.k8s.io/kubectl
-      tag: "v1.28.0"
-      pullPolicy: IfNotPresent
-  # don't use the cert-manager subchart 
-  cert-manager:
-    enabled: false
+    # maxUnavailable: 1  # Requires minAvailable: null
 
 external-secrets:
   enabled: true
@@ -108,7 +97,7 @@ strimzi-kafka-operator:
     imagePullSecrets: *imagePullSecrets
   defaultImageRegistry: quay.io
   defaultImageRepository: strimzi
-  defaultImageTag: 1.1.0
+  defaultImageTag: 1.2.0
 
 coherence-operator:
   enabled: true
@@ -118,16 +107,26 @@ coherence-operator:
   image:
     registry: "container-registry.oracle.com/middleware"
     name: "coherence-operator"
-    tag: "3.5.14"
+    tag: "3.5.17"
   # Default Coherence image for applications
   defaultCoherenceImage:
     registry: "container-registry.oracle.com/middleware"
     name: "coherence-ce"
     tag: "22.06.13"
-  # Operator replicas (HA by default)
-  replicas: 3
+  # One operator replica is sufficient for evaluation/development clusters.
+  # Increase to 3 for highly available operator reconciliation.
+  replicas: 1
   # Namespaces to watch (empty string = all namespaces)
   # Override to limit operator scope: "namespace1,namespace2"
   watchNamespaces: ""
   # Override default resources if needed
   resources: {}
+
+opentelemetry-operator:
+  enabled: true
+  # Keep network-policy rollout separate from the operator and
+  # auto-instrumentation upgrade.
+  manager:
+    featureGatesMap:
+      operator.networkpolicy: false
+      operand.networkpolicy: false

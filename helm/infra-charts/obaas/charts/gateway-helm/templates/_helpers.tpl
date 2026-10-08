@@ -114,47 +114,19 @@ Pull policy for the Envoy Gateway image.
 {{/*
 Pull secrets for the Envoy Gateway image.
 */}}
-{{- define "eg.normalizedImagePullSecrets" -}}
-{{- $secrets := default (list) .secrets -}}
-{{- if kindIs "string" $secrets -}}
-{{- $secrets = list $secrets -}}
-{{- end -}}
-{{- if and (not $secrets) .secretName -}}
-{{- $secrets = list .secretName -}}
-{{- end -}}
-{{- $normalized := list -}}
-{{- range $secrets -}}
-{{- if kindIs "string" . -}}
-{{- if . -}}
-{{- $normalized = append $normalized (dict "name" .) -}}
-{{- end -}}
-{{- else -}}
-{{- $normalized = append $normalized . -}}
-{{- end -}}
-{{- end -}}
-{{- toYaml $normalized -}}
-{{- end }}
-
-{{- define "eg.renderImagePullSecrets" -}}
-{{- $pullSecrets := include "eg.normalizedImagePullSecrets" . | trim -}}
-{{- if eq $pullSecrets "[]" -}}
-imagePullSecrets: []
-{{- else -}}
-imagePullSecrets:
-{{ $pullSecrets }}
-{{- end -}}
-{{- end }}
-
 {{- define "eg.image.pullSecrets" -}}
-{{- $secrets := list -}}
 {{- if .Values.global.imagePullSecrets -}}
-{{- $secrets = .Values.global.imagePullSecrets -}}
+imagePullSecrets:
+{{ toYaml .Values.global.imagePullSecrets }}
 {{- else if .Values.deployment.envoyGateway.imagePullSecrets -}}
-{{- $secrets = .Values.deployment.envoyGateway.imagePullSecrets -}}
+imagePullSecrets:
+{{ toYaml .Values.deployment.envoyGateway.imagePullSecrets }}
 {{- else if .Values.global.images.envoyGateway.pullSecrets -}}
-{{- $secrets = .Values.global.images.envoyGateway.pullSecrets -}}
+imagePullSecrets:
+{{ toYaml .Values.global.images.envoyGateway.pullSecrets }}
+{{- else -}}
+imagePullSecrets: {{ toYaml list }}
 {{- end }}
-{{ include "eg.renderImagePullSecrets" (dict "secrets" $secrets "secretName" .Values.global.imagePullSecretName) }}
 {{- end }}
 
 {{/*
@@ -167,7 +139,7 @@ The name of the Envoy Ratelimit image.
 {{-   $repositoryTag := $imageParts._1 -}}
 {{-   $repositoryParts := splitn ":" 2 $repositoryTag -}}
 {{-   $repositoryName := $repositoryParts._0 -}}
-{{-   $imageTag := default "master" $repositoryParts._1 -}}
+{{-   $imageTag := default "8fe6ea42" $repositoryParts._1 -}}
 {{-   printf "%s/%s:%s" $registryName $repositoryName $imageTag -}}
 {{- end -}}
 
@@ -175,13 +147,15 @@ The name of the Envoy Ratelimit image.
 Pull secrets for the Envoy Ratelimit image.
 */}}
 {{- define "eg.ratelimit.image.pullSecrets" -}}
-{{- $secrets := list -}}
 {{- if .Values.global.imagePullSecrets }}
-{{- $secrets = .Values.global.imagePullSecrets -}}
+imagePullSecrets:
+{{ toYaml .Values.global.imagePullSecrets }}
 {{- else if .Values.global.images.ratelimit.pullSecrets -}}
-{{- $secrets = .Values.global.images.ratelimit.pullSecrets -}}
+imagePullSecrets:
+{{ toYaml .Values.global.images.ratelimit.pullSecrets }}
+{{- else }}
+imagePullSecrets: {{ toYaml list }}
 {{- end }}
-{{ include "eg.renderImagePullSecrets" (dict "secrets" $secrets "secretName" .Values.global.imagePullSecretName) }}
 {{- end }}
 
 {{/*
@@ -194,7 +168,7 @@ Resolve the Envoy Proxy image.
 {{-   $repositoryTag := $imageParts._1 -}}
 {{-   $repositoryParts := splitn ":" 2 $repositoryTag -}}
 {{-   $repositoryName := $repositoryParts._0 -}}
-{{-   $imageTag := default "distroless-dev" $repositoryParts._1 -}}
+{{-   $imageTag := default "distroless-v1.39.1" $repositoryParts._1 -}}
 {{-   printf "%s/%s:%s" $registryName $repositoryName $imageTag -}}
 {{- end -}}
 
@@ -202,13 +176,15 @@ Resolve the Envoy Proxy image.
 Resolve the Envoy Proxy image pull secrets.
 */}}
 {{- define "eg.envoyProxy.image.pullSecrets" -}}
-{{- $secrets := list -}}
 {{- if .Values.global.imagePullSecrets }}
-{{- $secrets = .Values.global.imagePullSecrets -}}
+imagePullSecrets:
+{{ toYaml .Values.global.imagePullSecrets }}
 {{- else if .Values.global.images.envoyProxy.pullSecrets -}}
-{{- $secrets = .Values.global.images.envoyProxy.pullSecrets -}}
+imagePullSecrets:
+{{ toYaml .Values.global.images.envoyProxy.pullSecrets }}
+{{- else }}
+imagePullSecrets: {{ toYaml list }}
 {{- end }}
-{{ include "eg.renderImagePullSecrets" (dict "secrets" $secrets "secretName" .Values.global.imagePullSecretName) }}
 {{- end }}
 
 {{/*
@@ -224,7 +200,7 @@ The default Envoy Gateway configuration.
     {{- $_ := set $container "imagePullPolicy" .Values.global.images.envoyProxy.pullPolicy }}
   {{- end }}
   {{- $deployment := dict "container" $container }}
-  {{- if or .Values.global.imagePullSecrets .Values.global.images.envoyProxy.pullSecrets .Values.global.imagePullSecretName }}
+  {{- if or .Values.global.imagePullSecrets .Values.global.images.envoyProxy.pullSecrets }}
     {{- $pullSecretsYaml := include "eg.envoyProxy.image.pullSecrets" . }}
     {{- $pullSecrets := dict "imagePullSecrets" ($pullSecretsYaml | fromYaml).imagePullSecrets }}
     {{- $_ := set $deployment "pod" $pullSecrets }}
@@ -243,7 +219,7 @@ provider:
     rateLimitDeployment:
       container:
         image: {{ include "eg.ratelimit.image" . }}
-      {{- if (or .Values.global.imagePullSecrets .Values.global.images.ratelimit.pullSecrets .Values.global.imagePullSecretName) }}
+      {{- if (or .Values.global.imagePullSecrets .Values.global.images.ratelimit.pullSecrets) }}
       pod:
         {{- include "eg.ratelimit.image.pullSecrets" . | nindent 8 }}
       {{- end }}

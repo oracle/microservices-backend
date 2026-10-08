@@ -8,7 +8,7 @@ The ClickHouse Operator CRDs are installed as part of `obaas-prereqs` chart but 
 - CRDs are cluster-scoped resources (not namespaced)
 - Installing them once in prereqs prevents conflicts between multiple tenant installations
 - Each tenant gets their own namespace-scoped operator via SigNoz
-- Similar pattern to other operators in this chart (Strimzi, cert-manager, etc.)
+- Similar pattern to other operators in this chart (Strimzi, Oracle Database Operator, etc.)
 
 ## Current CRD Version
 

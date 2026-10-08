@@ -1,9 +1,0 @@
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: {{ include "oracle-database-operator.issuerName" . }}
-  namespace: {{ include "oracle-database-operator.namespace" . }}
-  labels:
-    {{- include "oracle-database-operator.labels" . | nindent 4 }}
-spec:
-  selfSigned: {}
