@@ -17,6 +17,7 @@ Use only these sources for installation and test truth:
 - `opentofu/README.md`, `opentofu/examples/`, and the Terraform sources, templates, and `cfgmgt/apply.py` under `opentofu/` for OCI provisioning and its OBaaS installation path.
 - `.github/workflows/opentofu.yml` and `opentofu/tests/` for infrastructure static checks.
 - `cloudbank-v5/README.md`, `cloudbank-v5/cloudbank-v5-install.md`, and `cloudbank-v5/cloudbank-test-doc.md`.
+- `cloudbank-v5/8-smoke_test_microtx_jwt.sh` for workflow JWT checks and `cloudbank-v5/tests/test_secure_services_smoke.py` for mocked secured-smoke regression coverage.
 - `cloudbank-v5/customer-helidon/README.md` when a mixed Spring Boot and Helidon CloudBank workload is required for observability testing.
 - `cloudbank-v5/helidon-producer/README.md` and `cloudbank-v5/helidon-consumer/README.md` when Kafka observability or Helidon MP messaging telemetry must be validated.
 - The task list provided with this guide.
@@ -168,6 +169,8 @@ All test runs use this checkout's `helm/infra-charts/obaas-prereqs` and `helm/in
 
 At handoff, verify:
 
+- The planned Kubernetes version from `opentofu/versions.tf` (currently `1.36.4`) matches the provisioned control plane and worker versions, or the report explains an intentional difference. Keep the documented minimum of 1.34 separate from this provisioning default.
+- CPU and GPU node pools present in the run have `node_metadata.areLegacyImdsEndpointsDisabled="true"` in the plan, and their worker instances have legacy IMDS endpoints disabled. Preserve sanitized node-pool and instance metadata evidence; do not capture metadata credentials. Verify IMDSv2 compatibility for worker tooling that accesses instance metadata.
 - `app_name` matches the application namespace, and the `kubeconfig_cmd` output or generated `cfgmgt/stage/kubeconfig` selects the intended cluster and authentication profile.
 - The generated `obaas-prereqs-values.yaml` and `obaas-values.yaml` match the database, secret names, registry, access path, and optional components. Run `PRE-008` on the generated values when available.
 - Automatic installation uses release `obaas-prereqs` in `obaas-system` and release `obaas` in the `app_name` namespace. Record those identities and verify them before CloudBank deployment.
@@ -184,8 +187,8 @@ Use this matrix as the master list for each run. Mark each test `Pass`, `Fail`, 
 | ID | Category | Test | Expected Result | Evidence |
 | --- | --- | --- | --- | --- |
 | INF-001 | Infrastructure | Validate infrastructure configuration. | Formatting, configuration, and ORM schema checks pass; IaC security findings are triaged. | CLI/provider versions, validation output, scan findings and disposition |
-| INF-002 | Infrastructure | Review the deployment plan. | Planned resources match the selected scenario and authorized scope; replacements and deletions are accounted for. | state reference, input references, sanitized plan summary and identity |
-| INF-003 | Infrastructure | Provision OCI resources. | Apply succeeds; cluster, node pools, and selected add-ons are ready. | apply output/status, OCI resource and add-on readiness |
+| INF-002 | Infrastructure | Review the deployment plan. | Planned resources match the selected scenario and authorized scope; replacements and deletions are accounted for; Kubernetes version and disabled legacy IMDS settings match the sources. | state reference, input references, sanitized plan summary and identity, version and node metadata settings |
+| INF-003 | Infrastructure | Provision OCI resources. | Apply succeeds; cluster, node pools, and selected add-ons are ready; actual Kubernetes versions and worker legacy-IMDS settings match the reviewed plan or documented deviations. | apply output/status, OCI resource and add-on readiness, control-plane/worker versions and sanitized instance metadata |
 | INF-004 | Infrastructure | Verify deployment handoff. | Context, namespaces, chart versions, generated values, database references, and component ownership match the run inputs. | sanitized outputs/values, context and release metadata |
 | INF-005 | Infrastructure | Verify retention or authorized teardown. | Run-owned resources are retained with an owner or removed as agreed; residual resources and follow-up are recorded. | resource inventory, retention decision or destroy evidence |
 | PRE-001 | Preflight | Verify current Kubernetes context. | Context equals `<kube-context>`. | `kubectl config current-context` |
@@ -222,12 +225,13 @@ Use this matrix as the master list for each run. Mark each test `Pass`, `Fail`, 
 | CB-006 | CloudBank | Run secured smoke test. | Smoke test passes. | smoke script output |
 | CB-007 | CloudBank | Check OAuth metadata and JWKS. | Metadata is public and JWKS exposes a key ID. | curl output |
 | CB-008 | CloudBank | Check unauthorized access. | Protected endpoint without token returns `401`. | curl output |
-| CB-009 | CloudBank | Check read access. | Read token can call account, customer, and creditscore APIs. | curl output |
+| CB-009 | CloudBank | Check read access. | Read token returns `200` for creditscore and the public account list, which may be empty after ownership filtering. Owner-sensitive account/customer checks use an owner user token. | HTTP output and sanitized ownership evidence |
 | CB-010 | CloudBank | Check wrong-scope access. | Wrong token scope returns `403`. | curl output |
 | CB-011 | CloudBank | Check deposit workflow. | Deposit returns success and check service logs show receipt. | curl and logs |
 | CB-012 | CloudBank | Check journal and clearance workflow. | Journal moves from pending to deposit after clear. | curl and logs |
 | CB-013 | CloudBank | Check transfer workflow. | Balances change correctly and transfer logs show LRA lifecycle. | curl and logs |
 | CB-014 | CloudBank | Run full all-services validation. | `7-test_all_services.sh` passes for `Full Validation`; local-functional runs may mark it `Not Applicable` with tier evidence. | full script output |
+| CB-015 | CloudBank | Verify MicroTx Workflow API JWT integration. | When workflow-server azn-server JWT integration is configured, `8-smoke_test_microtx_jwt.sh` passes: unauthenticated `401`, authenticated `200`, and successful JWKS request evidence; otherwise `Not Applicable` with configuration evidence. Required integration with failed prerequisites is `Blocked`. | effective security values, script output and exit status, sanitized claims/key IDs and JWKS logs |
 | OBS-001 | Observability | Log in to SigNoz. | SigNoz UI login succeeds. | screenshot |
 | OBS-002 | Observability | Verify SigNoz Services view. | Platform and CloudBank services appear for recent time window. | screenshot |
 | OBS-003 | Observability | Verify Services table columns. | P99 latency, error rate, and operations per second are populated. | screenshot |
@@ -264,6 +268,7 @@ Platform checks:
 - APISIX gateway must be reachable through the selected access path or a documented local port-forward.
 - APISIX admin API must show the route set expected after CloudBank route creation.
 - APISIX OpenTelemetry metadata must be configured by the `apisix-plugin-metadata` sidecar and retrievable from the Admin API before APISIX tracing is marked healthy.
+- Check the effective `apisix.apisix.tracing`, OpenTelemetry `set_ngx_var`, and JSON access-log settings against the chart defaults. For a traced CloudBank request, preserve an APISIX access-log entry with populated `trace_id` and `span_id` and correlate its trace ID with a SigNoz trace. Record intentional tracing overrides; do not treat an untraced health request as correlation evidence.
 - Eureka must show the OBaaS platform services and all selected CloudBank services after deployment. Record the effective `eureka.replicas` value and verify that APISIX lists a numbered StatefulSet-pod host for every replica; changing the replica count without updating that list is a failure.
 - Config Server must respond. If no test property is seeded, record that the server is reachable and that no config data validation was performed.
 - Spring Boot Admin must show monitored Spring services and health status.
@@ -277,6 +282,9 @@ Platform checks:
 CloudBank checks:
 
 - Run the automated secured smoke test from `CBV5-AGENT.md` first and preserve its full output.
+- Preserve account-discovery results or the explicit-ID bypass choice. Automatic discovery uses the internal service token directly against `svc/account`, including in read-only mode; a public account-list `200` with no owner-visible accounts does not prove discovery failed. Discovery failures fail the smoke test and skip dependent workflow requests.
+- Run `CB-015` using the prerequisites and command in `CBV5-AGENT.md` when the workflow server is configured for azn-server JWT integration. The chart's security default is disabled, so workflow-server readiness alone does not establish JWT integration. JWKS access-log entries prove successful requests but do not conclusively attribute them to the workflow server because the script also fetches JWKS.
+- For secured-smoke script changes, use the existing mocked regression suite documented in `CBV5-AGENT.md` and preserve its output separately from live cluster evidence. It covers discovery, argument validation, internal-token isolation, read-only behavior, and cleanup; it does not replace live authorization or workflow validation.
 - For `Full Validation`, run and preserve the output of `cloudbank-v5/7-test_all_services.sh` after the smoke test. A `Local Functional` run may mark this test `Not Applicable` only when the report records that tier and reason.
 - For CloudBank all-services tests, account IDs used with `--from-account` and `--to-account` must be accounts visible to the `--owner-username` user token used by the script. Do not guess seeded account IDs across environments. Prefer letting `cloudbank-v5/7-test_all_services.sh` auto-discover accounts, or first run it with `--read-only` and reuse the reported `account discovery from=<id> to=<id>` pair for the full mutating run.
 - When the run must validate Helidon observability, deploy `customer-helidon` instead of the Spring `customer` service so the workload includes both Spring Boot and Helidon services.
@@ -818,6 +826,7 @@ Known deviations or waivers:
 | CB-012 | CloudBank |  |  |  |  |  |
 | CB-013 | CloudBank |  |  |  |  |  |
 | CB-014 | CloudBank |  |  |  |  |  |
+| CB-015 | CloudBank |  |  |  |  |  |
 | OBS-001 | Observability |  |  |  |  |  |
 | OBS-002 | Observability |  |  |  |  |  |
 | OBS-003 | Observability |  |  |  |  |  |
@@ -852,6 +861,7 @@ Known deviations or waivers:
 | APISIX Gateway Service |  |  |  |
 | APISIX Admin API Routes |  |  |  |
 | APISIX OpenTelemetry Runtime Metadata |  |  |  |
+| APISIX Trace And Access-Log Correlation |  |  | Include a populated access-log trace ID matching a SigNoz trace, or document an intentional tracing override. |
 | Eureka UI/API |  |  |  |
 | Eureka/APISIX Replica Alignment |  |  |  |
 | Config Server |  |  |  |
@@ -860,6 +870,7 @@ Known deviations or waivers:
 | OTMM/MicroTx Runtime |  |  | Optional; required only when `otmm.coordinator.enabled=true`; include version-specific known failures instead of omitting this row. |
 | MicroTx Transfer Workflow |  |  | Optional; required only when `otmm.coordinator.enabled=true`; include CloudBank transfer evidence and failure diagnostics when failing. |
 | MicroTx Workflow Server |  |  | Optional; required only when `otmm.workflowServer.enabled=true`; include deployment, pod, service, endpoint, and health evidence. |
+| MicroTx Workflow API JWT Integration |  |  | Conditional `CB-015`; include security configuration and script output. JWKS request logs alone do not establish callback attribution. |
 | Workflow Server Flyway DB Initialization |  |  | Optional; required only when workflow server is enabled; include migration logs and any Oracle privilege diagnostics. |
 | OTMM Console |  |  | Optional; required only when `otmm.console.enabled=true` and either coordinator or workflow server is enabled; verify `/consoleui/`, not service root `/`; do not use as workflow server evidence. |
 | Coherence Cluster |  |  | Optional and deprecated; when enabled, include operator/CRD, CR, member-count, namespace-watch, and persistence evidence. |
@@ -943,6 +954,7 @@ A run is complete only when:
 - Applicable infrastructure checks have recorded outcomes, and retained or residual resources have an owner and follow-up.
 - Required install and platform tests are complete.
 - CloudBank deployment and smoke tests are complete; `7-test_all_services.sh` is also complete for `Full Validation`.
+- `CB-015` has a recorded outcome and JWT evidence when workflow-server azn-server integration is configured, or a configuration-backed `Not Applicable` reason; required integration blocked by a failed prerequisite remains `Blocked`.
 - Observability readiness checks prove required telemetry existed before screenshots were captured, or load generation was run and the checks were repeated.
 - Collector scrape health is verified, including EndpointSlice discovery and the absence of repeated collector self-scrape or deprecated-v1 warnings.
 - Observability evidence includes SigNoz Services, traces, logs, metrics, dashboards, dashboard-population screenshots, load-generation output, and dashboard validation metadata that distinguishes populated, partial, empty, zero-only, and not-applicable dashboards.

@@ -284,6 +284,8 @@ If the target version has been published and installing from the public Helm rep
 
 Use `opentofu/README.md` for initialization, planning, apply, and infrastructure cleanup. Select the mode in `TEST-AGENT.md` and record the state location and resource ownership before provisioning.
 
+Read the provisioning Kubernetes default from `opentofu/versions.tf` before each run (currently `1.36.4`), and record the planned and actual control-plane and worker versions. This provisioning default is separate from the documented Kubernetes minimum of 1.34. The CPU and GPU node pools in `opentofu/modules/kubernetes/main.tf` set `node_metadata.areLegacyImdsEndpointsDisabled` to `"true"`. Verify the setting in the plan and resulting worker-instance metadata; tooling on these workers must use IMDSv2.
+
 With `k8s_run_cfgmgt=true` (the default), apply runs `cfgmgt/apply.py`, which applies the generated Kubernetes manifest and installs `obaas-prereqs` in `obaas-system` and `obaas` in the namespace returned by `app_name`. Verify these releases using the checks below before deploying workloads. Reapply reruns configuration management; use read-only health checks when validating an existing installation.
 
 For OCI test runs, explicitly set `k8s_use_local_charts=true` in the run's variable file before plan and apply. It selects this checkout's `helm/infra-charts/obaas-prereqs` and `helm/infra-charts/obaas` directories. Prepare dependencies using `opentofu/README.md` and verify both local chart paths exist before apply. Confirm the target versions from their `Chart.yaml` files and verify the installed release metadata; `opentofu/versions.tf` contains a release placeholder.
@@ -535,12 +537,21 @@ signoz:
   enabled: true
 
 otmm:
-  enabled: true
+  coordinator:
+    enabled: true
   workflowServer:
     enabled: false
   console:
     enabled: false
 ```
+
+The chart defaults enable both `otmm.coordinator.enabled` and `otmm.workflowServer.enabled`; the example above explicitly disables the workflow server. There is no top-level `otmm.enabled` switch. Disable each unneeded component through its own `enabled` value. Plan at least 2 additional CPUs and 4 GiB RAM per cluster when the workflow server is enabled. The console renders only when requested and at least one of the coordinator or workflow server is enabled.
+
+### SigNoz Upgrades
+
+For an existing installation, follow the [SigNoz in-place upgrade procedure](docs-source/site/docs/observability/upgrade/index.md) with the complete values for the installed release. The chart defaults to `signozUpgrade.stage: standard`, which performs the normal in-place upgrade to SigNoz chart/application version 0.142.1 and retains existing data. Do not set `signozUpgrade.mode=destructive-replace` for this patch upgrade. Optional `stage1` and `stage2` profiles are available under `helm/infra-charts/obaas/examples/`; use them only for an existing installation when the operator selects the [protected recovery workflow](docs-source/site/docs/observability/upgrade/index.md) and its backup and validation requirements have been reviewed. Layer the selected profile after the normal values and retain the same release name and namespace for both stages.
+
+### AI Optimizer And Kafka
 
 AI Optimizer requires additional planning. The example expects:
 

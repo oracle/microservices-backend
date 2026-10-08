@@ -357,11 +357,35 @@ The `azn-server` user-management API (`/user/api/v1*`) is intentionally not rout
 
 Run the secured smoke-test script first. It verifies public authorization metadata/JWKs, token issuance, protected-route authentication, scope-based authorization, account lookup, check deposit, and that the transfer route rejects a non-owner client-credentials token through APISIX. Successful owner-scoped transfer workflow validation is performed by `7-test_all_services.sh`.
 
+Replace the placeholders in these commands with your configuration before running them.
+
 ```bash
 ./6-smoke_test_secure_services.sh -n <namespace> -d <dbname>
 ```
 
 Use `--read-only` to skip the mutating deposit and transfer checks.
+
+Automatic account discovery reads `service-client-secret` from `<dbname>-azn-server-auth` and obtains a `cloudbank.internal` token for `cloudbank-service-client`. It reads accounts through a temporary direct `svc/account` port-forward, because the public APISIX account route requires `cloudbank.read`. The public account-list check still uses the normal read token and accepts `200` even when ownership filtering returns an empty list. No user password is required.
+
+Discovery needs at least two accounts, including one with a balance greater than 1. The account-service port-forward uses local port `9081`, configurable with `--discovery-local-port`. It is always stopped on exit, including when `--keep-port-forward` retains the gateway forward, and private temporary response files are deleted. Failed discovery reports one failure and skips requests that require account IDs.
+Alternatively, supply two known, distinct, positive account IDs to bypass owner login. Replace the account ID placeholders below with existing accounts in your database:
+
+```bash
+./6-smoke_test_secure_services.sh -n <namespace> -d <dbname> \
+  --from-account <source-account-id> --to-account <destination-account-id>
+```
+
+When discovery is used with only one supplied account ID, that account must exist in the account service; a supplied source account must also have a balance greater than 1. Full workflow checks publish a test deposit; append `--read-only` to skip them.
+
+### MicroTx JWT Smoke Test
+
+If the MicroTx workflow server is deployed, run `8-smoke_test_microtx_jwt.sh` to check Workflow API JWT authentication and JWKS retrieval:
+
+```bash
+./8-smoke_test_microtx_jwt.sh -n <namespace> --secret-name <oauth-secret-name>
+```
+
+Select the existing secret containing `microtx-client-secret`, typically `<dbname>-azn-server-auth`. If `--secret-name` is omitted, the script uses `obaas-azn-server-auth`. See the [MicroTx JWT smoke test prerequisites and port options](cloudbank-test-doc.md#microtx-jwt-smoke-test).
 
 ### Get Gateway Address
 
