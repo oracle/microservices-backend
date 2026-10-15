@@ -1,0 +1,18 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+
+# Point TCS at mounted wallet secret using sqlnet.ora.
+{{- $db := .Values.otmm.coordinator.storage.db }}
+{{- if and .Values.otmm.coordinator.enabled (eq .Values.otmm.coordinator.storage.type "db") (not $db.credentialSecretName) (not $db.walletConfigMapName) (not $db.walletSecretName) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-otmm-wallet-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "obaas.labels" . | nindent 4 }}
+data:
+  sqlnet.ora: |
+    WALLET_LOCATION = (SOURCE = (METHOD = file) (METHOD_DATA = (DIRECTORY="/etc/config/dbwallet")))
+    SSL_SERVER_DN_MATCH=yes
+{{- end }}

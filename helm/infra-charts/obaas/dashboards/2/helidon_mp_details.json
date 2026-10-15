@@ -1,1654 +1,690 @@
 {
-  "description": "Helidon MP Applications Details",
-  "image": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE0Ljk0OTQgMTMuOTQyQzE2LjIzMTggMTIuNDI1OCAxNy4zMjY4IDkuNzAyMiAxNi4xOTU2IDYuNTc0ODdDMTUuNjQ0MyA1LjA1MjQ1IDE1LjAyMTkgNC4yMDI0OSAxNC4yOTY5IDMuNjYyNTJDMTMuODU1NyAzLjMzMzc5IDEyLjA5MzMgMi41MDYzMyA5Ljc1OTY1IDIuODY3NTZDOC4wNTM0OSAzLjEzMjU1IDUuNzc0ODcgNC4yMDg3NCA0LjI5MzY5IDUuOTU5OUMyLjg1NzUyIDcuNjYxMDYgMS43NDg4MyA5LjAwNDc0IDEuNjk3NTggMTAuMzA5N0MxLjYzMTMzIDExLjk4ODMgMi44OTYyNyAxMy40MzA4IDMuMDUwMDEgMTMuNjY0NUMzLjMyMzc0IDE0LjA3OTUgNS4xOTExNSAxNi40NTE4IDguNjk5NzEgMTYuNTczMUMxMS43OTcgMTYuNjc5MyAxMy44MTQ0IDE1LjI4NDQgMTQuOTQ5NCAxMy45NDJaIiBmaWxsPSIjNDAzRDNFIi8+CjxwYXRoIGQ9Ik00LjU1MzYzIDIuNzM3NDdDMi45Mzc0NiAzLjg5MTE2IDEuMTIxMzEgNi4yNTEwMyAxLjQ0NzU0IDkuNTYwODZDMS42MDYyOCAxMS4xNzIgMi4wMDI1MSAxMi4xNDk1IDIuNTcxMjMgMTIuODUwN0MyLjkxNzQ2IDEzLjI3ODIgNC40MTk4OCAxNC41NDkzIDYuNzczNTEgMTQuNzM2OEM5LjE0NTg4IDE0LjkyNTYgMTAuOTQ5NSAxNC4zOTQ0IDEyLjgzMzIgMTMuMDg0NEMxNi42NjE3IDEwLjQyMDggMTYuMDk4IDYuMzkzNTMgMTUuOTM0MyA1LjkyNDhDMTUuNzcwNSA1LjQ1NjA3IDE0LjU0NDQgMi42OTYyMiAxMS4xNzMzIDEuNzE1MDJDOC4xOTg0NCAwLjg1MDA2OCA1Ljk4MzU1IDEuNzE1MDIgNC41NTM2MyAyLjczNzQ3WiIgZmlsbD0iIzVFNjM2NyIvPgo8cGF0aCBkPSJNNy4zOTM1MyAyLjk2MTA5QzUuNjE3MzcgMi44OTczNCAzLjkxOTk2IDQuMjg4NTIgMy43NTYyMiA2LjAwNTkzQzMuNTkyNDggNy43MjIwOSA0LjY1NDkyIDkuMDI5NTIgNi4zMDk4MyA5LjI5NTc2QzcuOTY0NzUgOS41NjA3NCA5Ljg3ODM5IDguNTU1OCAxMC4yNjM0IDYuNDUwOTFDMTAuNjYwOSA0LjI4MjI3IDkuMDg5NjkgMy4wMjIzNCA3LjM5MzUzIDIuOTYxMDlaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNNy45NDIxNyA1LjkwMTE1QzcuOTQyMTcgNS45MDExNSA4LjM2OTY1IDUuODEyNCA4LjQ1NDY1IDUuMTgyNDRDOC41MzgzOSA0LjU2MjQ3IDguMjMwOTEgNC4wMzM3NSA3LjUxMzQ1IDMuODQzNzZDNi43MzM0OSAzLjYzNzUyIDYuMjA0NzcgNC4wNjYyNSA2LjA2NzI3IDQuNTE3NDdDNS44NzYwMyA1LjE0NDk0IDYuMTU4NTIgNS40NDM2NyA2LjE1ODUyIDUuNDQzNjdDNi4xNTg1MiA1LjQ0MzY3IDUuMzkzNTYgNS42Mjc0MSA1LjMzMjMxIDYuNTI5ODdDNS4yNzQ4MSA3LjM4MTA3IDUuODU2MDMgNy44Mzg1NSA2LjQzOTc1IDcuOTc4NTRDNy4xNjA5NiA4LjE1MjI4IDcuOTc4NDIgNy45NTQ3OSA4LjE3ODQxIDcuMDM0ODRDOC4zNDQ2NSA2LjI3NzM4IDcuOTQyMTcgNS45MDExNSA3Ljk0MjE3IDUuOTAxMTVaIiBmaWxsPSIjMzAzMDMwIi8+CjxwYXRoIGQ9Ik02LjczOTgzIDQuNzUzNjJDNi42NzEwOSA1LjAxMjM1IDYuODA4NTggNS4yNjIzNCA3LjA3ODU3IDUuMzMxMDlDNy4zNjk4IDUuNDA0ODMgNy42MzQ3OSA1LjMwODU5IDcuNzA2MDMgNS4wMTExQzcuNzY4NTMgNC43NDczNyA3LjY0MzU0IDQuNTE0ODggNy4zMzYwNSA0LjQzOTg4QzcuMDgzNTcgNC4zNzczOSA2LjgxNDgzIDQuNDcxMTMgNi43Mzk4MyA0Ljc1MzYyWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTYuOTU5NzggNi4wMzk3NEM2LjYzMjMgNS45Mzg0OSA2LjE5OTgyIDYuMDY0NzMgNi4xMzEwNyA2LjUwNDcxQzYuMDYyMzMgNi45NDQ2OSA2LjMyNjA2IDcuMTY5NjggNi42NzEwNCA3LjIzMjE3QzcuMDE2MDMgNy4yOTQ2NyA3LjM0MjI2IDcuMTEzNDMgNy40MDYwMSA2Ljc2MDk1QzcuNDY4NSA2LjQwOTcyIDcuMjg2MDEgNi4xMzk3MyA2Ljk1OTc4IDYuMDM5NzRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K",
-  "layout": [
-    {
-      "h": 10,
-      "i": "785bfb21-2012-4e4b-a0b9-bc1e48b6bded",
-      "moved": false,
-      "static": false,
-      "w": 2,
-      "x": 0,
-      "y": 0
-    },
-    {
-      "h": 5,
-      "i": "8ededdcd-e0e6-4745-b67f-3634499fd206",
-      "moved": false,
-      "static": false,
-      "w": 2,
-      "x": 2,
-      "y": 0
-    },
-    {
-      "h": 10,
-      "i": "2a5b1786-fc4d-4af3-baf4-fbde9ddda42d",
-      "moved": false,
-      "static": false,
-      "w": 2,
-      "x": 4,
-      "y": 0
-    },
-    {
-      "h": 5,
-      "i": "c933a1d0-bda3-4821-a29a-77fa0a6fd067",
-      "moved": false,
-      "static": false,
-      "w": 6,
-      "x": 6,
-      "y": 0
-    },
-    {
-      "h": 5,
-      "i": "c35c9632-d46c-4a88-b5fe-3f279fc94c2b",
-      "moved": false,
-      "static": false,
-      "w": 2,
-      "x": 2,
-      "y": 5
-    },
-    {
-      "h": 5,
-      "i": "f0c7223e-a9f1-4bb5-9129-eae3b30a4bbd",
-      "moved": false,
-      "static": false,
-      "w": 6,
-      "x": 6,
-      "y": 5
-    },
-    {
-      "h": 7,
-      "i": "5197947a-1195-4e18-8a24-7c8a34a06f1d",
-      "moved": false,
-      "static": false,
-      "w": 12,
-      "x": 0,
-      "y": 10
-    },
-    {
-      "h": 8,
-      "i": "68198e34-2036-4be4-ac63-28d5e8ca95bd",
-      "moved": false,
-      "static": false,
-      "w": 6,
-      "x": 0,
-      "y": 17
-    },
-    {
-      "h": 8,
-      "i": "ca13277a-b4f4-4264-93ff-2fa58cb541be",
-      "moved": false,
-      "static": false,
-      "w": 6,
-      "x": 6,
-      "y": 17
-    }
-  ],
-  "panelMap": {},
+  "schemaVersion": "v6",
+  "image": "/assets/Icons/eight-ball",
+  "name": "",
+  "generateName": true,
   "tags": [],
-  "title": "Helidon MP Details",
-  "uploadedGrafana": false,
-  "uuid": "019c4894-9621-7d0d-85d2-b10d05eebc20",
-  "variables": {
-    "0bacee01-edab-4412-a262-baaf101152a0": {
-      "allSelected": true,
-      "customValue": ".*",
-      "defaultValue": "",
-      "description": "",
-      "id": "0bacee01-edab-4412-a262-baaf101152a0",
-      "key": "0bacee01-edab-4412-a262-baaf101152a0",
-      "modificationUUID": "9228a5d2-5112-4345-bf71-607406c51b5e",
-      "multiSelect": true,
-      "name": "namespace",
-      "order": 0,
-      "queryValue": "SELECT distinct JSONExtractString(labels, 'kubernetes_namespace') \nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'jvm_memory_used_bytes')\nand (JSONExtractString(labels, 'kubernetes_namespace') != '')",
-      "showALLOption": true,
-      "sort": "ASC",
-      "textboxValue": "",
-      "type": "QUERY"
+  "spec": {
+    "display": {
+      "name": "Helidon MP Details",
+      "description": "Helidon MP Applications Details"
     },
-    "4b06c096-8584-4d86-8f54-9bd38ddf9552": {
-      "allSelected": false,
-      "customValue": ".*",
-      "defaultValue": "",
-      "description": "",
-      "id": "4b06c096-8584-4d86-8f54-9bd38ddf9552",
-      "modificationUUID": "bce60ce6-a861-41c1-a865-8b872ab5111b",
-      "multiSelect": true,
-      "name": "app_name",
-      "order": 0,
-      "queryValue": "SELECT distinct JSONExtractString(labels, 'mp_app')\nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'jvm_uptime_seconds')\nand (JSONExtractString(labels, 'kubernetes_namespace') in {{.namespace}})\n",
-      "showALLOption": true,
-      "sort": "ASC",
-      "textboxValue": "",
-      "type": "QUERY"
-    }
-  },
-  "version": "v5",
-  "widgets": [
-    {
-      "bucketCount": 30,
-      "bucketWidth": 0,
-      "columnUnits": {},
-      "contextLinks": {
-        "linksData": []
+    "variables": [
+      {
+        "kind": "ListVariable",
+        "spec": {
+          "display": {
+            "name": "namespace",
+            "description": ""
+          },
+          "allowAllValue": true,
+          "allowMultiple": true,
+          "customAllValue": "",
+          "capturingRegexp": "",
+          "sort": "alphabetical-asc",
+          "plugin": {
+            "kind": "signoz/QueryVariable",
+            "spec": {
+              "queryValue": "SELECT distinct JSONExtractString(labels, 'kubernetes_namespace') \nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'jvm_memory_used_bytes')\nand (JSONExtractString(labels, 'kubernetes_namespace') != '')"
+            }
+          },
+          "name": "namespace"
+        }
       },
-      "customLegendColors": {},
-      "decimalPrecision": 2,
-      "description": "",
-      "fillSpans": false,
-      "id": "785bfb21-2012-4e4b-a0b9-bc1e48b6bded",
-      "isLogScale": false,
-      "isStacked": false,
-      "legendPosition": "bottom",
-      "mergeAllActiveQueries": false,
-      "nullZeroValues": "zero",
-      "opacity": "1",
-      "panelTypes": "value",
-      "query": {
-        "builder": {
-          "queryData": [
-            {
-              "aggregations": [
+      {
+        "kind": "ListVariable",
+        "spec": {
+          "display": {
+            "name": "app_name",
+            "description": ""
+          },
+          "allowAllValue": true,
+          "allowMultiple": true,
+          "customAllValue": "",
+          "capturingRegexp": "",
+          "sort": "alphabetical-asc",
+          "plugin": {
+            "kind": "signoz/QueryVariable",
+            "spec": {
+              "queryValue": "SELECT distinct JSONExtractString(labels, 'mp_app')\nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'jvm_uptime_seconds')\nand (JSONExtractString(labels, 'kubernetes_namespace') in {{.namespace}})\n"
+            }
+          },
+          "name": "app_name"
+        }
+      }
+    ],
+    "panels": {
+      "2a5b1786-fc4d-4af3-baf4-fbde9ddda42d": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Total Heap Used %",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/NumberPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time"
+              },
+              "formatting": {
+                "unit": "percentunit",
+                "decimalPrecision": "2"
+              },
+              "thresholds": [
                 {
-                  "metricName": "memory_usedHeap_bytes",
-                  "reduceTo": "last",
-                  "spaceAggregation": "sum",
-                  "timeAggregation": "count"
+                  "value": 90,
+                  "operator": "above",
+                  "unit": "percentunit",
+                  "color": "Red",
+                  "format": "text"
                 }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "A",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [],
-              "having": {
-                "expression": ""
-              },
-              "legend": "",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "A",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
+              ]
+            }
+          },
+          "queries": [
+            {
+              "kind": "scalar",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/PromQLQuery",
+                  "spec": {
+                    "name": "A",
+                    "query": "sum(last_over_time(memory_usedHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m])) / sum(last_over_time(memory_maxHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m]))",
+                    "disabled": false,
+                    "step": 0,
+                    "stats": false,
+                    "legend": ""
+                  }
+                }
               }
             }
           ],
-          "queryFormulas": []
-        },
-        "clickhouse_sql": [
-          {
-            "disabled": false,
-            "legend": "",
-            "name": "A",
-            "query": ""
-          }
-        ],
-        "id": "b5dc4255-b6b8-472d-89e9-9cb4f38b09a3",
-        "promql": [
-          {
-            "name": "A",
-            "query": "count(last_over_time(jvm_uptime_seconds{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m]))",
-            "legend": ""
-          }
-        ],
-        "queryType": "promql"
-      },
-      "selectedLogFields": [
-        {
-          "dataType": "string",
-          "name": "body",
-          "type": ""
-        },
-        {
-          "dataType": "string",
-          "name": "timestamp",
-          "type": ""
+          "links": []
         }
-      ],
-      "selectedTracesFields": [
-        {
-          "dataType": "string",
-          "id": "serviceName--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "serviceName",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "name--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "name",
-          "type": "tag"
-        },
-        {
-          "dataType": "float64",
-          "id": "durationNano--float64--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "durationNano",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "httpMethod--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "httpMethod",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "responseStatusCode--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "responseStatusCode",
-          "type": "tag"
-        }
-      ],
-      "softMax": 0,
-      "softMin": 0,
-      "stackedBarChart": false,
-      "thresholds": [],
-      "timePreferance": "GLOBAL_TIME",
-      "title": "Total MP JVM's",
-      "yAxisUnit": "short"
-    },
-    {
-      "bucketCount": 30,
-      "bucketWidth": 0,
-      "columnUnits": {},
-      "contextLinks": {
-        "linksData": []
       },
-      "customLegendColors": {},
-      "decimalPrecision": 2,
-      "description": "",
-      "fillSpans": false,
-      "id": "c35c9632-d46c-4a88-b5fe-3f279fc94c2b",
-      "isLogScale": false,
-      "isStacked": false,
-      "legendPosition": "bottom",
-      "mergeAllActiveQueries": false,
-      "nullZeroValues": "zero",
-      "opacity": "1",
-      "panelTypes": "value",
-      "query": {
-        "builder": {
-          "queryData": [
+      "5197947a-1195-4e18-8a24-7c8a34a06f1d": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "HTTP Requests - All JVM's",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/BarChartPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": true,
+                "stackedBarChart": false
+              },
+              "formatting": {
+                "unit": "none",
+                "decimalPrecision": "2"
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
             {
-              "aggregations": [
-                {
-                  "metricName": "memory_maxHeap_bytes",
-                  "reduceTo": "last",
-                  "spaceAggregation": "sum",
-                  "temporality": null,
-                  "timeAggregation": "latest"
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/PromQLQuery",
+                  "spec": {
+                    "name": "A",
+                    "query": "sum(increase(requests_count_total{kubernetes_namespace=~\"$namespace\", mp_app=~\"$app_name\"}[5m])) by (mp_app)",
+                    "disabled": false,
+                    "step": 0,
+                    "stats": false,
+                    "legend": "{{mp_app}}"
+                  }
                 }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "A",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [],
-              "having": {
-                "expression": ""
-              },
-              "legend": "",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "A",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
               }
             }
           ],
-          "queryFormulas": []
-        },
-        "clickhouse_sql": [
-          {
-            "disabled": false,
-            "legend": "",
-            "name": "A",
-            "query": ""
-          }
-        ],
-        "id": "979d980c-d37c-4e2b-ad92-62d022753b9d",
-        "promql": [
-          {
-            "name": "A",
-            "query": "sum(last_over_time(memory_maxHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m]))",
-            "legend": ""
-          }
-        ],
-        "queryType": "promql"
-      },
-      "selectedLogFields": [
-        {
-          "dataType": "string",
-          "name": "body",
-          "type": ""
-        },
-        {
-          "dataType": "string",
-          "name": "timestamp",
-          "type": ""
+          "links": []
         }
-      ],
-      "selectedTracesFields": [
-        {
-          "dataType": "string",
-          "id": "serviceName--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "serviceName",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "name--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "name",
-          "type": "tag"
-        },
-        {
-          "dataType": "float64",
-          "id": "durationNano--float64--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "durationNano",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "httpMethod--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "httpMethod",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "responseStatusCode--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "responseStatusCode",
-          "type": "tag"
-        }
-      ],
-      "softMax": 0,
-      "softMin": 0,
-      "stackedBarChart": false,
-      "thresholds": [],
-      "timePreferance": "GLOBAL_TIME",
-      "title": "Total Heap Max",
-      "yAxisUnit": "decbytes"
-    },
-    {
-      "bucketCount": 30,
-      "bucketWidth": 0,
-      "columnUnits": {},
-      "contextLinks": {
-        "linksData": []
       },
-      "customLegendColors": {},
-      "decimalPrecision": 2,
-      "description": "",
-      "fillSpans": false,
-      "id": "2a5b1786-fc4d-4af3-baf4-fbde9ddda42d",
-      "isLogScale": false,
-      "isStacked": false,
-      "legendPosition": "bottom",
-      "mergeAllActiveQueries": false,
-      "nullZeroValues": "zero",
-      "opacity": "1",
-      "panelTypes": "value",
-      "query": {
-        "builder": {
-          "queryData": [
-            {
-              "aggregations": [
-                {
-                  "metricName": "memory_usedHeap_bytes",
-                  "reduceTo": "last",
-                  "spaceAggregation": "sum",
-                  "temporality": null,
-                  "timeAggregation": "latest"
+      "68198e34-2036-4be4-ac63-28d5e8ca95bd": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Total REST Calls all JVM's",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": false
+              },
+              "formatting": {
+                "unit": "short",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
                 }
-              ],
-              "dataSource": "metrics",
-              "disabled": true,
-              "expression": "A",
-              "filter": {
-                "expression": ""
               },
-              "functions": [],
-              "groupBy": [],
-              "having": {
-                "expression": ""
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
               },
-              "legend": "",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "A",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/PromQLQuery",
+                  "spec": {
+                    "name": "A",
+                    "query": "sum(increase(requests_count_total{kubernetes_namespace=~\"$namespace\", mp_app=~\"$app_name\"}[5m])) by (mp_app)",
+                    "disabled": false,
+                    "step": 0,
+                    "stats": false,
+                    "legend": "{{mp_app}}"
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "785bfb21-2012-4e4b-a0b9-bc1e48b6bded": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Total MP JVM's",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/NumberPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time"
+              },
+              "formatting": {
+                "unit": "short",
+                "decimalPrecision": "2"
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "scalar",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/PromQLQuery",
+                  "spec": {
+                    "name": "A",
+                    "query": "count(last_over_time(jvm_uptime_seconds{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m]))",
+                    "disabled": false,
+                    "step": 0,
+                    "stats": false,
+                    "legend": ""
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "8ededdcd-e0e6-4745-b67f-3634499fd206": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Total Heap Used",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/NumberPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time"
+              },
+              "formatting": {
+                "unit": "decbytes",
+                "decimalPrecision": "2"
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "scalar",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/PromQLQuery",
+                  "spec": {
+                    "name": "A",
+                    "query": "sum(last_over_time(memory_usedHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m]))",
+                    "disabled": false,
+                    "step": 0,
+                    "stats": false,
+                    "legend": ""
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "c35c9632-d46c-4a88-b5fe-3f279fc94c2b": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Total Heap Max",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/NumberPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time"
+              },
+              "formatting": {
+                "unit": "decbytes",
+                "decimalPrecision": "2"
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "scalar",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/PromQLQuery",
+                  "spec": {
+                    "name": "A",
+                    "query": "sum(last_over_time(memory_maxHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m]))",
+                    "disabled": false,
+                    "step": 0,
+                    "stats": false,
+                    "legend": ""
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "c933a1d0-bda3-4821-a29a-77fa0a6fd067": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Memory Usage (Current and 5m Peak)",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": false
+              },
+              "formatting": {
+                "unit": "decbytes",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/CompositeQuery",
+                  "spec": {
+                    "queries": [
+                      {
+                        "type": "promql",
+                        "spec": {
+                          "name": "A",
+                          "query": "sum(last_over_time(memory_usedHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m]))",
+                          "disabled": false,
+                          "step": 0,
+                          "stats": false,
+                          "legend": "Current Heap Used"
+                        }
+                      },
+                      {
+                        "type": "promql",
+                        "spec": {
+                          "name": "B",
+                          "query": "sum(last_over_time(memory_maxHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m]))",
+                          "disabled": false,
+                          "step": 0,
+                          "stats": false,
+                          "legend": "Current Heap Max"
+                        }
+                      },
+                      {
+                        "type": "promql",
+                        "spec": {
+                          "name": "C",
+                          "query": "sum(max_over_time(memory_usedHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[5m]))",
+                          "disabled": false,
+                          "step": 0,
+                          "stats": false,
+                          "legend": "Peak Heap Used (5m)"
+                        }
+                      },
+                      {
+                        "type": "promql",
+                        "spec": {
+                          "name": "D",
+                          "query": "sum(max_over_time(memory_maxHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[5m]))",
+                          "disabled": false,
+                          "step": 0,
+                          "stats": false,
+                          "legend": "Peak Heap Max (5m)"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "ca13277a-b4f4-4264-93ff-2fa58cb541be": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Total REST Calls all JVM's",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": false
+              },
+              "formatting": {
+                "unit": "short",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/PromQLQuery",
+                  "spec": {
+                    "name": "A",
+                    "query": "sum(increase(requests_count_total{kubernetes_namespace=~\"$namespace\", mp_app=~\"$app_name\"}[5m])) by (mp_app)",
+                    "disabled": false,
+                    "step": 0,
+                    "stats": false,
+                    "legend": "{{mp_app}}"
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "f0c7223e-a9f1-4bb5-9129-eae3b30a4bbd": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Memory Usage",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": false
+              },
+              "formatting": {
+                "unit": "decbytes",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/CompositeQuery",
+                  "spec": {
+                    "queries": [
+                      {
+                        "type": "promql",
+                        "spec": {
+                          "name": "A",
+                          "query": "sum(memory_usedHeap_bytes{kubernetes_namespace=~\"$namespace\", mp_app=~\"$app_name\"})",
+                          "disabled": false,
+                          "step": 0,
+                          "stats": false,
+                          "legend": "Total Heap Used"
+                        }
+                      },
+                      {
+                        "type": "promql",
+                        "spec": {
+                          "name": "B",
+                          "query": "sum(memory_maxHeap_bytes{kubernetes_namespace=~\"$namespace\", mp_app=~\"$app_name\"})",
+                          "disabled": false,
+                          "step": 0,
+                          "stats": false,
+                          "legend": "Total Heap Max"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      }
+    },
+    "layouts": [
+      {
+        "kind": "Grid",
+        "spec": {
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 2,
+              "height": 10,
+              "content": {
+                "$ref": "#/spec/panels/785bfb21-2012-4e4b-a0b9-bc1e48b6bded"
               }
             },
             {
-              "aggregations": [
-                {
-                  "metricName": "memory_maxHeap_bytes",
-                  "reduceTo": "last",
-                  "spaceAggregation": "sum",
-                  "temporality": null,
-                  "timeAggregation": "latest"
-                }
-              ],
-              "dataSource": "metrics",
-              "disabled": true,
-              "expression": "B",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [],
-              "having": {
-                "expression": ""
-              },
-              "legend": "",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "B",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
+              "x": 2,
+              "y": 0,
+              "width": 2,
+              "height": 5,
+              "content": {
+                "$ref": "#/spec/panels/8ededdcd-e0e6-4745-b67f-3634499fd206"
               }
-            }
-          ],
-          "queryFormulas": [
+            },
             {
-              "disabled": false,
-              "expression": "A/B",
-              "legend": "",
-              "queryName": "F1"
+              "x": 4,
+              "y": 0,
+              "width": 2,
+              "height": 10,
+              "content": {
+                "$ref": "#/spec/panels/2a5b1786-fc4d-4af3-baf4-fbde9ddda42d"
+              }
+            },
+            {
+              "x": 6,
+              "y": 0,
+              "width": 6,
+              "height": 5,
+              "content": {
+                "$ref": "#/spec/panels/c933a1d0-bda3-4821-a29a-77fa0a6fd067"
+              }
+            },
+            {
+              "x": 2,
+              "y": 5,
+              "width": 2,
+              "height": 5,
+              "content": {
+                "$ref": "#/spec/panels/c35c9632-d46c-4a88-b5fe-3f279fc94c2b"
+              }
+            },
+            {
+              "x": 6,
+              "y": 5,
+              "width": 6,
+              "height": 5,
+              "content": {
+                "$ref": "#/spec/panels/f0c7223e-a9f1-4bb5-9129-eae3b30a4bbd"
+              }
+            },
+            {
+              "x": 0,
+              "y": 10,
+              "width": 12,
+              "height": 7,
+              "content": {
+                "$ref": "#/spec/panels/5197947a-1195-4e18-8a24-7c8a34a06f1d"
+              }
+            },
+            {
+              "x": 0,
+              "y": 17,
+              "width": 6,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/68198e34-2036-4be4-ac63-28d5e8ca95bd"
+              }
+            },
+            {
+              "x": 6,
+              "y": 17,
+              "width": 6,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/ca13277a-b4f4-4264-93ff-2fa58cb541be"
+              }
             }
           ]
-        },
-        "clickhouse_sql": [
-          {
-            "disabled": false,
-            "legend": "",
-            "name": "A",
-            "query": ""
-          }
-        ],
-        "id": "22c584d2-7f8a-4daa-aeb3-1ec12c3a452e",
-        "promql": [
-          {
-            "name": "A",
-            "query": "sum(last_over_time(memory_usedHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m])) / sum(last_over_time(memory_maxHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m]))",
-            "legend": ""
-          }
-        ],
-        "queryType": "promql"
-      },
-      "selectedLogFields": [
-        {
-          "dataType": "string",
-          "name": "body",
-          "type": ""
-        },
-        {
-          "dataType": "string",
-          "name": "timestamp",
-          "type": ""
         }
-      ],
-      "selectedTracesFields": [
-        {
-          "dataType": "string",
-          "id": "serviceName--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "serviceName",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "name--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "name",
-          "type": "tag"
-        },
-        {
-          "dataType": "float64",
-          "id": "durationNano--float64--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "durationNano",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "httpMethod--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "httpMethod",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "responseStatusCode--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "responseStatusCode",
-          "type": "tag"
-        }
-      ],
-      "softMax": 0,
-      "softMin": 0,
-      "stackedBarChart": false,
-      "thresholds": [
-        {
-          "index": "91738c40-252e-41cc-974d-637119d32791",
-          "isEditEnabled": false,
-          "keyIndex": 0,
-          "selectedGraph": "value",
-          "thresholdColor": "Red",
-          "thresholdFormat": "Text",
-          "thresholdLabel": "",
-          "thresholdOperator": ">",
-          "thresholdTableOptions": "A",
-          "thresholdUnit": "percentunit",
-          "thresholdValue": 90
-        }
-      ],
-      "timePreferance": "GLOBAL_TIME",
-      "title": "Total Heap Used %",
-      "yAxisUnit": "percentunit"
-    },
-    {
-      "bucketCount": 30,
-      "bucketWidth": 0,
-      "columnUnits": {},
-      "contextLinks": {
-        "linksData": []
-      },
-      "customLegendColors": {},
-      "decimalPrecision": 2,
-      "description": "",
-      "fillSpans": false,
-      "id": "f0c7223e-a9f1-4bb5-9129-eae3b30a4bbd",
-      "isLogScale": false,
-      "isStacked": false,
-      "legendPosition": "bottom",
-      "mergeAllActiveQueries": false,
-      "nullZeroValues": "zero",
-      "opacity": "1",
-      "panelTypes": "graph",
-      "query": {
-        "builder": {
-          "queryData": [
-            {
-              "aggregations": [
-                {
-                  "metricName": "memory_usedHeap_bytes",
-                  "reduceTo": "avg",
-                  "spaceAggregation": "sum",
-                  "temporality": null,
-                  "timeAggregation": "latest"
-                }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "A",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [],
-              "having": {
-                "expression": ""
-              },
-              "legend": "Total Heap Used",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "A",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
-              }
-            },
-            {
-              "aggregations": [
-                {
-                  "metricName": "memory_maxHeap_bytes",
-                  "reduceTo": "avg",
-                  "spaceAggregation": "sum",
-                  "temporality": null,
-                  "timeAggregation": "latest"
-                }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "B",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [],
-              "having": {
-                "expression": ""
-              },
-              "legend": "Total Heap Max",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "B",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
-              }
-            }
-          ],
-          "queryFormulas": []
-        },
-        "clickhouse_sql": [
-          {
-            "disabled": false,
-            "legend": "",
-            "name": "A",
-            "query": ""
-          }
-        ],
-        "id": "44015c5c-4307-4343-b251-dec822867e8b",
-        "promql": [
-          {
-            "name": "A",
-            "query": "sum(memory_usedHeap_bytes{kubernetes_namespace=~\"$namespace\", mp_app=~\"$app_name\"})",
-            "legend": "Total Heap Used"
-          },
-          {
-            "name": "B",
-            "query": "sum(memory_maxHeap_bytes{kubernetes_namespace=~\"$namespace\", mp_app=~\"$app_name\"})",
-            "legend": "Total Heap Max"
-          }
-        ],
-        "queryType": "promql"
-      },
-      "selectedLogFields": [
-        {
-          "dataType": "string",
-          "name": "body",
-          "type": ""
-        },
-        {
-          "dataType": "string",
-          "name": "timestamp",
-          "type": ""
-        }
-      ],
-      "selectedTracesFields": [
-        {
-          "dataType": "string",
-          "id": "serviceName--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "serviceName",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "name--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "name",
-          "type": "tag"
-        },
-        {
-          "dataType": "float64",
-          "id": "durationNano--float64--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "durationNano",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "httpMethod--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "httpMethod",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "responseStatusCode--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "responseStatusCode",
-          "type": "tag"
-        }
-      ],
-      "softMax": 0,
-      "softMin": 0,
-      "stackedBarChart": false,
-      "thresholds": [],
-      "timePreferance": "GLOBAL_TIME",
-      "title": "Memory Usage",
-      "yAxisUnit": "decbytes"
-    },
-    {
-      "bucketCount": 30,
-      "bucketWidth": 0,
-      "columnUnits": {
-        "A": "decbytes",
-        "B": "decbytes",
-        "C": "decbytes",
-        "D": "decbytes"
-      },
-      "columnWidths": {
-        "A": 145,
-        "B": 145,
-        "C": 145,
-        "D": 145
-      },
-      "contextLinks": {
-        "linksData": []
-      },
-      "customLegendColors": {},
-      "decimalPrecision": 2,
-      "description": "",
-      "fillSpans": false,
-      "id": "c933a1d0-bda3-4821-a29a-77fa0a6fd067",
-      "isLogScale": false,
-      "isStacked": false,
-      "legendPosition": "bottom",
-      "mergeAllActiveQueries": false,
-      "nullZeroValues": "zero",
-      "opacity": "1",
-      "panelTypes": "table",
-      "query": {
-        "builder": {
-          "queryData": [
-            {
-              "aggregations": [
-                {
-                  "metricName": "memory_usedHeap_bytes",
-                  "reduceTo": "last",
-                  "spaceAggregation": "sum",
-                  "temporality": null,
-                  "timeAggregation": "latest"
-                }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "A",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [],
-              "having": {
-                "expression": ""
-              },
-              "legend": "Current Heap Used",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "A",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
-              }
-            },
-            {
-              "aggregations": [
-                {
-                  "metricName": "memory_maxHeap_bytes",
-                  "reduceTo": "last",
-                  "spaceAggregation": "sum",
-                  "temporality": null,
-                  "timeAggregation": "latest"
-                }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "B",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [],
-              "having": {
-                "expression": ""
-              },
-              "legend": "Current Heap Max",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "B",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
-              }
-            },
-            {
-              "aggregations": [
-                {
-                  "metricName": "memory_usedHeap_bytes",
-                  "reduceTo": "max",
-                  "spaceAggregation": "sum",
-                  "temporality": null,
-                  "timeAggregation": "latest"
-                }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "C",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [],
-              "having": {
-                "expression": ""
-              },
-              "legend": "Peak Heap Used (5m)",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "C",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
-              }
-            },
-            {
-              "aggregations": [
-                {
-                  "metricName": "memory_maxHeap_bytes",
-                  "reduceTo": "max",
-                  "spaceAggregation": "sum",
-                  "temporality": null,
-                  "timeAggregation": "max"
-                }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "D",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [],
-              "having": {
-                "expression": ""
-              },
-              "legend": "Peak Heap Max (5m)",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "D",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
-              }
-            }
-          ],
-          "queryFormulas": []
-        },
-        "clickhouse_sql": [
-          {
-            "disabled": false,
-            "legend": "",
-            "name": "A",
-            "query": ""
-          }
-        ],
-        "id": "ca1d40b4-1444-4650-897b-050940155430",
-        "promql": [
-          {
-            "name": "A",
-            "query": "sum(last_over_time(memory_usedHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m]))",
-            "legend": "Current Heap Used"
-          },
-          {
-            "name": "B",
-            "query": "sum(last_over_time(memory_maxHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m]))",
-            "legend": "Current Heap Max"
-          },
-          {
-            "name": "C",
-            "query": "sum(max_over_time(memory_usedHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[5m]))",
-            "legend": "Peak Heap Used (5m)"
-          },
-          {
-            "name": "D",
-            "query": "sum(max_over_time(memory_maxHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[5m]))",
-            "legend": "Peak Heap Max (5m)"
-          }
-        ],
-        "queryType": "promql"
-      },
-      "selectedLogFields": [
-        {
-          "dataType": "string",
-          "name": "body",
-          "type": ""
-        },
-        {
-          "dataType": "string",
-          "name": "timestamp",
-          "type": ""
-        }
-      ],
-      "selectedTracesFields": [
-        {
-          "dataType": "string",
-          "id": "serviceName--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "serviceName",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "name--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "name",
-          "type": "tag"
-        },
-        {
-          "dataType": "float64",
-          "id": "durationNano--float64--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "durationNano",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "httpMethod--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "httpMethod",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "responseStatusCode--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "responseStatusCode",
-          "type": "tag"
-        }
-      ],
-      "softMax": 0,
-      "softMin": 0,
-      "stackedBarChart": false,
-      "thresholds": [],
-      "timePreferance": "GLOBAL_TIME",
-      "title": "Memory Usage (Current and 5m Peak)",
-      "yAxisUnit": "decbytes"
-    },
-    {
-      "bucketCount": 30,
-      "bucketWidth": 0,
-      "columnUnits": {},
-      "contextLinks": {
-        "linksData": []
-      },
-      "customLegendColors": {},
-      "decimalPrecision": 2,
-      "description": "",
-      "fillSpans": true,
-      "id": "5197947a-1195-4e18-8a24-7c8a34a06f1d",
-      "isLogScale": false,
-      "isStacked": false,
-      "legendPosition": "bottom",
-      "mergeAllActiveQueries": false,
-      "nullZeroValues": "zero",
-      "opacity": "1",
-      "panelTypes": "bar",
-      "query": {
-        "builder": {
-          "queryData": [
-            {
-              "aggregations": [
-                {
-                  "metricName": "requests_count_total",
-                  "reduceTo": "avg",
-                  "spaceAggregation": "sum",
-                  "timeAggregation": "increase"
-                }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "A",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [
-                {
-                  "dataType": "string",
-                  "id": "mp_app--string--tag",
-                  "isColumn": false,
-                  "isJSON": false,
-                  "key": "mp_app",
-                  "type": "tag"
-                }
-              ],
-              "having": {
-                "expression": ""
-              },
-              "legend": "{{mp_app}}",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "A",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
-              }
-            }
-          ],
-          "queryFormulas": []
-        },
-        "clickhouse_sql": [
-          {
-            "disabled": false,
-            "legend": "",
-            "name": "A",
-            "query": ""
-          }
-        ],
-        "id": "ee4fa1a3-485d-4c1b-82f8-9b5a38dd9eed",
-        "promql": [
-          {
-            "name": "A",
-            "query": "sum(increase(requests_count_total{kubernetes_namespace=~\"$namespace\", mp_app=~\"$app_name\"}[5m])) by (mp_app)",
-            "legend": "{{mp_app}}"
-          }
-        ],
-        "queryType": "promql"
-      },
-      "selectedLogFields": [
-        {
-          "dataType": "string",
-          "name": "body",
-          "type": ""
-        },
-        {
-          "dataType": "string",
-          "name": "timestamp",
-          "type": ""
-        }
-      ],
-      "selectedTracesFields": [
-        {
-          "dataType": "string",
-          "id": "serviceName--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "serviceName",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "name--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "name",
-          "type": "tag"
-        },
-        {
-          "dataType": "float64",
-          "id": "durationNano--float64--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "durationNano",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "httpMethod--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "httpMethod",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "responseStatusCode--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "responseStatusCode",
-          "type": "tag"
-        }
-      ],
-      "softMax": 0,
-      "softMin": 0,
-      "stackedBarChart": false,
-      "thresholds": [],
-      "timePreferance": "GLOBAL_TIME",
-      "title": "HTTP Requests - All JVM's",
-      "yAxisUnit": "none"
-    },
-    {
-      "bucketCount": 30,
-      "bucketWidth": 0,
-      "columnUnits": {},
-      "contextLinks": {
-        "linksData": []
-      },
-      "customLegendColors": {},
-      "decimalPrecision": 2,
-      "description": "",
-      "fillSpans": false,
-      "id": "8ededdcd-e0e6-4745-b67f-3634499fd206",
-      "isLogScale": false,
-      "isStacked": false,
-      "legendPosition": "bottom",
-      "mergeAllActiveQueries": false,
-      "nullZeroValues": "zero",
-      "opacity": "1",
-      "panelTypes": "value",
-      "query": {
-        "builder": {
-          "queryData": [
-            {
-              "aggregations": [
-                {
-                  "metricName": "memory_usedHeap_bytes",
-                  "reduceTo": "last",
-                  "spaceAggregation": "sum",
-                  "temporality": null,
-                  "timeAggregation": "sum"
-                }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "A",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [],
-              "having": {
-                "expression": ""
-              },
-              "legend": "",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "A",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
-              }
-            }
-          ],
-          "queryFormulas": []
-        },
-        "clickhouse_sql": [
-          {
-            "disabled": false,
-            "legend": "",
-            "name": "A",
-            "query": ""
-          }
-        ],
-        "id": "d25f98cd-8288-4ae8-b842-c3911d1f1a3f",
-        "promql": [
-          {
-            "name": "A",
-            "query": "sum(last_over_time(memory_usedHeap_bytes{kubernetes_namespace=~\"$namespace\",mp_app=~\"$app_name\"}[2m]))",
-            "legend": ""
-          }
-        ],
-        "queryType": "promql"
-      },
-      "selectedLogFields": [
-        {
-          "dataType": "string",
-          "name": "body",
-          "type": ""
-        },
-        {
-          "dataType": "string",
-          "name": "timestamp",
-          "type": ""
-        }
-      ],
-      "selectedTracesFields": [
-        {
-          "dataType": "string",
-          "id": "serviceName--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "serviceName",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "name--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "name",
-          "type": "tag"
-        },
-        {
-          "dataType": "float64",
-          "id": "durationNano--float64--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "durationNano",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "httpMethod--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "httpMethod",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "responseStatusCode--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "responseStatusCode",
-          "type": "tag"
-        }
-      ],
-      "softMax": 0,
-      "softMin": 0,
-      "stackedBarChart": false,
-      "thresholds": [],
-      "timePreferance": "GLOBAL_TIME",
-      "title": "Total Heap Used",
-      "yAxisUnit": "decbytes"
-    },
-    {
-      "bucketCount": 30,
-      "bucketWidth": 0,
-      "columnUnits": {},
-      "contextLinks": {
-        "linksData": []
-      },
-      "customLegendColors": {},
-      "decimalPrecision": 2,
-      "description": "",
-      "fillSpans": false,
-      "id": "68198e34-2036-4be4-ac63-28d5e8ca95bd",
-      "isLogScale": false,
-      "isStacked": false,
-      "legendPosition": "bottom",
-      "mergeAllActiveQueries": false,
-      "nullZeroValues": "zero",
-      "opacity": "1",
-      "panelTypes": "pie",
-      "query": {
-        "builder": {
-          "queryData": [
-            {
-              "aggregations": [
-                {
-                  "metricName": "REST_request_seconds.count",
-                  "reduceTo": "avg",
-                  "spaceAggregation": "avg",
-                  "temporality": "",
-                  "timeAggregation": "avg"
-                }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "A",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [
-                {
-                  "dataType": "string",
-                  "id": "method--string--tag",
-                  "isColumn": false,
-                  "isJSON": false,
-                  "key": "method",
-                  "type": "tag"
-                }
-              ],
-              "having": {
-                "expression": ""
-              },
-              "legend": "",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "A",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
-              }
-            }
-          ],
-          "queryFormulas": []
-        },
-        "clickhouse_sql": [
-          {
-            "disabled": false,
-            "legend": "",
-            "name": "A",
-            "query": ""
-          }
-        ],
-        "id": "d80dec89-53b9-431f-88a4-350af302ab2f",
-        "promql": [
-          {
-            "name": "A",
-            "query": "sum(increase(requests_count_total{kubernetes_namespace=~\"$namespace\", mp_app=~\"$app_name\"}[5m])) by (mp_app)",
-            "legend": "{{mp_app}}"
-          }
-        ],
-        "queryType": "promql"
-      },
-      "selectedLogFields": [
-        {
-          "dataType": "string",
-          "name": "body",
-          "type": ""
-        },
-        {
-          "dataType": "string",
-          "name": "timestamp",
-          "type": ""
-        }
-      ],
-      "selectedTracesFields": [
-        {
-          "dataType": "string",
-          "id": "serviceName--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "serviceName",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "name--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "name",
-          "type": "tag"
-        },
-        {
-          "dataType": "float64",
-          "id": "durationNano--float64--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "durationNano",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "httpMethod--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "httpMethod",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "responseStatusCode--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "responseStatusCode",
-          "type": "tag"
-        }
-      ],
-      "softMax": 0,
-      "softMin": 0,
-      "stackedBarChart": false,
-      "thresholds": [],
-      "timePreferance": "GLOBAL_TIME",
-      "title": "Total REST Calls all JVM's",
-      "yAxisUnit": "short"
-    },
-    {
-      "bucketCount": 30,
-      "bucketWidth": 0,
-      "columnUnits": {
-        "A": "short"
-      },
-      "columnWidths": {
-        "mp_app": 145,
-        "A": 145
-      },
-      "contextLinks": {
-        "linksData": []
-      },
-      "customLegendColors": {},
-      "decimalPrecision": 2,
-      "description": "",
-      "fillSpans": false,
-      "id": "ca13277a-b4f4-4264-93ff-2fa58cb541be",
-      "isLogScale": false,
-      "isStacked": false,
-      "legendPosition": "bottom",
-      "mergeAllActiveQueries": false,
-      "nullZeroValues": "zero",
-      "opacity": "1",
-      "panelTypes": "table",
-      "query": {
-        "builder": {
-          "queryData": [
-            {
-              "aggregations": [
-                {
-                  "metricName": "REST_request_seconds.count",
-                  "reduceTo": "avg",
-                  "spaceAggregation": "sum",
-                  "temporality": "",
-                  "timeAggregation": "rate"
-                }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "A",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [
-                {
-                  "dataType": "string",
-                  "id": "method--string--tag",
-                  "isColumn": false,
-                  "isJSON": false,
-                  "key": "method",
-                  "type": "tag"
-                }
-              ],
-              "having": {
-                "expression": ""
-              },
-              "legend": "Value",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "A",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
-              }
-            },
-            {
-              "aggregations": [
-                {
-                  "metricName": "REST_request_seconds.sum",
-                  "reduceTo": "avg",
-                  "spaceAggregation": "sum",
-                  "temporality": "",
-                  "timeAggregation": "rate"
-                }
-              ],
-              "dataSource": "metrics",
-              "disabled": false,
-              "expression": "C",
-              "filter": {
-                "expression": ""
-              },
-              "functions": [],
-              "groupBy": [
-                {
-                  "dataType": "string",
-                  "id": "method--string--tag",
-                  "isColumn": false,
-                  "isJSON": false,
-                  "key": "method",
-                  "type": "tag"
-                }
-              ],
-              "having": {
-                "expression": ""
-              },
-              "legend": "Total Time",
-              "limit": null,
-              "orderBy": [],
-              "queryName": "C",
-              "source": "",
-              "stepInterval": 60,
-              "filters": {
-                "items": [],
-                "op": "AND"
-              }
-            }
-          ],
-          "queryFormulas": [
-            {
-              "disabled": false,
-              "expression": "A/C",
-              "legend": "Percent",
-              "queryName": "F1"
-            }
-          ]
-        },
-        "clickhouse_sql": [
-          {
-            "disabled": false,
-            "legend": "",
-            "name": "A",
-            "query": ""
-          }
-        ],
-        "id": "e828a773-52b8-4d0d-bae1-9ba982ab464d",
-        "promql": [
-          {
-            "name": "A",
-            "query": "sum(increase(requests_count_total{kubernetes_namespace=~\"$namespace\", mp_app=~\"$app_name\"}[5m])) by (mp_app)",
-            "legend": "{{mp_app}}"
-          }
-        ],
-        "queryType": "promql"
-      },
-      "selectedLogFields": [
-        {
-          "dataType": "string",
-          "name": "body",
-          "type": ""
-        },
-        {
-          "dataType": "string",
-          "name": "timestamp",
-          "type": ""
-        }
-      ],
-      "selectedTracesFields": [
-        {
-          "dataType": "string",
-          "id": "serviceName--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "serviceName",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "name--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "name",
-          "type": "tag"
-        },
-        {
-          "dataType": "float64",
-          "id": "durationNano--float64--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "durationNano",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "httpMethod--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "httpMethod",
-          "type": "tag"
-        },
-        {
-          "dataType": "string",
-          "id": "responseStatusCode--string--tag--true",
-          "isColumn": true,
-          "isJSON": false,
-          "key": "responseStatusCode",
-          "type": "tag"
-        }
-      ],
-      "softMax": 0,
-      "softMin": 0,
-      "stackedBarChart": false,
-      "thresholds": [],
-      "timePreferance": "GLOBAL_TIME",
-      "title": "Total REST Calls all JVM's",
-      "yAxisUnit": "short"
-    }
-  ]
+      }
+    ],
+    "duration": "",
+    "refreshInterval": "",
+    "links": []
+  }
 }

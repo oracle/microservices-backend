@@ -82,14 +82,13 @@ spec:
             - name: http-console
               containerPort: 8080
               protocol: TCP
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: http-console
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 3
-            failureThreshold: 6
+          {{- $probes := .Values.otmm.console.probes | default dict }}
+          {{- range $name := list "startup" "readiness" "liveness" }}
+          {{- with index $probes $name }}
+          {{ $name }}Probe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
           resources:
             {{- with .Values.otmm.console.resources }}
             {{ toYaml . | nindent 6 }}

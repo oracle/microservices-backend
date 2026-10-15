@@ -10,29 +10,31 @@ global:
   # Override image-specific values directly if a global override is not desired.
   images:
     envoyGateway:
-      # This is the full image name including the hub, repo, and tag.
-      image: "docker.io/envoyproxy/gateway:v1.8.2"
-      # Specify image pull policy if default behavior isn't desired.
+      # -- Full image for the Envoy Gateway control plane Deployment installed by this chart.
+      image: docker.io/envoyproxy/gateway:v1.9.1
+      # -- Image pull policy for the Envoy Gateway control plane Deployment.
       # Default behavior: latest images will be Always else IfNotPresent.
-      pullPolicy: Always
-      # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
+      pullPolicy: IfNotPresent
+      # -- Pull secrets for the Envoy Gateway control plane Deployment.
       pullSecrets: []
     ratelimit:
       # This is the full image name including the hub, repo, and tag.
-      image: "docker.io/envoyproxy/ratelimit:master"
+      image: "docker.io/envoyproxy/ratelimit:8fe6ea42"
       # Specify image pull policy if default behavior isn't desired.
       # Default behavior: latest images will be Always else IfNotPresent.
       pullPolicy: IfNotPresent
       # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
       pullSecrets: []
     envoyProxy:
-      # This is the full image name including the hub, repo, and tag for the Envoy Proxy data plane.
-      # If not specified, uses the default image built into envoy-gateway.
-      image: "docker.io/envoyproxy/envoy:distroless-v1.38.3"
-      # Specify image pull policy if default behavior isn't desired.
+      # -- Full image for the managed Envoy Proxy data plane.
+      # This updates the generated `envoyProxy` config and does not change the `envoy-gateway`
+      # control plane Deployment image. If not specified, the default image built into
+      # `envoy-gateway` is used.
+      image: ""
+      # -- Image pull policy for the managed Envoy Proxy data plane.
       # Default behavior: IfNotPresent.
-      pullPolicy: IfNotPresent
-      # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
+      pullPolicy: ""
+      # -- Pull secrets for the managed Envoy Proxy data plane.
       pullSecrets: []
 
 # Values for CRDs dependency
@@ -46,6 +48,7 @@ commonLabels: {}
 podDisruptionBudget:
   minAvailable: 0
   # maxUnavailable: 1
+  # unhealthyPodEvictionPolicy: IfHealthyBudget
 
 deployment:
   annotations: {}
@@ -68,7 +71,7 @@ deployment:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-          - ALL
+        - ALL
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: true
@@ -83,6 +86,31 @@ deployment:
     #       claimName: envoy-gateway-wasm-cache
     strategy: {}
     wasmCacheVolume: {}
+    # Kubernetes best practice for controllers: use a startupProbe with a generous
+    # failure threshold to avoid premature liveness/readiness failures during initialization.
+    # Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-startup-probes
+    startupProbe:
+      httpGet:
+        path: /healthz
+        port: 8081
+      failureThreshold: 30
+      periodSeconds: 1
+      successThreshold: 1
+      timeoutSeconds: 1
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8081
+      periodSeconds: 20
+      successThreshold: 1
+      timeoutSeconds: 1
+    readinessProbe:
+      httpGet:
+        path: /readyz
+        port: 8081
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
   ports:
     - name: grpc
       port: 18000
@@ -142,7 +170,7 @@ hpa:
   behavior: {}
 
 config:
-  # -- EnvoyGateway configuration. Visit https://gateway.envoyproxy.io/docs/api/extension_types/#envoygateway to view all options.
+# -- EnvoyGateway configuration. Visit https://gateway.envoyproxy.io/docs/api/extension_types/#envoygateway to view all options.
   envoyGateway:
     gateway:
       controllerName: gateway.envoyproxy.io/gatewayclass-controller
@@ -185,7 +213,7 @@ certgen:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-          - ALL
+        - ALL
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: true

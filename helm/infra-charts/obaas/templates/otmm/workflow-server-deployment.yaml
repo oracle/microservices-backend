@@ -1,6 +1,8 @@
 ## Copyright (c) 2026, Oracle and/or its affiliates.
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
 {{- if .Values.otmm.workflowServer.enabled }}
+{{- include "obaas.otmm.validateStorage" . }}
+{{- $filePersistence := .Values.otmm.workflowServer.config.storage.fileSystem.persistence }}
 {{- $workflowMetrics := default dict .Values.otmm.workflowServer.metrics }}
 {{- $workflowMetricsScrape := default dict $workflowMetrics.scrape }}
 {{- $workflowMetricsEnabled := true }}
@@ -33,6 +35,14 @@ metadata:
     {{- include "obaas.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.otmm.workflowServer.replicas}}
+  {{- if and $filePersistence.enabled (not (has "ReadWriteMany" $filePersistence.accessModes)) }}
+  strategy:
+    type: Recreate
+    rollingUpdate: null
+  {{- else }}
+  strategy:
+    type: RollingUpdate
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ .Release.Name }}-otmm-workflow-server
@@ -250,7 +260,12 @@ spec:
           {{- end }}
       volumes:
             - name: workflow-fs-volume
+              {{- if $filePersistence.enabled }}
+              persistentVolumeClaim:
+                claimName: {{ include "obaas.otmm.workflowClaim" . }}
+              {{- else }}
               emptyDir: {}
+              {{- end }}
             - name: oracle-db-wallet-volume
               secret:
                 optional: true

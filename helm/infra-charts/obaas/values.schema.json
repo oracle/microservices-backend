@@ -1,7 +1,100 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
+  "$defs": {
+    "microtxPersistence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "existingClaim": { "type": "string" },
+        "storageClass": { "type": "string" },
+        "size": { "type": "string", "minLength": 1 },
+        "accessModes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["ReadWriteOnce", "ReadWriteMany", "ReadWriteOncePod"] }
+        },
+        "retain": { "type": "boolean" }
+      }
+    }
+  },
   "properties": {
+    "signoz": {
+      "type": "object",
+      "properties": {
+        "setup": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "otmm": {
+      "type": "object",
+      "properties": {
+        "coordinator": {
+          "type": "object",
+          "properties": {
+            "storage": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": { "enum": ["memory", "db", "etcd"] },
+                "db": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "initializeSchema": { "type": "boolean" },
+                    "connectionString": { "type": "string" },
+                    "connectionParams": { "type": "string" },
+                    "credentialSecretName": { "type": "string" },
+                    "credentialSecretKey": { "type": "string", "minLength": 1 },
+                    "walletConfigMapName": { "type": "string" },
+                    "walletSecretName": { "type": "string" }
+                  }
+                },
+                "etcd": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "endpoints": { "type": "string" },
+                    "skipHostNameVerification": { "type": "boolean" },
+                    "credentialSecretName": { "type": "string" },
+                    "credentialSecretKey": { "type": "string", "minLength": 1 },
+                    "caConfigMapName": { "type": "string" },
+                    "caConfigMapKey": { "type": "string", "minLength": 1 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "workflowServer": {
+          "type": "object",
+          "properties": {
+            "config": {
+              "type": "object",
+              "properties": {
+                "storage": {
+                  "type": "object",
+                  "properties": {
+                    "fileSystem": {
+                      "type": "object",
+                      "properties": {
+                        "persistence": { "$ref": "#/$defs/microtxPersistence" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "global": {
       "type": "object",
       "properties": {
@@ -14,6 +107,73 @@
             ]
           },
           "description": "Image pull secrets must be a list (strings or {name: ...} objects), not a bare string. Use --set global.imagePullSecrets[0]=mysecret"
+        }
+      }
+    },
+    "signozUpgrade": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "target", "backup", "validation"],
+      "properties": {
+        "stage": {
+          "type": "string",
+          "enum": ["standard", "stage1", "stage2"]
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["destructive-replace"]
+        },
+        "confirmDataLoss": { "type": "boolean" },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["chartVersion", "signozVersion", "otelCollectorVersion", "clickhouseVersion"],
+          "properties": {
+            "chartVersion": { "type": "string", "enum": ["0.142.1"] },
+            "signozVersion": { "type": "string", "enum": ["v0.142.1"] },
+            "otelCollectorVersion": { "type": "string", "enum": ["v0.144.10"] },
+            "clickhouseVersion": { "type": "string", "enum": ["25.12.5"] }
+          }
+        },
+        "backup": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provider", "volumeSnapshotClassName", "volumeSnapshotClassByStorageClass", "timeout"],
+          "properties": {
+            "provider": { "type": "string", "enum": ["csi"] },
+            "volumeSnapshotClassName": {
+              "type": "string",
+              "maxLength": 253,
+              "pattern": "^$|^[a-z0-9]([-a-z0-9.]*[a-z0-9])?$"
+            },
+            "volumeSnapshotClassByStorageClass": {
+              "type": "object",
+              "propertyNames": {
+                "maxLength": 253,
+                "pattern": "^[a-z0-9]([-a-z0-9.]*[a-z0-9])?$"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 253,
+                "pattern": "^[a-z0-9]([-a-z0-9.]*[a-z0-9])?$"
+              }
+            },
+            "timeout": { "type": "string", "pattern": "^[1-9][0-9]*[smh]$" }
+          }
+        },
+        "validation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["timeout", "markerSecretName"],
+          "properties": {
+            "timeout": { "type": "string", "pattern": "^[1-9][0-9]*[smh]$" },
+            "markerSecretName": {
+              "type": "string",
+              "maxLength": 63,
+              "pattern": "^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+            }
+          }
         }
       }
     },

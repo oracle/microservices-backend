@@ -1,6 +1,8 @@
 ## Copyright (c) 2024, 2026, Oracle and/or its affiliates.
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
 {{- if .Values.otmm.coordinator.enabled }}
+{{- include "obaas.otmm.validateStorage" . }}
+{{- $storage := .Values.otmm.coordinator.storage }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -42,9 +44,21 @@ data:
   NOTIFICATION_SPIKE_TIME_IN_SEC: "5"
   PORT: "9000"
   REQUEST_WITH_NO_JWT: ALLOW
-  STORAGE_ETCD_ENDPOINTS: ""
-  STORAGE_ETCD_SKIP_HOSTNAME_VERIFICATION: "false"
-  STORAGE_TYPE: memory
+  SERVE_TLS_ENABLED: "false"
+  STORAGE_TYPE: {{ $storage.type | quote }}
+  STORAGE_ETCD_ENDPOINTS: {{ ternary $storage.etcd.endpoints "" (eq $storage.type "etcd") | quote }}
+  STORAGE_ETCD_SKIP_HOSTNAME_VERIFICATION: {{ ternary $storage.etcd.skipHostNameVerification false (eq $storage.type "etcd") | quote }}
+  {{- if eq $storage.type "db" }}
+  {{- if $storage.db.connectionString }}
+  STORAGE_DB_CONNECTION_STRING: {{ $storage.db.connectionString | quote }}
+  {{- end }}
+  STORAGE_DB_CONNECTION_PARAMS: {{ $storage.db.connectionParams | quote }}
+  {{- else if eq $storage.type "etcd" }}
+  {{- if $storage.etcd.credentialSecretName }}
+  STORAGE_ETCD_CREDENTIAL_SECRET_FILE_NAME: credentials.json
+  STORAGE_ETCD_CA_CERT_FILE_NAME: ca.pem
+  {{- end }}
+  {{- end }}
   TCC_COORDINATOR_ENABLED: "true"
   TMM_APPNAME: {{ .Release.Name }}-otmm-tcs
   TMM_IMAGE: "{{ .Values.otmm.coordinator.image.repository }}:{{ .Values.otmm.coordinator.image.tag }}"

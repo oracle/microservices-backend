@@ -18,4 +18,3 @@
 # disable metrics-server in obaas-prereqs.
 metrics-server:
   enabled: true
-

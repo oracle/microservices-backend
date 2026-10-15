@@ -11,14 +11,47 @@ The steps below are generic — replace placeholder values like `my-app`, `my-se
 
 Before you begin, ensure the following tools are installed and configured:
 
-| Tool | Purpose | Verify |
-|------|---------|--------|
-| **Java** | Build application JARs | `java -version` |
-| **Maven** | Build and package | `mvn --version` |
-| **Docker** | Build and push container images | `docker ps` |
-| **kubectl** | Interact with Kubernetes cluster | `kubectl cluster-info` |
-| **Helm** | Deploy applications to Kubernetes | `helm version` |
-| **OCI CLI** | Manage OCI resources (if using OCIR) | `oci --version` |
+<table aria-label="Prerequisites table">
+  <thead>
+    <tr>
+      <th scope="col">Tool</th>
+      <th scope="col">Purpose</th>
+      <th scope="col">Verify</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><strong>Java</strong></th>
+      <td>Build application JARs</td>
+      <td><code>java -version</code></td>
+    </tr>
+    <tr>
+      <th scope="row"><strong>Maven</strong></th>
+      <td>Build and package</td>
+      <td><code>mvn --version</code></td>
+    </tr>
+    <tr>
+      <th scope="row"><strong>Docker</strong></th>
+      <td>Build and push container images</td>
+      <td><code>docker ps</code></td>
+    </tr>
+    <tr>
+      <th scope="row"><strong>kubectl</strong></th>
+      <td>Interact with Kubernetes cluster</td>
+      <td><code>kubectl cluster-info</code></td>
+    </tr>
+    <tr>
+      <th scope="row"><strong>Helm</strong></th>
+      <td>Deploy applications to Kubernetes</td>
+      <td><code>helm version</code></td>
+    </tr>
+    <tr>
+      <th scope="row"><strong>OCI CLI</strong></th>
+      <td>Manage OCI resources (if using OCIR)</td>
+      <td><code>oci --version</code></td>
+    </tr>
+  </tbody>
+</table>
 
 Additional requirements:
 
@@ -164,10 +197,27 @@ If your application connects to an Oracle database, you need to create Kubernete
 
 The Helm chart expects secrets following this naming pattern:
 
-| Secret | Purpose | Keys |
-|--------|---------|------|
-| `{dbname}-db-priv-authn` | Privileged credentials (for creating users, Liquibase) | `username`, `password`, `service` |
-| `{dbname}-{service}-db-authn` | Application credentials (per service) | `username`, `password`, `service` |
+<table aria-label="Secret Naming Convention table">
+  <thead>
+    <tr>
+      <th scope="col">Secret</th>
+      <th scope="col">Purpose</th>
+      <th scope="col">Keys</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><code>&#123;dbname&#125;-db-priv-authn</code></th>
+      <td>Privileged credentials (for creating users, Liquibase)</td>
+      <td><code>username</code>, <code>password</code>, <code>service</code></td>
+    </tr>
+    <tr>
+      <th scope="row"><code>&#123;dbname&#125;-&#123;service&#125;-db-authn</code></th>
+      <td>Application credentials (per service)</td>
+      <td><code>username</code>, <code>password</code>, <code>service</code></td>
+    </tr>
+  </tbody>
+</table>
 
 ### Create the Privileged Secret
 
@@ -288,20 +338,77 @@ helidon:
 
 ### Helm Values Reference
 
-| Value | Required | Description |
-|-------|----------|-------------|
-| `image.repository` | Yes | Full image path (without tag) |
-| `image.tag` | Yes | Image tag |
-| `obaas.releaseName` | Yes | OBaaS platform Helm release name |
-| `obaas.framework` | Yes | `SPRING_BOOT` or `HELIDON` |
-| `database.name` | If using DB | Database name (derives secret names and wallet) |
-| `database.authN.secretName` | No | Override derived secret name `{dbname}-{release}-db-authn` |
-| `database.aq.enabled` | No | Grant Advanced Queuing (AQ/JMS) permissions (default: `false`) |
-| `eureka.enabled` | No | Register with Eureka service discovery (default: `true`) |
-| `otel.enabled` | No | Enable OpenTelemetry integration (default: `true`) |
-| `otmm.enabled` | No | Enable MicroTx LRA distributed transactions (default: `false`) |
-| `service.port` | No | Container and service port (default: `8080`) |
-| `replicaCount` | No | Number of pod replicas (default: `1`) |
+<table aria-label="Helm Values Reference table">
+  <thead>
+    <tr>
+      <th scope="col">Value</th>
+      <th scope="col">Required</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><code>image.repository</code></th>
+      <td>Yes</td>
+      <td>Full image path (without tag)</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>image.tag</code></th>
+      <td>Yes</td>
+      <td>Image tag</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>obaas.releaseName</code></th>
+      <td>Yes</td>
+      <td>OBaaS platform Helm release name</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>obaas.framework</code></th>
+      <td>Yes</td>
+      <td><code>SPRING_BOOT</code> or <code>HELIDON</code></td>
+    </tr>
+    <tr>
+      <th scope="row"><code>database.name</code></th>
+      <td>If using DB</td>
+      <td>Database name (derives secret names and wallet)</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>database.authN.secretName</code></th>
+      <td>No</td>
+      <td>Override derived secret name <code>&#123;dbname&#125;-&#123;release&#125;-db-authn</code></td>
+    </tr>
+    <tr>
+      <th scope="row"><code>database.aq.enabled</code></th>
+      <td>No</td>
+      <td>Grant Advanced Queuing (AQ/JMS) permissions (default: <code>false</code>)</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>eureka.enabled</code></th>
+      <td>No</td>
+      <td>Register with Eureka service discovery (default: <code>true</code>)</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>otel.enabled</code></th>
+      <td>No</td>
+      <td>Enable OpenTelemetry integration (default: <code>true</code>)</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>otmm.enabled</code></th>
+      <td>No</td>
+      <td>Enable MicroTx LRA distributed transactions (default: <code>false</code>)</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>service.port</code></th>
+      <td>No</td>
+      <td>Container and service port (default: <code>8080</code>)</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>replicaCount</code></th>
+      <td>No</td>
+      <td>Number of pod replicas (default: <code>1</code>)</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Deploy a Service
 
@@ -419,13 +526,36 @@ curl http://localhost:9180/apisix/admin/routes/1 \
 
 Key fields:
 
-| Field | Description |
-|-------|-------------|
-| `uri` | The URL pattern to match. Use a wildcard suffix (e.g., `/api/v1/my-service*`). |
-| `upstream.service_name` | The Eureka-registered service name (uppercase by default for Spring Boot). |
-| `upstream.discovery_type` | Set to `eureka` so APISIX resolves service instances from the Eureka registry. |
-| `plugins.opentelemetry` | Enables distributed tracing through the gateway. |
-| `plugins.prometheus` | Enables Prometheus metrics collection for the route. |
+<table aria-label="Create a Route table">
+  <thead>
+    <tr>
+      <th scope="col">Field</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><code>uri</code></th>
+      <td>The URL pattern to match. Use a wildcard suffix (e.g., <code>/api/v1/my-service*</code>).</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>upstream.service_name</code></th>
+      <td>The Eureka-registered service name (uppercase by default for Spring Boot).</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>upstream.discovery_type</code></th>
+      <td>Set to <code>eureka</code> so APISIX resolves service instances from the Eureka registry.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>plugins.opentelemetry</code></th>
+      <td>Enables distributed tracing through the gateway.</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>plugins.prometheus</code></th>
+      <td>Enables Prometheus metrics collection for the route.</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Verify the Route
 
@@ -450,12 +580,41 @@ kill %1
 
 The full deployment flow:
 
-| Step | What | How |
-|------|------|-----|
-| 1 | Create container repositories | OCI CLI or registry UI |
-| 2 | Build and push images | Maven + JKube (`k8s:build` + `k8s:push`) |
-| 3 | Create database secrets | `kubectl create secret` |
-| 4 | Deploy with Helm | `helm upgrade --install` with `obaas-sample-app` chart |
-| 5 | Create API gateway routes | APISIX Admin API via `curl` |
+<table aria-label="Summary table">
+  <thead>
+    <tr>
+      <th scope="col">Step</th>
+      <th scope="col">What</th>
+      <th scope="col">How</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Create container repositories</td>
+      <td>OCI CLI or registry UI</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Build and push images</td>
+      <td>Maven + JKube (<code>k8s:build</code> + <code>k8s:push</code>)</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>Create database secrets</td>
+      <td><code>kubectl create secret</code></td>
+    </tr>
+    <tr>
+      <th scope="row">4</th>
+      <td>Deploy with Helm</td>
+      <td><code>helm upgrade --install</code> with <code>obaas-sample-app</code> chart</td>
+    </tr>
+    <tr>
+      <th scope="row">5</th>
+      <td>Create API gateway routes</td>
+      <td>APISIX Admin API via <code>curl</code></td>
+    </tr>
+  </tbody>
+</table>
 
 After all steps are complete, your application is accessible through the APISIX gateway at the URI patterns you configured.

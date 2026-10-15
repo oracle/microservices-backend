@@ -1,0 +1,67 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+# Example: MicroTx Enterprise Edition with coordinator database storage.
+# Layer after the complete values for your OBaaS installation:
+#
+# helm upgrade --install <app-release> helm/infra-charts/obaas \
+#   -n <application-namespace> --create-namespace \
+#   -f <existing-obaas-values.yaml> \
+#   -f helm/infra-charts/obaas/examples/values-microtx-ee.yaml
+#
+# Prerequisites:
+# - Accept the applicable EE image terms and create ocr-secret in the namespace.
+# - Prepare database access, schema-creation privileges, and tablespace quota.
+# - Select a StorageClass for the workflow files, or provide an existing claim.
+#
+# By default the coordinator reuses the OBaaS application credentials and wallet.
+# Oracle requires separate coordinator and workflow schemas when both use Oracle
+# Database. For that setup, override coordinator.storage.db.credentialSecretName
+# and connectionString, and provide a custom wallet when required. See:
+# https://docs.oracle.com/en/database/oracle/transaction-manager-for-microservices/26.1/tmmdg/create-data-store.html
+# Coordinator schema initialization is enabled by default. The workflow PVC below
+# stores uploaded files/connectors; coordinator transaction state is in Oracle DB.
+
+global:
+  # Keep the namespace cleanup hook from deleting retained workflow files.
+  cleanupPVCs: false
+
+otmm:
+  coordinator:
+    imagePullSecrets:
+      - ocr-secret
+    enabled: true
+    storage:
+      type: db
+    image:
+      repository: container-registry.oracle.com/database/microtx-ee-coordinator
+      tag: "26.1.2"
+      pullPolicy: IfNotPresent
+
+  workflowServer:
+    imagePullSecrets:
+      - ocr-secret
+    enabled: true
+    config:
+      storage:
+        fileSystem:
+          persistence:
+            enabled: true
+            size: 10Gi
+            accessModes: [ReadWriteOnce]
+            retain: true
+            # Set storageClass for your cluster, or use an existing claim:
+            # storageClass: "<storage-class>"
+            # existingClaim: microtx-workflow-files
+    image:
+      repository: container-registry.oracle.com/database/microtx-ee-workflow
+      tag: "26.1.2"
+      pullPolicy: IfNotPresent
+
+  console:
+    imagePullSecrets:
+      - ocr-secret
+    enabled: true
+    image:
+      repository: container-registry.oracle.com/database/microtx-ee-console
+      tag: "26.1.2"
+      pullPolicy: IfNotPresent

@@ -1,0 +1,42 @@
+{{- $files := .Files.Glob "dashboards/*.json" -}}
+{{- if eq (len $files) 0 -}}
+{{- fail "Add at least one dashboard JSON file to dashboards/ before installing" -}}
+{{- end -}}
+{{- $names := dict -}}
+{{- $_ := set $names (include "signoz-dashboards.scriptName" .) true -}}
+{{- range $path, $_ := $files }}
+{{- $name := include "signoz-dashboards.configMapName" $path -}}
+{{- if hasKey $names $name -}}
+{{- fail (printf "Dashboard ConfigMap name collision: %s" $name) -}}
+{{- end -}}
+{{- $_ := set $names $name true -}}
+{{- $content := $.Files.Get $path -}}
+{{- if gt (len $content) 1048576 -}}
+{{- fail (printf "%s exceeds the 1 MiB ConfigMap data limit" $path) -}}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: signoz-dashboards
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+data:
+  dashboard.json: |-
+{{ $content | indent 4 }}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "signoz-dashboards.scriptName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: signoz-dashboards
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  import-dashboards.py: |-
+{{ .Files.Get "scripts/import-dashboards.py" | indent 4 }}
+
