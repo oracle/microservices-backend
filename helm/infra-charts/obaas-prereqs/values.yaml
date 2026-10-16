@@ -38,6 +38,8 @@ oracle-database-operator:
     # Specify a version tag for reproducible deployments
     tag: "2.2.0"
     pullPolicy: IfNotPresent
+  crdConfiguration:
+    image: docker.io/alpine/k8s:1.36.4
   # Deployment scope configuration
   scope:
     mode: cluster
@@ -127,6 +129,14 @@ opentelemetry-operator:
   # Keep network-policy rollout separate from the operator and
   # auto-instrumentation upgrade.
   manager:
+    # Pin the collector operand independently from the operator version.
+    collectorImage:
+      repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s
+      tag: "0.160.0"
     featureGatesMap:
       operator.networkpolicy: false
       operand.networkpolicy: false
+  testFramework:
+    image:
+      repository: docker.io/busybox
+      tag: "1.37"

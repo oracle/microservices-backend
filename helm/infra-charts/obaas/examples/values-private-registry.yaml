@@ -100,18 +100,18 @@ ai-optimizer:
     replicaCount: 1
     # -- Image details: Required for BYO Infra
     # imagePullSecrets: []
-    # image:
-    #   repository: localhost/ai-optimizer-server
-    #   tag: latest
-    #   pullPolicy: IfNotPresent
+    image:
+      repository: myregistry.example.com/obaas/optimizer
+      tag: "2.5.0"
+      pullPolicy: IfNotPresent
   client:
     enabled: true
     # -- Image details: Required for BYO Infra
     # imagePullSecrets: []
-    # image:
-    #   repository: localhost/ai-optimizer-client
-    #   tag: latest
-    #   pullPolicy: IfNotPresent
+    image:
+      repository: myregistry.example.com/obaas/optimizer
+      tag: "2.5.0"
+      pullPolicy: IfNotPresent
 
 # Eureka Service Discovery
 eureka:
@@ -188,7 +188,7 @@ oracle-database-exporter:
   replicas: 1
   image:
     repository: myregistry.example.com/database/observability-exporter
-    tag: "2.4.2"
+    tag: "2.5.0"
   # Busybox sidecar for tailing alert.log
   busybox:
     repository: myregistry.example.com/busybox

@@ -79,7 +79,7 @@ oracle-database-operator:
     tag: "2.2.0"
     pullPolicy: IfNotPresent
   crdConfiguration:
-    image: myregistry.example.com/kubectl:v1.36.3
+    image: myregistry.example.com/alpine/k8s:1.36.4
   # Deployment scope configuration
   scope:
     mode: cluster
@@ -198,7 +198,7 @@ coherence-operator:
   defaultCoherenceImage:
     registry: "myregistry.example.com/middleware"
     name: "coherence-ce"
-    tag: "26.04"
+    tag: "22.06.13"
   # One operator replica is sufficient for evaluation/development clusters.
   # Increase to 3 for highly available operator reconciliation.
   replicas: 1
@@ -215,7 +215,11 @@ opentelemetry-operator:
   manager:
     collectorImage:
       repository: "myregistry.example.com/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s"
-      tag: "0.158.0"
+      tag: "0.160.0"
     image:
-      repository: "myregistry.example.com/open-telemetry/opentelemetry-operator"
+      repository: "myregistry.example.com/open-telemetry/opentelemetry-operator/opentelemetry-operator"
       tag: "0.158.0"
+  testFramework:
+    image:
+      repository: "myregistry.example.com/busybox"
+      tag: "1.37"

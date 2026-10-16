@@ -36,8 +36,8 @@ rg -q 'version: 0\.122\.0' "${CHART_DIR}/Chart.lock" \
 helm lint "${CHART_DIR}" >/dev/null
 helm template obaas-prereqs "${CHART_DIR}" -n obaas-system >"${RENDERED}"
 
-rg -q -- '--collector-image=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s:0\.158\.0' "${RENDERED}" \
-  || fail "rendered collector image is not 0.158.0"
+rg -q -- '--collector-image=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s:0\.160\.0' "${RENDERED}" \
+  || fail "rendered collector image is not 0.160.0"
 rg -q -- '--feature-gates=-operand\.networkpolicy,-operator\.networkpolicy' "${RENDERED}" \
   || fail "rendered network-policy compatibility gates are not disabled"
 rg -q 'app\.kubernetes\.io/version: "0\.158\.0"' "${RENDERED}" \
@@ -45,4 +45,4 @@ rg -q 'app\.kubernetes\.io/version: "0\.158\.0"' "${RENDERED}" \
 ! rg -q 'opentelemetry-operator-0\.119\.0|:0\.154\.0' "${RENDERED}" \
   || fail "rendered output contains stale OpenTelemetry Operator versions"
 
-echo "OpenTelemetry Operator 0.122.0 / 0.158.0 regression test passed"
+echo "OpenTelemetry Operator 0.122.0 / 0.158.0 with collector 0.160.0 regression test passed"
