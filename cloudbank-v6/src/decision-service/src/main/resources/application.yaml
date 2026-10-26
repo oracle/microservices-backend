@@ -1,0 +1,53 @@
+server:
+  port: ${PORT:8088}
+spring:
+  application:
+    name: decision-service
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DECISION_DATASOURCE_URL:jdbc:oracle:thin:@//localhost:1521/freepdb1}
+    username: ${DECISION_DATASOURCE_USERNAME:CB_DECISION_APP}
+    password: ${DECISION_DATASOURCE_PASSWORD:}
+    driver-class-name: oracle.jdbc.OracleDriver
+    type: oracle.ucp.jdbc.PoolDataSource
+    oracleucp:
+      connection-factory-class-name: oracle.jdbc.pool.OracleDataSource
+      connection-pool-name: DecisionConnectionPool
+      initial-pool-size: 1
+      min-pool-size: 1
+      max-pool-size: 4
+  security:
+    oauth2:
+      client:
+        registration:
+          cloudbank-service:
+            provider: cloudbank-authorization-server
+            client-id: ${DECISION_CLIENT_ID:cloudbank-service-client}
+            client-secret: ${DECISION_CLIENT_SECRET:}
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: client_credentials
+            scope: [cloudbank.internal]
+        provider:
+          cloudbank-authorization-server:
+            token-uri: ${DECISION_TOKEN_URI:http://127.0.0.1:8080/oauth2/token}
+      resourceserver:
+        jwt:
+          issuer-uri: ${AZN_ISSUER_URI:http://127.0.0.1:8080}
+          jwk-set-uri: ${AZN_JWK_SET_URI:http://127.0.0.1:8080/oauth2/jwks}
+cloudbank:
+  schema: ${DECISION_SCHEMA:CLOUDBANK}
+  security:
+    audience: ${AZN_AUDIENCE:cloudbank-api}
+    internal-client-ids: ${DECISION_CALLER_CLIENT_IDS:cloudbank-service-client}
+  loan-application:
+    base-url: ${LOAN_APPLICATION_BASE_URL:http://127.0.0.1:8081}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  health:
+    probes:
+      enabled: true

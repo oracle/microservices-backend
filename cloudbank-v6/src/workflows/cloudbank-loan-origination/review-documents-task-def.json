@@ -1,0 +1,13 @@
+{
+  "name": "review_documents",
+  "description": "Review extracted CloudBank loan documents and acknowledge their validated or manual-review status.",
+  "retryCount": 3,
+  "retryLogic": "EXPONENTIAL_BACKOFF",
+  "retryDelaySeconds": 2,
+  "timeoutSeconds": 120,
+  "responseTimeoutSeconds": 60,
+  "timeoutPolicy": "RETRY",
+  "totalTimeoutSeconds": 600,
+  "inputKeys": [],
+  "outputKeys": []
+}

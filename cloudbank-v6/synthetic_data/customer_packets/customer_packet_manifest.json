@@ -1,0 +1,125 @@
+{
+  "corpusId": "CLOUDBANK-CUSTOMER-PACKETS-2026.0",
+  "generatedNonProductionValues": true,
+  "name": "CloudBank Customer Packet Corpus",
+  "pdfCustomerFacingMarkers": false,
+  "safetyRules": {
+    "containsCreditBureauArtifact": false,
+    "containsRawAccountNumber": false,
+    "containsRawGovernmentIdentifier": false,
+    "usesReservedEmailDomain": "example.invalid",
+    "usesReservedPhoneNumbers": true
+  },
+  "scenarioCount": 5,
+  "scenarios": [
+    {
+      "applicantId": "APL-CB-APR-001",
+      "applicationId": "APP-APR-001",
+      "documents": [
+        "app_apr_001_elena_parker/loan_application.pdf",
+        "app_apr_001_elena_parker/applicant_disclosures_and_consent.pdf",
+        "app_apr_001_elena_parker/identity_verification_summary.pdf",
+        "app_apr_001_elena_parker/address_jurisdiction_verification.pdf",
+        "app_apr_001_elena_parker/income_evidence_validation.pdf",
+        "app_apr_001_elena_parker/pay_statement_novereign_systems.pdf",
+        "app_apr_001_elena_parker/deposit_summary_cloudbank.pdf",
+        "app_apr_001_elena_parker/liability_schedule.pdf",
+        "app_apr_001_elena_parker/payment_calculation_summary.pdf"
+      ],
+      "expectedOutcome": "APPROVED",
+      "packetManifest": "app_apr_001_elena_parker/packet_manifest.json",
+      "recoveredDecision": null,
+      "scenarioId": "SCN-FAST-APPROVAL-001",
+      "slug": "app_apr_001_elena_parker",
+      "workflowId": "WF-APP-APR-001"
+    },
+    {
+      "applicantId": "APL-CB-MR-002",
+      "applicationId": "APP-MR-002",
+      "documents": [
+        "app_mr_002_maya_chen/loan_application.pdf",
+        "app_mr_002_maya_chen/applicant_disclosures_and_consent.pdf",
+        "app_mr_002_maya_chen/identity_verification_summary.pdf",
+        "app_mr_002_maya_chen/address_jurisdiction_verification.pdf",
+        "app_mr_002_maya_chen/income_evidence_validation.pdf",
+        "app_mr_002_maya_chen/earnings_statement_lumenfield.pdf",
+        "app_mr_002_maya_chen/account_activity_summary.pdf",
+        "app_mr_002_maya_chen/liability_schedule.pdf",
+        "app_mr_002_maya_chen/payment_calculation_summary.pdf",
+        "app_mr_002_maya_chen/income_clarification_request.pdf"
+      ],
+      "expectedOutcome": "MANUAL_REVIEW",
+      "packetManifest": "app_mr_002_maya_chen/packet_manifest.json",
+      "recoveredDecision": null,
+      "scenarioId": "SCN-MANUAL-REVIEW-002",
+      "slug": "app_mr_002_maya_chen",
+      "workflowId": "WF-APP-MR-002"
+    },
+    {
+      "applicantId": "APL-CB-REJ-003",
+      "applicationId": "APP-REJ-003",
+      "documents": [
+        "app_rej_003_daniel_rojas/loan_application.pdf",
+        "app_rej_003_daniel_rojas/applicant_disclosures_and_consent.pdf",
+        "app_rej_003_daniel_rojas/identity_verification_summary.pdf",
+        "app_rej_003_daniel_rojas/address_jurisdiction_verification.pdf",
+        "app_rej_003_daniel_rojas/income_evidence_validation.pdf",
+        "app_rej_003_daniel_rojas/contractor_income_statement.pdf",
+        "app_rej_003_daniel_rojas/account_activity_summary.pdf",
+        "app_rej_003_daniel_rojas/liability_schedule.pdf",
+        "app_rej_003_daniel_rojas/payment_calculation_summary.pdf"
+      ],
+      "expectedOutcome": "REJECTED",
+      "packetManifest": "app_rej_003_daniel_rojas/packet_manifest.json",
+      "recoveredDecision": null,
+      "scenarioId": "SCN-REJECTION-003",
+      "slug": "app_rej_003_daniel_rojas",
+      "workflowId": "WF-APP-REJ-003"
+    },
+    {
+      "applicantId": "APL-CB-OPF-004",
+      "applicationId": "APP-OPFAIL-004",
+      "documents": [
+        "app_opfail_004_priya_natarajan/loan_application.pdf",
+        "app_opfail_004_priya_natarajan/applicant_disclosures_and_consent.pdf",
+        "app_opfail_004_priya_natarajan/identity_verification_summary.pdf",
+        "app_opfail_004_priya_natarajan/address_jurisdiction_verification.pdf",
+        "app_opfail_004_priya_natarajan/income_evidence_validation.pdf",
+        "app_opfail_004_priya_natarajan/pay_statement_sablecrest.pdf",
+        "app_opfail_004_priya_natarajan/deposit_summary_cloudbank.pdf",
+        "app_opfail_004_priya_natarajan/liability_schedule.pdf",
+        "app_opfail_004_priya_natarajan/payment_calculation_summary.pdf",
+        "app_opfail_004_priya_natarajan/document_receipt.pdf"
+      ],
+      "expectedOutcome": "FAILED_RETRYABLE_RECOVERED",
+      "packetManifest": "app_opfail_004_priya_natarajan/packet_manifest.json",
+      "recoveredDecision": "APPROVED",
+      "scenarioId": "SCN-OPERATIONAL-FAILURE-004",
+      "slug": "app_opfail_004_priya_natarajan",
+      "workflowId": "WF-APP-OPFAIL-004"
+    },
+    {
+      "applicantId": "APL-CB-RSK-005",
+      "applicationId": "APP-RISK-005",
+      "documents": [
+        "app_risk_005_jordan_brooks/loan_application.pdf",
+        "app_risk_005_jordan_brooks/applicant_disclosures_and_consent.pdf",
+        "app_risk_005_jordan_brooks/identity_verification_summary.pdf",
+        "app_risk_005_jordan_brooks/address_jurisdiction_verification.pdf",
+        "app_risk_005_jordan_brooks/income_evidence_validation.pdf",
+        "app_risk_005_jordan_brooks/pay_statement_copperline.pdf",
+        "app_risk_005_jordan_brooks/deposit_summary_cloudbank.pdf",
+        "app_risk_005_jordan_brooks/liability_schedule.pdf",
+        "app_risk_005_jordan_brooks/payment_calculation_summary.pdf",
+        "app_risk_005_jordan_brooks/relationship_signal_summary.pdf"
+      ],
+      "expectedOutcome": "MANUAL_REVIEW",
+      "packetManifest": "app_risk_005_jordan_brooks/packet_manifest.json",
+      "recoveredDecision": null,
+      "scenarioId": "SCN-RISK-SIGNAL-005",
+      "slug": "app_risk_005_jordan_brooks",
+      "workflowId": "WF-APP-RISK-005"
+    }
+  ],
+  "version": "2026.0"
+}

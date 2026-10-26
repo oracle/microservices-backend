@@ -1,0 +1,27 @@
+--- a/modules/kubernetes/iam.tf
++++ b/modules/kubernetes/iam.tf
+@@ -23,5 +23,5 @@
+   statements = [
+     # Workload Principles specific to oracle-database-operator-system Namespace
+-    format("allow any-user to manage autonomous-database-family in compartment id %s where all {request.principal.type = 'workload', request.principal.namespace = 'oracle-database-operator-system', request.principal.service_account = 'default', request.principal.cluster_id = '%s'}", var.compartment_id, oci_containerengine_cluster.default_cluster.id),
++    format("allow any-user to manage autonomous-database-family in compartment id %s where all {request.principal.type = 'workload', request.principal.namespace = 'oracle-database-operator-system', request.principal.service_account = 'oracle-database-operator-controller-manager', request.principal.cluster_id = '%s'}", var.compartment_id, oci_containerengine_cluster.default_cluster.id),
+     # Workload Principles specific to native-ingress-controller-system Namespace
+     format("allow any-user to manage load-balancers in compartment id %s where all {request.principal.type = 'workload', request.principal.namespace = 'native-ingress-controller-system', request.principal.service_account = 'oci-native-ingress-controller', request.principal.cluster_id = '%s'}", var.compartment_id, oci_containerengine_cluster.default_cluster.id),
+--- a/modules/kubernetes/templates/k8s-manifest.yaml
++++ b/modules/kubernetes/templates/k8s-manifest.yaml
+@@ -141,5 +141,5 @@
+ subjects:
+ - kind: ServiceAccount
+-  name: default
++  name: oracle-database-operator-controller-manager
+   namespace: oracle-database-operator-system
+ %{ endif }
+--- a/cfgmgt/helm/obaas/templates/database/adb-wallet-secret.yaml
++++ b/cfgmgt/helm/obaas/templates/database/adb-wallet-secret.yaml
+@@ -14,5 +14,5 @@
+     {{- include "obaas.labels" . | nindent 4 }}
+ stringData:
+-  {{ .Release.Name }}-adb-wallet-pass-{{ .Release.Revision }}: {{ include "obaas.randomPassword" . | quote }}
++  password: {{ include "obaas.randomPassword" . | quote }}
+ {{- end }}
+ {{- end }}

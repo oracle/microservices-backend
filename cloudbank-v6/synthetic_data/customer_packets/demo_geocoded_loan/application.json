@@ -1,0 +1,28 @@
+{
+  "scenarioId": "SMOKE",
+  "scenarioName": "Loan Intake Smoke Test",
+  "applicant": {
+    "displayName": "Synthetic Smoke Applicant",
+    "phoneToken": "smoke-phone",
+    "emailToken": "smoke-email",
+    "ageBand": "35-44",
+    "address": {
+      "addressLine": "109 Market Street",
+      "locality": "Denton, MD",
+      "postalCode": "21629",
+      "countryCode": "US",
+      "jurisdictionCode": "CX",
+      "addressToken": "smoke-address"
+    }
+  },
+  "loan": {
+    "requestedAmount": 5000.00,
+    "requestedTermMonths": 24,
+    "purposeCode": "OTHER_CONSUMER_PURPOSE",
+    "policyVersion": "2026.0"
+  },
+  "documents": [
+    { "documentType": "LOAN_APPLICATION", "fileName": "loan_application.pdf", "required": true },
+    { "documentType": "PAY_STATEMENT", "fileName": "pay_statement_novereign_systems.pdf", "required": true }
+  ]
+}

@@ -1,0 +1,8 @@
+---
+databaseChangeLog:
+  - include:
+      file: classpath:db/changelog/dbuser.sql
+  - include:
+      file: classpath:db/changelog/table.sql
+  - include:
+      file: classpath:db/changelog/trigger.sql

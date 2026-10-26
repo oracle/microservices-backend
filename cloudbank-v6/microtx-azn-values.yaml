@@ -1,0 +1,33 @@
+commonConfiguration:
+  security:
+    enabled: true
+
+    identityProvider:
+      serverType: other
+
+      # Deve corrispondere esattamente al claim "iss" nel JWT di azn-server.
+      issuer: "http://localhost:8080"
+
+      # Minikube raggiunge i servizi del Mac tramite host.minikube.internal.
+      jwksUri: "http://host.minikube.internal:8080/oauth2/jwks"
+      identityProviderUrl: "http://host.minikube.internal:8080/oauth2/token"
+
+      audience: "microtx-workflow"
+
+      roleMappings:
+        coordinator:
+          adminUserRoles: "microtx-conductor-admin"
+          adminUserRolesPath: "roles"
+
+        workflow:
+          claimsRolePaths: "roles"
+          roles:
+            superAdmin: "microtx-conductor-super-admin"
+            admin: "microtx-conductor-admin"
+            user: "microtx-conductor-user"
+            readOnlyUser: "microtx-conductor-read-only-user"
+            metadataManager: "microtx-conductor-metadata-manager"
+            worker: "microtx-conductor-worker"
+
+    authentication:
+      requestsWithNoJWT: DENY

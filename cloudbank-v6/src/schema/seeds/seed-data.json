@@ -1,0 +1,783 @@
+{
+  "metadata": {
+    "seedName": "cloudbank-2026.0-fixtures",
+    "schemaVersion": "2026.0",
+    "description": "Structured CloudBank personal-loan fixtures for schema loading and deterministic demo validation.",
+    "sourceCorpus": "synthetic_data/customer_packets",
+    "policyVersion": "2026.0"
+  },
+  "principals": [
+    {
+      "principalId": "svc-document-ingest",
+      "principalType": "SERVICE",
+      "displayName": "Document Ingest Service",
+      "externalSubject": "svc:cloudbank:document-ingest"
+    },
+    {
+      "principalId": "svc-decision",
+      "principalType": "SERVICE",
+      "displayName": "Decision Service",
+      "externalSubject": "svc:cloudbank:decision"
+    },
+    {
+      "principalId": "loan-officer-001",
+      "principalType": "EMPLOYEE",
+      "displayName": "CloudBank Loan Officer",
+      "externalSubject": "user:cloudbank:loan-officer-001"
+    },
+    {
+      "principalId": "underwriter-001",
+      "principalType": "EMPLOYEE",
+      "displayName": "CloudBank Underwriter",
+      "externalSubject": "user:cloudbank:underwriter-001"
+    },
+    {
+      "principalId": "auditor-001",
+      "principalType": "AUDITOR",
+      "displayName": "CloudBank Audit Reviewer",
+      "externalSubject": "user:cloudbank:auditor-001"
+    }
+  ],
+  "roleGrants": [
+    { "principalId": "svc-document-ingest", "roleCode": "SERVICE" },
+    { "principalId": "svc-decision", "roleCode": "SERVICE" },
+    { "principalId": "loan-officer-001", "roleCode": "LOAN_OFFICER" },
+    { "principalId": "underwriter-001", "roleCode": "UNDERWRITER" },
+    { "principalId": "auditor-001", "roleCode": "AUDITOR" }
+  ],
+  "employers": [
+    {
+      "employerId": "EMP-NOV-001",
+      "employerName": "Novereign Systems",
+      "employerToken": "emp_tok_novereign_systems",
+      "employerAddress": "410 Meridian Fold, Cobalt Junction CX"
+    },
+    {
+      "employerId": "EMP-LUM-002",
+      "employerName": "Lumenfield Services",
+      "employerToken": "emp_tok_lumenfield_services",
+      "employerAddress": "88 Harbor Loom, Briar Falls CX"
+    },
+    {
+      "employerId": "EMP-DRR-003",
+      "employerName": "Rojas Independent Design",
+      "employerToken": "emp_tok_rojas_design",
+      "employerAddress": "24 Ember Arcade, North Verdan CX"
+    },
+    {
+      "employerId": "EMP-SAB-004",
+      "employerName": "Sablecrest Analytics",
+      "employerToken": "emp_tok_sablecrest_analytics",
+      "employerAddress": "701 Willowspire Loop, Cedar Quay CX"
+    },
+    {
+      "employerId": "EMP-COP-005",
+      "employerName": "Copperline Works",
+      "employerToken": "emp_tok_copperline_works",
+      "employerAddress": "56 Fenwick Landing, East Orison CX"
+    }
+  ],
+  "jurisdictionZones": [
+    {
+      "zoneId": "ZONE-CX-ELIGIBLE-001",
+      "jurisdictionCode": "CX",
+      "zoneName": "Cobalt Service Area",
+      "zoneType": "ELIGIBLE_SERVICE_AREA",
+      "zoneStatus": "ACTIVE",
+      "wkt": "POLYGON((-76.20 38.70,-75.80 38.70,-75.80 39.10,-76.20 39.10,-76.20 38.70))"
+    },
+    {
+      "zoneId": "ZONE-CX-BOUNDARY-001",
+      "jurisdictionCode": "CX",
+      "zoneName": "East Boundary Review",
+      "zoneType": "BOUNDARY_REVIEW",
+      "zoneStatus": "ACTIVE",
+      "wkt": "POLYGON((-75.86 38.72,-75.80 38.72,-75.80 39.08,-75.86 39.08,-75.86 38.72))"
+    }
+  ],
+  "policyDocuments": [
+    {
+      "policyDocumentId": "POL-CBPL-100-2026.0",
+      "policyCode": "CBPL-100",
+      "policyTitle": "Eligibility and Product Scope",
+      "sourcePath": "synthetic_data/policy/CBPL-100-eligibility-and-product-scope.md",
+      "effectiveDate": "2026-01-01",
+      "ownerRole": "UNDERWRITER",
+      "chunks": [
+        {
+          "chunkId": "CBPL-100-S3-C01",
+          "sectionRef": "S3-C01",
+          "heading": "Eligibility checklist",
+          "chunkOrdinal": 1,
+          "minRole": "LOAN_OFFICER",
+          "text": "Applications may proceed when identity, eligible jurisdiction, permitted purpose, required disclosures, residential address, and income evidence are present.",
+          "embeddingText": "[0.11,0.21,0.31,0.41]"
+        }
+      ]
+    },
+    {
+      "policyDocumentId": "POL-CBPL-110-2026.0",
+      "policyCode": "CBPL-110",
+      "policyTitle": "Identity, Fraud, and Applicant Integrity",
+      "sourcePath": "synthetic_data/policy/CBPL-110-identity-fraud-and-applicant-integrity.md",
+      "effectiveDate": "2026-01-01",
+      "ownerRole": "UNDERWRITER",
+      "chunks": [
+        {
+          "chunkId": "CBPL-110-S4-C01",
+          "sectionRef": "S4-C01",
+          "heading": "Shared-attribute review",
+          "chunkOrdinal": 1,
+          "minRole": "UNDERWRITER",
+          "text": "Unresolved shared device, address, phone, or email signals require underwriter review before an automated approval can be issued.",
+          "embeddingText": "[0.12,0.22,0.32,0.42]"
+        }
+      ]
+    },
+    {
+      "policyDocumentId": "POL-CBPL-120-2026.0",
+      "policyCode": "CBPL-120",
+      "policyTitle": "Income, Employment, and Documentation",
+      "sourcePath": "synthetic_data/policy/CBPL-120-income-employment-and-documentation.md",
+      "effectiveDate": "2026-01-01",
+      "ownerRole": "UNDERWRITER",
+      "chunks": [
+        {
+          "chunkId": "CBPL-120-S4-C01",
+          "sectionRef": "S4-C01",
+          "heading": "Inconsistent income evidence",
+          "chunkOrdinal": 1,
+          "minRole": "UNDERWRITER",
+          "text": "Income evidence that differs materially between pay documentation and deposit evidence requires manual review or clarification.",
+          "embeddingText": "[0.13,0.23,0.33,0.43]"
+        },
+        {
+          "chunkId": "CBPL-120-S5-C01",
+          "sectionRef": "S5-C01",
+          "heading": "Stable recurring income",
+          "chunkOrdinal": 2,
+          "minRole": "LOAN_OFFICER",
+          "text": "Stable recurring employment income with consistent pay and deposit evidence can support automated processing.",
+          "embeddingText": "[0.14,0.24,0.34,0.44]"
+        }
+      ]
+    },
+    {
+      "policyDocumentId": "POL-CBPL-130-2026.0",
+      "policyCode": "CBPL-130",
+      "policyTitle": "Credit Capacity and Debt-to-Income",
+      "sourcePath": "synthetic_data/policy/CBPL-130-credit-capacity-and-debt-to-income.md",
+      "effectiveDate": "2026-01-01",
+      "ownerRole": "UNDERWRITER",
+      "chunks": [
+        {
+          "chunkId": "CBPL-130-S3-C01",
+          "sectionRef": "S3-C01",
+          "heading": "Manual review DTI band",
+          "chunkOrdinal": 1,
+          "minRole": "UNDERWRITER",
+          "text": "Applications in the upper debt-to-income review band require underwriter review even when no hard reject condition is present.",
+          "embeddingText": "[0.15,0.25,0.35,0.45]"
+        },
+        {
+          "chunkId": "CBPL-130-S4-C01",
+          "sectionRef": "S4-C01",
+          "heading": "Hard capacity failure",
+          "chunkOrdinal": 2,
+          "minRole": "LOAN_OFFICER",
+          "text": "A hard capacity failure occurs when verified income and monthly obligations cannot support the requested payment.",
+          "embeddingText": "[0.16,0.26,0.36,0.46]"
+        },
+        {
+          "chunkId": "CBPL-130-S5-C01",
+          "sectionRef": "S5-C01",
+          "heading": "Low DTI approval path",
+          "chunkOrdinal": 3,
+          "minRole": "LOAN_OFFICER",
+          "text": "Low debt-to-income results with no adverse credit indicators can support an automated approval path.",
+          "embeddingText": "[0.17,0.27,0.37,0.47]"
+        }
+      ]
+    },
+    {
+      "policyDocumentId": "POL-CBPL-140-2026.0",
+      "policyCode": "CBPL-140",
+      "policyTitle": "Pricing, Terms, and Risk Tiering",
+      "sourcePath": "synthetic_data/policy/CBPL-140-pricing-terms-and-risk-tiering.md",
+      "effectiveDate": "2026-01-01",
+      "ownerRole": "UNDERWRITER",
+      "chunks": [
+        {
+          "chunkId": "CBPL-140-S3-C01",
+          "sectionRef": "S3-C01",
+          "heading": "Risk tier pricing",
+          "chunkOrdinal": 1,
+          "minRole": "LOAN_OFFICER",
+          "text": "Risk bands map to approved term, APR text, and proposed monthly payment in the pricing summary.",
+          "embeddingText": "[0.18,0.28,0.38,0.48]"
+        }
+      ]
+    },
+    {
+      "policyDocumentId": "POL-CBPL-150-2026.0",
+      "policyCode": "CBPL-150",
+      "policyTitle": "Manual Review, Exceptions, and Overrides",
+      "sourcePath": "synthetic_data/policy/CBPL-150-manual-review-exceptions-and-overrides.md",
+      "effectiveDate": "2026-01-01",
+      "ownerRole": "UNDERWRITER",
+      "chunks": [
+        {
+          "chunkId": "CBPL-150-S2-C01",
+          "sectionRef": "S2-C01",
+          "heading": "Low confidence routing",
+          "chunkOrdinal": 1,
+          "minRole": "UNDERWRITER",
+          "text": "Low confidence extraction or unresolved document inconsistency routes the application to manual review.",
+          "embeddingText": "[0.19,0.29,0.39,0.49]"
+        },
+        {
+          "chunkId": "CBPL-150-S3-C01",
+          "sectionRef": "S3-C01",
+          "heading": "Risk signal routing",
+          "chunkOrdinal": 2,
+          "minRole": "UNDERWRITER",
+          "text": "Identity or relationship risk signals require review before final decisioning.",
+          "embeddingText": "[0.20,0.30,0.40,0.50]"
+        },
+        {
+          "chunkId": "CBPL-150-S6-C01",
+          "sectionRef": "S6-C01",
+          "heading": "Retryable operational failures",
+          "chunkOrdinal": 3,
+          "minRole": "LOAN_OFFICER",
+          "text": "Retryable operational failures may recover and continue when the document packet later validates successfully.",
+          "embeddingText": "[0.21,0.31,0.41,0.51]"
+        }
+      ]
+    },
+    {
+      "policyDocumentId": "POL-CBPL-160-2026.0",
+      "policyCode": "CBPL-160",
+      "policyTitle": "Adverse Action and Explanation Standards",
+      "sourcePath": "synthetic_data/policy/CBPL-160-adverse-action-and-explanation-standards.md",
+      "effectiveDate": "2026-01-01",
+      "ownerRole": "UNDERWRITER",
+      "chunks": [
+        {
+          "chunkId": "CBPL-160-S3-C01",
+          "sectionRef": "S3-C01",
+          "heading": "Manual review explanation",
+          "chunkOrdinal": 1,
+          "minRole": "UNDERWRITER",
+          "text": "Manual review explanations must identify the material issue without exposing restricted investigation detail.",
+          "embeddingText": "[0.22,0.32,0.42,0.52]"
+        },
+        {
+          "chunkId": "CBPL-160-S4-C01",
+          "sectionRef": "S4-C01",
+          "heading": "Adverse explanation",
+          "chunkOrdinal": 2,
+          "minRole": "LOAN_OFFICER",
+          "text": "Rejection explanations must reference capacity or documentation reasons in clear non-technical language.",
+          "embeddingText": "[0.23,0.33,0.43,0.53]"
+        }
+      ]
+    },
+    {
+      "policyDocumentId": "POL-CBPL-170-2026.0",
+      "policyCode": "CBPL-170",
+      "policyTitle": "Data Security, Audit, and AI Use",
+      "sourcePath": "synthetic_data/policy/CBPL-170-data-security-audit-and-ai-use.md",
+      "effectiveDate": "2026-01-01",
+      "ownerRole": "AUDITOR",
+      "chunks": [
+        {
+          "chunkId": "CBPL-170-S4-C01",
+          "sectionRef": "S4-C01",
+          "heading": "AI retrieval authorization",
+          "chunkOrdinal": 1,
+          "minRole": "UNDERWRITER",
+          "text": "AI retrieval must apply role and data authorization before policy or customer document chunks are sent to tools or models.",
+          "embeddingText": "[0.24,0.34,0.44,0.54]"
+        },
+        {
+          "chunkId": "CBPL-170-S5-C01",
+          "sectionRef": "S5-C01",
+          "heading": "Operational audit",
+          "chunkOrdinal": 2,
+          "minRole": "AUDITOR",
+          "text": "Workflow retries, recovered document failures, and final decisions must be traceable through audit and telemetry correlation.",
+          "embeddingText": "[0.25,0.35,0.45,0.55]"
+        }
+      ]
+    }
+  ],
+  "applicants": [
+    {
+      "applicantId": "APL-CB-APR-001",
+      "displayName": "Elena Parker",
+      "phoneToken": "phone_tok_555_0101",
+      "emailToken": "elena.parker.001@example.invalid",
+      "ageBand": "35-44",
+      "address": {
+        "addressId": "ADDR-APR-001",
+        "addressLine": "18 Alder Compass Way",
+        "locality": "Cobalt Junction",
+        "jurisdictionCode": "CX",
+        "jurisdictionStatus": "ENABLED",
+        "addressToken": "addr_tok_alder_compass_18",
+        "longitude": -76.02,
+        "latitude": 38.91
+      }
+    },
+    {
+      "applicantId": "APL-CB-MR-002",
+      "displayName": "Maya Chen",
+      "phoneToken": "phone_tok_555_0102",
+      "emailToken": "maya.chen.002@example.invalid",
+      "ageBand": "25-34",
+      "address": {
+        "addressId": "ADDR-MR-002",
+        "addressLine": "72 Briar Signal Terrace",
+        "locality": "Briar Falls",
+        "jurisdictionCode": "CX",
+        "jurisdictionStatus": "ENABLED",
+        "addressToken": "addr_tok_briar_signal_72",
+        "longitude": -76.08,
+        "latitude": 38.84
+      }
+    },
+    {
+      "applicantId": "APL-CB-REJ-003",
+      "displayName": "Daniel Rojas",
+      "phoneToken": "phone_tok_555_0103",
+      "emailToken": "daniel.rojas.003@example.invalid",
+      "ageBand": "45-54",
+      "address": {
+        "addressId": "ADDR-REJ-003",
+        "addressLine": "9 North Verdan Arcade",
+        "locality": "North Verdan",
+        "jurisdictionCode": "CX",
+        "jurisdictionStatus": "ENABLED",
+        "addressToken": "addr_tok_verdan_arcade_9",
+        "longitude": -75.99,
+        "latitude": 38.76
+      }
+    },
+    {
+      "applicantId": "APL-CB-OPF-004",
+      "displayName": "Priya Natarajan",
+      "phoneToken": "phone_tok_555_0104",
+      "emailToken": "priya.natarajan.004@example.invalid",
+      "ageBand": "35-44",
+      "address": {
+        "addressId": "ADDR-OPF-004",
+        "addressLine": "44 Cedar Quay Mews",
+        "locality": "Cedar Quay",
+        "jurisdictionCode": "CX",
+        "jurisdictionStatus": "ENABLED",
+        "addressToken": "addr_tok_cedar_quay_44",
+        "longitude": -76.12,
+        "latitude": 38.97
+      }
+    },
+    {
+      "applicantId": "APL-CB-RSK-005",
+      "displayName": "Jordan Brooks",
+      "phoneToken": "phone_tok_555_0105",
+      "emailToken": "jordan.brooks.005@example.invalid",
+      "ageBand": "25-34",
+      "address": {
+        "addressId": "ADDR-RSK-005",
+        "addressLine": "6 East Orison Crossing",
+        "locality": "East Orison",
+        "jurisdictionCode": "CX",
+        "jurisdictionStatus": "ENABLED_NEAR_BOUNDARY",
+        "addressToken": "addr_tok_shared_orison_6",
+        "longitude": -75.835,
+        "latitude": 38.93
+      }
+    }
+  ],
+  "applications": [
+    {
+      "applicationId": "APP-APR-001",
+      "applicantId": "APL-CB-APR-001",
+      "scenarioId": "SCN-FAST-APPROVAL-001",
+      "requestedAmount": 16000,
+      "requestedTermMonths": 36,
+      "purposeCode": "DEBT_CONSOLIDATION",
+      "applicationStatus": "APPROVED",
+      "expectedOutcome": "APPROVED",
+      "workflowId": "WF-APP-APR-001",
+      "traceId": "trace-app-apr-001",
+      "packetDir": "app_apr_001_elena_parker",
+      "employment": {
+        "employerId": "EMP-NOV-001",
+        "employmentStatus": "ACTIVE",
+        "jobTitle": "Operations Analyst",
+        "tenureText": "3 years 4 months",
+        "tenureBand": "12_PLUS_MONTHS",
+        "incomeSourceType": "SALARIED_W2_EQUIVALENT",
+        "payFrequency": "BIWEEKLY"
+      },
+      "incomeEvidence": {
+        "documentId": "DOC-APR-006",
+        "statedGrossMonthlyIncome": 7200,
+        "payDocumentMonthlyIncome": 7200,
+        "verifiedGrossMonthlyIncome": 7200,
+        "incomeConsistencyResult": "CONSISTENT_WITHIN_10_PERCENT",
+        "extractionConfidence": "HIGH",
+        "documentValidationStatus": "PASS"
+      },
+      "liability": {
+        "existingMonthlyDebt": 850,
+        "proposedMonthlyPayment": 514,
+        "debtToIncomePct": 18.9,
+        "recentDelinquencyIndicator": "NONE",
+        "bankruptcyIndicator": "NONE"
+      },
+      "payment": {
+        "requestedAmount": 16000,
+        "evaluatedAmount": 16000,
+        "termMonths": 36,
+        "aprText": "10.49%",
+        "monthlyPayment": 514,
+        "calculationStatus": "CALCULATED"
+      },
+      "decision": {
+        "decisionId": "DEC-APP-APR-001",
+        "decisionType": "INITIAL",
+        "decisionOutcome": "APPROVED",
+        "riskBand": "CB-A",
+        "evidenceChunkIds": ["CBPL-100-S3-C01", "CBPL-120-S5-C01", "CBPL-130-S5-C01", "CBPL-140-S3-C01"],
+        "explanation": "Application approved based on complete eligibility, stable verified income, low debt-to-income, and risk-band pricing."
+      },
+      "documents": [
+        { "documentId": "DOC-APR-001", "documentType": "LOAN_APPLICATION", "fileName": "loan_application.pdf", "contentSha256": "aa00000000000000000000000000000000000000000000000000000000000001", "status": "VALIDATED", "minRole": "LOAN_OFFICER" },
+        { "documentId": "DOC-APR-002", "documentType": "DISCLOSURE_CONSENT", "fileName": "applicant_disclosures_and_consent.pdf", "contentSha256": "aa00000000000000000000000000000000000000000000000000000000000002", "status": "VALIDATED", "minRole": "LOAN_OFFICER" },
+        { "documentId": "DOC-APR-003", "documentType": "IDENTITY_SUMMARY", "fileName": "identity_verification_summary.pdf", "contentSha256": "aa00000000000000000000000000000000000000000000000000000000000003", "status": "VALIDATED", "minRole": "UNDERWRITER" },
+        { "documentId": "DOC-APR-006", "documentType": "PAY_STATEMENT", "fileName": "pay_statement_novereign_systems.pdf", "contentSha256": "aa00000000000000000000000000000000000000000000000000000000000006", "status": "VALIDATED", "minRole": "LOAN_OFFICER" },
+        { "documentId": "DOC-APR-007", "documentType": "DEPOSIT_SUMMARY", "fileName": "deposit_summary_cloudbank.pdf", "contentSha256": "aa00000000000000000000000000000000000000000000000000000000000007", "status": "VALIDATED", "minRole": "LOAN_OFFICER" }
+      ],
+      "documentFacts": [
+        { "factName": "identityOutcome", "factValueText": "IDENTITY_VERIFIED", "confidence": 0.99 },
+        { "factName": "fraudSignal", "factValueText": "NONE", "confidence": 0.98 },
+        { "factName": "verifiedGrossMonthlyIncome", "factValueNumber": 7200, "confidence": 0.98 }
+      ],
+      "documentChunks": [
+        { "documentId": "DOC-APR-006", "chunkId": "DCH-APR-PAY-001", "ordinal": 1, "minRole": "LOAN_OFFICER", "text": "Novereign Systems pay statement shows stable biweekly gross earnings supporting monthly income of 7200.", "embeddingText": "[0.31,0.11,0.21,0.41]" },
+        { "documentId": "DOC-APR-003", "chunkId": "DCH-APR-ID-001", "ordinal": 1, "minRole": "UNDERWRITER", "text": "Identity verification completed with no unresolved fraud or shared-attribute signal.", "embeddingText": "[0.32,0.12,0.22,0.42]" }
+      ]
+    },
+    {
+      "applicationId": "APP-MR-002",
+      "applicantId": "APL-CB-MR-002",
+      "scenarioId": "SCN-MANUAL-REVIEW-002",
+      "requestedAmount": 18000,
+      "requestedTermMonths": 48,
+      "purposeCode": "DEBT_CONSOLIDATION",
+      "applicationStatus": "MANUAL_REVIEW",
+      "expectedOutcome": "MANUAL_REVIEW",
+      "workflowId": "WF-APP-MR-002",
+      "traceId": "trace-app-mr-002",
+      "packetDir": "app_mr_002_maya_chen",
+      "employment": {
+        "employerId": "EMP-LUM-002",
+        "employmentStatus": "ACTIVE",
+        "jobTitle": "Client Support Lead",
+        "tenureText": "2 years 1 month",
+        "tenureBand": "12_PLUS_MONTHS",
+        "incomeSourceType": "SALARIED_W2_EQUIVALENT",
+        "payFrequency": "BIWEEKLY"
+      },
+      "incomeEvidence": {
+        "documentId": "DOC-MR-006",
+        "statedGrossMonthlyIncome": 6400,
+        "payDocumentMonthlyIncome": 6400,
+        "verifiedGrossMonthlyIncome": 5135,
+        "incomeConsistencyResult": "INCONSISTENT_OVER_20_PERCENT",
+        "extractionConfidence": "LOW",
+        "documentValidationStatus": "REVIEW"
+      },
+      "liability": {
+        "existingMonthlyDebt": 1850,
+        "proposedMonthlyPayment": 610,
+        "debtToIncomePct": 47.9,
+        "recentDelinquencyIndicator": "NONE",
+        "bankruptcyIndicator": "NONE"
+      },
+      "payment": {
+        "requestedAmount": 18000,
+        "evaluatedAmount": 18000,
+        "termMonths": 48,
+        "aprText": "15.99%",
+        "monthlyPayment": 610,
+        "calculationStatus": "CALCULATED"
+      },
+      "decision": {
+        "decisionId": "DEC-APP-MR-002",
+        "decisionType": "INITIAL",
+        "decisionOutcome": "MANUAL_REVIEW",
+        "riskBand": "CB-B",
+        "evidenceChunkIds": ["CBPL-120-S4-C01", "CBPL-130-S3-C01", "CBPL-150-S2-C01", "CBPL-160-S3-C01"],
+        "explanation": "Application requires manual review because income evidence is inconsistent and extraction confidence is below the automatic threshold."
+      },
+      "reviewTask": {
+        "taskId": "TASK-APP-MR-002",
+        "taskType": "INCOME_REVIEW",
+        "priority": "HIGH",
+        "reasonCode": "pay_statement_and_deposit_difference_over_10_percent"
+      },
+      "documents": [
+        { "documentId": "DOC-MR-001", "documentType": "LOAN_APPLICATION", "fileName": "loan_application.pdf", "contentSha256": "bb00000000000000000000000000000000000000000000000000000000000001", "status": "VALIDATED", "minRole": "LOAN_OFFICER" },
+        { "documentId": "DOC-MR-006", "documentType": "PAY_STATEMENT", "fileName": "earnings_statement_lumenfield.pdf", "contentSha256": "bb00000000000000000000000000000000000000000000000000000000000006", "status": "NEEDS_REVIEW", "minRole": "LOAN_OFFICER" },
+        { "documentId": "DOC-MR-007", "documentType": "ACCOUNT_ACTIVITY", "fileName": "account_activity_summary.pdf", "contentSha256": "bb00000000000000000000000000000000000000000000000000000000000007", "status": "NEEDS_REVIEW", "minRole": "UNDERWRITER" }
+      ],
+      "documentIssues": [
+        { "issueCode": "pay_statement_and_deposit_difference_over_10_percent", "severity": "REVIEW", "routingEffect": "MANUAL_REVIEW", "policyHint": "CBPL-120-S4-C01" },
+        { "issueCode": "document_extraction_confidence_below_auto_threshold", "severity": "REVIEW", "routingEffect": "MANUAL_REVIEW", "policyHint": "CBPL-150-S2-C01" }
+      ],
+      "documentChunks": [
+        { "documentId": "DOC-MR-006", "chunkId": "DCH-MR-PAY-001", "ordinal": 1, "minRole": "LOAN_OFFICER", "text": "Lumenfield Services pay statement supports stated income, but deposit evidence does not match expected net deposits.", "embeddingText": "[0.33,0.13,0.23,0.43]" },
+        { "documentId": "DOC-MR-007", "chunkId": "DCH-MR-BANK-001", "ordinal": 1, "minRole": "UNDERWRITER", "text": "Account activity shows lower recurring payroll deposits than expected from the submitted pay statement.", "embeddingText": "[0.34,0.14,0.24,0.44]" }
+      ]
+    },
+    {
+      "applicationId": "APP-REJ-003",
+      "applicantId": "APL-CB-REJ-003",
+      "scenarioId": "SCN-REJECTION-003",
+      "requestedAmount": 30000,
+      "requestedTermMonths": 48,
+      "purposeCode": "OTHER_CONSUMER_PURPOSE",
+      "applicationStatus": "REJECTED",
+      "expectedOutcome": "REJECTED",
+      "workflowId": "WF-APP-REJ-003",
+      "traceId": "trace-app-rej-003",
+      "packetDir": "app_rej_003_daniel_rojas",
+      "employment": {
+        "employerId": "EMP-DRR-003",
+        "employmentStatus": "SELF_EMPLOYED",
+        "jobTitle": "Independent Designer",
+        "tenureText": "Variable project history",
+        "tenureBand": "VARIABLE",
+        "incomeSourceType": "SELF_EMPLOYED_CONTRACT",
+        "payFrequency": "VARIABLE"
+      },
+      "incomeEvidence": {
+        "documentId": "DOC-REJ-006",
+        "statedGrossMonthlyIncome": 9200,
+        "payDocumentMonthlyIncome": 2100,
+        "verifiedGrossMonthlyIncome": 2100,
+        "incomeConsistencyResult": "INSUFFICIENT_STABLE_RECURRING_EVIDENCE",
+        "extractionConfidence": "MEDIUM",
+        "documentValidationStatus": "FAIL"
+      },
+      "liability": {
+        "existingMonthlyDebt": 3200,
+        "proposedMonthlyPayment": 1040,
+        "debtToIncomePct": 201.9,
+        "recentDelinquencyIndicator": "NONE",
+        "bankruptcyIndicator": "NONE"
+      },
+      "payment": {
+        "requestedAmount": 30000,
+        "evaluatedAmount": 30000,
+        "termMonths": 48,
+        "aprText": "NO_OFFER",
+        "monthlyPayment": 1040,
+        "calculationStatus": "CALCULATED"
+      },
+      "decision": {
+        "decisionId": "DEC-APP-REJ-003",
+        "decisionType": "INITIAL",
+        "decisionOutcome": "REJECTED",
+        "riskBand": "CB-X",
+        "evidenceChunkIds": ["CBPL-130-S4-C01", "CBPL-160-S4-C01"],
+        "explanation": "Application rejected because verified stable income is insufficient for the requested payment and obligations."
+      },
+      "documents": [
+        { "documentId": "DOC-REJ-001", "documentType": "LOAN_APPLICATION", "fileName": "loan_application.pdf", "contentSha256": "cc00000000000000000000000000000000000000000000000000000000000001", "status": "VALIDATED", "minRole": "LOAN_OFFICER" },
+        { "documentId": "DOC-REJ-006", "documentType": "CONTRACTOR_INCOME", "fileName": "contractor_income_statement.pdf", "contentSha256": "cc00000000000000000000000000000000000000000000000000000000000006", "status": "NEEDS_REVIEW", "minRole": "LOAN_OFFICER" },
+        { "documentId": "DOC-REJ-008", "documentType": "LIABILITY_SCHEDULE", "fileName": "liability_schedule.pdf", "contentSha256": "cc00000000000000000000000000000000000000000000000000000000000008", "status": "VALIDATED", "minRole": "LOAN_OFFICER" }
+      ],
+      "documentIssues": [
+        { "issueCode": "verified_income_below_required_capacity", "severity": "BLOCKING", "routingEffect": "REJECT", "policyHint": "CBPL-130-S4-C01" },
+        { "issueCode": "dti_exceeds_hard_reject_threshold", "severity": "BLOCKING", "routingEffect": "REJECT", "policyHint": "CBPL-130-S4-C01" },
+        { "issueCode": "unsupported_income_for_automatic_processing", "severity": "BLOCKING", "routingEffect": "REJECT", "policyHint": "CBPL-160-S4-C01" }
+      ],
+      "documentChunks": [
+        { "documentId": "DOC-REJ-006", "chunkId": "DCH-REJ-INCOME-001", "ordinal": 1, "minRole": "LOAN_OFFICER", "text": "Contractor income evidence is variable and does not establish stable recurring monthly income.", "embeddingText": "[0.35,0.15,0.25,0.45]" },
+        { "documentId": "DOC-REJ-008", "chunkId": "DCH-REJ-LIAB-001", "ordinal": 1, "minRole": "UNDERWRITER", "text": "Liability schedule and proposed payment produce a debt-to-income result above hard capacity limits.", "embeddingText": "[0.36,0.16,0.26,0.46]" }
+      ]
+    },
+    {
+      "applicationId": "APP-OPFAIL-004",
+      "applicantId": "APL-CB-OPF-004",
+      "scenarioId": "SCN-OPERATIONAL-FAILURE-004",
+      "requestedAmount": 22000,
+      "requestedTermMonths": 48,
+      "purposeCode": "HOME_IMPROVEMENT",
+      "applicationStatus": "RECOVERED",
+      "expectedOutcome": "FAILED_RETRYABLE_RECOVERED",
+      "workflowId": "WF-APP-OPFAIL-004",
+      "traceId": "trace-app-opfail-004",
+      "packetDir": "app_opfail_004_priya_natarajan",
+      "employment": {
+        "employerId": "EMP-SAB-004",
+        "employmentStatus": "ACTIVE",
+        "jobTitle": "Data Operations Manager",
+        "tenureText": "4 years 7 months",
+        "tenureBand": "12_PLUS_MONTHS",
+        "incomeSourceType": "SALARIED_W2_EQUIVALENT",
+        "payFrequency": "BIWEEKLY"
+      },
+      "incomeEvidence": {
+        "documentId": "DOC-OPF-006",
+        "statedGrossMonthlyIncome": 7800,
+        "payDocumentMonthlyIncome": 7800,
+        "verifiedGrossMonthlyIncome": 7800,
+        "incomeConsistencyResult": "CONSISTENT_WITHIN_10_PERCENT",
+        "extractionConfidence": "HIGH_AFTER_RETRY",
+        "documentValidationStatus": "PASS_AFTER_RETRY"
+      },
+      "liability": {
+        "existingMonthlyDebt": 1200,
+        "proposedMonthlyPayment": 704,
+        "debtToIncomePct": 24.4,
+        "recentDelinquencyIndicator": "NONE",
+        "bankruptcyIndicator": "NONE"
+      },
+      "payment": {
+        "requestedAmount": 22000,
+        "evaluatedAmount": 22000,
+        "termMonths": 48,
+        "aprText": "11.49%",
+        "monthlyPayment": 704,
+        "calculationStatus": "CALCULATED"
+      },
+      "decision": {
+        "decisionId": "DEC-APP-OPFAIL-004",
+        "decisionType": "RECOVERED",
+        "decisionOutcome": "RECOVERED",
+        "riskBand": "CB-A",
+        "evidenceChunkIds": ["CBPL-150-S6-C01", "CBPL-170-S5-C01"],
+        "explanation": "A retryable document-processing failure recovered and the validated packet can continue through the approval workflow."
+      },
+      "documents": [
+        { "documentId": "DOC-OPF-001", "documentType": "LOAN_APPLICATION", "fileName": "loan_application.pdf", "contentSha256": "dd00000000000000000000000000000000000000000000000000000000000001", "status": "VALIDATED", "minRole": "LOAN_OFFICER" },
+        { "documentId": "DOC-OPF-006", "documentType": "PAY_STATEMENT", "fileName": "pay_statement_sablecrest.pdf", "contentSha256": "dd00000000000000000000000000000000000000000000000000000000000006", "status": "VALIDATED", "minRole": "LOAN_OFFICER" },
+        { "documentId": "DOC-OPF-010", "documentType": "DOCUMENT_RECEIPT", "fileName": "document_receipt.pdf", "contentSha256": "dd00000000000000000000000000000000000000000000000000000000000010", "status": "VALIDATED", "minRole": "UNDERWRITER" }
+      ],
+      "documentIssues": [
+        { "issueCode": "temporary_document_processing_timeout_recovered", "severity": "INFO", "routingEffect": "RECOVERED", "policyHint": "CBPL-150-S6-C01" }
+      ],
+      "documentChunks": [
+        { "documentId": "DOC-OPF-006", "chunkId": "DCH-OPF-PAY-001", "ordinal": 1, "minRole": "LOAN_OFFICER", "text": "Sablecrest Analytics pay statement and deposits validate after retry with high confidence.", "embeddingText": "[0.37,0.17,0.27,0.47]" },
+        { "documentId": "DOC-OPF-010", "chunkId": "DCH-OPF-RETRY-001", "ordinal": 1, "minRole": "UNDERWRITER", "text": "Document processing receipt records retryable failure followed by successful recovery.", "embeddingText": "[0.38,0.18,0.28,0.48]" }
+      ]
+    },
+    {
+      "applicationId": "APP-RISK-005",
+      "applicantId": "APL-CB-RSK-005",
+      "scenarioId": "SCN-RISK-SIGNAL-005",
+      "requestedAmount": 12000,
+      "requestedTermMonths": 36,
+      "purposeCode": "MAJOR_PURCHASE",
+      "applicationStatus": "MANUAL_REVIEW",
+      "expectedOutcome": "MANUAL_REVIEW",
+      "workflowId": "WF-APP-RISK-005",
+      "traceId": "trace-app-risk-005",
+      "packetDir": "app_risk_005_jordan_brooks",
+      "employment": {
+        "employerId": "EMP-COP-005",
+        "employmentStatus": "ACTIVE",
+        "jobTitle": "Field Coordinator",
+        "tenureText": "1 year 8 months",
+        "tenureBand": "12_PLUS_MONTHS",
+        "incomeSourceType": "SALARIED_W2_EQUIVALENT",
+        "payFrequency": "BIWEEKLY"
+      },
+      "incomeEvidence": {
+        "documentId": "DOC-RSK-006",
+        "statedGrossMonthlyIncome": 6200,
+        "payDocumentMonthlyIncome": 6200,
+        "verifiedGrossMonthlyIncome": 6200,
+        "incomeConsistencyResult": "CONSISTENT_WITHIN_10_PERCENT",
+        "extractionConfidence": "HIGH",
+        "documentValidationStatus": "REVIEW"
+      },
+      "liability": {
+        "existingMonthlyDebt": 1200,
+        "proposedMonthlyPayment": 396,
+        "debtToIncomePct": 25.7,
+        "recentDelinquencyIndicator": "NONE",
+        "bankruptcyIndicator": "NONE"
+      },
+      "payment": {
+        "requestedAmount": 12000,
+        "evaluatedAmount": 12000,
+        "termMonths": 36,
+        "aprText": "16.49%",
+        "monthlyPayment": 396,
+        "calculationStatus": "CALCULATED"
+      },
+      "decision": {
+        "decisionId": "DEC-APP-RISK-005",
+        "decisionType": "INITIAL",
+        "decisionOutcome": "MANUAL_REVIEW",
+        "riskBand": "CB-B",
+        "evidenceChunkIds": ["CBPL-110-S4-C01", "CBPL-150-S3-C01", "CBPL-170-S4-C01"],
+        "explanation": "Application requires manual review because identity and relationship signals need underwriter review before final decision."
+      },
+      "reviewTask": {
+        "taskId": "TASK-APP-RISK-005",
+        "taskType": "IDENTITY_REVIEW",
+        "priority": "HIGH",
+        "reasonCode": "shared_device_and_address_signal_requires_review"
+      },
+      "documents": [
+        { "documentId": "DOC-RSK-001", "documentType": "LOAN_APPLICATION", "fileName": "loan_application.pdf", "contentSha256": "ee00000000000000000000000000000000000000000000000000000000000001", "status": "VALIDATED", "minRole": "LOAN_OFFICER" },
+        { "documentId": "DOC-RSK-006", "documentType": "PAY_STATEMENT", "fileName": "pay_statement_copperline.pdf", "contentSha256": "ee00000000000000000000000000000000000000000000000000000000000006", "status": "VALIDATED", "minRole": "LOAN_OFFICER" },
+        { "documentId": "DOC-RSK-010", "documentType": "RELATIONSHIP_SIGNAL", "fileName": "relationship_signal_summary.pdf", "contentSha256": "ee00000000000000000000000000000000000000000000000000000000000010", "status": "NEEDS_REVIEW", "minRole": "UNDERWRITER" }
+      ],
+      "documentIssues": [
+        { "issueCode": "shared_device_and_address_signal_requires_review", "severity": "REVIEW", "routingEffect": "MANUAL_REVIEW", "policyHint": "CBPL-110-S4-C01" }
+      ],
+      "documentChunks": [
+        { "documentId": "DOC-RSK-006", "chunkId": "DCH-RSK-PAY-001", "ordinal": 1, "minRole": "LOAN_OFFICER", "text": "Copperline Works income evidence is complete and consistent with stated income.", "embeddingText": "[0.39,0.19,0.29,0.49]" },
+        { "documentId": "DOC-RSK-010", "chunkId": "DCH-RSK-SIGNAL-001", "ordinal": 1, "minRole": "UNDERWRITER", "text": "Relationship signal summary identifies shared address and device attributes requiring review.", "embeddingText": "[0.40,0.20,0.30,0.50]" }
+      ],
+      "relationships": [
+        {
+          "edgeId": "EDGE-RSK-005-ADDR",
+          "sourceEntityType": "APPLICANT",
+          "sourceEntityId": "APL-CB-RSK-005",
+          "targetEntityType": "ADDRESS",
+          "targetEntityId": "ADDR-RSK-005",
+          "relationshipType": "SHARES_ADDRESS",
+          "evidenceStrength": 0.84,
+          "signalStatus": "REVIEW_REQUIRED"
+        },
+        {
+          "edgeId": "EDGE-RSK-005-DEVICE",
+          "sourceEntityType": "APPLICANT",
+          "sourceEntityId": "APL-CB-RSK-005",
+          "targetEntityType": "DEVICE",
+          "targetEntityId": "device_tok_shared_orison_005",
+          "relationshipType": "SHARES_DEVICE",
+          "evidenceStrength": 0.88,
+          "signalStatus": "REVIEW_REQUIRED"
+        }
+      ],
+      "spatialSignal": {
+        "signalId": "SPAT-RSK-005-BOUNDARY",
+        "zoneId": "ZONE-CX-BOUNDARY-001",
+        "signalType": "BOUNDARY_PROXIMITY",
+        "signalResult": "REVIEW",
+        "distanceToBoundaryM": 41.5,
+        "routingEffect": "MANUAL_REVIEW"
+      }
+    }
+  ]
+}

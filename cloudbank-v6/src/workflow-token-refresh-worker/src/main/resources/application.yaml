@@ -1,0 +1,36 @@
+server:
+  port: ${PORT:8087}
+
+spring:
+  application:
+    name: workflow-token-refresh-worker
+  threads:
+    virtual:
+      enabled: true
+
+cloudbank:
+  token-refresh-worker:
+    mode: ${WORKFLOW_MODE:fake}
+    task-type: ${WORKFLOW_TOKEN_REFRESH_TASK_TYPE:refresh_workflow_authorization}
+    worker-id: ${WORKFLOW_TOKEN_REFRESH_WORKER_ID:cloudbank-workflow-token-refresh-worker}
+    poll-delay-ms: ${WORKFLOW_TOKEN_REFRESH_POLL_DELAY_MS:1000}
+    microtx:
+      base-url: ${MICROTX_WORKFLOW_URL:}
+      token-uri: ${WORKFLOW_TOKEN_REFRESH_MICROTX_TOKEN_URI:}
+      client-id: ${WORKFLOW_TOKEN_REFRESH_MICROTX_CLIENT_ID:microtx-workflow-client}
+      client-secret: ${WORKFLOW_TOKEN_REFRESH_MICROTX_CLIENT_SECRET:}
+      scope: ${WORKFLOW_TOKEN_REFRESH_MICROTX_SCOPE:microtx.workflow}
+    task-token:
+      token-uri: ${WORKFLOW_TOKEN_REFRESH_TASK_TOKEN_URI:}
+      client-id: ${WORKFLOW_TOKEN_REFRESH_TASK_CLIENT_ID:cloudbank-service-client}
+      client-secret: ${WORKFLOW_TOKEN_REFRESH_TASK_CLIENT_SECRET:}
+      scope: ${WORKFLOW_TOKEN_REFRESH_TASK_SCOPE:cloudbank.internal}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  health:
+    probes:
+      enabled: true

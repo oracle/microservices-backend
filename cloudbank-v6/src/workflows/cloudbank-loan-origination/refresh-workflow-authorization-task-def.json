@@ -1,0 +1,20 @@
+{
+  "name": "refresh_workflow_authorization",
+  "description": "Obtain a fresh masked CloudBank service token after a long-running human review task.",
+  "retryCount": 3,
+  "retryLogic": "EXPONENTIAL_BACKOFF",
+  "retryDelaySeconds": 2,
+  "timeoutSeconds": 60,
+  "responseTimeoutSeconds": 30,
+  "timeoutPolicy": "RETRY",
+  "totalTimeoutSeconds": 300,
+  "inputKeys": [
+    "applicationId",
+    "workflowId",
+    "traceId"
+  ],
+  "outputKeys": [
+    "workflowTaskAuthorization",
+    "expiresAtEpochSecond"
+  ]
+}

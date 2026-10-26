@@ -1,0 +1,94 @@
+# OBaaS deployment values for geographic-risk-service.
+fullnameOverride: "geographic-risk-service"
+
+image:
+  repository: "localhost/geographic-risk-service"
+  tag: "0.0.1-SNAPSHOT"
+  pullPolicy: Always
+
+obaas:
+  releaseName: "obaas"
+  framework: "HELIDON"
+
+helidon:
+  datasource:
+    name: "geographic-risk"
+  metrics:
+    rest_request_enabled: true
+    virtual_threads_enabled: true
+
+service:
+  type: ClusterIP
+  port: 8080
+
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 768Mi
+
+database:
+  authN:
+    secretName: "cloudbank-geographic-risk-db-authn"
+  privAuthN:
+    secretName: "cloudbank-geographic-risk-db-priv-authn"
+
+env:
+  - name: OTEL_INSTRUMENTATION_LOGBACK_MDC_ENABLED
+    value: "true"
+  - name: GEOGRAPHIC_RISK_BOUNDARY_DISTANCE_METERS
+    value: "100"
+  # Override both values with the stable, cluster-reachable azn-server issuer
+  # selected for the target namespace. AZN_ISSUER_URI must match JWT iss exactly.
+  - name: AZN_ISSUER_URI
+    value: "http://azn-server:8080"
+  - name: AZN_JWK_SET_URI
+    value: "http://azn-server:8080/oauth2/jwks"
+  - name: AZN_AUDIENCE
+    value: "cloudbank-api"
+  - name: GEOGRAPHIC_RISK_CALLER_CLIENT_IDS
+    value: "cloudbank-service-client"
+  - name: javax.sql.DataSource.geographic-risk.initialPoolSize
+    value: "2"
+  - name: javax.sql.DataSource.geographic-risk.minPoolSize
+    value: "2"
+  - name: javax.sql.DataSource.geographic-risk.maxPoolSize
+    value: "16"
+  - name: javax.sql.DataSource.geographic-risk.connectionWaitTimeout
+    value: "10"
+  - name: javax.sql.DataSource.geographic-risk.validateConnectionOnBorrow
+    value: "true"
+  - name: javax.sql.DataSource.geographic-risk.SQLForValidateConnection
+    value: "select 1 from dual"
+  - name: javax.sql.DataSource.geographic-risk.inactiveConnectionTimeout
+    value: "120"
+  - name: javax.sql.DataSource.geographic-risk.timeoutCheckInterval
+    value: "30"
+
+eureka:
+  enabled: true
+
+configServer:
+  enabled: false
+
+otel:
+  enabled: true
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 185
+  runAsGroup: 0
+  fsGroup: 0
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL

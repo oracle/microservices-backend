@@ -1,0 +1,44 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at https://oss.oracle.com/licenses/upl.
+
+# CloudBank AI-owned overlay for an OBaaS MicroTx Workflow Server.
+# Replace <application-namespace> and <live-azn-issuer-uri> before rendering or installing.
+otmm:
+  commonConfiguration:
+    security:
+      enabled: true
+      identityProvider:
+        serverType: other
+        issuer: "<live-azn-issuer-uri>"
+        jwksUri: "http://azn-server.<application-namespace>.svc.cluster.local:8080/oauth2/jwks"
+        identityProviderUrl: "http://azn-server.<application-namespace>.svc.cluster.local:8080/oauth2/token"
+        audience: "microtx-workflow"
+        adminUserRoles: "microtx-conductor-admin"
+        adminUserRolesPath: "roles"
+        policy:
+          claimsRolePaths: "roles"
+          roles:
+            superAdmin: "microtx-conductor-super-admin"
+            admin: "microtx-conductor-admin"
+            user: "microtx-conductor-user"
+            readOnlyUser: "microtx-conductor-read-only-user"
+            metadataManager: "microtx-conductor-metadata-manager"
+            worker: "microtx-conductor-worker"
+
+  workflowServer:
+    enabled: true
+    security:
+      identityProvider:
+        policy:
+          claimsRolePaths: "roles"
+          roles:
+            superAdmin: "microtx-conductor-super-admin"
+            admin: "microtx-conductor-admin"
+            user: "microtx-conductor-user"
+            readOnlyUser: "microtx-conductor-read-only-user"
+            metadataManager: "microtx-conductor-metadata-manager"
+            worker: "microtx-conductor-worker"
+
+  # Browser Workbench/console authentication is outside this phase.
+  console:
+    enabled: false

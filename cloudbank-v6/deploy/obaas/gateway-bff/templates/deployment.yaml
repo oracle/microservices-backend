@@ -1,0 +1,96 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-bff-service
+  labels:
+    app.kubernetes.io/name: gateway-bff-service
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gateway-bff-service
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: gateway-bff-service
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecret | quote }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: gateway-bff-service
+          image: {{ required "image is required" .Values.image | quote }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8089
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: BFF_OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.oauthSecretName | quote }}
+                  key: bff-client-secret
+            - name: BFF_ISSUER_URI
+              value: {{ .Values.issuerUri | quote }}
+            - name: BFF_AUTHORIZATION_URI
+              value: {{ .Values.authorizationUri | quote }}
+            - name: BFF_CALLBACK_URI
+              value: {{ .Values.callbackUri | quote }}
+            - name: BFF_TOKEN_URI
+              value: {{ .Values.tokenUri | quote }}
+            - name: BFF_JWK_SET_URI
+              value: {{ .Values.jwkSetUri | quote }}
+            - name: BFF_USERINFO_URI
+              value: {{ .Values.userInfoUri | quote }}
+            - name: BFF_LOAN_BASE_URL
+              value: {{ .Values.loanBaseUrl | quote }}
+            {{- if .Values.microtxBaseUrl }}
+            - name: BFF_MICROTX_BASE_URL
+              value: {{ .Values.microtxBaseUrl | quote }}
+            - name: BFF_MICROTX_TOKEN_URI
+              value: {{ .Values.tokenUri | quote }}
+            - name: BFF_MICROTX_CLIENT_ID
+              value: {{ .Values.microtxClientId | quote }}
+            - name: BFF_MICROTX_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.oauthSecretName | quote }}
+                  key: microtx-client-secret
+            {{- end }}
+            - name: BFF_COOKIE_SECURE
+              value: {{ .Values.cookieSecure | quote }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 512Mi

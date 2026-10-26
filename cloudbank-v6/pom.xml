@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  Copyright (c) 2026, Oracle and/or its affiliates.  -->
+<!--  Licensed under the Universal Permissive License v 1.0 as shown at
+https://oss.oracle.com/licenses/upl/  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.0.8</version>
+		<relativePath/>
+	</parent>
+
+	<groupId>com.cloudbank</groupId>
+	<artifactId>cloudbank-ai</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>CloudBank AI</name>
+	<description>CloudBank AI demonstrates OBaaS and the Oracle AI Database</description>
+
+	<properties>
+		<java.version>25</java.version>
+		<springai.version>2.0.1</springai.version>
+		<oci-java-sdk.version>3.95.0</oci-java-sdk.version>
+		<spring-cloud.version>2025.1.2</spring-cloud.version>
+		<spring-cloud-starter-config.version>5.0.5</spring-cloud-starter-config.version>
+		<org.springdoc-version>3.0.3</org.springdoc-version>
+		<bouncycastle.version>1.84</bouncycastle.version>
+		<oracle-springboot-starter.version>26.2.1</oracle-springboot-starter.version>
+		<liquibase.version>5.0.3</liquibase.version>
+		<pdfbox.version>3.0.7</pdfbox.version>
+		<jkube.version>1.19.0</jkube.version>
+		<image.registry>localhost</image.registry>
+		<argLine/>
+	</properties>
+
+	<modules>
+		<module>src/loan-application-service</module>
+		<module>src/document-ingest</module>
+		<module>src/document-review-service</module>
+		<module>src/decision-service</module>
+		<module>src/ai-agent-service</module>
+		<module>src/azn-server</module>
+		<module>src/geographic-risk-service</module>
+		<module>src/policy-embedding-support</module>
+		<module>src/policy-retrieval-service</module>
+		<module>src/policy-loader</module>
+		<module>src/workflow-token-refresh-worker</module>
+		<module>src/gateway-bff-service</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Override only the starter; the release-train BOM keeps the Config client at 5.0.4. -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-starter-config</artifactId>
+				<version>${spring-cloud-starter-config.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk18on</artifactId>
+				<version>${bouncycastle.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!-- Java 25 blocks Mockito's deprecated self-attach path; run Mockito as a test JVM agent. -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<argLine>@{argLine} -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<configuration>
+						<argLine>@{argLine} -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

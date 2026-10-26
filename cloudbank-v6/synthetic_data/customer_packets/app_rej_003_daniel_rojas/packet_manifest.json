@@ -1,0 +1,92 @@
+{
+  "applicantId": "APL-CB-REJ-003",
+  "applicantName": "Daniel Rojas",
+  "applicationId": "APP-REJ-003",
+  "dataSafety": {
+    "containsRawAccountNumber": false,
+    "containsRawGovernmentIdentifier": false,
+    "generatedNonProductionValues": true,
+    "usesReservedContactPatterns": true
+  },
+  "documents": [
+    "loan_application.pdf",
+    "applicant_disclosures_and_consent.pdf",
+    "identity_verification_summary.pdf",
+    "address_jurisdiction_verification.pdf",
+    "income_evidence_validation.pdf",
+    "contractor_income_statement.pdf",
+    "account_activity_summary.pdf",
+    "liability_schedule.pdf",
+    "payment_calculation_summary.pdf"
+  ],
+  "expectedExtractionFacts": {
+    "apr": "NO_OFFER",
+    "bankruptcyIndicator": "NONE",
+    "dataClassification": "restricted_customer",
+    "debtToIncome": "201.9%",
+    "disclosureStatus": "ACCEPTED",
+    "documentValidationStatus": "FAIL",
+    "employmentStatus": "SELF_EMPLOYED",
+    "existingMonthlyDebt": 3200,
+    "extractionConfidence": "MEDIUM",
+    "fraudSignal": "NONE",
+    "identityOutcome": "IDENTITY_VERIFIED",
+    "incomeConsistencyResult": "INSUFFICIENT_STABLE_RECURRING_EVIDENCE",
+    "jurisdictionCode": "CX",
+    "jurisdictionStatus": "ENABLED",
+    "payFrequency": "VARIABLE",
+    "paymentCalculationStatus": "CALCULATED",
+    "proposedMonthlyPayment": 1040,
+    "purposeCode": "OTHER_CONSUMER_PURPOSE",
+    "recentDelinquencyIndicator": "NONE",
+    "requestedAmount": 30000,
+    "requestedTerm": "48 months",
+    "riskBand": "CB-X",
+    "statedGrossMonthlyIncome": 9200,
+    "tenureBand": "VARIABLE",
+    "verifiedGrossMonthlyIncome": 2100
+  },
+  "expectedOutcome": "REJECTED",
+  "policyAlignment": {
+    "cbpl100Eligibility": {
+      "ageBandPresent": true,
+      "dataClassificationPresent": true,
+      "disclosuresAccepted": true,
+      "identityRecordPresent": true,
+      "incomeEvidencePresent": true,
+      "jurisdictionEligible": true,
+      "permittedPurpose": true,
+      "residentialAddressPresent": true
+    },
+    "cbpl120Income": {
+      "documentValidationStatus": "FAIL",
+      "employmentStatus": "SELF_EMPLOYED",
+      "incomeConsistencyResult": "INSUFFICIENT_STABLE_RECURRING_EVIDENCE",
+      "tenureBand": "VARIABLE",
+      "verifiedIncomeMeetsMinimum": false
+    },
+    "cbpl130Capacity": {
+      "bankruptcyIndicator": "NONE",
+      "dti": "201.9%",
+      "hardRejectCapacityRule": true,
+      "recentDelinquencyIndicator": "NONE"
+    },
+    "cbpl150Routing": {
+      "expectedOutcome": "REJECTED",
+      "manualReviewSignals": [],
+      "operationalRecovery": false
+    }
+  },
+  "policyEvidenceHints": [
+    "CBPL-130-S4-C01",
+    "CBPL-160-S4-C01"
+  ],
+  "recoveredDecision": null,
+  "scenarioId": "SCN-REJECTION-003",
+  "validationIssues": [
+    "verified_income_below_required_capacity",
+    "dti_exceeds_hard_reject_threshold",
+    "unsupported_income_for_automatic_processing"
+  ],
+  "workflowId": "WF-APP-REJ-003"
+}

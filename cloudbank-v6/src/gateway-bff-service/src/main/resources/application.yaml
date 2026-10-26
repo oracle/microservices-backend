@@ -1,0 +1,42 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/.
+server:
+  port: 8089
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        name: CBBFFSESSION
+        http-only: true
+        secure: ${BFF_COOKIE_SECURE:true}
+        same-site: lax
+        path: /
+spring:
+  http:
+    clients:
+      connect-timeout: 5s
+      read-timeout: 10s
+  application:
+    name: gateway-bff-service
+cloudbank:
+  bff:
+    allowed-username: obaas-admin
+    loan-base-url: ${BFF_LOAN_BASE_URL}
+    issuer-uri: ${BFF_ISSUER_URI}
+    jwk-set-uri: ${BFF_JWK_SET_URI}
+    audience: cloudbank-api
+    microtx:
+      base-url: ${BFF_MICROTX_BASE_URL:}
+      token-uri: ${BFF_MICROTX_TOKEN_URI:${BFF_TOKEN_URI:}}
+      client-id: ${BFF_MICROTX_CLIENT_ID:microtx-workflow-client}
+      client-secret: ${BFF_MICROTX_CLIENT_SECRET:}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true

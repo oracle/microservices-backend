@@ -1,0 +1,94 @@
+{
+  "applicantId": "APL-CB-RSK-005",
+  "applicantName": "Jordan Brooks",
+  "applicationId": "APP-RISK-005",
+  "dataSafety": {
+    "containsRawAccountNumber": false,
+    "containsRawGovernmentIdentifier": false,
+    "generatedNonProductionValues": true,
+    "usesReservedContactPatterns": true
+  },
+  "documents": [
+    "loan_application.pdf",
+    "applicant_disclosures_and_consent.pdf",
+    "identity_verification_summary.pdf",
+    "address_jurisdiction_verification.pdf",
+    "income_evidence_validation.pdf",
+    "pay_statement_copperline.pdf",
+    "deposit_summary_cloudbank.pdf",
+    "liability_schedule.pdf",
+    "payment_calculation_summary.pdf",
+    "relationship_signal_summary.pdf"
+  ],
+  "expectedExtractionFacts": {
+    "apr": "16.49%",
+    "bankruptcyIndicator": "NONE",
+    "dataClassification": "restricted_customer",
+    "debtToIncome": "25.7%",
+    "disclosureStatus": "ACCEPTED",
+    "documentValidationStatus": "REVIEW",
+    "employmentStatus": "ACTIVE",
+    "existingMonthlyDebt": 1200,
+    "extractionConfidence": "HIGH",
+    "fraudSignal": "UNRESOLVED_SHARED_ATTRIBUTE_SIGNAL",
+    "identityOutcome": "IDENTITY_NEEDS_REVIEW",
+    "incomeConsistencyResult": "CONSISTENT_WITHIN_10_PERCENT",
+    "jurisdictionCode": "CX",
+    "jurisdictionStatus": "ENABLED_NEAR_BOUNDARY",
+    "payFrequency": "BIWEEKLY",
+    "paymentCalculationStatus": "CALCULATED",
+    "proposedMonthlyPayment": 396,
+    "purposeCode": "MAJOR_PURCHASE",
+    "recentDelinquencyIndicator": "NONE",
+    "requestedAmount": 12000,
+    "requestedTerm": "36 months",
+    "riskBand": "CB-B",
+    "statedGrossMonthlyIncome": 6200,
+    "tenureBand": "12_PLUS_MONTHS",
+    "verifiedGrossMonthlyIncome": 6200
+  },
+  "expectedOutcome": "MANUAL_REVIEW",
+  "policyAlignment": {
+    "cbpl100Eligibility": {
+      "ageBandPresent": true,
+      "dataClassificationPresent": true,
+      "disclosuresAccepted": true,
+      "identityRecordPresent": true,
+      "incomeEvidencePresent": true,
+      "jurisdictionEligible": true,
+      "permittedPurpose": true,
+      "residentialAddressPresent": true
+    },
+    "cbpl120Income": {
+      "documentValidationStatus": "REVIEW",
+      "employmentStatus": "ACTIVE",
+      "incomeConsistencyResult": "CONSISTENT_WITHIN_10_PERCENT",
+      "tenureBand": "12_PLUS_MONTHS",
+      "verifiedIncomeMeetsMinimum": true
+    },
+    "cbpl130Capacity": {
+      "bankruptcyIndicator": "NONE",
+      "dti": "25.7%",
+      "hardRejectCapacityRule": false,
+      "recentDelinquencyIndicator": "NONE"
+    },
+    "cbpl150Routing": {
+      "expectedOutcome": "MANUAL_REVIEW",
+      "manualReviewSignals": [
+        "shared_device_and_address_signal_requires_review"
+      ],
+      "operationalRecovery": false
+    }
+  },
+  "policyEvidenceHints": [
+    "CBPL-110-S4-C01",
+    "CBPL-150-S3-C01",
+    "CBPL-170-S4-C01"
+  ],
+  "recoveredDecision": null,
+  "scenarioId": "SCN-RISK-SIGNAL-005",
+  "validationIssues": [
+    "shared_device_and_address_signal_requires_review"
+  ],
+  "workflowId": "WF-APP-RISK-005"
+}

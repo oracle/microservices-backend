@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="001-core-relational-schema" author="cloudbank" labels="loan-application-runtime">
+    <comment>Create core personal-loan relational schema.</comment>
+    <sqlFile path="changes/001-core-relational-schema.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="035-address-geocoding-fields" author="cloudbank" labels="loan-application-runtime">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <columnExists tableName="CB_ADDRESS" columnName="COUNTRY_CODE"/>
+      </not>
+    </preConditions>
+    <comment>Add optional country and postal-code parts for Oracle GCDR address resolution.</comment>
+    <sqlFile path="changes/027-address-geocoding-fields.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="002-document-json-schema" author="cloudbank" labels="loan-application-runtime">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="CB_DOCUMENT"/>
+      </not>
+    </preConditions>
+    <comment>Create document metadata, extraction JSON, document facts, issues, and chunks.</comment>
+    <sqlFile path="changes/002-document-json-schema.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="016-document-json-runtime-indexes" author="cloudbank" labels="loan-application-runtime">
+    <preConditions onFail="HALT" onError="HALT">
+      <and>
+        <tableExists tableName="CB_DOCUMENT"/>
+        <tableExists tableName="CB_DOCUMENT_EXTRACTION"/>
+        <tableExists tableName="CB_DOCUMENT_FACT"/>
+        <tableExists tableName="CB_DOCUMENT_ISSUE"/>
+        <tableExists tableName="CB_DOCUMENT_CHUNK"/>
+        <tableExists tableName="CB_INCOME_EVIDENCE"/>
+      </and>
+    </preConditions>
+    <comment>Create document runtime indexes after the document tables are complete.</comment>
+    <sqlFile path="changes/010-document-json-runtime-indexes.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="003-policy-vector-schema" author="cloudbank" labels="loan-application-runtime">
+    <comment>Create policy corpus and vector-ready RAG tables.</comment>
+    <sqlFile path="changes/003-policy-vector-schema.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="004-risk-spatial-graph-schema" author="cloudbank" labels="full-demo">
+    <comment>Create relationship, spatial, and graph support tables.</comment>
+    <sqlFile path="changes/004-risk-spatial-graph-schema.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="036-spatial-signal-code" author="cloudbank" labels="full-demo">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <and>
+        <tableExists tableName="CB_SPATIAL_SIGNAL"/>
+        <not>
+          <columnExists tableName="CB_SPATIAL_SIGNAL" columnName="SIGNAL_CODE"/>
+        </not>
+      </and>
+    </preConditions>
+    <comment>Persist the public geographic signal code independently of the database signal type.</comment>
+    <sqlFile path="changes/028-spatial-signal-code.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="005-workflow-observability-audit-schema" author="cloudbank" labels="loan-application-runtime">
+    <comment>Create workflow, telemetry, audit, decision, explanation, and review tables.</comment>
+    <sqlFile path="changes/005-workflow-observability-audit-schema.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="006-security-roles-and-views" author="cloudbank" labels="loan-application-runtime">
+    <comment>Create security support tables and role-aware inspection views.</comment>
+    <sqlFile path="changes/006-security-roles-and-views.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="013-loan-application-intake" author="cloudbank" labels="loan-application-runtime">
+    <comment>Add durable intake, document readiness, and workflow-start outbox objects.</comment>
+    <sqlFile path="changes/008-loan-application-intake.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="015-align-service-principal" author="cloudbank" labels="loan-application-runtime">
+    <comment>Align the database service principal with azn-server service JWT identity.</comment>
+    <sqlFile path="changes/009-align-service-principal.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="007-comments-and-annotations" author="cloudbank" labels="full-demo">
+    <comment>Add schema documentation comments and Oracle annotations.</comment>
+    <sqlFile path="sql/001-object-comments-and-annotations.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="008-feature-indexes-and-objects" author="cloudbank" labels="full-demo">
+    <comment>Create Oracle feature indexes and metadata objects.</comment>
+    <sqlFile path="sql/002-json-search-indexes.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+    <sqlFile path="sql/003-vector-indexes.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+    <sqlFile path="sql/004-spatial-metadata-and-indexes.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+    <sqlFile path="sql/004-risk-property-graph.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="009-security-policy-objects" author="cloudbank" labels="loan-application-runtime">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="CB_SECURITY_POLICY_CATALOG"/>
+      </not>
+    </preConditions>
+    <comment>Create the future Deep Data Security policy catalog.</comment>
+    <sqlFile path="sql/006-deep-data-security.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="010-ords-inspection-endpoints" author="cloudbank" labels="ords">
+    <comment>Create ORDS inspection endpoint definitions.</comment>
+    <sqlFile path="sql/007-ords-inspection-endpoints.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter="/"/>
+  </changeSet>
+
+  <changeSet id="011-seed-staging" author="cloudbank" labels="full-demo">
+    <comment>Create structured JSON seed staging table.</comment>
+    <sqlFile path="changes/007-seed-staging.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="012-seed-loader" author="cloudbank" labels="full-demo" runOnChange="true">
+    <comment>Create JSON seed staging table and loader package. The seed rows live in seeds/seed-data.json.</comment>
+    <sqlFile path="seeds/load-seed-data.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter="/"/>
+  </changeSet>
+
+  <changeSet id="014-loan-application-security" author="cloudbank" labels="loan-application-runtime">
+    <comment>Add the least-privilege runtime role and authenticated principal security bridge.</comment>
+    <sqlFile path="sql/008-loan-application-security.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter="/"/>
+  </changeSet>
+
+  <changeSet id="018-document-content-and-ingest-runtime" author="cloudbank" labels="loan-application-runtime">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="CB_DOCUMENT_CONTENT"/>
+      </not>
+    </preConditions>
+    <comment>Add secured Oracle BLOB storage for uploaded PDFs.</comment>
+    <sqlFile path="changes/011-document-content-and-ingest-runtime.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="019-document-content-runtime-index" author="cloudbank" labels="loan-application-runtime">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <indexExists indexName="CB_DOCUMENT_CONTENT_APP_IX"/>
+      </not>
+    </preConditions>
+    <comment>Add the document-content application lookup index.</comment>
+    <sqlFile path="changes/012-document-content-runtime-index.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="020-document-ingest-runtime-role" author="cloudbank" labels="loan-application-runtime">
+    <comment>Create the restart-safe document-ingest runtime role.</comment>
+    <sqlFile path="changes/013-document-ingest-runtime-role.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter="/"/>
+  </changeSet>
+
+  <changeSet id="021-document-content-and-ingest-grants" author="cloudbank" labels="loan-application-runtime">
+    <comment>Grant least privilege and register the document-ingest service principal.</comment>
+    <sqlFile path="changes/014-document-content-and-ingest-grants.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="028-policy-retrieval-runtime-role" author="cloudbank" labels="full-demo">
+    <comment>Create the least-privilege policy-retrieval runtime role.</comment>
+    <sqlFile path="changes/020-policy-retrieval-runtime-role.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter="/"/>
+  </changeSet>
+
+  <changeSet id="022-geographic-risk-evaluation" author="cloudbank" labels="full-demo">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="CB_GEOGRAPHIC_RISK_EVALUATION"/>
+      </not>
+    </preConditions>
+    <comment>Add the geographic-risk-service evaluation envelope and spatial signal linkage.</comment>
+    <sqlFile path="changes/015-geographic-risk-evaluation.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="023-geographic-risk-runtime-role" author="cloudbank" labels="full-demo">
+    <comment>Create the geographic-risk runtime role and service principal.</comment>
+    <sqlFile path="changes/016-geographic-risk-runtime-role.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter="/"/>
+  </changeSet>
+
+  <changeSet id="024-geographic-risk-demo-fixture" author="cloudbank" labels="full-demo">
+    <comment>Load the minimal APP-RISK-005 spatial fixture for geographic-risk-service smoke testing.</comment>
+    <sqlFile path="changes/017-geographic-risk-demo-fixture.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="025-document-review-schema" author="cloudbank" labels="loan-application-runtime">
+    <comment>Create durable deterministic document-review state.</comment>
+    <sqlFile path="changes/018-document-review-schema.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="026-document-review-runtime-role" author="cloudbank" labels="loan-application-runtime">
+    <comment>Create the least-privilege document-review runtime role.</comment>
+    <sqlFile path="changes/019-document-review-runtime-role.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter="/"/>
+  </changeSet>
+
+  <changeSet id="027-document-review-projection-routes" author="cloudbank" labels="loan-application-runtime">
+    <preConditions onFail="HALT" onError="HALT">
+      <and>
+        <tableExists tableName="CB_DOCUMENT_ISSUE"/>
+        <tableExists tableName="CB_INCOME_EVIDENCE"/>
+      </and>
+    </preConditions>
+    <comment>Keep document-review blocked and over-10-percent outcomes distinct from lending decisions.</comment>
+    <sqlFile path="changes/020-document-review-projection-routes.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="029-loan-address-intake-grant" author="cloudbank" labels="loan-application-runtime">
+    <comment>Grant loan intake least-privilege access to persist applicant address evidence.</comment>
+    <sqlFile path="changes/021-loan-address-intake-grant.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="030-policy-corpus-load" author="cloudbank" labels="full-demo">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="CB_POLICY_CORPUS_LOAD"/>
+      </not>
+    </preConditions>
+    <comment>Create the immutable policy-corpus load identity.</comment>
+    <sqlFile path="changes/022-policy-corpus-load.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="031-policy-loader-runtime-role" author="cloudbank" labels="full-demo">
+    <comment>Create the least-privilege one-shot policy-loader role.</comment>
+    <sqlFile path="changes/023-policy-loader-runtime-role.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter="/"/>
+  </changeSet>
+
+  <changeSet id="032-decision-service-idempotency" author="cloudbank" labels="loan-application-runtime">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <columnExists tableName="CB_DECISION" columnName="IDEMPOTENCY_KEY_HASH"/>
+      </not>
+    </preConditions>
+    <comment>Add durable workflow correlation and idempotency metadata for decision-service.</comment>
+    <sqlFile path="changes/024-decision-service-idempotency.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="033-decision-runtime-role" author="cloudbank" labels="loan-application-runtime">
+    <comment>Create the least-privilege decision-service database runtime role.</comment>
+    <sqlFile path="changes/025-decision-runtime-role.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter="/"/>
+  </changeSet>
+
+  <changeSet id="034-document-review-decision-fact-grants" author="cloudbank" labels="loan-application-runtime">
+    <comment>Allow document-review-service to promote vetted capacity and payment facts for deterministic decisioning.</comment>
+    <sqlFile path="changes/026-document-review-decision-fact-grants.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="037-ai-document-summary" author="cloudbank" labels="loan-application-runtime">
+    <comment>Create immutable redacted AI document-summary results for durable replay.</comment>
+    <sqlFile path="changes/029-ai-document-summary.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter=";"/>
+  </changeSet>
+
+  <changeSet id="038-ai-agent-runtime-role" author="cloudbank" labels="loan-application-runtime">
+    <comment>Grant ai-agent-service access to its own results only.</comment>
+    <sqlFile path="changes/030-ai-agent-runtime-role.sql" relativeToChangelogFile="true" splitStatements="true" endDelimiter="/"/>
+  </changeSet>
+</databaseChangeLog>

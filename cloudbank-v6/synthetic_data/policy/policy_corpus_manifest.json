@@ -1,0 +1,255 @@
+{
+  "corpusId": "POLICY-CORPUS-2026.0",
+  "name": "CloudBank Personal Loan Policy Corpus",
+  "version": "2026.0",
+  "effectiveDate": "2026-01-01",
+  "internalUse": true,
+  "status": "active",
+  "decisionBoundary": {
+    "llmMayExplain": true,
+    "llmMayRetrievePolicy": true,
+    "llmMayMakeCreditDecision": false,
+    "decisionSource": "DETERMINISTIC_POLICY_RULES"
+  },
+  "roleAccessModel": {
+    "enforcement": "ALLOW_LIST_BEFORE_RETRIEVAL",
+    "metadataFields": [
+      "access_roles",
+      "restricted_to",
+      "role_filter_required"
+    ],
+    "roles": {
+      "LOAN_OFFICER": {
+        "description": "May retrieve product, documentation, status, explanation, and assigned-application workflow policy needed to support applicants and manual-review intake."
+      },
+      "UNDERWRITER": {
+        "description": "May retrieve loan-officer policy plus restricted underwriting, fraud-signal, exception, pricing-tier, audit, and security-control policy."
+      }
+    },
+    "rule": "A policy chunk is accessible only when the active user role is included in access_roles. Underwriter-only chunks must not be retrieved, displayed, summarized, cited, or paraphrased for loan-officer sessions."
+  },
+  "recommendedChunking": {
+    "strategy": "section",
+    "targetTokens": 450,
+    "overlapTokens": 80,
+    "stableChunkIdPattern": "{policyId}-{sectionId}-C{chunkNumber}"
+  },
+  "documents": [
+    {
+      "file": "POLICY-2026.0-MASTER.md",
+      "policyId": "POLICY-2026.0",
+      "title": "CloudBank Personal Loan Policy Manual 2026.0",
+      "domain": "governance"
+    },
+    {
+      "file": "CBPL-100-eligibility-and-product-scope.md",
+      "policyId": "CBPL-100",
+      "title": "Eligibility and Product Scope",
+      "domain": "eligibility"
+    },
+    {
+      "file": "CBPL-110-identity-fraud-and-applicant-integrity.md",
+      "policyId": "CBPL-110",
+      "title": "Identity, Fraud, and Applicant Integrity",
+      "domain": "identity_fraud"
+    },
+    {
+      "file": "CBPL-120-income-employment-and-documentation.md",
+      "policyId": "CBPL-120",
+      "title": "Income, Employment, and Documentation",
+      "domain": "income_verification"
+    },
+    {
+      "file": "CBPL-130-credit-capacity-and-debt-to-income.md",
+      "policyId": "CBPL-130",
+      "title": "Credit Capacity and Debt-to-Income",
+      "domain": "capacity"
+    },
+    {
+      "file": "CBPL-140-pricing-terms-and-risk-tiering.md",
+      "policyId": "CBPL-140",
+      "title": "Pricing, Terms, and Risk Tiering",
+      "domain": "pricing_terms"
+    },
+    {
+      "file": "CBPL-150-manual-review-exceptions-and-overrides.md",
+      "policyId": "CBPL-150",
+      "title": "Manual Review, Exceptions, and Overrides",
+      "domain": "manual_review"
+    },
+    {
+      "file": "CBPL-160-adverse-action-and-explanation-standards.md",
+      "policyId": "CBPL-160",
+      "title": "Adverse Action and Explanation Standards",
+      "domain": "explanations"
+    },
+    {
+      "file": "CBPL-170-data-security-audit-and-ai-use.md",
+      "policyId": "CBPL-170",
+      "title": "Data Security, Audit, and AI Use",
+      "domain": "security_ai"
+    }
+  ],
+  "sectionAccess": {
+    "POLICY-2026.0": {
+      "defaultAccessRoles": [
+        "LOAN_OFFICER",
+        "UNDERWRITER"
+      ],
+      "overrides": {
+        "S6": [
+          "UNDERWRITER"
+        ]
+      }
+    },
+    "CBPL-100": {
+      "defaultAccessRoles": [
+        "LOAN_OFFICER",
+        "UNDERWRITER"
+      ],
+      "overrides": {}
+    },
+    "CBPL-110": {
+      "defaultAccessRoles": [
+        "UNDERWRITER"
+      ],
+      "overrides": {
+        "S1": [
+          "LOAN_OFFICER",
+          "UNDERWRITER"
+        ],
+        "S2": [
+          "LOAN_OFFICER",
+          "UNDERWRITER"
+        ],
+        "S3": [
+          "LOAN_OFFICER",
+          "UNDERWRITER"
+        ],
+        "S7": [
+          "LOAN_OFFICER",
+          "UNDERWRITER"
+        ]
+      }
+    },
+    "CBPL-120": {
+      "defaultAccessRoles": [
+        "LOAN_OFFICER",
+        "UNDERWRITER"
+      ],
+      "overrides": {}
+    },
+    "CBPL-130": {
+      "defaultAccessRoles": [
+        "LOAN_OFFICER",
+        "UNDERWRITER"
+      ],
+      "overrides": {
+        "S6": [
+          "UNDERWRITER"
+        ],
+        "S7": [
+          "UNDERWRITER"
+        ]
+      }
+    },
+    "CBPL-140": {
+      "defaultAccessRoles": [
+        "UNDERWRITER"
+      ],
+      "overrides": {
+        "S1": [
+          "LOAN_OFFICER",
+          "UNDERWRITER"
+        ],
+        "S3": [
+          "LOAN_OFFICER",
+          "UNDERWRITER"
+        ],
+        "S5": [
+          "LOAN_OFFICER",
+          "UNDERWRITER"
+        ],
+        "S7": [
+          "LOAN_OFFICER",
+          "UNDERWRITER"
+        ],
+        "S8": [
+          "LOAN_OFFICER",
+          "UNDERWRITER"
+        ]
+      }
+    },
+    "CBPL-150": {
+      "defaultAccessRoles": [
+        "LOAN_OFFICER",
+        "UNDERWRITER"
+      ],
+      "overrides": {
+        "S3": [
+          "UNDERWRITER"
+        ],
+        "S4": [
+          "UNDERWRITER"
+        ],
+        "S5": [
+          "UNDERWRITER"
+        ]
+      }
+    },
+    "CBPL-160": {
+      "defaultAccessRoles": [
+        "LOAN_OFFICER",
+        "UNDERWRITER"
+      ],
+      "overrides": {}
+    },
+    "CBPL-170": {
+      "defaultAccessRoles": [
+        "UNDERWRITER"
+      ],
+      "overrides": {
+        "S1": [
+          "LOAN_OFFICER",
+          "UNDERWRITER"
+        ],
+        "S2": [
+          "LOAN_OFFICER",
+          "UNDERWRITER"
+        ],
+        "S9": [
+          "LOAN_OFFICER",
+          "UNDERWRITER"
+        ]
+      }
+    }
+  },
+  "referenceWorkflowPolicyEvidence": {
+    "APP-MR-002": [
+      "CBPL-120-S4-C01",
+      "CBPL-130-S3-C01",
+      "CBPL-150-S2-C01",
+      "CBPL-160-S3-C01"
+    ],
+    "APP-APR-001": [
+      "CBPL-100-S3-C01",
+      "CBPL-120-S5-C01",
+      "CBPL-130-S5-C01",
+      "CBPL-140-S3-C01"
+    ],
+    "APP-REJ-003": [
+      "CBPL-100-S5-C01",
+      "CBPL-130-S4-C01",
+      "CBPL-160-S4-C01"
+    ],
+    "APP-OPFAIL-004": [
+      "CBPL-150-S6-C01",
+      "CBPL-170-S5-C01"
+    ],
+    "APP-RISK-005": [
+      "CBPL-110-S4-C01",
+      "CBPL-150-S3-C01",
+      "CBPL-170-S4-C01"
+    ]
+  }
+}

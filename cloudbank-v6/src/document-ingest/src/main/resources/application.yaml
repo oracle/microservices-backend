@@ -1,0 +1,58 @@
+server:
+  port: ${PORT:8082}
+
+spring:
+  application:
+    name: document-ingest-service
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DOCUMENT_INGEST_DATASOURCE_URL:jdbc:oracle:thin:@//localhost:1521/freepdb1}
+    username: ${DOCUMENT_INGEST_DATASOURCE_USERNAME:CB_DOCUMENT_INGEST_APP}
+    password: ${DOCUMENT_INGEST_DATASOURCE_PASSWORD:}
+    driver-class-name: oracle.jdbc.OracleDriver
+    type: oracle.ucp.jdbc.PoolDataSource
+    oracleucp:
+      connection-factory-class-name: oracle.jdbc.pool.OracleDataSource
+      connection-pool-name: DocumentIngestConnectionPool
+      initial-pool-size: 1
+      min-pool-size: 1
+      max-pool-size: 4
+  security:
+    oauth2:
+      client:
+        registration:
+          loan-application:
+            provider: cloudbank-authorization-server
+            client-id: ${DOCUMENT_INGEST_CLIENT_ID:cloudbank-document-ingest-client}
+            client-secret: ${DOCUMENT_INGEST_CLIENT_SECRET:}
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: client_credentials
+            scope:
+              - cloudbank.internal
+        provider:
+          cloudbank-authorization-server:
+            token-uri: ${DOCUMENT_INGEST_TOKEN_URI:http://127.0.0.1:8080/oauth2/token}
+      resourceserver:
+        jwt:
+          issuer-uri: ${AZN_ISSUER_URI:http://127.0.0.1:8080}
+          jwk-set-uri: ${AZN_JWK_SET_URI:http://127.0.0.1:8080/oauth2/jwks}
+
+cloudbank:
+  schema: ${DOCUMENT_INGEST_SCHEMA:CLOUDBANK}
+  security:
+    audience: ${AZN_AUDIENCE:cloudbank-api}
+    internal-client-ids: ${DOCUMENT_INGEST_CALLER_CLIENT_IDS:cloudbank-service-client}
+    review-input-client-ids: ${DOCUMENT_INGEST_REVIEW_INPUT_CLIENT_IDS:cloudbank-ai-agent-client}
+  loan-application:
+    base-url: ${LOAN_APPLICATION_BASE_URL:http://127.0.0.1:8081}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  health:
+    probes:
+      enabled: true

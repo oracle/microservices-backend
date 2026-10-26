@@ -1,0 +1,96 @@
+{
+  "applicantId": "APL-CB-MR-002",
+  "applicantName": "Maya Chen",
+  "applicationId": "APP-MR-002",
+  "dataSafety": {
+    "containsRawAccountNumber": false,
+    "containsRawGovernmentIdentifier": false,
+    "generatedNonProductionValues": true,
+    "usesReservedContactPatterns": true
+  },
+  "documents": [
+    "loan_application.pdf",
+    "applicant_disclosures_and_consent.pdf",
+    "identity_verification_summary.pdf",
+    "address_jurisdiction_verification.pdf",
+    "income_evidence_validation.pdf",
+    "earnings_statement_lumenfield.pdf",
+    "account_activity_summary.pdf",
+    "liability_schedule.pdf",
+    "payment_calculation_summary.pdf",
+    "income_clarification_request.pdf"
+  ],
+  "expectedExtractionFacts": {
+    "apr": "15.99%",
+    "bankruptcyIndicator": "NONE",
+    "dataClassification": "restricted_customer",
+    "debtToIncome": "47.9%",
+    "disclosureStatus": "ACCEPTED",
+    "documentValidationStatus": "REVIEW",
+    "employmentStatus": "ACTIVE",
+    "existingMonthlyDebt": 1850,
+    "extractionConfidence": "LOW",
+    "fraudSignal": "NONE",
+    "identityOutcome": "IDENTITY_VERIFIED",
+    "incomeConsistencyResult": "INCONSISTENT_OVER_20_PERCENT",
+    "jurisdictionCode": "CX",
+    "jurisdictionStatus": "ENABLED",
+    "payFrequency": "BIWEEKLY",
+    "paymentCalculationStatus": "CALCULATED",
+    "proposedMonthlyPayment": 610,
+    "purposeCode": "DEBT_CONSOLIDATION",
+    "recentDelinquencyIndicator": "NONE",
+    "requestedAmount": 18000,
+    "requestedTerm": "48 months",
+    "riskBand": "CB-B",
+    "statedGrossMonthlyIncome": 6400,
+    "tenureBand": "12_PLUS_MONTHS",
+    "verifiedGrossMonthlyIncome": 5135
+  },
+  "expectedOutcome": "MANUAL_REVIEW",
+  "policyAlignment": {
+    "cbpl100Eligibility": {
+      "ageBandPresent": true,
+      "dataClassificationPresent": true,
+      "disclosuresAccepted": true,
+      "identityRecordPresent": true,
+      "incomeEvidencePresent": true,
+      "jurisdictionEligible": true,
+      "permittedPurpose": true,
+      "residentialAddressPresent": true
+    },
+    "cbpl120Income": {
+      "documentValidationStatus": "REVIEW",
+      "employmentStatus": "ACTIVE",
+      "incomeConsistencyResult": "INCONSISTENT_OVER_20_PERCENT",
+      "tenureBand": "12_PLUS_MONTHS",
+      "verifiedIncomeMeetsMinimum": true
+    },
+    "cbpl130Capacity": {
+      "bankruptcyIndicator": "NONE",
+      "dti": "47.9%",
+      "hardRejectCapacityRule": false,
+      "recentDelinquencyIndicator": "NONE"
+    },
+    "cbpl150Routing": {
+      "expectedOutcome": "MANUAL_REVIEW",
+      "manualReviewSignals": [
+        "document_extraction_confidence_below_auto_threshold"
+      ],
+      "operationalRecovery": false
+    }
+  },
+  "policyEvidenceHints": [
+    "CBPL-120-S4-C01",
+    "CBPL-130-S3-C01",
+    "CBPL-150-S2-C01",
+    "CBPL-160-S3-C01"
+  ],
+  "recoveredDecision": null,
+  "scenarioId": "SCN-MANUAL-REVIEW-002",
+  "validationIssues": [
+    "pay_statement_and_deposit_difference_over_10_percent",
+    "document_extraction_confidence_below_auto_threshold"
+  ],
+  "workflowId": "WF-APP-MR-002"
+}

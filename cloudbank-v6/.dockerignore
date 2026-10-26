@@ -1,0 +1,44 @@
+# Secrets, credentials, wallets, and local configuration
+**/.env
+**/.env.*
+**/.cloudbank-local
+**/.oci
+**/.aws
+**/.kube
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.jks
+**/*.sso
+**/ewallet.p12
+**/Wallet_*.zip
+env-obaas.sh
+deploy/obaas/obaas.env.sh
+.policy-values.*
+
+# Version control, agent state, and editor files
+**/.git
+**/.agents
+**/.crewai_storage
+**/AGENTS.md
+**/CLAUDE.md
+**/GEMINI.md
+**/.idea
+**/.vscode
+**/.DS_Store
+**/*.iml
+**/*.swp
+
+# Local build output, dependencies, caches, and run artifacts
+**/target
+**/node_modules
+**/.venv
+**/__pycache__
+**/*.pyc
+**/*.log
+**/*.bak
+**/crash.log
+output
+stack
+.deployed

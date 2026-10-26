@@ -1,0 +1,127 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: azn-server
+  cloud:
+    config:
+      import-check:
+        enabled: false
+    # Discovery is opt-in so local runs and tests do not attempt to register.
+    discovery:
+      enabled: ${EUREKA_CLIENT_ENABLED:false}
+  threads:
+    virtual:
+      enabled: true
+
+  datasource:
+    # Runtime connections authenticate directly as the application schema user.
+    url: ${AZN_DATASOURCE_URL:${SPRING_DATASOURCE_URL:}}
+    username: ${AZN_USER_REPO_USERNAME:USER_REPO_APP}
+    password: ${AZN_USER_REPO_PASSWORD}
+    driver-class-name: oracle.jdbc.OracleDriver
+    type: oracle.ucp.jdbc.PoolDataSource
+    oracleucp:
+      connection-factory-class-name: oracle.jdbc.pool.OracleDataSource
+      connection-pool-name: AznServerConnectionPool
+      initial-pool-size: 2
+      min-pool-size: 1
+      max-pool-size: 8
+
+  jpa:
+    # Keep database access inside service/controller methods, not view rendering.
+    open-in-view: false
+    hibernate:
+      # Liquibase owns schema changes; Hibernate only validates the result.
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+
+  liquibase:
+    # Liquibase uses the admin account directly so it can create USER_REPO.
+    change-log: classpath:db/changelog/controller.yaml
+    url: ${AZN_LIQUIBASE_URL:${LIQUIBASE_DATASOURCE_URL:${AZN_DATASOURCE_URL:${SPRING_DATASOURCE_URL:}}}}
+    user: ${AZN_LIQUIBASE_USERNAME:${LIQUIBASE_DATASOURCE_USERNAME:${AZN_DATASOURCE_USERNAME:${SPRING_LIQUIBASE_USER:${SPRING_DATASOURCE_USERNAME:}}}}}
+    password: ${AZN_LIQUIBASE_PASSWORD:${LIQUIBASE_DATASOURCE_PASSWORD:${AZN_DATASOURCE_PASSWORD:${SPRING_LIQUIBASE_PASSWORD:${SPRING_DATASOURCE_PASSWORD:}}}}}
+    parameters:
+      userRepoOwnerPassword: ${AZN_USER_REPO_OWNER_PASSWORD:${AZN_USER_REPO_PASSWORD}}
+      userRepoRuntimePassword: ${AZN_USER_REPO_PASSWORD}
+    enabled: ${RUN_LIQUIBASE:true}
+
+azn:
+  authorization-server:
+    # Always configure the externally visible issuer in deployed environments.
+    issuer: ${AZN_ISSUER_URI:http://127.0.0.1:8080}
+    audience: ${AZN_AUDIENCE:cloudbank-api}
+    document-ingest-client:
+      id: ${AZN_AUTHORIZATION_SERVER_DOCUMENT_INGEST_CLIENT_ID:cloudbank-document-ingest-client}
+      secret: ${AZN_AUTHORIZATION_SERVER_DOCUMENT_INGEST_CLIENT_SECRET:}
+      scopes: ${AZN_AUTHORIZATION_SERVER_DOCUMENT_INGEST_CLIENT_SCOPES:cloudbank.internal}
+    document-review-client:
+      id: ${AZN_AUTHORIZATION_SERVER_DOCUMENT_REVIEW_CLIENT_ID:cloudbank-document-review-client}
+      secret: ${AZN_AUTHORIZATION_SERVER_DOCUMENT_REVIEW_CLIENT_SECRET:}
+      scopes: ${AZN_AUTHORIZATION_SERVER_DOCUMENT_REVIEW_CLIENT_SCOPES:cloudbank.internal}
+    ai-agent-client:
+      id: ${AZN_AUTHORIZATION_SERVER_AI_AGENT_CLIENT_ID:cloudbank-ai-agent-client}
+      secret: ${AZN_AUTHORIZATION_SERVER_AI_AGENT_CLIENT_SECRET:}
+      scopes: ${AZN_AUTHORIZATION_SERVER_AI_AGENT_CLIENT_SCOPES:cloudbank.internal}
+    microtx-client:
+      id: ${AZN_AUTHORIZATION_SERVER_MICROTX_CLIENT_ID:microtx-workflow-client}
+      secret: ${AZN_AUTHORIZATION_SERVER_MICROTX_CLIENT_SECRET:}
+      scopes: ${AZN_AUTHORIZATION_SERVER_MICROTX_CLIENT_SCOPES:microtx.workflow}
+      roles: ${AZN_AUTHORIZATION_SERVER_MICROTX_CLIENT_ROLES:microtx-conductor-user,microtx-conductor-worker}
+      audience: ${AZN_AUTHORIZATION_SERVER_MICROTX_CLIENT_AUDIENCE:microtx-workflow}
+    microtx-console-client:
+      id: ${AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_CLIENT_ID:microtx-console-client}
+      secret: ${AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_CLIENT_SECRET:}
+      scopes: ${AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_CLIENT_SCOPES:openid,cloudbank.read,cloudbank.write}
+      redirect-uri: ${AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_CLIENT_REDIRECT_URI:http://localhost/console/oidc/redirect}
+      post-logout-redirect-uri: ${AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_CLIENT_POST_LOGOUT_REDIRECT_URI:http://localhost/consoleui/index.html}
+      access-token-time-to-live: ${AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_ACCESS_TOKEN_TIME_TO_LIVE:PT8H}
+      refresh-token-time-to-live: ${AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_REFRESH_TOKEN_TIME_TO_LIVE:PT24H}
+    bff-client:
+      id: ${AZN_AUTHORIZATION_SERVER_BFF_CLIENT_ID:cloudbank-bff-client}
+      secret: ${AZN_AUTHORIZATION_SERVER_BFF_CLIENT_SECRET:}
+      redirect-uri: ${AZN_AUTHORIZATION_SERVER_BFF_CLIENT_REDIRECT_URI:}
+    signing-key:
+      required: ${AZN_PERSISTENT_SIGNING_KEY_REQUIRED:false}
+  bootstrap-users:
+    admin-password: ${AZN_BOOTSTRAP_USERS_ADMIN_PASSWORD:${OBAAS_ADMIN_PASSWORD:}}
+    user-password: ${AZN_BOOTSTRAP_USERS_USER_PASSWORD:${OBAAS_USER_PASSWORD:}}
+
+management:
+  endpoint:
+    health:
+      show-details: when-authorized
+      roles: ACTUATOR
+  endpoints:
+    web:
+      exposure:
+        # Keep actuator surface small; SecurityConfig protects non-health/info endpoints.
+        include: health,info
+  health:
+    probes:
+      enabled: true
+
+eureka:
+  instance:
+    hostname: ${spring.application.name}
+    preferIpAddress: true
+  client:
+    # Supported for deployments, disabled by default for local/test startup.
+    service-url:
+      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
+    enabled: ${EUREKA_CLIENT_ENABLED:false}
+
+
+# Logging
+logging:
+  level:
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    com.cloudbank.aznserver: INFO

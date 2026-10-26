@@ -1,0 +1,125 @@
+-- Remove temporary migration privileges and lock the schema owner.
+-- Pass SUCCESS after a successful migration or CLEANUP after a failed migration.
+
+SET DEFINE ON
+SET VERIFY OFF
+SET ECHO OFF
+SET FEEDBACK OFF
+
+DEFINE finalize_mode = '&1'
+
+DECLARE
+  l_mode  VARCHAR2(20) := UPPER('&&finalize_mode');
+  l_count PLS_INTEGER;
+
+  PROCEDURE revoke_if_granted(p_statement VARCHAR2) IS
+  BEGIN
+    EXECUTE IMMEDIATE p_statement;
+  EXCEPTION
+    WHEN OTHERS THEN
+      IF SQLCODE NOT IN (-1927, -1951, -1952) THEN
+        RAISE;
+      END IF;
+  END;
+BEGIN
+  IF l_mode NOT IN ('SUCCESS', 'CLEANUP') THEN
+    RAISE_APPLICATION_ERROR(-20003, 'Finalize mode must be SUCCESS or CLEANUP');
+  END IF;
+
+  IF l_mode = 'SUCCESS' THEN
+    SELECT COUNT(*) INTO l_count
+    FROM dba_roles
+    WHERE role = 'CB_LOAN_APPLICATION_RUNTIME';
+
+    IF l_count != 1 THEN
+      RAISE_APPLICATION_ERROR(-20004, 'CB_LOAN_APPLICATION_RUNTIME was not created');
+    END IF;
+
+    EXECUTE IMMEDIATE
+      'GRANT CB_LOAN_APPLICATION_RUNTIME TO CB_LOAN_APPLICATION_APP';
+
+    SELECT COUNT(*) INTO l_count
+    FROM dba_roles
+    WHERE role = 'CB_DOCUMENT_INGEST_RUNTIME';
+
+    IF l_count != 1 THEN
+      RAISE_APPLICATION_ERROR(-20005, 'CB_DOCUMENT_INGEST_RUNTIME was not created');
+    END IF;
+
+    EXECUTE IMMEDIATE
+      'GRANT CB_DOCUMENT_INGEST_RUNTIME TO CB_DOCUMENT_INGEST_APP';
+
+    SELECT COUNT(*) INTO l_count FROM dba_roles WHERE role = 'CB_DOCUMENT_REVIEW_RUNTIME';
+    IF l_count != 1 THEN
+      RAISE_APPLICATION_ERROR(-20007, 'CB_DOCUMENT_REVIEW_RUNTIME was not created');
+    END IF;
+    EXECUTE IMMEDIATE 'GRANT CB_DOCUMENT_REVIEW_RUNTIME TO CB_DOCUMENT_REVIEW_APP';
+
+    SELECT COUNT(*) INTO l_count FROM dba_roles WHERE role = 'CB_DECISION_RUNTIME';
+    IF l_count != 1 THEN
+      RAISE_APPLICATION_ERROR(-20009, 'CB_DECISION_RUNTIME was not created');
+    END IF;
+    EXECUTE IMMEDIATE 'GRANT CB_DECISION_RUNTIME TO CB_DECISION_APP';
+
+    SELECT COUNT(*) INTO l_count FROM dba_roles WHERE role = 'CB_AI_AGENT_RUNTIME';
+    IF l_count != 1 THEN
+      RAISE_APPLICATION_ERROR(-20010, 'CB_AI_AGENT_RUNTIME was not created');
+    END IF;
+    EXECUTE IMMEDIATE 'GRANT CB_AI_AGENT_RUNTIME TO CB_AI_AGENT_APP';
+
+    SELECT COUNT(*) INTO l_count
+    FROM dba_roles
+    WHERE role = 'CB_GEOGRAPHIC_RISK_RUNTIME';
+
+    IF l_count = 1 THEN
+      SELECT COUNT(*) INTO l_count
+      FROM dba_users
+      WHERE username = 'CB_GEOGRAPHIC_RISK_APP';
+
+      IF l_count = 1 THEN
+        EXECUTE IMMEDIATE
+          'GRANT CB_GEOGRAPHIC_RISK_RUNTIME TO CB_GEOGRAPHIC_RISK_APP';
+      END IF;
+    END IF;
+
+    SELECT COUNT(*) INTO l_count FROM dba_roles WHERE role = 'CB_POLICY_RETRIEVAL_RUNTIME';
+    IF l_count = 1 THEN
+      SELECT COUNT(*) INTO l_count
+      FROM dba_users
+      WHERE username = 'CB_POLICY_APPLICATION_APP';
+
+      IF l_count = 1 THEN
+        EXECUTE IMMEDIATE
+          'GRANT CB_POLICY_RETRIEVAL_RUNTIME TO CB_POLICY_APPLICATION_APP';
+      END IF;
+    END IF;
+
+    SELECT COUNT(*) INTO l_count FROM dba_roles WHERE role = 'CB_POLICY_LOADER_RUNTIME';
+    IF l_count = 1 THEN
+      SELECT COUNT(*) INTO l_count
+      FROM dba_users
+      WHERE username = 'CB_POLICY_LOADER_APP';
+
+      IF l_count = 1 THEN
+        EXECUTE IMMEDIATE
+          'GRANT CB_POLICY_LOADER_RUNTIME TO CB_POLICY_LOADER_APP';
+      END IF;
+    END IF;
+  END IF;
+
+  revoke_if_granted('REVOKE CREATE ANY CONTEXT FROM CLOUDBANK');
+  revoke_if_granted('REVOKE CREATE PROPERTY GRAPH FROM CLOUDBANK');
+  revoke_if_granted('REVOKE CREATE ROLE FROM CLOUDBANK');
+  revoke_if_granted('REVOKE CREATE TYPE FROM CLOUDBANK');
+  revoke_if_granted('REVOKE CREATE TRIGGER FROM CLOUDBANK');
+  revoke_if_granted('REVOKE CREATE PROCEDURE FROM CLOUDBANK');
+  revoke_if_granted('REVOKE CREATE SEQUENCE FROM CLOUDBANK');
+  revoke_if_granted('REVOKE CREATE VIEW FROM CLOUDBANK');
+  revoke_if_granted('REVOKE CREATE TABLE FROM CLOUDBANK');
+  revoke_if_granted('REVOKE CREATE SESSION FROM CLOUDBANK');
+
+  EXECUTE IMMEDIATE 'ALTER USER CLOUDBANK ACCOUNT LOCK';
+END;
+/
+
+UNDEFINE finalize_mode

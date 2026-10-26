@@ -1,0 +1,55 @@
+server:
+  port: ${PORT:8084}
+spring:
+  application:
+    name: document-review-service
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DOCUMENT_REVIEW_DATASOURCE_URL:jdbc:oracle:thin:@//localhost:1521/freepdb1}
+    username: ${DOCUMENT_REVIEW_DATASOURCE_USERNAME:CB_DOCUMENT_REVIEW_APP}
+    password: ${DOCUMENT_REVIEW_DATASOURCE_PASSWORD:}
+    driver-class-name: oracle.jdbc.OracleDriver
+    type: oracle.ucp.jdbc.PoolDataSource
+    oracleucp:
+      connection-factory-class-name: oracle.jdbc.pool.OracleDataSource
+      connection-pool-name: DocumentReviewConnectionPool
+      initial-pool-size: 1
+      min-pool-size: 1
+      max-pool-size: 4
+  security:
+    oauth2:
+      client:
+        registration:
+          cloudbank-service:
+            provider: cloudbank-authorization-server
+            client-id: ${DOCUMENT_REVIEW_CLIENT_ID:cloudbank-document-review-client}
+            client-secret: ${DOCUMENT_REVIEW_CLIENT_SECRET:}
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: client_credentials
+            scope: [cloudbank.internal]
+        provider:
+          cloudbank-authorization-server:
+            token-uri: ${DOCUMENT_REVIEW_TOKEN_URI:http://127.0.0.1:8080/oauth2/token}
+      resourceserver:
+        jwt:
+          issuer-uri: ${AZN_ISSUER_URI:http://127.0.0.1:8080}
+          jwk-set-uri: ${AZN_JWK_SET_URI:http://127.0.0.1:8080/oauth2/jwks}
+cloudbank:
+  schema: ${DOCUMENT_REVIEW_SCHEMA:CLOUDBANK}
+  security:
+    audience: ${AZN_AUDIENCE:cloudbank-api}
+    internal-client-ids: ${DOCUMENT_REVIEW_CALLER_CLIENT_IDS:cloudbank-service-client}
+  loan-application:
+    base-url: ${LOAN_APPLICATION_BASE_URL:http://127.0.0.1:8081}
+  document-ingest:
+    base-url: ${DOCUMENT_INGEST_BASE_URL:http://127.0.0.1:8082}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  health:
+    probes:
+      enabled: true

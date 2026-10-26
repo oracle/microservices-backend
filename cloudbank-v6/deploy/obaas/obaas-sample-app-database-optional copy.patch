@@ -1,0 +1,44 @@
+--- a/templates/_helpers.tpl
++++ b/templates/_helpers.tpl
+@@ -113,14 +113,20 @@
+ Pattern: {{ dbname }}-{{ schema }}-db-authn (e.g., mydb-account-db-authn)
+ */}}
+ {{- define "obaas.database.authN.secretName" -}}
++{{- $database := .Values.database | default dict }}
++{{- $databaseDisabled := and (hasKey $database "enabled") (eq $database.enabled false) }}
++{{- if $databaseDisabled }}
++{{- "" }}
++{{- else }}
+ {{- $authN := .Values.database.authN | default dict }}
+ {{- $secretName := $authN.secretName | default "" }}
+ {{- if $secretName }}
+ {{- $secretName }}
+ {{- else if .Values.database.name }}
+ {{- printf "%s-%s-db-authn" (.Values.database.name | lower) .Release.Name }}
+ {{- else }}
+-{{- required "database.authN.secretName is required (or set database.name)" "" }}
++{{- required "database.authN.secretName is required when database.enabled is true (or set database.name)" "" }}
++{{- end }}
+ {{- end }}
+ {{- end }}
+ 
+@@ -177,14 +183,19 @@
+ Database wallet secret name (dynamically looks up obaas platform revision)
+ */}}
+ {{- define "obaas.database.walletSecret" -}}
+ {{- $db := .Values.database | default dict }}
++{{- $databaseDisabled := and (hasKey $db "enabled") (eq $db.enabled false) }}
++{{- if $databaseDisabled }}
++{{- "" }}
++{{- else }}
+ {{- $walletSecret := $db.walletSecret | default "" }}
+ {{- if $walletSecret }}
+ {{- $walletSecret }}
+ {{- else }}
+ {{- printf "%s-adb-tns-admin-%s" (include "obaas.releaseName" .) (include "obaas.releaseRevision" . | trim) }}
+ {{- end }}
+ {{- end }}
++{{- end }}
+ 
+ {{/*
+ Eureka service name

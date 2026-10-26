@@ -1,0 +1,671 @@
+{
+  "name": "cloudbank-loan-origination",
+  "description": "CloudBank loan-origination workflow version 1. Retries extraction and review up to three times, gathers document, policy, and geographic-risk evidence before routing, produces governed AI support, and pauses manual-review cases after AI reviewer assistance.",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "init_workflow_authorization",
+      "taskReferenceName": "init_workflow_authorization",
+      "inputParameters": {
+        "workflowTaskAuthorization": "${workflow.input.workflowTaskAuthorization}"
+      },
+      "type": "SET_VARIABLE",
+      "optional": false,
+      "asyncComplete": false
+    },
+    {
+      "name": "document_extraction_review_loop",
+      "taskReferenceName": "document_extraction_review_loop",
+      "type": "DO_WHILE",
+      "evaluatorType": "graaljs",
+      "loopCondition": "(function () { var loop = $.document_extraction_review_loop || {}; var iteration = Number(loop.iteration || 0); var current = loop[String(iteration)] || loop[iteration] || {}; var normalized = current.normalize_review_disposition || {}; var result = normalized.result || {}; return iteration < $.maxExtractionAttempts && result.disposition === 'RETRY_EXTRACTION'; })();",
+      "inputParameters": {
+        "document_extraction_review_loop": "${document_extraction_review_loop.output}",
+        "maxExtractionAttempts": 3
+      },
+      "loopOver": [
+        {
+          "name": "extract_documents",
+          "taskReferenceName": "extract_documents",
+          "inputParameters": {
+            "method": "POST",
+            "uri": "${workflow.variables.documentIngestBaseUrl}/internal/api/v1/document-extractions",
+            "headers": {
+              "Content-Type": "application/json",
+              "Authorization": "${workflow.variables.workflowTaskAuthorization}",
+              "Idempotency-Key": "extract:${workflow.input.applicationId}:${workflow.workflowId}:${document_extraction_review_loop.output.iteration}"
+            },
+            "body": {
+              "applicationId": "${workflow.input.applicationId}",
+              "workflowId": "${workflow.workflowId}",
+              "taskReference": "extract_documents",
+              "traceId": "${workflow.input.traceId}"
+            }
+          },
+          "type": "HTTP",
+          "retryCount": 3,
+          "optional": false,
+          "asyncComplete": false
+        },
+        {
+          "name": "review_documents",
+          "taskReferenceName": "review_documents",
+          "inputParameters": {
+            "method": "POST",
+            "uri": "${workflow.variables.documentReviewBaseUrl}/internal/api/v1/document-reviews",
+            "headers": {
+              "Content-Type": "application/json",
+              "Authorization": "${workflow.variables.workflowTaskAuthorization}",
+              "Idempotency-Key": "review_documents:${workflow.input.applicationId}:${workflow.workflowId}:${document_extraction_review_loop.output.iteration}",
+              "X-Trace-Id": "${workflow.input.traceId}"
+            },
+            "body": {
+              "applicationId": "${workflow.input.applicationId}",
+              "workflowId": "${workflow.workflowId}",
+              "taskReference": "review_documents",
+              "traceId": "${workflow.input.traceId}"
+            }
+          },
+          "type": "HTTP",
+          "retryCount": 3,
+          "optional": false,
+          "asyncComplete": false
+        },
+        {
+          "name": "normalize_review_disposition",
+          "taskReferenceName": "normalize_review_disposition",
+          "inputParameters": {
+            "evaluatorType": "graaljs",
+            "expression": "(function () { var response = $.reviewResponse || {}; var body = response.body || {}; var disposition = body.disposition; var reviewId = body.reviewId; return { disposition: disposition == null ? 'UNEXPECTED' : String(disposition), reviewId: reviewId == null ? '' : String(reviewId) }; })();",
+            "reviewResponse": "${review_documents.output.response}"
+          },
+          "type": "INLINE",
+          "optional": false,
+          "asyncComplete": false
+        }
+      ],
+      "optional": false,
+      "asyncComplete": false
+    },
+    {
+      "name": "select_final_review",
+      "taskReferenceName": "select_final_review",
+      "inputParameters": {
+        "evaluatorType": "graaljs",
+        "expression": "(function () { var loop = $.loopResult || {}; var iteration = Number(loop.iteration || 0); var current = loop[String(iteration)] || loop[iteration] || {}; var normalized = current.normalize_review_disposition || {}; var result = normalized.result || {}; return { disposition: result.disposition == null ? 'UNEXPECTED' : String(result.disposition), reviewId: result.reviewId == null ? '' : String(result.reviewId), extractionAttempts: iteration }; })();",
+        "loopResult": "${document_extraction_review_loop.output}"
+      },
+      "type": "INLINE",
+      "optional": false,
+      "asyncComplete": false
+    },
+    {
+      "name": "route_review_disposition",
+      "taskReferenceName": "route_review_disposition",
+      "inputParameters": {
+        "case": "${select_final_review.output.result.disposition}"
+      },
+      "type": "SWITCH",
+      "evaluatorType": "value-param",
+      "expression": "case",
+      "decisionCases": {
+        "CLEAR": [
+          {
+            "name": "continue_clear_review",
+            "taskReferenceName": "continue_clear_review",
+            "type": "NOOP"
+          }
+        ],
+        "MANUAL_REVIEW": [
+          {
+            "name": "continue_manual_review",
+            "taskReferenceName": "continue_manual_review",
+            "type": "NOOP"
+          }
+        ],
+        "RETRY_EXTRACTION": [
+          {
+            "name": "terminate_retry_exhausted",
+            "taskReferenceName": "terminate_retry_exhausted",
+            "inputParameters": {
+              "terminationStatus": "FAILED",
+              "workflowOutput": {
+                "disposition": "RETRY_EXTRACTION",
+                "extractionAttempts": "${select_final_review.output.result.extractionAttempts}",
+                "message": "Document extraction still requires remediation after the bounded retry loop."
+              }
+            },
+            "type": "TERMINATE"
+          }
+        ],
+        "BLOCKED": [
+          {
+            "name": "terminate_blocked",
+            "taskReferenceName": "terminate_blocked",
+            "inputParameters": {
+              "terminationStatus": "FAILED",
+              "workflowOutput": {
+                "disposition": "BLOCKED",
+                "message": "Document review is blocked and requires remediation."
+              }
+            },
+            "type": "TERMINATE"
+          }
+        ]
+      },
+      "defaultCase": [
+        {
+          "name": "terminate_unexpected_review_disposition",
+          "taskReferenceName": "terminate_unexpected_review_disposition",
+          "inputParameters": {
+            "terminationStatus": "FAILED",
+            "workflowOutput": {
+              "disposition": "UNEXPECTED",
+              "message": "Document review returned an unsupported disposition."
+            }
+          },
+          "type": "TERMINATE"
+        }
+      ],
+      "optional": false,
+      "asyncComplete": false
+    },
+    {
+      "name": "ai_document_evidence_summary",
+      "taskReferenceName": "ai_document_evidence_summary",
+      "inputParameters": {
+        "method": "POST",
+        "uri": "${workflow.variables.aiAgentBaseUrl}/internal/api/v1/ai/document-evidence-summaries",
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "${workflow.variables.workflowTaskAuthorization}",
+          "Idempotency-Key": "ai_document_evidence_summary:${workflow.input.applicationId}:${workflow.workflowId}",
+          "X-Trace-Id": "${workflow.input.traceId}"
+        },
+        "body": {
+          "applicationId": "${workflow.input.applicationId}",
+          "workflowId": "${workflow.workflowId}",
+          "taskReference": "ai_document_evidence_summary",
+          "traceId": "${workflow.input.traceId}",
+          "reviewId": "${select_final_review.output.result.reviewId}",
+          "audience": "UNDERWRITER"
+        }
+      },
+      "type": "HTTP",
+      "retryCount": 3,
+      "optional": true,
+      "asyncComplete": false
+    },
+    {
+      "name": "normalize_document_summary",
+      "taskReferenceName": "normalize_document_summary",
+      "type": "INLINE",
+      "inputParameters": {
+        "evaluatorType": "graaljs",
+        "expression": "(function () { var response = $.summaryResponse || {}; var body = response.body || {}; var id = body.summaryId == null ? '' : String(body.summaryId); var valid = /^[A][I][S][U][M]-[0-9a-fA-F]{32}$/.test(id) && body.status === 'COMPLETED' && body.guardrailStatus === 'PASSED' && response.statusCode >= 200 && response.statusCode < 300; return { summaryId: valid ? id : '', summaryStatus: valid ? 'AVAILABLE' : 'UNAVAILABLE', summaryUnavailableReason: valid ? '' : 'AI_DOCUMENT_SUMMARY_UNAVAILABLE' }; })();",
+        "summaryResponse": "${ai_document_evidence_summary.output.response}"
+      },
+      "optional": false,
+      "asyncComplete": false
+    },
+    {
+      "name": "policy_evidence_retrieval",
+      "taskReferenceName": "policy_evidence_retrieval",
+      "inputParameters": {
+        "method": "GET",
+        "uri": "${workflow.variables.policyRetrievalBaseUrl}/internal/api/v1/policy-evidence?query=loan%20underwriting%20income%20affordability",
+        "headers": {
+          "Authorization": "${workflow.variables.workflowTaskAuthorization}",
+          "Idempotency-Key": "policy_evidence_retrieval:${workflow.input.applicationId}:${workflow.workflowId}",
+          "X-Trace-Id": "${workflow.input.traceId}"
+        }
+      },
+      "type": "HTTP",
+      "retryCount": 3,
+      "optional": false,
+      "asyncComplete": false
+    },
+    {
+      "name": "prepare_policy_evidence_support",
+      "taskReferenceName": "prepare_policy_evidence_support",
+      "inputParameters": {
+        "evaluatorType": "graaljs",
+        "expression": "(function () { var retrieval = $.retrieval; if (typeof retrieval === 'string') { try { retrieval = JSON.parse(retrieval); } catch (ignored) { retrieval = []; } } var results = Array.isArray(retrieval) ? retrieval : []; var evidence = results.slice(0, 3).map(function (item) { item = item || {}; var chunk = item.chunk || {}; var document = item.document || {}; var score = Number(item.vectorScore); if (!isFinite(score)) score = 0; score = Math.max(-1, Math.min(1, score)); return { policyDocumentId: String(chunk.policyDocumentId || document.documentId || '').slice(0, 80), policyCode: String(document.policyCode || '').slice(0, 40), policyVersion: String(document.version || '').slice(0, 40), chunkId: String(chunk.chunkId || '').slice(0, 100), sectionRef: String(chunk.sectionRef || '').slice(0, 80), heading: String(chunk.heading || '').slice(0, 200), content: String(chunk.chunkText || '').slice(0, 4000), vectorScore: score }; }).filter(function (item) { return item.policyDocumentId && item.policyCode && item.policyVersion && item.chunkId && item.sectionRef && item.heading && item.content; }); return { policyEvidence: evidence }; })();",
+        "retrieval": "${policy_evidence_retrieval.output.response.body}"
+      },
+      "type": "INLINE",
+      "optional": false,
+      "asyncComplete": false
+    },
+    {
+      "name": "ai_policy_evidence_support",
+      "taskReferenceName": "ai_policy_evidence_support",
+      "inputParameters": {
+        "method": "POST",
+        "uri": "${workflow.variables.aiAgentBaseUrl}/internal/api/v1/ai/policy-evidence-summaries",
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "${workflow.variables.workflowTaskAuthorization}",
+          "Idempotency-Key": "ai_policy_evidence_support:${workflow.input.applicationId}:${workflow.workflowId}",
+          "X-Trace-Id": "${workflow.input.traceId}"
+        },
+        "body": {
+          "applicationId": "${workflow.input.applicationId}",
+          "workflowId": "${workflow.workflowId}",
+          "taskReference": "ai_policy_evidence_support",
+          "traceId": "${workflow.input.traceId}",
+          "reviewId": "${select_final_review.output.result.reviewId}",
+          "documentSummaryId": "${normalize_document_summary.output.result.summaryId}",
+          "audience": "UNDERWRITER",
+          "policyEvidence": "${prepare_policy_evidence_support.output.result.policyEvidence}"
+        }
+      },
+      "type": "HTTP",
+      "retryCount": 3,
+      "optional": false,
+      "asyncComplete": false
+    },
+    {
+      "name": "evaluate_geographic_risk",
+      "taskReferenceName": "evaluate_geographic_risk",
+      "inputParameters": {
+        "method": "POST",
+        "uri": "${workflow.variables.geographicRiskBaseUrl}/internal/api/v1/geographic-risk/evaluations",
+        "headers": {
+          "Authorization": "${workflow.variables.workflowTaskAuthorization}",
+          "Idempotency-Key": "geo-risk:${workflow.input.applicationId}:${workflow.workflowId}",
+          "X-Trace-Id": "${workflow.input.traceId}"
+        },
+        "body": {
+          "applicationId": "${workflow.input.applicationId}",
+          "workflowId": "${workflow.workflowId}",
+          "taskReference": "evaluate_geographic_risk",
+          "traceId": "${workflow.input.traceId}"
+        }
+      },
+      "type": "HTTP",
+      "retryCount": 3,
+      "optional": false,
+      "asyncComplete": false
+    },
+    {
+      "name": "derive_post_evidence_disposition",
+      "taskReferenceName": "derive_post_evidence_disposition",
+      "inputParameters": {
+        "evaluatorType": "graaljs",
+        "expression": "(function () { var documentDisposition = String($.documentDisposition || 'UNEXPECTED'); var policyEvidenceStatus = String($.policyEvidenceStatus || 'UNEXPECTED'); var geographicRiskDisposition = String($.geographicRiskDisposition || 'UNEXPECTED'); if (geographicRiskDisposition === 'BLOCKED') return { disposition: 'BLOCKED', reason: 'GEOGRAPHIC_RISK_BLOCKED' }; if (documentDisposition === 'MANUAL_REVIEW') return { disposition: 'MANUAL_REVIEW', reason: 'DOCUMENT_REVIEW_REQUIRED' }; if (geographicRiskDisposition === 'MANUAL_REVIEW') return { disposition: 'MANUAL_REVIEW', reason: 'GEOGRAPHIC_RISK_REVIEW_REQUIRED' }; if (geographicRiskDisposition === 'NOT_EVALUATED') return { disposition: 'MANUAL_REVIEW', reason: 'GEOGRAPHIC_RISK_NOT_EVALUATED' }; if (policyEvidenceStatus === 'INSUFFICIENT_EVIDENCE') return { disposition: 'MANUAL_REVIEW', reason: 'POLICY_EVIDENCE_INSUFFICIENT' }; if (documentDisposition === 'CLEAR' && geographicRiskDisposition === 'CLEAR' && policyEvidenceStatus === 'GROUNDED') return { disposition: 'CLEAR', reason: 'EVIDENCE_CLEAR' }; return { disposition: 'UNEXPECTED', reason: 'UNSUPPORTED_EVIDENCE_COMBINATION' }; })();",
+        "documentDisposition": "${select_final_review.output.result.disposition}",
+        "policyEvidenceStatus": "${ai_policy_evidence_support.output.response.body.evidenceStatus}",
+        "geographicRiskDisposition": "${evaluate_geographic_risk.output.response.body.disposition}"
+      },
+      "type": "INLINE",
+      "optional": false,
+      "asyncComplete": false
+    },
+    {
+      "name": "route_post_evidence_disposition",
+      "taskReferenceName": "route_post_evidence_disposition",
+      "inputParameters": {
+        "case": "${derive_post_evidence_disposition.output.result.disposition}"
+      },
+      "type": "SWITCH",
+      "evaluatorType": "value-param",
+      "expression": "case",
+      "decisionCases": {
+        "BLOCKED": [
+          {
+            "name": "terminate_post_evidence_blocked",
+            "taskReferenceName": "terminate_post_evidence_blocked",
+            "inputParameters": {
+              "terminationStatus": "FAILED",
+              "workflowOutput": {
+                "disposition": "BLOCKED",
+                "reason": "${derive_post_evidence_disposition.output.result.reason}",
+                "message": "Post-evidence evaluation is blocked and requires operational remediation."
+              }
+            },
+            "type": "TERMINATE"
+          }
+        ]
+      },
+      "defaultCase": [
+        {
+          "name": "prepare_decision_policy_citations",
+          "taskReferenceName": "prepare_decision_policy_citations",
+          "inputParameters": {
+            "evaluatorType": "graaljs",
+            "expression": "(function () { var evidence = $.evidence; if (!Array.isArray(evidence)) return { citations: [] }; return { citations: evidence.slice(0, 10).map(function (item) { item = item || {}; return { chunkId: String(item.chunkId || '').slice(0, 100), policyCode: String(item.policyCode || '').slice(0, 40), sectionRef: String(item.sectionRef || '').slice(0, 80) }; }).filter(function (item) { return item.chunkId && item.policyCode && item.sectionRef; }) }; })();",
+            "evidence": "${prepare_policy_evidence_support.output.result.policyEvidence}"
+          },
+          "type": "INLINE",
+          "optional": false,
+          "asyncComplete": false
+        },
+        {
+          "name": "deterministic_initial_decision",
+          "taskReferenceName": "deterministic_initial_decision",
+          "inputParameters": {
+            "method": "POST",
+            "uri": "${workflow.variables.decisionBaseUrl}/internal/api/v1/decisions",
+            "headers": {
+              "Content-Type": "application/json",
+              "Authorization": "${workflow.variables.workflowTaskAuthorization}",
+              "Idempotency-Key": "decision:initial:${workflow.input.applicationId}:${workflow.workflowId}",
+              "X-Trace-Id": "${workflow.input.traceId}"
+            },
+            "body": {
+              "applicationId": "${workflow.input.applicationId}",
+              "workflowId": "${workflow.workflowId}",
+              "taskReference": "deterministic_initial_decision",
+              "traceId": "${workflow.input.traceId}",
+              "decisionType": "INITIAL",
+              "evidence": {
+                "documentReviewId": "${select_final_review.output.result.reviewId}",
+                "documentDisposition": "${select_final_review.output.result.disposition}",
+                "policySupportId": "${ai_policy_evidence_support.output.response.body.policySupportId}",
+                "policyEvidenceStatus": "${ai_policy_evidence_support.output.response.body.evidenceStatus}",
+                "policyCitations": "${prepare_decision_policy_citations.output.result.citations}",
+                "geographicRiskEvaluationId": "${evaluate_geographic_risk.output.response.body.evaluationId}",
+                "geographicRiskDisposition": "${evaluate_geographic_risk.output.response.body.disposition}"
+              }
+            }
+          },
+          "type": "HTTP",
+          "retryCount": 3,
+          "optional": false,
+          "asyncComplete": false
+        },
+        {
+          "name": "route_initial_decision",
+          "taskReferenceName": "route_initial_decision",
+          "inputParameters": {
+            "case": "${deterministic_initial_decision.output.response.body.outcome}"
+          },
+          "type": "SWITCH",
+          "evaluatorType": "value-param",
+          "expression": "case",
+          "decisionCases": {
+            "APPROVED": [
+              {
+                "name": "complete_approved_path",
+                "taskReferenceName": "complete_approved_path",
+                "type": "NOOP"
+              }
+            ],
+            "REJECTED": [
+              {
+                "name": "complete_rejected_path",
+                "taskReferenceName": "complete_rejected_path",
+                "type": "NOOP"
+              }
+            ],
+            "MANUAL_REVIEW": [
+              {
+                "name": "ai_manual_review_assistant",
+                "taskReferenceName": "ai_manual_review_assistant",
+                "inputParameters": {
+                  "method": "POST",
+                  "uri": "${workflow.variables.aiAgentBaseUrl}/internal/api/v1/ai/manual-review-assistances",
+                  "headers": {
+                    "Content-Type": "application/json",
+                    "Authorization": "${workflow.variables.workflowTaskAuthorization}",
+                    "Idempotency-Key": "ai_manual_review_assistant:${workflow.input.applicationId}:${workflow.workflowId}",
+                    "X-Trace-Id": "${workflow.input.traceId}"
+                  },
+                  "body": {
+                    "applicationId": "${workflow.input.applicationId}",
+                    "workflowId": "${workflow.workflowId}",
+                    "taskReference": "ai_manual_review_assistant",
+                    "traceId": "${workflow.input.traceId}",
+                    "reviewId": "${select_final_review.output.result.reviewId}",
+                    "documentSummaryId": "${normalize_document_summary.output.result.summaryId}",
+                    "audience": "UNDERWRITER"
+                  }
+                },
+                "type": "HTTP",
+                "retryCount": 3,
+                "optional": true,
+                "asyncComplete": false
+              },
+              {
+                "name": "normalize_manual_review_assistance",
+                "taskReferenceName": "normalize_manual_review_assistance",
+                "inputParameters": {
+                  "evaluatorType": "graaljs",
+                  "expression": "(function () { var response = $.assistanceResponse || {}; var body = response.body || {}; var assistanceId = body.assistanceId == null ? '' : String(body.assistanceId); if (assistanceId) { return { assistanceId: assistanceId, assistanceStatus: 'AVAILABLE', assistanceUnavailableReason: '' }; } return { assistanceId: '', assistanceStatus: 'UNAVAILABLE', assistanceUnavailableReason: 'AI_ASSISTANCE_UNAVAILABLE' }; })();",
+                  "assistanceResponse": "${ai_manual_review_assistant.output.response}"
+                },
+                "type": "INLINE",
+                "optional": false,
+                "asyncComplete": false
+              },
+              {
+                "name": "human_task",
+                "taskReferenceName": "human_task_manual_review",
+                "inputParameters": {
+                  "applicationId": "${workflow.input.applicationId}",
+                  "traceId": "${workflow.input.traceId}",
+                  "scenarioId": "${workflow.input.scenarioId}",
+                  "scenarioName": "${workflow.input.scenarioName}",
+                  "documentCount": "${workflow.input.documentCount}",
+                  "initialDecisionId": "${deterministic_initial_decision.output.response.body.decisionId}",
+                  "initialDecisionOutcome": "${deterministic_initial_decision.output.response.body.outcome}",
+                  "requiredCompletionFields": "decisionOutcome,reviewerRole,reviewerPrincipalId,reasonCode,policySection",
+                  "allowedDecisionOutcomes": "APPROVED,REJECTED",
+                  "requiredReviewerRole": "UNDERWRITER",
+                  "requiredPolicySectionFormat": "CBPL-<policy-number>-S<section-number>",
+                  "reviewId": "${select_final_review.output.result.reviewId}",
+                  "documentSummaryId": "${normalize_document_summary.output.result.summaryId}",
+                  "manualReviewAssistanceId": "${normalize_manual_review_assistance.output.result.assistanceId}",
+                  "reviewRouteReason": "${derive_post_evidence_disposition.output.result.reason}",
+                  "policySupportId": "${ai_policy_evidence_support.output.response.body.policySupportId}",
+                  "policyEvidenceStatus": "${ai_policy_evidence_support.output.response.body.evidenceStatus}",
+                  "geographicRiskEvaluationId": "${evaluate_geographic_risk.output.response.body.evaluationId}",
+                  "geographicRiskDisposition": "${evaluate_geographic_risk.output.response.body.disposition}",
+                  "manualReviewAssistanceStatus": "${normalize_manual_review_assistance.output.result.assistanceStatus}",
+                  "manualReviewAssistanceUnavailableReason": "${normalize_manual_review_assistance.output.result.assistanceUnavailableReason}",
+                  "documentSummaryStatus": "${normalize_document_summary.output.result.summaryStatus}",
+                  "documentSummaryUnavailableReason": "${normalize_document_summary.output.result.summaryUnavailableReason}"
+                },
+                "type": "HUMAN"
+              },
+              {
+                "name": "validate_manual_review_completion",
+                "taskReferenceName": "validate_manual_review_completion",
+                "inputParameters": {
+                  "evaluatorType": "graaljs",
+                  "expression": "(function () { var completion = $.completion || {}; var outcome = completion.decisionOutcome == null ? '' : String(completion.decisionOutcome); var reviewerRole = completion.reviewerRole == null ? '' : String(completion.reviewerRole); var reviewerPrincipalId = completion.reviewerPrincipalId == null ? '' : String(completion.reviewerPrincipalId); var reasonCode = completion.reasonCode == null ? '' : String(completion.reasonCode); var policySection = completion.policySection == null ? '' : String(completion.policySection); var invalidFields = []; if (outcome !== 'APPROVED' && outcome !== 'REJECTED') invalidFields.push('decisionOutcome'); if (reviewerRole !== 'UNDERWRITER') invalidFields.push('reviewerRole'); if (!reviewerPrincipalId.trim() || reviewerPrincipalId.length > 80) invalidFields.push('reviewerPrincipalId'); if (!/^[A-Z0-9_:-]{3,120}$/.test(reasonCode)) invalidFields.push('reasonCode'); if (!/^CBPL-[0-9]{3}-S[0-9]+$/.test(policySection)) invalidFields.push('policySection'); return { status: invalidFields.length === 0 ? 'VALID' : 'INVALID', invalidFields: invalidFields }; })();",
+                  "completion": "${human_task_manual_review.output}"
+                },
+                "type": "INLINE",
+                "optional": false,
+                "asyncComplete": false
+              },
+              {
+                "name": "route_manual_review_completion",
+                "taskReferenceName": "route_manual_review_completion",
+                "inputParameters": {
+                  "case": "${validate_manual_review_completion.output.result.status}"
+                },
+                "type": "SWITCH",
+                "evaluatorType": "value-param",
+                "expression": "case",
+                "decisionCases": {
+                  "INVALID": [
+                    {
+                      "name": "terminate_invalid_manual_review_completion",
+                      "taskReferenceName": "terminate_invalid_manual_review_completion",
+                      "inputParameters": {
+                        "terminationStatus": "FAILED",
+                        "workflowOutput": {
+                          "disposition": "MANUAL_REVIEW_COMPLETION_INVALID",
+                          "reason": "REQUIRED_HUMAN_OUTPUT_MISSING_OR_INVALID",
+                          "invalidFields": "${validate_manual_review_completion.output.result.invalidFields}",
+                          "message": "The HUMAN task must be completed with all required decision fields."
+                        }
+                      },
+                      "type": "TERMINATE"
+                    }
+                  ]
+                },
+                "defaultCase": [
+                  {
+                    "name": "manual_review_completion_valid",
+                    "taskReferenceName": "manual_review_completion_valid",
+                    "type": "NOOP"
+                  }
+                ]
+              },
+              {
+                "name": "refresh_workflow_authorization",
+                "taskReferenceName": "refresh_workflow_authorization",
+                "inputParameters": {
+                  "applicationId": "${workflow.input.applicationId}",
+                  "workflowId": "${workflow.workflowId}",
+                  "traceId": "${workflow.input.traceId}"
+                },
+                "type": "SIMPLE",
+                "optional": false,
+                "asyncComplete": false
+              },
+              {
+                "name": "use_refreshed_authorization",
+                "taskReferenceName": "use_refreshed_authorization",
+                "inputParameters": {
+                  "workflowTaskAuthorization": "${refresh_workflow_authorization.output.workflowTaskAuthorization}"
+                },
+                "type": "SET_VARIABLE",
+                "optional": false,
+                "asyncComplete": false
+              },
+              {
+                "name": "deterministic_manual_final_decision",
+                "taskReferenceName": "deterministic_manual_final_decision",
+                "inputParameters": {
+                  "method": "POST",
+                  "uri": "${workflow.variables.decisionBaseUrl}/internal/api/v1/decisions",
+                  "headers": {
+                    "Content-Type": "application/json",
+                    "Authorization": "${workflow.variables.workflowTaskAuthorization}",
+                    "Idempotency-Key": "decision:manual-final:${workflow.input.applicationId}:${workflow.workflowId}",
+                    "X-Trace-Id": "${workflow.input.traceId}"
+                  },
+                  "body": {
+                    "applicationId": "${workflow.input.applicationId}",
+                    "workflowId": "${workflow.workflowId}",
+                    "taskReference": "deterministic_manual_final_decision",
+                    "traceId": "${workflow.input.traceId}",
+                    "decisionType": "MANUAL_FINAL",
+                    "evidence": {
+                      "documentReviewId": "${select_final_review.output.result.reviewId}",
+                      "documentDisposition": "${select_final_review.output.result.disposition}",
+                      "policySupportId": "${ai_policy_evidence_support.output.response.body.policySupportId}",
+                      "policyEvidenceStatus": "${ai_policy_evidence_support.output.response.body.evidenceStatus}",
+                      "policyCitations": "${prepare_decision_policy_citations.output.result.citations}",
+                      "geographicRiskEvaluationId": "${evaluate_geographic_risk.output.response.body.evaluationId}",
+                      "geographicRiskDisposition": "${evaluate_geographic_risk.output.response.body.disposition}"
+                    },
+                    "manualReview": {
+                      "outcome": "${human_task_manual_review.output.decisionOutcome}",
+                      "reviewerRole": "${human_task_manual_review.output.reviewerRole}",
+                      "reviewerPrincipalId": "${human_task_manual_review.output.reviewerPrincipalId}",
+                      "reasonCode": "${human_task_manual_review.output.reasonCode}",
+                      "policySection": "${human_task_manual_review.output.policySection}"
+                    }
+                  }
+                },
+                "type": "HTTP",
+                "retryCount": 3,
+                "optional": false,
+                "asyncComplete": false
+              }
+            ]
+          },
+          "defaultCase": [
+            {
+              "name": "terminate_unexpected_decision_outcome",
+              "taskReferenceName": "terminate_unexpected_decision_outcome",
+              "inputParameters": {
+                "terminationStatus": "FAILED",
+                "workflowOutput": {
+                  "disposition": "UNEXPECTED",
+                  "message": "Decision service returned an unsupported outcome."
+                }
+              },
+              "type": "TERMINATE"
+            }
+          ],
+          "optional": false,
+          "asyncComplete": false
+        }
+      ],
+      "optional": false,
+      "asyncComplete": false
+    },
+    {
+      "name": "select_final_decision",
+      "taskReferenceName": "select_final_decision",
+      "inputParameters": {
+        "evaluatorType": "graaljs",
+        "expression": "(function () { var manual = $.manualResponse || {}; var initial = $.initialResponse || {}; var body = manual.body || initial.body || {}; return { decisionId: body.decisionId == null ? '' : String(body.decisionId), outcome: body.outcome == null ? 'UNEXPECTED' : String(body.outcome), riskBand: body.riskBand == null ? 'NOT_SCORED' : String(body.riskBand) }; })();",
+        "initialResponse": "${deterministic_initial_decision.output.response}",
+        "manualResponse": "${deterministic_manual_final_decision.output.response}"
+      },
+      "type": "INLINE",
+      "optional": false,
+      "asyncComplete": false
+    }
+  ],
+  "inputParameters": [
+    "applicationId",
+    "traceId",
+    "workflowTaskAuthorization",
+    "scenarioId",
+    "scenarioName",
+    "documentCount"
+  ],
+  "inputTemplate": {
+    "applicationId": "",
+    "traceId": "",
+    "workflowTaskAuthorization": "",
+    "scenarioId": "",
+    "scenarioName": "",
+    "documentCount": 0
+  },
+  "enforceSchema": true,
+  "outputParameters": {
+    "disposition": "${select_final_decision.output.result.outcome}",
+    "decisionId": "${select_final_decision.output.result.decisionId}",
+    "decisionOutcome": "${select_final_decision.output.result.outcome}",
+    "riskBand": "${select_final_decision.output.result.riskBand}",
+    "extractionAttempts": "${select_final_review.output.result.extractionAttempts}",
+    "policySupportId": "${ai_policy_evidence_support.output.response.body.policySupportId}",
+    "policyEvidenceStatus": "${ai_policy_evidence_support.output.response.body.evidenceStatus}",
+    "geographicRiskEvaluationId": "${evaluate_geographic_risk.output.response.body.evaluationId}",
+    "geographicRiskDisposition": "${evaluate_geographic_risk.output.response.body.disposition}",
+    "documentReviewDisposition": "${select_final_review.output.result.disposition}",
+    "reviewRouteReason": "${derive_post_evidence_disposition.output.result.reason}",
+    "documentSummaryId": "${normalize_document_summary.output.result.summaryId}",
+    "documentSummaryStatus": "${normalize_document_summary.output.result.summaryStatus}",
+    "documentSummaryUnavailableReason": "${normalize_document_summary.output.result.summaryUnavailableReason}"
+  },
+  "failureWorkflow": "",
+  "schemaVersion": 2,
+  "restartable": true,
+  "workflowStatusListenerEnabled": false,
+  "timeoutPolicy": "TIME_OUT_WF",
+  "timeoutSeconds": 0,
+  "variables": {
+    "documentIngestBaseUrl": "http://host.minikube.internal:8082",
+    "documentReviewBaseUrl": "http://host.minikube.internal:8084",
+    "aiAgentBaseUrl": "http://host.minikube.internal:8085",
+    "policyRetrievalBaseUrl": "http://host.minikube.internal:8086",
+    "geographicRiskBaseUrl": "http://host.minikube.internal:8083",
+    "decisionBaseUrl": "http://host.minikube.internal:8088"
+  },
+  "metadata": {},
+  "maskedFields": [
+    "workflowTaskAuthorization",
+    "Authorization"
+  ]
+}

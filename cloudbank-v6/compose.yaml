@@ -1,0 +1,410 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+# Licensed under the Universal Permissive License v1.0 as shown at
+# https://oss.oracle.com/licenses/upl.
+
+name: cloudbank-ai
+
+x-application-build: &application-build
+  context: .
+  dockerfile: Dockerfile
+
+x-application-runtime: &application-runtime
+  restart: unless-stopped
+  init: true
+  networks:
+    - cloudbank
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+
+services:
+  oracle:
+    profiles: ["managed"]
+    image: ${ORACLE_IMAGE:?ORACLE_IMAGE is required}
+    restart: unless-stopped
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD:?Run ./run-compose.sh init to create local configuration}
+    ports:
+      - "${ORACLE_HOST_PORT:-1521}:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+    networks:
+      - cloudbank
+
+  schema-init:
+    image: container-registry.oracle.com/database/sqlcl:26.2.1
+    restart: "no"
+    entrypoint: ["/bin/bash", "/workspace/src/loan-application-service/setup-local-db.sh"]
+    environment:
+      LOAN_DB_ADMIN_USERNAME: ${ORACLE_ADMIN_USERNAME:?ORACLE_ADMIN_USERNAME is required}
+      LOAN_DB_ADMIN_PASSWORD: ${ORACLE_PASSWORD}
+      LOAN_SCHEMA_OWNER_PASSWORD: ${LOAN_SCHEMA_OWNER_PASSWORD}
+      LOAN_DATASOURCE_PASSWORD: ${LOAN_DATASOURCE_PASSWORD}
+      DOCUMENT_INGEST_DATASOURCE_PASSWORD: ${DOCUMENT_INGEST_DATASOURCE_PASSWORD}
+      DOCUMENT_REVIEW_DATASOURCE_PASSWORD: ${DOCUMENT_REVIEW_DATASOURCE_PASSWORD}
+      DECISION_DATASOURCE_PASSWORD: ${DECISION_DATASOURCE_PASSWORD}
+      AI_DATASOURCE_PASSWORD: ${AI_DATASOURCE_PASSWORD}
+      GEOGRAPHIC_RISK_DATASOURCE_PASSWORD: ${GEOGRAPHIC_RISK_DATASOURCE_PASSWORD}
+      POLICY_RETRIEVAL_DATASOURCE_PASSWORD: ${POLICY_RETRIEVAL_DATASOURCE_PASSWORD}
+      SCHEMA_PROFILE: ${SCHEMA_PROFILE:?SCHEMA_PROFILE is required}
+      LOAN_SQLCL_CONNECT: //${DATABASE_HOST:?DATABASE_HOST is required}:${DATABASE_PORT:?DATABASE_PORT is required}/${ORACLE_SERVICE_NAME:?ORACLE_SERVICE_NAME is required}
+    volumes:
+      - ./src/loan-application-service/setup-local-db.sh:/workspace/src/loan-application-service/setup-local-db.sh:ro
+      - ./src/schema:/workspace/src/schema:ro
+    depends_on:
+      oracle:
+        condition: service_healthy
+        required: false
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - cloudbank
+
+  azn-server:
+    <<: *application-runtime
+    build:
+      <<: *application-build
+      target: azn-server
+    environment:
+      AZN_DATASOURCE_URL: jdbc:oracle:thin:@//${DATABASE_HOST}:${DATABASE_PORT}/${ORACLE_SERVICE_NAME}
+      AZN_USER_REPO_PASSWORD: ${AZN_USER_REPO_PASSWORD}
+      AZN_USER_REPO_OWNER_PASSWORD: ${AZN_USER_REPO_OWNER_PASSWORD}
+      AZN_LIQUIBASE_URL: jdbc:oracle:thin:@//${DATABASE_HOST}:${DATABASE_PORT}/${ORACLE_SERVICE_NAME}
+      AZN_LIQUIBASE_USERNAME: ${ORACLE_ADMIN_USERNAME}
+      AZN_LIQUIBASE_PASSWORD: ${ORACLE_PASSWORD}
+      AZN_BOOTSTRAP_USERS_ADMIN_PASSWORD: ${AZN_BOOTSTRAP_USERS_ADMIN_PASSWORD}
+      AZN_BOOTSTRAP_USERS_USER_PASSWORD: ${AZN_BOOTSTRAP_USERS_USER_PASSWORD}
+      AZN_AUTHORIZATION_SERVER_DEFAULT_CLIENT_ENABLED: "true"
+      AZN_AUTHORIZATION_SERVER_DEFAULT_CLIENT_ID: cloudbank-client
+      AZN_AUTHORIZATION_SERVER_DEFAULT_CLIENT_SECRET: ${AZN_AUTHORIZATION_SERVER_DEFAULT_CLIENT_SECRET}
+      AZN_AUTHORIZATION_SERVER_SERVICE_CLIENT_SECRET: ${AZN_AUTHORIZATION_SERVER_SERVICE_CLIENT_SECRET}
+      AZN_AUTHORIZATION_SERVER_DOCUMENT_INGEST_CLIENT_SECRET: ${AZN_AUTHORIZATION_SERVER_DOCUMENT_INGEST_CLIENT_SECRET}
+      AZN_AUTHORIZATION_SERVER_DOCUMENT_REVIEW_CLIENT_SECRET: ${AZN_AUTHORIZATION_SERVER_DOCUMENT_REVIEW_CLIENT_SECRET}
+      AZN_AUTHORIZATION_SERVER_AI_AGENT_CLIENT_SECRET: ${AZN_AUTHORIZATION_SERVER_AI_AGENT_CLIENT_SECRET}
+      AZN_AUTHORIZATION_SERVER_MICROTX_CLIENT_SECRET: ${AZN_AUTHORIZATION_SERVER_MICROTX_CLIENT_SECRET}
+      AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_CLIENT_ID: microtx-console-client
+      AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_CLIENT_SECRET: ${AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_CLIENT_SECRET}
+      AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_CLIENT_REDIRECT_URI: ${AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_CLIENT_REDIRECT_URI:-http://localhost/console/oidc/redirect}
+      AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_CLIENT_POST_LOGOUT_REDIRECT_URI: ${AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_CLIENT_POST_LOGOUT_REDIRECT_URI:-http://localhost/consoleui/index.html}
+      AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_ACCESS_TOKEN_TIME_TO_LIVE: ${AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_ACCESS_TOKEN_TIME_TO_LIVE:-PT8H}
+      AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_REFRESH_TOKEN_TIME_TO_LIVE: ${AZN_AUTHORIZATION_SERVER_MICROTX_CONSOLE_REFRESH_TOKEN_TIME_TO_LIVE:-PT24H}
+      AZN_AUTHORIZATION_SERVER_SIGNING_KEY_PRIVATE_KEY_PATH: /run/cloudbank/signing-private.pem
+      AZN_AUTHORIZATION_SERVER_SIGNING_KEY_PUBLIC_KEY_PATH: /run/cloudbank/signing-public.pem
+      AZN_AUTHORIZATION_SERVER_SIGNING_KEY_KEY_ID: cloudbank-local
+      AZN_PERSISTENT_SIGNING_KEY_REQUIRED: "true"
+      AZN_ISSUER_URI: ${AZN_ISSUER_URI:-http://localhost:8080}
+      EUREKA_CLIENT_ENABLED: "false"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./.cloudbank-local/signing-private.pem:/run/cloudbank/signing-private.pem:ro
+      - ./.cloudbank-local/signing-public.pem:/run/cloudbank/signing-public.pem:ro
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      schema-init:
+        condition: service_completed_successfully
+
+  loan-application-service:
+    <<: *application-runtime
+    build:
+      <<: *application-build
+      target: loan-application-service
+    environment:
+      PORT: "8081"
+      LOAN_DATASOURCE_URL: jdbc:oracle:thin:@//${DATABASE_HOST}:${DATABASE_PORT}/${ORACLE_SERVICE_NAME}
+      LOAN_DATASOURCE_USERNAME: CB_LOAN_APPLICATION_APP
+      LOAN_DATASOURCE_PASSWORD: ${LOAN_DATASOURCE_PASSWORD}
+      LOAN_SCHEMA: CLOUDBANK
+      AZN_ISSUER_URI: ${AZN_ISSUER_URI:-http://localhost:8080}
+      AZN_JWK_SET_URI: http://azn-server:8080/oauth2/jwks
+      AZN_AUDIENCE: cloudbank-api
+      LOAN_INTERNAL_CLIENT_IDS: cloudbank-service-client,cloudbank-document-ingest-client,cloudbank-document-review-client
+      EUREKA_CLIENT_ENABLED: "false"
+      # Keep the local stack self-contained by default. Set WORKFLOW_MODE=microtx
+      # together with the variables below to let loan-application-service start
+      # cloudbank-loan-origination in an external MicroTx Workflow Server.
+      WORKFLOW_MODE: ${WORKFLOW_MODE:-fake}
+      MICROTX_WORKFLOW_URL: ${MICROTX_WORKFLOW_URL:-}
+      MICROTX_WORKFLOW_NAME: ${MICROTX_WORKFLOW_NAME:-cloudbank-loan-origination}
+      MICROTX_TOKEN_URI: ${MICROTX_TOKEN_URI:-http://azn-server:8080/oauth2/token}
+      MICROTX_CLIENT_ID: ${MICROTX_CLIENT_ID:-microtx-workflow-client}
+      MICROTX_CLIENT_SECRET: ${MICROTX_CLIENT_SECRET:-${AZN_AUTHORIZATION_SERVER_MICROTX_CLIENT_SECRET}}
+      MICROTX_SCOPE: ${MICROTX_SCOPE:-microtx.workflow}
+      WORKFLOW_TASK_TOKEN_URI: ${WORKFLOW_TASK_TOKEN_URI:-http://azn-server:8080/oauth2/token}
+      WORKFLOW_TASK_CLIENT_ID: ${WORKFLOW_TASK_CLIENT_ID:-cloudbank-service-client}
+      WORKFLOW_TASK_CLIENT_SECRET: ${WORKFLOW_TASK_CLIENT_SECRET:-${AZN_AUTHORIZATION_SERVER_SERVICE_CLIENT_SECRET}}
+      WORKFLOW_TASK_SCOPE: ${WORKFLOW_TASK_SCOPE:-cloudbank.internal}
+      WORKFLOW_DISPATCH_DELAY_MS: ${WORKFLOW_DISPATCH_DELAY_MS:-1000}
+      WORKFLOW_MAX_DISPATCH_ATTEMPTS: ${WORKFLOW_MAX_DISPATCH_ATTEMPTS:-5}
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      schema-init:
+        condition: service_completed_successfully
+      azn-server:
+        condition: service_healthy
+
+  document-ingest:
+    <<: *application-runtime
+    build:
+      <<: *application-build
+      target: document-ingest
+    environment:
+      PORT: "8082"
+      DOCUMENT_INGEST_DATASOURCE_URL: jdbc:oracle:thin:@//${DATABASE_HOST}:${DATABASE_PORT}/${ORACLE_SERVICE_NAME}
+      DOCUMENT_INGEST_DATASOURCE_USERNAME: CB_DOCUMENT_INGEST_APP
+      DOCUMENT_INGEST_DATASOURCE_PASSWORD: ${DOCUMENT_INGEST_DATASOURCE_PASSWORD}
+      DOCUMENT_INGEST_SCHEMA: CLOUDBANK
+      AZN_ISSUER_URI: ${AZN_ISSUER_URI:-http://localhost:8080}
+      AZN_JWK_SET_URI: http://azn-server:8080/oauth2/jwks
+      DOCUMENT_INGEST_TOKEN_URI: http://azn-server:8080/oauth2/token
+      DOCUMENT_INGEST_CLIENT_ID: cloudbank-document-ingest-client
+      DOCUMENT_INGEST_CLIENT_SECRET: ${AZN_AUTHORIZATION_SERVER_DOCUMENT_INGEST_CLIENT_SECRET}
+      DOCUMENT_INGEST_CALLER_CLIENT_IDS: cloudbank-service-client,cloudbank-document-review-client
+      DOCUMENT_INGEST_REVIEW_INPUT_CLIENT_IDS: cloudbank-ai-agent-client
+      LOAN_APPLICATION_BASE_URL: http://loan-application-service:8081
+      AZN_AUDIENCE: cloudbank-api
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      azn-server:
+        condition: service_healthy
+      loan-application-service:
+        condition: service_healthy
+
+  workflow-token-refresh-worker:
+    <<: *application-runtime
+    build:
+      <<: *application-build
+      target: workflow-token-refresh-worker
+    environment:
+      PORT: "8087"
+      WORKFLOW_MODE: ${WORKFLOW_MODE:-fake}
+      MICROTX_WORKFLOW_URL: ${MICROTX_WORKFLOW_URL:-}
+      WORKFLOW_TOKEN_REFRESH_TASK_TYPE: refresh_workflow_authorization
+      WORKFLOW_TOKEN_REFRESH_WORKER_ID: cloudbank-workflow-token-refresh-worker
+      WORKFLOW_TOKEN_REFRESH_POLL_DELAY_MS: ${WORKFLOW_TOKEN_REFRESH_POLL_DELAY_MS:-1000}
+      WORKFLOW_TOKEN_REFRESH_MICROTX_TOKEN_URI: http://azn-server:8080/oauth2/token
+      WORKFLOW_TOKEN_REFRESH_MICROTX_CLIENT_ID: ${MICROTX_CLIENT_ID:-microtx-workflow-client}
+      WORKFLOW_TOKEN_REFRESH_MICROTX_CLIENT_SECRET: ${MICROTX_CLIENT_SECRET:-${AZN_AUTHORIZATION_SERVER_MICROTX_CLIENT_SECRET}}
+      WORKFLOW_TOKEN_REFRESH_MICROTX_SCOPE: ${MICROTX_SCOPE:-microtx.workflow}
+      WORKFLOW_TOKEN_REFRESH_TASK_TOKEN_URI: http://azn-server:8080/oauth2/token
+      WORKFLOW_TOKEN_REFRESH_TASK_CLIENT_ID: ${WORKFLOW_TASK_CLIENT_ID:-cloudbank-service-client}
+      WORKFLOW_TOKEN_REFRESH_TASK_CLIENT_SECRET: ${WORKFLOW_TASK_CLIENT_SECRET:-${AZN_AUTHORIZATION_SERVER_SERVICE_CLIENT_SECRET}}
+      WORKFLOW_TOKEN_REFRESH_TASK_SCOPE: ${WORKFLOW_TASK_SCOPE:-cloudbank.internal}
+    ports:
+      - "8087:8087"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8087/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      azn-server:
+        condition: service_healthy
+
+  document-review-service:
+    <<: *application-runtime
+    build:
+      <<: *application-build
+      target: document-review-service
+    environment:
+      PORT: "8084"
+      DOCUMENT_REVIEW_DATASOURCE_URL: jdbc:oracle:thin:@//${DATABASE_HOST}:${DATABASE_PORT}/${ORACLE_SERVICE_NAME}
+      DOCUMENT_REVIEW_DATASOURCE_USERNAME: CB_DOCUMENT_REVIEW_APP
+      DOCUMENT_REVIEW_DATASOURCE_PASSWORD: ${DOCUMENT_REVIEW_DATASOURCE_PASSWORD}
+      DOCUMENT_REVIEW_SCHEMA: CLOUDBANK
+      AZN_ISSUER_URI: ${AZN_ISSUER_URI:-http://localhost:8080}
+      AZN_JWK_SET_URI: http://azn-server:8080/oauth2/jwks
+      DOCUMENT_REVIEW_TOKEN_URI: http://azn-server:8080/oauth2/token
+      DOCUMENT_REVIEW_CLIENT_ID: cloudbank-document-review-client
+      DOCUMENT_REVIEW_CLIENT_SECRET: ${AZN_AUTHORIZATION_SERVER_DOCUMENT_REVIEW_CLIENT_SECRET}
+      DOCUMENT_REVIEW_CALLER_CLIENT_IDS: cloudbank-service-client,cloudbank-ai-agent-client
+      LOAN_APPLICATION_BASE_URL: http://loan-application-service:8081
+      DOCUMENT_INGEST_BASE_URL: http://document-ingest:8082
+      AZN_AUDIENCE: cloudbank-api
+    ports:
+      - "8084:8084"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8084/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      azn-server:
+        condition: service_healthy
+      loan-application-service:
+        condition: service_healthy
+      document-ingest:
+        condition: service_healthy
+
+  ai-agent-service:
+    <<: *application-runtime
+    build:
+      <<: *application-build
+      target: ai-agent-service
+    environment:
+      PORT: "8085"
+      AI_DATASOURCE_URL: jdbc:oracle:thin:@//${DATABASE_HOST}:${DATABASE_PORT}/${ORACLE_SERVICE_NAME}
+      AI_DATASOURCE_USERNAME: CB_AI_AGENT_APP
+      AI_DATASOURCE_PASSWORD: ${AI_DATASOURCE_PASSWORD}
+      AI_SCHEMA: CLOUDBANK
+      AZN_ISSUER_URI: ${AZN_ISSUER_URI:-http://localhost:8080}
+      AZN_JWK_SET_URI: http://azn-server:8080/oauth2/jwks
+      AZN_AUDIENCE: cloudbank-api
+      AI_AGENT_CALLER_CLIENT_IDS: cloudbank-service-client
+      AI_AGENT_TOKEN_URI: http://azn-server:8080/oauth2/token
+      AI_AGENT_CLIENT_ID: cloudbank-ai-agent-client
+      AI_AGENT_CLIENT_SECRET: ${AZN_AUTHORIZATION_SERVER_AI_AGENT_CLIENT_SECRET}
+      DOCUMENT_REVIEW_BASE_URL: http://document-review-service:8084
+      DOCUMENT_INGEST_BASE_URL: http://document-ingest:8082
+      AI_OCI_GENAI_AUTHENTICATION_TYPE: ${AI_OCI_GENAI_AUTHENTICATION_TYPE:-WORKLOAD_IDENTITY}
+      AI_OCI_GENAI_REGION: ${AI_OCI_GENAI_REGION}
+      AI_OCI_GENAI_CHAT_MODEL: ${AI_OCI_GENAI_CHAT_MODEL}
+      OKE_CLUSTER_COMPARTMENT_ID: ${OKE_CLUSTER_COMPARTMENT_ID}
+      SPRING_MAIN_LAZY_INITIALIZATION: "true"
+    ports:
+      - "8085:8085"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8085/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      azn-server:
+        condition: service_healthy
+      document-review-service:
+        condition: service_healthy
+
+  decision-service:
+    <<: *application-runtime
+    build:
+      <<: *application-build
+      target: decision-service
+    environment:
+      PORT: "8088"
+      DECISION_DATASOURCE_URL: jdbc:oracle:thin:@//${DATABASE_HOST}:${DATABASE_PORT}/${ORACLE_SERVICE_NAME}
+      DECISION_DATASOURCE_USERNAME: CB_DECISION_APP
+      DECISION_DATASOURCE_PASSWORD: ${DECISION_DATASOURCE_PASSWORD}
+      DECISION_SCHEMA: CLOUDBANK
+      AZN_ISSUER_URI: ${AZN_ISSUER_URI:-http://localhost:8080}
+      AZN_JWK_SET_URI: http://azn-server:8080/oauth2/jwks
+      AZN_AUDIENCE: cloudbank-api
+      DECISION_CALLER_CLIENT_IDS: cloudbank-service-client
+      DECISION_TOKEN_URI: http://azn-server:8080/oauth2/token
+      DECISION_CLIENT_ID: cloudbank-service-client
+      DECISION_CLIENT_SECRET: ${AZN_AUTHORIZATION_SERVER_SERVICE_CLIENT_SECRET}
+      LOAN_APPLICATION_BASE_URL: http://loan-application-service:8081
+    ports:
+      - "8088:8088"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8088/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      schema-init:
+        condition: service_completed_successfully
+      azn-server:
+        condition: service_healthy
+      loan-application-service:
+        condition: service_healthy
+
+  policy-retrieval-service:
+    profiles: ["full-demo"]
+    <<: *application-runtime
+    build:
+      <<: *application-build
+      target: policy-retrieval-service
+    environment:
+      PORT: "8086"
+      POLICY_DATASOURCE_URL: jdbc:oracle:thin:@//${DATABASE_HOST}:${DATABASE_PORT}/${ORACLE_SERVICE_NAME}
+      POLICY_DATASOURCE_USERNAME: CB_POLICY_APPLICATION_APP
+      POLICY_DATASOURCE_PASSWORD: ${POLICY_RETRIEVAL_DATASOURCE_PASSWORD}
+      POLICY_SCHEMA: CLOUDBANK
+      AZN_ISSUER_URI: ${AZN_ISSUER_URI}
+      AZN_JWK_SET_URI: http://azn-server:8080/oauth2/jwks
+      AZN_AUDIENCE: cloudbank-api
+      OCI_GENAI_AUTHENTICATION_TYPE: ${POLICY_OCI_GENAI_AUTHENTICATION_TYPE:-FILE}
+      OCI_GENAI_CONFIG_FILE: ${POLICY_OCI_GENAI_CONFIG_DIRECTORY}/config
+      OCI_GENAI_PROFILE: ${POLICY_OCI_GENAI_PROFILE}
+      OCI_GENAI_REGION: ${POLICY_OCI_GENAI_REGION}
+      OCI_GENAI_EMBEDDING_MODEL: ${POLICY_OCI_GENAI_EMBEDDING_MODEL}
+      OCI_GENAI_EMBEDDING_COMPARTMENT_ID: ${POLICY_OCI_GENAI_EMBEDDING_COMPARTMENT_ID}
+    volumes:
+      - ${POLICY_OCI_GENAI_CONFIG_DIRECTORY}:${POLICY_OCI_GENAI_CONFIG_DIRECTORY}:ro
+    ports:
+      - "8086:8086"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8086/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    depends_on:
+      schema-init:
+        condition: service_completed_successfully
+      azn-server:
+        condition: service_healthy
+
+  geographic-risk-service:
+    profiles: ["full-demo"]
+    <<: *application-runtime
+    build:
+      <<: *application-build
+      target: geographic-risk-service
+    environment:
+      javax.sql.DataSource.geographic-risk.connectionFactoryClassName: oracle.jdbc.pool.OracleDataSource
+      javax.sql.DataSource.geographic-risk.URL: jdbc:oracle:thin:@//${DATABASE_HOST}:${DATABASE_PORT}/${ORACLE_SERVICE_NAME}
+      javax.sql.DataSource.geographic-risk.user: CB_GEOGRAPHIC_RISK_APP
+      javax.sql.DataSource.geographic-risk.password: ${GEOGRAPHIC_RISK_DATASOURCE_PASSWORD}
+      GEOGRAPHIC_RISK_BOUNDARY_DISTANCE_METERS: "100"
+      GEOGRAPHIC_RISK_SERVICE_PRINCIPAL_ID: svc-geographic-risk-service
+      AZN_ISSUER_URI: ${AZN_ISSUER_URI:-http://localhost:8080}
+      AZN_JWK_SET_URI: http://azn-server:8080/oauth2/jwks
+      AZN_AUDIENCE: cloudbank-api
+      GEOGRAPHIC_RISK_CALLER_CLIENT_IDS: cloudbank-service-client
+      OTEL_INSTRUMENTATION_LOGBACK_MDC_ENABLED: "true"
+    ports:
+      - "8083:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      schema-init:
+        condition: service_completed_successfully
+
+volumes:
+  oracle-data:
+
+networks:
+  cloudbank:

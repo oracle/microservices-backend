@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: policy-loader
+  main:
+    web-application-type: none
+    banner-mode: "off"
+  datasource:
+    url: ${POLICY_LOADER_DATASOURCE_URL:}
+    username: ${POLICY_LOADER_DATASOURCE_USERNAME:CB_POLICY_LOADER_APP}
+    password: ${POLICY_LOADER_DATASOURCE_PASSWORD:}
+    driver-class-name: oracle.jdbc.OracleDriver
+    type: oracle.ucp.jdbc.PoolDataSource
+    oracleucp:
+      connection-factory-class-name: oracle.jdbc.pool.OracleDataSource
+      connection-pool-name: PolicyLoaderConnectionPool
+      initial-pool-size: 1
+      min-pool-size: 1
+      max-pool-size: 2
+
+cloudbank:
+  policy-loader:
+    corpus-path: ${POLICY_CORPUS_PATH:/app/policy}
+    schema: ${POLICY_SCHEMA:CLOUDBANK}
+
+logging:
+  level:
+    com.cloudbank.policyloader: INFO

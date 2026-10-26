@@ -1,0 +1,77 @@
+server:
+  port: ${PORT:8086}
+
+spring:
+  application:
+    name: policy-retrieval-service
+  cloud:
+    config:
+      import-check:
+        enabled: false
+    discovery:
+      enabled: ${EUREKA_CLIENT_ENABLED:false}
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${POLICY_DATASOURCE_URL:${SPRING_DATASOURCE_URL:}}
+    username: ${POLICY_DATASOURCE_USERNAME:CB_POLICY_APPLICATION_APP}
+    password: ${POLICY_DATASOURCE_PASSWORD:}
+    driver-class-name: oracle.jdbc.OracleDriver
+    type: oracle.ucp.jdbc.PoolDataSource
+    oracleucp:
+      connection-factory-class-name: oracle.jdbc.pool.OracleDataSource
+      connection-pool-name: PolicyApplicationConnectionPool
+      initial-pool-size: 2
+      min-pool-size: 1
+      max-pool-size: 8
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: ${POLICY_SCHEMA:CLOUDBANK}
+    show-sql: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AZN_ISSUER_URI:http://127.0.0.1:8080}
+          jwk-set-uri: ${AZN_JWK_SET_URI:http://127.0.0.1:8080/oauth2/jwks}
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 10MB
+
+
+cloudbank:
+  schema: ${POLICY_SCHEMA:CLOUDBANK}
+  security:
+    audience: ${AZN_AUDIENCE:cloudbank-api}
+    internal-client-ids: ${POLICY_RETRIEVAL_CALLER_CLIENT_IDS:cloudbank-service-client}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+
+eureka:
+  client:
+    enabled: ${EUREKA_CLIENT_ENABLED:false}
+    service-url:
+      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
+
+logging:
+  level:
+    com.cloudbank.policyretrieval: INFO
+    org.springframework.security: INFO

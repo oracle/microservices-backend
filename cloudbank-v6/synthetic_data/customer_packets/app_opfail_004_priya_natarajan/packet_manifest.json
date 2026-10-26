@@ -1,0 +1,91 @@
+{
+  "applicantId": "APL-CB-OPF-004",
+  "applicantName": "Priya Natarajan",
+  "applicationId": "APP-OPFAIL-004",
+  "dataSafety": {
+    "containsRawAccountNumber": false,
+    "containsRawGovernmentIdentifier": false,
+    "generatedNonProductionValues": true,
+    "usesReservedContactPatterns": true
+  },
+  "documents": [
+    "loan_application.pdf",
+    "applicant_disclosures_and_consent.pdf",
+    "identity_verification_summary.pdf",
+    "address_jurisdiction_verification.pdf",
+    "income_evidence_validation.pdf",
+    "pay_statement_sablecrest.pdf",
+    "deposit_summary_cloudbank.pdf",
+    "liability_schedule.pdf",
+    "payment_calculation_summary.pdf",
+    "document_receipt.pdf"
+  ],
+  "expectedExtractionFacts": {
+    "apr": "11.49%",
+    "bankruptcyIndicator": "NONE",
+    "dataClassification": "restricted_customer",
+    "debtToIncome": "24.4%",
+    "disclosureStatus": "ACCEPTED",
+    "documentValidationStatus": "PASS_AFTER_RETRY",
+    "employmentStatus": "ACTIVE",
+    "existingMonthlyDebt": 1200,
+    "extractionConfidence": "HIGH_AFTER_RETRY",
+    "fraudSignal": "NONE",
+    "identityOutcome": "IDENTITY_VERIFIED",
+    "incomeConsistencyResult": "CONSISTENT_WITHIN_10_PERCENT",
+    "jurisdictionCode": "CX",
+    "jurisdictionStatus": "ENABLED",
+    "payFrequency": "BIWEEKLY",
+    "paymentCalculationStatus": "CALCULATED",
+    "proposedMonthlyPayment": 704,
+    "purposeCode": "HOME_IMPROVEMENT",
+    "recentDelinquencyIndicator": "NONE",
+    "requestedAmount": 22000,
+    "requestedTerm": "48 months",
+    "riskBand": "CB-A",
+    "statedGrossMonthlyIncome": 7800,
+    "tenureBand": "12_PLUS_MONTHS",
+    "verifiedGrossMonthlyIncome": 7800
+  },
+  "expectedOutcome": "FAILED_RETRYABLE_RECOVERED",
+  "policyAlignment": {
+    "cbpl100Eligibility": {
+      "ageBandPresent": true,
+      "dataClassificationPresent": true,
+      "disclosuresAccepted": true,
+      "identityRecordPresent": true,
+      "incomeEvidencePresent": true,
+      "jurisdictionEligible": true,
+      "permittedPurpose": true,
+      "residentialAddressPresent": true
+    },
+    "cbpl120Income": {
+      "documentValidationStatus": "PASS_AFTER_RETRY",
+      "employmentStatus": "ACTIVE",
+      "incomeConsistencyResult": "CONSISTENT_WITHIN_10_PERCENT",
+      "tenureBand": "12_PLUS_MONTHS",
+      "verifiedIncomeMeetsMinimum": true
+    },
+    "cbpl130Capacity": {
+      "bankruptcyIndicator": "NONE",
+      "dti": "24.4%",
+      "hardRejectCapacityRule": false,
+      "recentDelinquencyIndicator": "NONE"
+    },
+    "cbpl150Routing": {
+      "expectedOutcome": "FAILED_RETRYABLE_RECOVERED",
+      "manualReviewSignals": [],
+      "operationalRecovery": true
+    }
+  },
+  "policyEvidenceHints": [
+    "CBPL-150-S6-C01",
+    "CBPL-170-S5-C01"
+  ],
+  "recoveredDecision": "APPROVED",
+  "scenarioId": "SCN-OPERATIONAL-FAILURE-004",
+  "validationIssues": [
+    "temporary_document_processing_timeout_recovered"
+  ],
+  "workflowId": "WF-APP-OPFAIL-004"
+}
