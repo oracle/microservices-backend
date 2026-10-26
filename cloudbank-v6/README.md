@@ -472,18 +472,16 @@ sequenceDiagram
 
 ## Project Structure
 
-The root Maven build contains eleven modules: nine runtime services, the policy loader, and the shared embedding library.
+The root Maven build contains twelve modules: ten runtime services (including the token refresh worker), the policy loader, and the shared embedding library. The React/TypeScript UI in `src/cloudbank_ui/` is a separate npm project.
+
+The tree below shows the main project directories:
 
 ```text
-cloudbank-ai/
-├── README_public.md                    # Public application guide
-├── pom.xml                             # Java 25 multi-module Maven build
-├── Dockerfile                          # Service, policy-loader, and schema-init image targets
-├── compose.yaml                        # Local development stack
-├── run-compose.sh                      # Local lifecycle and component verification
+cloudbank-v6/
 ├── src/
 │   ├── azn-server/                     # OAuth2/OIDC, users, roles, and JWT signing
-│   ├── gateway-bff-service/            # Browser session and authorized application list (A/B)
+│   ├── gateway-bff-service/            # Browser sessions, intake, PDF upload, and manual review
+│   ├── cloudbank_ui/                   # React/TypeScript/Vite browser application
 │   ├── loan-application-service/       # Intake, immutable PDFs, state, and workflow-start outbox
 │   ├── document-ingest/                # PDF extraction and structured result persistence
 │   ├── document-review-service/        # Deterministic document and evidence review
@@ -495,9 +493,7 @@ cloudbank-ai/
 │   ├── policy-loader/                  # Synthetic policy corpus and embedding loader
 │   ├── workflow-token-refresh-worker/  # Post-human-review authorization refresh
 │   ├── workflows/
-│   │   ├── cloudbank-loan-origination/ # Versioned definitions, task definitions, and helpers
-│   │   ├── start-geocoded-loan-oke.sh  # Geocoded OKE workflow smoke test
-│   │   └── geocoded-loan-address.json # Synthetic address fixture
+│   │   └── cloudbank-loan-origination/ # Versioned definitions, task definitions, and helpers
 │   └── schema/
 │       ├── changes/                    # Ordered schema migrations and runtime grants
 │       ├── admin/                      # Privileged provisioning SQL
@@ -506,21 +502,15 @@ cloudbank-ai/
 │       └── verify/                     # Schema and feature validation
 ├── deploy/
 │   ├── obaas/
-│   │   ├── cloudbank-v6-install.md     # OKE installation and testing guide
-│   │   ├── azn-server-runbook.md       # Authorization-server deployment procedure
-│   │   ├── services-runbook.md         # Services, schema, policies, and Workload Identity
-│   │   ├── deploy-azn-server_v1.sh     # Authorization-server publication and deployment
-│   │   ├── gateway-bff-runbook.md      # BFF-only OKE deployment and local port-forward
-│   │   ├── deploy-gateway-bff.sh       # Repeatable BFF-only Helm deployment
-│   │   └── deploy-services.sh          # Application image publication and Helm deployment
+│   │   ├── gateway-bff/                # Dedicated BFF Helm chart
+│   │   ├── lib/                       # Shared deployment helpers
+│   │   └── tests/                     # Deployment regression checks
 │   └── microtx/
-│       ├── oke-obaas/                  # MicroTx authentication integration on OBaaS
-│       └── minikube/                   # Local Kubernetes MicroTx integration
+│       └── oke-obaas/                  # MicroTx authentication integration on OBaaS
 ├── synthetic_data/
 │   ├── customer_packets/              # Clearly synthetic PDF packets for demos and tests
 │   └── policy/                        # Versioned synthetic underwriting policy corpus
-├── media/                             # Application illustrations
-└── output/                            # Generated run artifacts
+└── media/                             # Application illustrations
 ```
 
-Service-specific setup, API contracts, and component checks are documented in each service's README. The [loan-origination workflow guide](src/workflows/cloudbank-loan-origination/README.md) describes workflow publication, task behavior, and the structured manual-review completion contract.
+Service-specific setup, API contracts, and component checks are documented in each service's README. The [UI guide](src/cloudbank_ui/README.md) covers the browser application. The [loan-origination workflow guide](src/workflows/cloudbank-loan-origination/README.md) describes workflow publication, task behavior, and the structured manual-review completion contract. Generated run artifacts go under `output/`, which is created when needed and ignored by Git.
