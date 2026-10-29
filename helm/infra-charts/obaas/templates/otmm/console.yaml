@@ -2,6 +2,16 @@
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
 
 {{- if eq (include "otmm.console.enabled" .) "true" }}
+{{- include "obaas.otmm.validateSecurity" . }}
+{{- $coordinatorRoles := include "obaas.otmm.coordinatorRoles" . | fromYaml }}
+{{- $security := .Values.otmm.commonConfiguration.security }}
+{{- $idp := $security.identityProvider }}
+{{- $externalURL := .Values.otmm.commonConfiguration.externalURL }}
+{{- $consoleOrigin := printf "%s://%s" ($externalURL.protocol | default "http") ($externalURL.host | default (printf "%s-otmm-console" .Release.Name)) }}
+{{- if $externalURL.port }}
+{{- $consoleOrigin = printf "%s://%s:%v" $externalURL.protocol $externalURL.host $externalURL.port }}
+{{- end }}
+{{- $defaultScopes := ternary "openid groups" "openid" (eq $idp.serverType "idcs") }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -91,7 +101,7 @@ spec:
           {{- end }}
           resources:
             {{- with .Values.otmm.console.resources }}
-            {{ toYaml . | nindent 6 }}
+            {{- toYaml . | nindent 12 }}
             {{- else }}
             limits:
               cpu: "2"
@@ -111,13 +121,13 @@ spec:
             - name: TMM_TCS_URL
               value: "http://{{ .Release.Name }}-otmm-tcs:9000"
             {{- end }}
-            {{- if eq .Values.otmm.commonConfiguration.security.enabled true }}
+            {{- if $security.enabled }}
             - name: TMM_ADMIN_USER_ROLE_NAMES
-              value: {{ .Values.otmm.commonConfiguration.security.identityProvider.adminUserRoles }}
+              value: {{ $coordinatorRoles.adminUserRoles | quote }}
             - name: TMM_ROLES_PATH
-              value: {{ .Values.otmm.commonConfiguration.security.identityProvider.adminUserRolesPath }}
+              value: {{ $coordinatorRoles.adminUserRolesPath | quote }}
             - name: SECURITY_PROPERTIES_OIDC_IDENTITY_URI
-              value: {{ .Values.otmm.commonConfiguration.security.identityProvider.identityProviderUrl }}
+              value: {{ $idp.identityProviderUrl | quote }}
             - name: SECURITY_PROPERTIES_COOKIE_ENCRYPTION_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -126,39 +136,24 @@ spec:
             - name: SECURITY_PROPERTIES_OIDC_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.otmm.commonConfiguration.security.clientSecretName }}
+                  name: {{ $security.clientSecretName }}
                   key: clientId
             - name: SECURITY_PROPERTIES_OIDC_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.otmm.commonConfiguration.security.clientSecretName }}
+                  name: {{ $security.clientSecretName }}
                   key: clientPassword
             - name: SECURITY_PROPERTIES_OIDC_ISSUER
-              value: {{ .Values.otmm.commonConfiguration.security.identityProvider.issuer }}
+              value: {{ $idp.issuer | quote }}
             - name: SECURITY_PROPERTIES_OIDC_AUDIENCE
-              value: {{ .Values.otmm.commonConfiguration.security.identityProvider.audience }}
+              value: {{ $idp.audience | quote }}
             - name: SECURITY_PROPERTIES_OIDC_BASE_SCOPES
-            {{- if or (eq (.Values.otmm.commonConfiguration.security.identityProvider.scopes | toString) "") (not (.Values.commonConfiguration.security.identityProvider.scopes)) }}
-              {{- if (eq (.Values.otmm.commonConfiguration.security.identityProvider.serverType | toString) "idcs") }}
-              value: "openid groups"
-              {{- else }}
-              value: "openid"
-              {{- end }}
-            {{- else }}
-              value: {{ .Values.otmm.commonConfiguration.security.identityProvider.scopes }}
-            {{- end }}
+              value: {{ $idp.scopes | default $defaultScopes | quote }}
             - name: SECURITY_PROPERTIES_FRONTEND_URI
-            {{- if .Values.otmm.commonConfiguration.externalURL.port }}
-              value: "{{ .Values.otmm.commonConfiguration.externalURL.protocol }}://{{ .Values.otmm.commonConfiguration.externalURL.host }}:{{ .Values.otmm.commonConfiguration.externalURL.port }}/console"
-            {{- else }}
-              value: "{{ .Values.commonConfiguration.externalURL.protocol }}://{{ .Values.otmm.commonConfiguration.externalURL.host }}/console"
+              value: {{ printf "%s/console" $consoleOrigin | quote }}
             {{- end }}
             - name: SECURITY_ENABLED
-              value: "true"
-            {{- else }}
-            - name: SECURITY_ENABLED
-              value: "false"
-            {{- end }}
+              value: {{ $security.enabled | quote }}
             {{- if .Values.otmm.workflowServer.enabled }}
             # WorkflowServer URL configuration
             - name: WF_SERVER
@@ -166,17 +161,10 @@ spec:
             - name: CONDUCTOR_BACKEND_ENDPOINT
               value: "http://{{ .Release.Name }}-otmm-workflow-server:9010"
             - name: CONDUCTOR_FRONTEND_ENDPOINT
-            {{- if .Values.otmm.commonConfiguration.externalURL.port }}
-              value: "{{ .Values.otmm.commonConfiguration.externalURL.protocol }}://{{ .Values.otmm.commonConfiguration.externalURL.host }}:{{ .Values.otmm.commonConfiguration.externalURL.port }}"
-            {{- else }}
-              value: "{{ .Values.otmm.commonConfiguration.externalURL.protocol | default "http" }}://{{ .Values.otmm.commonConfiguration.externalURL.host | default (printf "%s-otmm-console" .Release.Name) }}"
+              value: {{ $consoleOrigin | quote }}
             {{- end }}
-            {{- end }}
-            # temporary
             - name: SECURITY_PROPERTIES_COOKIE_ENCRYPTION_ENABLED
-              value: "false"
+              value: {{ .Values.otmm.console.cookieEncryption.enabled | quote }}
             - name: FAST_REFRESH
               value: "false"
-        # securityContext:
-        # runAsUser: 1000
 {{- end }}

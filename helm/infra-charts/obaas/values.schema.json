@@ -35,9 +35,71 @@
     "otmm": {
       "type": "object",
       "properties": {
+        "commonConfiguration": {
+          "type": "object",
+          "properties": {
+            "security": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "clientSecretName": { "type": "string" },
+                "identityProvider": {
+                  "type": "object",
+                  "properties": {
+                    "issuer": { "type": "string" },
+                    "jwksUri": { "type": "string" },
+                    "identityProviderUrl": { "type": "string" },
+                    "audience": { "type": "string" },
+                    "scopes": { "type": "string" },
+                    "serverType": {
+                      "enum": ["idcs", "other"]
+                    },
+                    "roleMappings": {
+                      "type": "object",
+                      "properties": {
+                        "coordinator": {
+                          "type": "object",
+                          "properties": {
+                            "adminUserRoles": { "type": "string" },
+                            "adminUserRolesPath": { "type": "string" }
+                          }
+                        },
+                        "workflow": {
+                          "type": "object",
+                          "properties": {
+                            "claimsRolePaths": { "type": "string" },
+                            "roles": {
+                              "type": "object",
+                              "properties": {
+                                "superAdmin": { "type": "string" },
+                                "admin": { "type": "string" },
+                                "user": { "type": "string" },
+                                "readOnlyUser": { "type": "string" },
+                                "metadataManager": { "type": "string" },
+                                "worker": { "type": "string" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "coordinator": {
           "type": "object",
           "properties": {
+            "authentication": {
+              "type": "object",
+              "properties": {
+                "requestsWithNoJWT": {
+                  "enum": ["", "ALLOW", "DENY"]
+                }
+              }
+            },
             "storage": {
               "type": "object",
               "additionalProperties": false,
@@ -68,6 +130,17 @@
                     "caConfigMapKey": { "type": "string", "minLength": 1 }
                   }
                 }
+              }
+            }
+          }
+        },
+        "console": {
+          "type": "object",
+          "properties": {
+            "cookieEncryption": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" }
               }
             }
           }

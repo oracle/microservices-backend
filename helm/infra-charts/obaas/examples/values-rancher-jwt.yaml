@@ -56,34 +56,25 @@ otmm:
         jwksUri: "http://azn-server.obaas.svc.cluster.local:8080/oauth2/jwks"
         identityProviderUrl: "http://azn-server.obaas.svc.cluster.local:8080/oauth2/token"
         audience: "microtx-workflow"
-        adminUserRoles: "microtx-conductor-admin"
-        adminUserRolesPath: "roles"
-        policy:
-          claimsRolePaths: "roles"
-          roles:
-            superAdmin: "microtx-conductor-super-admin"
-            admin: "microtx-conductor-admin"
-            user: "microtx-conductor-user"
-            readOnlyUser: "microtx-conductor-read-only-user"
-            metadataManager: "microtx-conductor-metadata-manager"
-            worker: "microtx-conductor-worker"
+        roleMappings:
+          coordinator:
+            adminUserRoles: "microtx-conductor-admin"
+            adminUserRolesPath: "roles"
+          workflow:
+            claimsRolePaths: "roles"
+            roles:
+              superAdmin: "microtx-conductor-super-admin"
+              admin: "microtx-conductor-admin"
+              user: "microtx-conductor-user"
+              readOnlyUser: "microtx-conductor-read-only-user"
+              metadataManager: "microtx-conductor-metadata-manager"
+              worker: "microtx-conductor-worker"
 
   coordinator:
     enabled: true
 
   workflowServer:
     enabled: true
-    security:
-      identityProvider:
-        policy:
-          claimsRolePaths: "roles"
-          roles:
-            superAdmin: "microtx-conductor-super-admin"
-            admin: "microtx-conductor-admin"
-            user: "microtx-conductor-user"
-            readOnlyUser: "microtx-conductor-read-only-user"
-            metadataManager: "microtx-conductor-metadata-manager"
-            worker: "microtx-conductor-worker"
 
   # The API validation does not require the browser console. Enable it separately
   # after registering an authorization-code client and cookie-encryption Secret.

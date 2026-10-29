@@ -2,10 +2,7 @@
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
 {{- if .Values.otmm.coordinator.enabled }}
 {{- $storage := .Values.otmm.coordinator.storage }}
-{{- $sharedDatabase := and (eq $storage.type "db") (not $storage.db.credentialSecretName) }}
-{{- $databaseWallet := or $storage.db.walletConfigMapName $storage.db.walletSecretName $sharedDatabase }}
-{{- $sharedWallet := and $sharedDatabase (not $storage.db.walletConfigMapName) (not $storage.db.walletSecretName) }}
-{{- $mountStorage := or (and (eq $storage.type "db") $databaseWallet) (and (eq $storage.type "etcd") $storage.etcd.credentialSecretName) }}
+{{- $storageOptions := include "obaas.otmm.coordinatorStorageOptions" . | fromYaml }}
 {{- $otmmMetrics := default dict .Values.otmm.coordinator.metrics }}
 {{- $otmmMetricsScrape := default dict $otmmMetrics.scrape }}
 {{- $otmmMetricsEnabled := true }}
@@ -41,7 +38,7 @@ spec:
         app.kubernetes.io/component: transaction-coordinator
       annotations:
         checksum/otmm-config: {{ include (print $.Template.BasePath "/otmm/configmap.yaml") . | sha256sum }}
-        {{- if $sharedWallet }}
+        {{- if $storageOptions.sharedWallet }}
         checksum/otmm-wallet-config: {{ include (print $.Template.BasePath "/otmm/wallet-configmap.yaml") . | sha256sum }}
         {{- end }}
         {{- if and .Values.signoz.enabled $otmmMetricsEnabled $otmmMetricsScrapeEnabled }}
@@ -61,7 +58,7 @@ spec:
       - name: initialize-coordinator-schema
         image: "{{ .Values.otmm.coordinator.image.repository }}:{{ .Values.otmm.coordinator.image.tag }}"
         imagePullPolicy: {{ .Values.otmm.coordinator.image.pullPolicy | default "IfNotPresent" }}
-        {{- include "obaas.otmm.coordinatorConfig" (dict "root" . "initialize" true) | nindent 8 }}
+        {{- include "obaas.otmm.coordinatorConfig" (dict "root" . "initialize" true "storageOptions" $storageOptions) | nindent 8 }}
       {{- end }}
       containers:
       - name: otmm-tcs
@@ -71,7 +68,7 @@ spec:
         - name: http
           containerPort: 9000
           protocol: TCP
-        {{- include "obaas.otmm.coordinatorConfig" (dict "root" . "initialize" false) | nindent 8 }}
+        {{- include "obaas.otmm.coordinatorConfig" (dict "root" . "initialize" false "storageOptions" $storageOptions) | nindent 8 }}
         {{- $probes := .Values.otmm.coordinator.probes | default dict }}
         {{- range $name := list "startup" "readiness" "liveness" }}
         {{- with index $probes $name }}
@@ -90,9 +87,9 @@ spec:
             cpu: 250m
             memory: 1Gi
           {{- end }}
-      {{- if $mountStorage }}
+      {{- if $storageOptions.mountStorage }}
       volumes:
-      {{- if and (eq $storage.type "db") $databaseWallet }}
+      {{- if and (eq $storage.type "db") $storageOptions.databaseWallet }}
       - name: database-wallet
         {{- if $storage.db.walletSecretName }}
         secret:

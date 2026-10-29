@@ -506,28 +506,44 @@ otmm:
   commonConfiguration:
     externalURL: {}
     security:
+      # Enable JWT validation and RBAC for MicroTx. Required in production.
       enabled: false
+      # Namespace-local Secret with clientId and clientPassword (console access).
       clientSecretName: ""
       identityProvider:
+        # idcs for Oracle IDCS; other for other supported identity providers.
         serverType: "other"
+        # Copy issuer and jwks_uri from the provider's discovery document.
         issuer: ""
         jwksUri: ""
+        # Provider URL used for token refresh and console OIDC discovery.
         identityProviderUrl: ""
+        # Required for coordinator JWT authentication and console access.
+        # Must match the access token's aud claim; exported as JWT_AUDIENCES.
         audience: ""
+        # IDCS only; empty uses "openid groups". Leave empty for other providers.
         scopes: ""
-        adminUserRoles: ""
-        adminUserRolesPath: "roles"
-        policy:
-          claimsRolePaths: "roles"
-          roles:
-            superAdmin: "microtx-conductor-super-admin"
-            admin: "microtx-conductor-admin"
-            user: "microtx-conductor-user"
-            readOnlyUser: "microtx-conductor-read-only-user"
-            metadataManager: "microtx-conductor-metadata-manager"
-            worker: "microtx-conductor-worker"
+        roleMappings:
+          coordinator:
+            adminUserRoles: ""
+            # Comma-separated path, e.g. "realm_access, roles" for Keycloak.
+            adminUserRolesPath: "roles"
+          workflow:
+            # Dot-separated path, e.g. "realm_access.roles" for Keycloak.
+            claimsRolePaths: "roles"
+            roles:
+              superAdmin: "microtx-conductor-super-admin"
+              admin: "microtx-conductor-admin"
+              user: "microtx-conductor-user"
+              readOnlyUser: "microtx-conductor-read-only-user"
+              metadataManager: "microtx-conductor-metadata-manager"
+              worker: "microtx-conductor-worker"
   coordinator:
     enabled: true
+    authentication:
+      # Empty derives DENY when common security is enabled, ALLOW otherwise.
+      # Explicit DENY also enables JWT validation without enabling common RBAC.
+      requestsWithNoJWT: ""
     replicas: 1
     # Native Kubernetes probe fields. Set an entry to null to disable that probe.
     probes:
@@ -654,6 +670,10 @@ otmm:
         memory: 4Gi
   console:
     enabled: true
+    cookieEncryption:
+      # Preserve the existing console behavior; enable with a compatible cookie
+      # encryption password Secret after validating browser login.
+      enabled: false
     # Native Kubernetes probe fields. Set an entry to null to disable that probe.
     probes:
       startup:

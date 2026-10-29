@@ -61,6 +61,90 @@ otmm:
 
 The console exists only to front the coordinator and workflow server, so it is deployed only when at least one of those two components is enabled. If both `otmm.coordinator.enabled` and `otmm.workflowServer.enabled` are `false`, the console is not deployed even if `otmm.console.enabled` is `true`. When deployed, the console is connected only to the backends that are enabled, so a coordinator-only or workflow-only install does not leave the console pointing at a service that was not deployed.
 
+## Identity provider and JWT security
+
+Configure MicroTx security under `otmm.commonConfiguration.security`. The
+identity-provider fields follow the [MicroTx 26.1 identity-provider
+properties](https://docs.oracle.com/en/database/oracle/transaction-manager-for-microservices/26.1/tmmdg/identity-provider-properties.html).
+Use `serverType: idcs` for Oracle IDCS and `other` for other supported providers.
+Copy `issuer` and `jwksUri` from the provider's discovery document. Leave `scopes`
+empty for non-IDCS providers; IDCS defaults to `openid groups`.
+
+For example, a Keycloak configuration with console access is:
+
+```yaml
+otmm:
+  commonConfiguration:
+    externalURL:
+      protocol: https
+      host: microtx.example.com
+    security:
+      enabled: true
+      clientSecretName: microtx-client
+      identityProvider:
+        serverType: other
+        issuer: https://idp.example.com/realms/obaas
+        jwksUri: https://idp.example.com/realms/obaas/protocol/openid-connect/certs
+        identityProviderUrl: https://idp.example.com/realms/obaas
+        audience: microtx
+        scopes: ""
+        roleMappings:
+          coordinator:
+            adminUserRoles: microtx-admin
+            adminUserRolesPath: "realm_access, roles"
+          workflow:
+            claimsRolePaths: realm_access.roles
+            roles:
+              admin: microtx-workflow-admin
+  coordinator:
+    authentication:
+      requestsWithNoJWT: DENY
+  console:
+    cookieEncryptionPasswordSecretName: microtx-console-cookie
+```
+
+Prepare namespace-local Secrets: `microtx-client` with `clientId` and
+`clientPassword`, and `microtx-console-cookie` with `secret`. Register the console
+redirect URI `https://microtx.example.com/console/oidc/redirect` with the IdP,
+and configure the audience and roles in the tokens. The IdP must be reachable by
+MicroTx pods and by users' browsers. Set up the corresponding HTTPS route;
+`externalURL` alone does not provision it.
+
+Console cookie encryption is configured separately through
+`otmm.console.cookieEncryption.enabled`. It defaults to `false` to preserve
+existing console behavior. Set it to `true` to enable the console's cookie
+encryption setting and verify browser login with your encryption-password Secret.
+When common security and the console are enabled, the chart still requires
+`cookieEncryptionPasswordSecretName`, regardless of this setting.
+
+Common security enables coordinator RBAC, workflow JWT validation, and console
+OIDC. An empty `coordinator.authentication.requestsWithNoJWT` derives `DENY` when
+security is enabled and `ALLOW` otherwise. `ALLOW` with coordinator RBAC enabled
+is rejected. For JWT authentication without common RBAC, explicitly set `DENY`
+and provide issuer/JWKS details and the expected access-token audience. The chart
+exports `identityProvider.audience` as the coordinator's `JWT_AUDIENCES` setting.
+API-only installations can disable the console and omit its client Secret, URL,
+and administrator role settings; coordinator JWT authentication still requires
+the audience.
+The evaluation defaults leave security disabled; enable security and require
+JWTs in production, as described in [MicroTx authentication
+properties](https://docs.oracle.com/en/database/oracle/transaction-manager-for-microservices/26.1/tmmdg/authentication-properties.html).
+
+Use `identityProvider.roleMappings.coordinator` for administrator roles and
+`identityProvider.roleMappings.workflow` for workflow roles. Coordinator role
+paths use commas; workflow paths use dots. Older OBaaS overrides under
+`identityProvider.adminUserRoles`, `identityProvider.adminUserRolesPath`,
+`identityProvider.policy`, and `workflowServer.security.identityProvider.policy`
+remain supported and take precedence. Remove those overrides when migrating to
+the documented `roleMappings` paths.
+
+JWT validation and RBAC do not enable token propagation to participant callbacks.
+The chart keeps token propagation disabled; enabling it requires additional
+encryption-key and callback configuration. After deployment, verify that missing,
+expired, incorrectly signed, and wrong-issuer tokens are rejected, and that
+administrator APIs enforce the configured roles. Helm render checks do not
+establish runtime IdP compatibility.
+
 ## Coordinator database storage
 
 The coordinator defaults to `otmm.coordinator.storage.type: memory`. To persist
