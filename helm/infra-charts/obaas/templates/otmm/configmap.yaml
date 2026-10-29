@@ -2,7 +2,11 @@
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
 {{- if .Values.otmm.coordinator.enabled }}
 {{- include "obaas.otmm.validateStorage" . }}
+{{- include "obaas.otmm.validateSecurity" . }}
 {{- $storage := .Values.otmm.coordinator.storage }}
+{{- $security := .Values.otmm.commonConfiguration.security }}
+{{- $idp := $security.identityProvider }}
+{{- $roles := include "obaas.otmm.coordinatorRoles" . | fromYaml }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -15,7 +19,9 @@ metadata:
     {{- include "obaas.labels" . | nindent 4 }}
 data:
   APPLICATION_NAMESPACE: ""
-  AUTHORIZATION_ENABLED: "false"
+  AUTHENTICATION_ENABLED: {{ eq (include "obaas.otmm.requestsWithNoJWT" .) "DENY" | quote }}
+  AUTHORIZATION_ENABLED: {{ $security.enabled | quote }}
+  # Token propagation additionally requires encryption key configuration.
   AUTHORIZATION_TOKEN_PROPAGATION_ENABLED: "false"
   BATCH_INTERVAL: "60"
   CACHE_ENABLED: "true"
@@ -28,9 +34,13 @@ data:
   HTTP_CLIENT_TIMEOUT_IN_SECS: "60"
   HTTP_TRACE_ENABLED: "true"
   ID: TCS01
-  IDENTITY_PROVIDER_CLIENT_ID: ""
-  IDENTITY_PROVIDER_NAME: ""
-  IDENTITY_PROVIDER_URL: ""
+  IDENTITY_PROVIDER_SERVER_TYPE: {{ $idp.serverType | quote }}
+  IDENTITY_PROVIDER_URL: {{ $idp.identityProviderUrl | quote }}
+  JWT_ISSUER: {{ $idp.issuer | quote }}
+  JWT_JWKS_URI: {{ $idp.jwksUri | quote }}
+  JWT_AUDIENCES: {{ $idp.audience | quote }}
+  ADMIN_USER_ROLES: {{ $roles.adminUserRoles | quote }}
+  ADMIN_USER_ROLES_PATH: {{ $roles.adminUserRolesPath | quote }}
   INTERNAL_ADDR: {{ printf "http://%s-otmm-tcs:9000" .Release.Name }}
   ISTIO_INGRESS_GATEWAY: ingressgateway
   ISTIO_SYSTEM_NAMESPACE: ""
@@ -43,7 +53,7 @@ data:
   NARAYANA_LRA_COMPATIBILITY_MODE: "false"
   NOTIFICATION_SPIKE_TIME_IN_SEC: "5"
   PORT: "9000"
-  REQUEST_WITH_NO_JWT: ALLOW
+  REQUEST_WITH_NO_JWT: {{ include "obaas.otmm.requestsWithNoJWT" . | quote }}
   SERVE_TLS_ENABLED: "false"
   STORAGE_TYPE: {{ $storage.type | quote }}
   STORAGE_ETCD_ENDPOINTS: {{ ternary $storage.etcd.endpoints "" (eq $storage.type "etcd") | quote }}

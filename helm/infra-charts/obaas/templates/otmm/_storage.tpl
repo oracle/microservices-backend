@@ -37,14 +37,24 @@ Licensed under the Universal Permissive License v1.0 as shown at http://oss.orac
 {{- .Values.otmm.workflowServer.config.storage.fileSystem.persistence.existingClaim | default (printf "%s-otmm-workflow-files" .Release.Name | trunc 63 | trimSuffix "-") -}}
 {{- end -}}
 
+{{/* Keep volume and startup decisions in sync for all coordinator containers. */}}
+{{- define "obaas.otmm.coordinatorStorageOptions" -}}
+{{- $storage := .Values.otmm.coordinator.storage -}}
+{{- $sharedDatabase := and (eq $storage.type "db") (not $storage.db.credentialSecretName) -}}
+{{- $databaseWallet := not (empty (or $storage.db.walletConfigMapName $storage.db.walletSecretName $sharedDatabase)) -}}
+{{- toYaml (dict
+    "sharedDatabase" $sharedDatabase
+    "databaseWallet" $databaseWallet
+    "sharedWallet" (and $sharedDatabase (not $storage.db.walletConfigMapName) (not $storage.db.walletSecretName))
+    "mountStorage" (or (and (eq $storage.type "db") $databaseWallet) (and (eq $storage.type "etcd") (not (empty $storage.etcd.credentialSecretName))))) -}}
+{{- end -}}
+
 {{/* Shared startup configuration for schema initialization and the coordinator. */}}
 {{- define "obaas.otmm.coordinatorConfig" -}}
 {{- $root := .root -}}
 {{- $storage := $root.Values.otmm.coordinator.storage -}}
-{{- $sharedDatabase := and (eq $storage.type "db") (not $storage.db.credentialSecretName) -}}
-{{- $databaseWallet := or $storage.db.walletConfigMapName $storage.db.walletSecretName $sharedDatabase -}}
-{{- $mountStorage := or (and (eq $storage.type "db") $databaseWallet) (and (eq $storage.type "etcd") $storage.etcd.credentialSecretName) -}}
-{{- if $sharedDatabase }}
+{{- $options := .storageOptions -}}
+{{- if $options.sharedDatabase }}
 # MicroTx expects JSON credentials; serialize the shared secret at runtime.
 command: ["/usr/bin/python3", "-c"]
 args:
@@ -66,8 +76,15 @@ env:
   value: {{ .initialize | quote }}
 - name: GIN_MODE
   value: release
+{{- if and $root.Values.otmm.commonConfiguration.security.enabled $root.Values.otmm.commonConfiguration.security.clientSecretName }}
+- name: IDENTITY_PROVIDER_CLIENT_ID
+  valueFrom:
+    secretKeyRef:
+      name: {{ $root.Values.otmm.commonConfiguration.security.clientSecretName | quote }}
+      key: clientId
+{{- end }}
 {{- if eq $storage.type "db" }}
-{{- if $sharedDatabase }}
+{{- if $options.sharedDatabase }}
 {{- include "obaas.database.authN" $root | nindent 0 }}
 {{- else }}
 - name: STORAGE_DB_CREDENTIAL
@@ -76,14 +93,14 @@ env:
       name: {{ $storage.db.credentialSecretName | quote }}
       key: {{ $storage.db.credentialSecretKey | quote }}
 {{- end }}
-{{- if $databaseWallet }}
+{{- if $options.databaseWallet }}
 - name: TNS_ADMIN
   value: /etc/config/dbwallet
 {{- end }}
 {{- end }}
-{{- if $mountStorage }}
+{{- if $options.mountStorage }}
 volumeMounts:
-{{- if and (eq $storage.type "db") $databaseWallet }}
+{{- if and (eq $storage.type "db") $options.databaseWallet }}
 - name: database-wallet
   mountPath: /etc/config/dbwallet
   readOnly: true

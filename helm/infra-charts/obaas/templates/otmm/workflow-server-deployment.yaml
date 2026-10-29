@@ -2,6 +2,8 @@
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
 {{- if .Values.otmm.workflowServer.enabled }}
 {{- include "obaas.otmm.validateStorage" . }}
+{{- include "obaas.otmm.validateSecurity" . }}
+{{- $workflowRoles := include "obaas.otmm.workflowRoles" . | fromYaml }}
 {{- $filePersistence := .Values.otmm.workflowServer.config.storage.fileSystem.persistence }}
 {{- $workflowMetrics := default dict .Values.otmm.workflowServer.metrics }}
 {{- $workflowMetricsScrape := default dict $workflowMetrics.scrape }}
@@ -180,19 +182,19 @@ spec:
               value: {{ .Values.otmm.commonConfiguration.security.identityProvider.audience | quote }}
             {{- end }}
             - name: POLICY_SECURITY_CLAIMS_ROLE_PATHS
-              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.claimsRolePaths | quote }}
+              value: {{ $workflowRoles.claimsRolePaths | quote }}
             - name: POLICY_SECURITY_ROLE_SUPER_ADMIN
-              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.roles.superAdmin | quote }}
+              value: {{ $workflowRoles.roles.superAdmin | quote }}
             - name: POLICY_SECURITY_ROLE_ADMIN
-              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.roles.admin | quote }}
+              value: {{ $workflowRoles.roles.admin | quote }}
             - name: POLICY_SECURITY_ROLE_USER
-              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.roles.user | quote }}
+              value: {{ $workflowRoles.roles.user | quote }}
             - name: POLICY_SECURITY_ROLE_READ_ONLY_USER
-              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.roles.readOnlyUser | quote }}
+              value: {{ $workflowRoles.roles.readOnlyUser | quote }}
             - name: POLICY_SECURITY_ROLE_METADATA_MANAGER
-              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.roles.metadataManager | quote }}
+              value: {{ $workflowRoles.roles.metadataManager | quote }}
             - name: POLICY_SECURITY_ROLE_WORKER
-              value: {{ .Values.otmm.workflowServer.security.identityProvider.policy.roles.worker | quote }}
+              value: {{ $workflowRoles.roles.worker | quote }}
             - name: CONDUCTOR_SECURITY_ENABLED
               value: "true"
             {{- else }}
