@@ -1,0 +1,10 @@
+{
+  "label": "Helm Installation",
+  "position": 2,
+  "collapsible": true,
+  "collapsed": true,
+  "link": {
+    "type": "doc",
+    "id": "setup/helm/index"
+  }
+}

@@ -51,7 +51,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          lastVersion: '2.1.1',
+          lastVersion: '2.1.2',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
@@ -85,7 +85,7 @@ const config: Config = {
         },
         {
           type: 'docsVersionDropdown',
-          versions: ['current', '2.1.1', '2.1.0', '2.0.0']
+          versions: ['current', '2.1.2', '2.1.1', '2.1.0', '2.0.0']
         },
         {
           href: 'https://github.com/oracle/microservices-backend',

@@ -1,0 +1,70 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+#
+# Persistent exporter queues for ONE SigNoz collector (small or medium only).
+# Layer after the size profile. Create signoz-collector-queue-pvc.yaml in the
+# release namespace first. For the complete steps, see
+# https://oracle.github.io/microservices-backend/obaas/docs/observability/signoz-persistent-queue
+# Do not layer onto distributed: that profile requires independent queue claims
+# for each collector. Never scale this Deployment with the shared claim below.
+# This overlay replaces extraVolumes, extraVolumeMounts and service.extensions
+# lists; merge any site-specific entries explicitly.
+
+signoz:
+  enabled: true
+  otelCollector:
+    replicaCount: 1
+    autoscaling:
+      enabled: false
+    # Prevent overlapping old/new pods during upgrades. Restarts interrupt
+    # ingestion; SDK/agent retries still need to cover that interruption.
+    strategy: Recreate
+    podSecurityContext:
+      fsGroup: 10001
+      fsGroupChangePolicy: OnRootMismatch
+    securityContext:
+      runAsUser: 10001
+      runAsGroup: 10001
+      runAsNonRoot: true
+    extraVolumes:
+      - name: exporter-queue
+        persistentVolumeClaim:
+          claimName: signoz-collector-queue
+    extraVolumeMounts:
+      - name: exporter-queue
+        mountPath: /var/lib/otelcol/queue
+    config:
+      extensions:
+        file_storage/queue:
+          directory: /var/lib/otelcol/queue/storage
+          create_directory: true
+          fsync: true
+          compaction:
+            on_rebound: true
+            directory: /var/lib/otelcol/queue/compaction
+      exporters:
+        clickhousetraces: &persistentExporter
+          timeout: 30s
+          sending_queue:
+            enabled: true
+            storage: file_storage/queue
+            sizer: requests
+            # Per exporter, measured in requests/batches, not bytes or records.
+            # These are starting values, not a tested outage-duration budget.
+            queue_size: 1000
+            num_consumers: 2
+            block_on_overflow: true
+          retry_on_failure:
+            enabled: true
+            initial_interval: 5s
+            max_interval: 30s
+            # Keep retrying retryable failures; permanent errors can still drop
+            # data. Storage and queue capacity remain finite.
+            max_elapsed_time: 0s
+        signozclickhousemetrics: *persistentExporter
+        clickhouselogsexporter: *persistentExporter
+        metadataexporter: *persistentExporter
+        signozclickhousemeter: *persistentExporter
+      service:
+        # Helm replaces lists: preserve the default diagnostic extensions.
+        extensions: [health_check, zpages, pprof, file_storage/queue]

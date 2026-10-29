@@ -16,6 +16,20 @@ Before beginning these tests, ensure you have:
 - Access to the CloudBank OAuth client secrets created by `3-k8s_db_secrets.sh`
 - The azn-server signing-key secret created by `3-k8s_db_secrets.sh`
 
+## MicroTx JWT Smoke Test
+
+When the MicroTx workflow server is deployed, run:
+
+```bash
+./8-smoke_test_microtx_jwt.sh -n <namespace> --secret-name <oauth-secret-name>
+```
+
+The script checks that the Workflow API returns `401` without a token and `200` with an azn-server JWT, and shows evidence of JWKS retrieval. It requires `svc/azn-server`, `svc/obaas-otmm-workflow-server`, and the `microtx-client-secret` key in the selected secret. The service names and OAuth client ID `microtx-workflow-client` are fixed in the script. Use `--secret-name` to select your existing OAuth secret (typically `<dbname>-azn-server-auth`); omitting it retains the default `obaas-azn-server-auth`. The script does not create or modify secrets.
+
+Temporary port-forwards use local ports `18080` and `19010`; override them with `--azn-port` and `--workflow-port`. Both port-forwards are stopped on exit.
+
+The script prints progress by default, including startup settings, readiness updates every five attempts, secret lookup, token issuance, API checks, and cleanup. Failures identify the stage and report expected versus actual HTTP status for API checks; startup failures also show port-forward logs. Client secrets and bearer tokens are not printed, and temporary response files are private and removed on exit.
+
 ## Step 1: Getting Started
 
 ### 1.1 Set Environment Variables

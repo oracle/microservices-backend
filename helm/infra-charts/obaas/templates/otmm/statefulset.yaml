@@ -1,6 +1,8 @@
 ## Copyright (c) 2024, 2026, Oracle and/or its affiliates.
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
 {{- if .Values.otmm.coordinator.enabled }}
+{{- $storage := .Values.otmm.coordinator.storage }}
+{{- $storageOptions := include "obaas.otmm.coordinatorStorageOptions" . | fromYaml }}
 {{- $otmmMetrics := default dict .Values.otmm.coordinator.metrics }}
 {{- $otmmMetricsScrape := default dict $otmmMetrics.scrape }}
 {{- $otmmMetricsEnabled := true }}
@@ -34,8 +36,12 @@ spec:
       labels:
         app.kubernetes.io/name: {{ .Release.Name }}-otmm-tcs
         app.kubernetes.io/component: transaction-coordinator
-      {{- if and .Values.signoz.enabled $otmmMetricsEnabled $otmmMetricsScrapeEnabled }}
       annotations:
+        checksum/otmm-config: {{ include (print $.Template.BasePath "/otmm/configmap.yaml") . | sha256sum }}
+        {{- if $storageOptions.sharedWallet }}
+        checksum/otmm-wallet-config: {{ include (print $.Template.BasePath "/otmm/wallet-configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if and .Values.signoz.enabled $otmmMetricsEnabled $otmmMetricsScrapeEnabled }}
         signoz.io/scrape: "true"
         signoz.io/port: {{ $otmmMetricsPort | quote }}
         signoz.io/path: {{ $otmmMetricsPath | quote }}
@@ -45,6 +51,15 @@ spec:
       serviceAccountName: {{ .Release.Name }}-otmm-tcs
       securityContext:
         runAsUser: 1000
+
+      ## If using database storage, initialize the MicroTX Schema.
+      {{- if and (eq $storage.type "db") $storage.db.initializeSchema }}
+      initContainers:
+      - name: initialize-coordinator-schema
+        image: "{{ .Values.otmm.coordinator.image.repository }}:{{ .Values.otmm.coordinator.image.tag }}"
+        imagePullPolicy: {{ .Values.otmm.coordinator.image.pullPolicy | default "IfNotPresent" }}
+        {{- include "obaas.otmm.coordinatorConfig" (dict "root" . "initialize" true "storageOptions" $storageOptions) | nindent 8 }}
+      {{- end }}
       containers:
       - name: otmm-tcs
         image: "{{ .Values.otmm.coordinator.image.repository }}:{{ .Values.otmm.coordinator.image.tag }}"
@@ -53,14 +68,14 @@ spec:
         - name: http
           containerPort: 9000
           protocol: TCP
-        env:
-        - name: GIN_MODE
-          value: release
-        - name: CONFIG_MAP_PATH
-          value: /etc/config
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/config
+        {{- include "obaas.otmm.coordinatorConfig" (dict "root" . "initialize" false "storageOptions" $storageOptions) | nindent 8 }}
+        {{- $probes := .Values.otmm.coordinator.probes | default dict }}
+        {{- range $name := list "startup" "readiness" "liveness" }}
+        {{- with index $probes $name }}
+        {{ $name }}Probe:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
         resources:
           {{- if .Values.otmm.coordinator.resources }}
           {{- toYaml .Values.otmm.coordinator.resources | nindent 10 }}
@@ -72,8 +87,42 @@ spec:
             cpu: 250m
             memory: 1Gi
           {{- end }}
+      {{- if $storageOptions.mountStorage }}
       volumes:
-      - name: config-volume
+      {{- if and (eq $storage.type "db") $storageOptions.databaseWallet }}
+      - name: database-wallet
+        {{- if $storage.db.walletSecretName }}
+        secret:
+          secretName: {{ $storage.db.walletSecretName | quote }}
+        {{- else if $storage.db.walletConfigMapName }}
         configMap:
-          name: {{ .Release.Name }}-otmm-config
+          name: {{ $storage.db.walletConfigMapName | quote }}
+        {{- else }}
+        projected:
+          sources:
+          - secret:
+              name: {{ ternary (include "obaas.databaseAdbTnsAdminSecret" .) (include "obaas.databaseTnsAdminSecret" .) (eq (include "obaas.database.isADB" .) "true") }}
+              optional: true
+          # The downloaded wallet points to ?/network/admin; use this mount instead.
+          - configMap:
+              name: {{ .Release.Name }}-otmm-wallet-config
+              items:
+              - key: sqlnet.ora
+                path: sqlnet.ora
+        {{- end }}
+      {{- else if and (eq $storage.type "etcd") $storage.etcd.credentialSecretName }}
+      - name: etcd-credentials
+        secret:
+          secretName: {{ $storage.etcd.credentialSecretName | quote }}
+          items:
+            - key: {{ $storage.etcd.credentialSecretKey | quote }}
+              path: credentials.json
+      - name: etcd-ca
+        configMap:
+          name: {{ $storage.etcd.caConfigMapName | quote }}
+          items:
+            - key: {{ $storage.etcd.caConfigMapKey | quote }}
+              path: ca.pem
+      {{- end }}
+      {{- end }}
 {{- end }}

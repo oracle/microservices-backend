@@ -1,0 +1,136 @@
+---
+title: Spring Boot Eureka Server
+sidebar_position: 9
+---
+
+Oracle Backend for Microservices and AI includes the Spring Boot Eureka service registry, which stores information about client services. Typically, each microservice registers with Eureka at startup. Eureka maintains a list of all active service instances, including their IP addresses and ports. Other services can look up this information using a well-known key, enabling service-to-service communication without hardcoding addresses at development or deployment time.
+
+:::note
+ Want to use Eureka in your Helidon applications - see [below](#enable-a-helidon-application-for-eureka)
+:::
+
+## Installing Spring Boot Eureka Server
+
+Spring Boot Eureka Server will be installed if the `eureka.enabled` is set to `true` in the `values.yaml` file. The default namespace for Spring Boot Eureka Server is `eureka`.
+
+### Scaling Eureka replicas
+
+By default, OBaaS deploys three Eureka replicas. You can change the number of
+replicas with `eureka.replicas`.
+
+When APISIX is enabled, update the APISIX Eureka discovery host list to include
+each Eureka replica. See [Configure APISIX for multiple Eureka
+replicas](./apacheapisix.md#configure-apisix-for-multiple-eureka-replicas) for
+the required configuration.
+
+### Connection idle timeout
+
+The Eureka server's Jetty connection idle timeout defaults to 90 seconds. This is longer than APISIX/OpenResty's 60-second pooled connection lifetime and prevents APISIX from attempting to reuse a connection that Eureka has already closed.
+
+You can override the timeout in your OBaaS values file:
+
+```yaml
+eureka:
+  connectionIdleTimeout: 90s
+```
+
+Keep this value longer than the APISIX/OpenResty pooled connection lifetime. Lower values can cause intermittent `failed to fetch registry ...: closed` messages while APISIX refreshes the Eureka registry.
+
+## Access Eureka Web User Interface
+
+To access the Eureka Web User Interface, use kubectl port-forward to create a secure channel to `service/eureka`. Run the following command to establish the secure tunnel (replace the example namespace `obaas-dev` with the namespace where the Spring Boot Eureka Server is deployed):
+
+```shell
+kubectl port-forward -n obaas-dev svc/eureka 8761
+```
+
+Open the [Eureka web user interface](http://localhost:8761)
+
+![Eureka Web User Interface](images/eureka-web.png)
+
+## Enable a Spring Boot application for Eureka
+
+To enable a Spring Boot application, you need to add the following dependency.
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+```
+
+And to configure the application to register with Eureka, add the following to the `application.yaml` file. The variables in this configuration are automatically injected into your deployment and pods when you deploy applications to Oracle Backend for Microservices and AI using the OBaaS deployment Helm chart.
+
+```yaml
+eureka:
+  instance:
+    hostname: ${spring.application.name}
+    preferIpAddress: true
+  client:
+    service-url:
+      defaultZone: ${eureka.service-url}
+    fetch-registry: true
+    register-with-eureka: true
+    enabled: true
+```
+
+## Enable a Helidon application for Eureka
+
+To enable a Helidon application, you need to add the following dependency.
+
+```xml
+<dependency>
+    <groupId>io.helidon.integrations.eureka</groupId>
+    <artifactId>helidon-integrations-eureka</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+
+And to configure the application to register with Eureka, add the following to the `application.yaml` file:
+
+```properties
+server.features.eureka.enabled=true
+server.features.eureka.instance.name=${eureka.instance.hostname}
+server.features.eureka.client.base-uri=${eureka.client.service-url.defaultZone}
+server.features.eureka.client.register-with-eureka=true
+server.features.eureka.client.fetch-registry=true
+server.features.eureka.instance.preferIpAddress=true
+```
+
+
+## Enable a Helidon application for Eureka
+
+To enable a Helidon application, you need to add the following dependency to your `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>io.helidon.integrations.eureka</groupId>
+    <artifactId>helidon-integrations-eureka</artifactId>
+</dependency>
+```
+
+Then, update your application configuration in `src/main/resources/application.yaml`:
+
+```yaml
+server:
+  features:
+    eureka:
+      enabled: true
+      client:
+        base-uri: ${eureka.client.service-url.defaultZone}
+        connect-timeout: PT10S
+        read-timeout: PT30S
+      instance:
+        name: "your-service-name"  # IMPORTANT: Use 'name' not 'app-name'
+        hostname: ${eureka.instance.hostname}
+        prefer-ip-address: ${eureka.instance.preferIpAddress:true}
+```
+
+Notes:
+
+* Use `instance.name` (not `app-name`)
+* Use ISO 8601 duration format: `PT10S` (not `10s`)
+* Environment variables will be injected by OBaaS
+
+If you deploy your application using the OBaaS application Helm chart, you can enable Eureka by
+setting `obaas.eureka.enabled: true` in your `values.yaml`.

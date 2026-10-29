@@ -12,18 +12,21 @@ This chart must be installed **once per cluster** before installing any OBaaS in
 - **strimzi-kafka-operator** - Kafka cluster management via CRDs
 - **clickhouse-operator CRDs** - Custom Resource Definitions for ClickHouse management (operator runs per-tenant namespace)
 - **oracle-database-operator** - Oracle Database lifecycle management via CRDs
-- **cert-manager** (subchart) - Certificate management and issuance.
 
 ## Installation
 
 ### Prerequisites
 
-- Kubernetes >= 1.34.0
+- Kubernetes 1.36–1.37
 - Helm 3.x
+- A healthy, separately installed cert-manager with its CRDs and cainjector.
 
 ### Install Prerequisites (once per cluster)
 
 ```bash
+# Install cert-manager (version correct as of: 11-Sept-2026)
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.21.2/cert-manager.yaml
+
 # Install prerequisites
 helm upgrade --install obaas-prereqs . --create-namespace -n obaas-system
 
@@ -32,6 +35,20 @@ helm upgrade --install obaas-prereqs . -n obaas-system --create-namespace --valu
 ```
 
 **Note:** All prerequisite components will be installed into the `obaas-system` namespace. While these components operate cluster-wide and manage cluster-scoped resources (CRDs, cluster roles, etc.), their deployments, services, and other namespaced resources will reside in `obaas-system`.
+
+### Verify Metrics Server
+
+Metrics Server is working when its aggregated APIService is available and
+`kubectl top` returns current node or pod usage:
+
+```bash
+kubectl get apiservice v1beta1.metrics.k8s.io
+kubectl top nodes
+kubectl top pods -n <application-namespace>
+```
+
+The APIService should report `Available=True`; an empty `kubectl top` result
+immediately after startup can be normal while the first scrape completes.
 
 ### After Prerequisites are Installed
 
@@ -77,13 +94,18 @@ strimzi-kafka-operator:
 ```yaml
 oracle-database-operator:
   enabled: true
-  # Uncomment to override default image for air-gapped installations
+  # Uncomment to override images for air-gapped installations
   # image:
   #   registry: myregistry.example.com
   #   repository: database/operator
-  #   tag: "2.1.0"
-  # Uncomment to watch specific namespace instead of all namespaces
-  # watchNamespace: "tenant1"
+  #   tag: "2.2.0"
+  # crdConfiguration:
+  #   image: myregistry.example.com/kubectl:v1.36.3
+  # Uncomment to watch an existing namespace
+  # scope:
+  #   mode: namespace
+  #   watchNamespaces:
+  #     - tenant1
 ```
 
 **AKS-specific note for metrics-server:**

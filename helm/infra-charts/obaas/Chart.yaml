@@ -3,7 +3,7 @@
 apiVersion: v2
 type: application
 name: "obaas"
-kubeVersion: ">= 1.34.0"
+kubeVersion: ">=1.36.0-0 <1.38.0-0"
 description: A Helm chart for Oracle Backend as a Service
 home: https://oracle.github.io/microservices-backend
 maintainers:
@@ -11,9 +11,9 @@ maintainers:
     email: obaas_ww@oracle.com
     url: https://oracle.github.io/microservices-backend
 # This is the chart version.
-version: 0.2.0
+version: 0.1.2
 # This is the version number of the application being deployed.
-appVersion: "2.2.0"
+appVersion: "2.1.2"
 
 # SubCharts
 # Note: Cluster-singleton prerequisites (oracle-database-operator, external-secrets, metrics-server,
@@ -22,7 +22,7 @@ appVersion: "2.2.0"
 dependencies:
   - name: gateway-helm
     repository: "file://charts/gateway-helm"
-    version: "1.8.2"
+    version: "1.9.1"
     condition: gateway-helm.enabled
   - name: ingress-nginx
     version: "4.15.1"
@@ -33,14 +33,14 @@ dependencies:
     repository: https://charts.signoz.io
     condition: signoz.enabled
   - name: signoz
-    version: "0.134.0"
+    version: "0.142.1"
     repository: https://charts.signoz.io
     condition: signoz.enabled
   - name: apisix
-    version: "2.16.0"
+    version: "2.17.0"
     repository: https://apache.github.io/apisix-helm-chart
     condition: apisix.enabled
   - name: ai-optimizer
-    version: "2.4.1"
+    version: "2.0.3"
     repository: https://oracle.github.io/ai-optimizer/helm
     condition: ai-optimizer.enabled

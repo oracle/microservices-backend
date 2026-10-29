@@ -3,7 +3,7 @@
 apiVersion: v2
 type: application
 name: "obaas-prereqs"
-kubeVersion: ">= 1.34.0"
+kubeVersion: ">=1.36.0-0 <1.38.0-0"
 description: Prerequisites and cluster-singleton infrastructure for Oracle Backend as a Service
 home: https://oracle.github.io/microservices-backend
 maintainers:
@@ -11,40 +11,38 @@ maintainers:
     email: obaas_ww@oracle.com
     url: https://oracle.github.io/microservices-backend
 # This is the chart version.
-version: 0.2.0
+version: 0.1.2
 # This is the version number of the application being deployed.
-appVersion: "2.2.0"
+appVersion: "2.1.2"
 
 # SubCharts - Cluster-scoped singleton infrastructure
 dependencies:
   - name: external-secrets
-    version: "2.8.0"
+    version: "2.10.0"
     repository: https://charts.external-secrets.io
     condition: external-secrets.enabled
   - name: metrics-server
-    version: "3.13.1"
+    version: "3.14.0"
     repository: https://kubernetes-sigs.github.io/metrics-server/
     condition: metrics-server.enabled
   - name: kube-state-metrics
-    version: "6.4.1"
+    version: "8.4.2"
     repository: https://prometheus-community.github.io/helm-charts
     condition: kube-state-metrics.enabled
   - name: strimzi-kafka-operator
-    version: "1.1.0"
+    version: "1.2.0"
     repository: https://strimzi.io/charts/
     condition: strimzi-kafka-operator.enabled
   - name: coherence-operator
-    version: "3.5.14"
+    version: "3.5.17"
     repository: https://oracle.github.io/coherence-operator/charts
     condition: coherence-operator.enabled
   # Installs the OpenTelemetry Operator to enable auto-instrumentation via custom resources
   - name: opentelemetry-operator
-    version: "0.119.0"
+    version: "0.122.0"
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     condition: opentelemetry-operator.enabled
   - name: oracle-database-operator
-    # NOTE: cert-manager is a dependency of oracle-database-operator
-    #       if cert-manager is already installed, modify values.yaml to disable cert-manager in the subchart
     version: "0.2.0"
     repository: "file://charts/oracle-database-operator"
     condition: oracle-database-operator.enabled
