@@ -5,7 +5,8 @@
 region          = "uk-london-1"
 label_prefix    = "obaasdr"
 fsdr_enabled    = true
-fsdr_region_1   = "uk-london-1"
+# The standby region must differ from region and have a READY tenancy subscription.
+fsdr_region_1   = "eu-frankfurt-1"
 fsdr_plan_types = ["SWITCHOVER", "FAILOVER", "START_DRILL", "STOP_DRILL"]
 fsdr_timeouts = {
   create = "40m"
