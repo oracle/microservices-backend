@@ -21,6 +21,8 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -74,6 +76,44 @@ public class LoanApplicationController {
                     message = "must be a valid CloudBank application ID") String applicationId,
             JwtAuthenticationToken authentication) {
         return service.get(applicationId, AuthenticatedPrincipal.from(authentication.getToken()));
+    }
+
+    @GetMapping("/api/v1/loan-applications/{applicationId}/workspace")
+    @PreAuthorize("@loanAuthorization.isUser(authentication) and hasAuthority('SCOPE_cloudbank.read') and "
+            + "hasAnyRole('APPLICANT','LOAN_OFFICER','UNDERWRITER','AUDITOR','ADMIN')")
+    public ResponseEntity<ApplicationApiModels.WorkspaceResponse> workspace(
+            @PathVariable @Pattern(regexp = APPLICATION_ID_PATTERN) String applicationId,
+            JwtAuthenticationToken authentication) {
+        return ResponseEntity.ok().header(HttpHeaders.CACHE_CONTROL, "private, no-store")
+                .body(service.workspace(applicationId, AuthenticatedPrincipal.from(authentication.getToken())));
+    }
+
+    @GetMapping("/api/v1/loan-applications/{applicationId}/audit")
+    @PreAuthorize("@loanAuthorization.isUser(authentication) and hasAuthority('SCOPE_cloudbank.read') and "
+            + "hasAnyRole('APPLICANT','LOAN_OFFICER','UNDERWRITER','AUDITOR','ADMIN')")
+    public ResponseEntity<ApplicationApiModels.AuditResponse> audit(
+            @PathVariable @Pattern(regexp = APPLICATION_ID_PATTERN) String applicationId,
+            JwtAuthenticationToken authentication) {
+        return ResponseEntity.ok().header(HttpHeaders.CACHE_CONTROL, "private, no-store")
+                .body(service.audit(applicationId, AuthenticatedPrincipal.from(authentication.getToken())));
+    }
+
+    @GetMapping("/api/v1/loan-applications/{applicationId}/documents/{documentId}/content")
+    @PreAuthorize("@loanAuthorization.isUser(authentication) and hasAuthority('SCOPE_cloudbank.read') and "
+            + "hasAnyRole('APPLICANT','LOAN_OFFICER','UNDERWRITER','AUDITOR','ADMIN')")
+    public ResponseEntity<byte[]> previewDocument(
+            @PathVariable @Pattern(regexp = APPLICATION_ID_PATTERN) String applicationId,
+            @PathVariable @Pattern(regexp = DOCUMENT_ID_PATTERN) String documentId,
+            JwtAuthenticationToken authentication) {
+        var preview = service.previewDocument(applicationId, documentId,
+                AuthenticatedPrincipal.from(authentication.getToken()));
+        String name = preview.fileName() == null || preview.fileName().isBlank() ? "document.pdf"
+                : preview.fileName().replaceAll("[\\p{Cntrl}]", "_").replace('/', '_').replace('\\', '_');
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).contentLength(preview.content().length)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.inline().filename(name, StandardCharsets.UTF_8).build().toString())
+                .header(HttpHeaders.CACHE_CONTROL, "private, no-store")
+                .header("X-Content-Type-Options", "nosniff").body(preview.content());
     }
 
     @GetMapping("/api/v1/loan-applications")

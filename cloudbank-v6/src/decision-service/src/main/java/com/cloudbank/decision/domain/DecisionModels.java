@@ -82,4 +82,9 @@ public final class DecisionModels {
 
     public record StoredDecision(DecisionResult result, String requestHash) {
     }
+
+    public record PaymentFacts(String currency, BigDecimal evaluatedAmount, Integer termMonths,
+            BigDecimal monthlyPayment, String calculationStatus) { }
+
+    public record WorkspaceDecision(DecisionResult result, PaymentFacts paymentFacts) { }
 }

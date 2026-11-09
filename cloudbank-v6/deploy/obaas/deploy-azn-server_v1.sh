@@ -54,11 +54,11 @@ usage() {
 Prepare and deploy CloudBank AI azn-server on OCI OBaaS.
 
 Usage:
-  ./deploy/obaas/deploy-azn-server_v1.sh first-deploy
-  ./deploy/obaas/deploy-azn-server_v1.sh redeploy
+  deploy/obaas/deploy-azn-server_v1.sh first-deploy
+  deploy/obaas/deploy-azn-server_v1.sh redeploy
 
 The repository-root .env must contain the deployment inputs documented in
-./deploy/obaas/azn-server-runbook.md. NEW_IMAGE_TAG must be exported by the
+deploy/obaas/azn-server-runbook.md. NEW_IMAGE_TAG must be exported by the
 caller and must identify a new immutable image tag.
 EOF
 }

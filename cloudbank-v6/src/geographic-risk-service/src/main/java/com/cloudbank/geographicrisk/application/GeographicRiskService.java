@@ -172,6 +172,17 @@ public class GeographicRiskService {
         return database.available();
     }
 
+    public GeographicRiskResponse workspace(String applicationId, String workflowId, String evaluationId) {
+        ApplicationAddress address = database.findApplicationAddress(applicationId)
+                .orElseThrow(NotFoundException::new);
+        var evaluation = evaluationRepository.findByIdempotency(address.applicationSk(),
+                "geo-risk:" + applicationId + ":" + workflowId).orElseThrow(NotFoundException::new);
+        if (!workflowId.equals(evaluation.workflowId()) || !evaluationId.equals(evaluation.evaluationId())) {
+            throw new NotFoundException();
+        }
+        return response(applicationId, evaluation, signalResponses(evaluation.evaluationId()));
+    }
+
     private List<SpatialSignalDraft> evaluateSignals(ApplicationAddress address) {
         List<SpatialSignalDraft> signals = new ArrayList<>();
         if (!address.hasLocation()) {

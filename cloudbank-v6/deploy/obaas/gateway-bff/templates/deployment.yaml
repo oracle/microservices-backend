@@ -61,6 +61,23 @@ spec:
               value: {{ .Values.userInfoUri | quote }}
             - name: BFF_LOAN_BASE_URL
               value: {{ .Values.loanBaseUrl | quote }}
+            - name: BFF_AI_BASE_URL
+              value: {{ .Values.aiBaseUrl | quote }}
+            - name: BFF_DECISION_BASE_URL
+              value: {{ .Values.decisionBaseUrl | quote }}
+            - name: BFF_GEOGRAPHIC_BASE_URL
+              value: {{ .Values.geographicBaseUrl | quote }}
+            - name: BFF_SIGNOZ_BASE_URL
+              value: {{ .Values.signozBaseUrl | quote }}
+            - name: BFF_SIGNOZ_PUBLIC_URL
+              value: {{ .Values.signozPublicUrl | quote }}
+            {{- if or .Values.signozApiKeySecretName .Values.signozApiKeySecretKey }}
+            - name: BFF_SIGNOZ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "signozApiKeySecretName is required" .Values.signozApiKeySecretName | quote }}
+                  key: {{ required "signozApiKeySecretKey is required" .Values.signozApiKeySecretKey | quote }}
+            {{- end }}
             {{- if .Values.microtxBaseUrl }}
             - name: BFF_MICROTX_BASE_URL
               value: {{ .Values.microtxBaseUrl | quote }}

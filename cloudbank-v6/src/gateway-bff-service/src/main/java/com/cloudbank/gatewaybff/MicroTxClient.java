@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /** MicroTx credentials and runtime payloads stay on the server. No generic browser proxy. */
 @Component
@@ -26,6 +28,19 @@ class MicroTxClient {
     private static final String REGISTRATION = "bff-microtx";
     private final RestClient client;
     private final OAuth2AuthorizedClientManager authorization;
+
+    JsonNode execution(String workflowId, String correlation, ObjectMapper json) {
+        return client.get().uri("/workflow/{id}?includeTasks=true", workflowId)
+                .headers(headers -> headers.setBearerAuth(accessToken()))
+                .header("X-Correlation-ID", correlation).exchange((request, response) -> {
+                    if (response.getStatusCode().value() != 200) {
+                        throw new ResponseStatusException(response.getStatusCode());
+                    }
+                    byte[] bytes = response.getBody().readNBytes(2 * 1024 * 1024 + 1);
+                    if (bytes.length > 2 * 1024 * 1024) throw new ResponseStatusException(HttpStatus.BAD_GATEWAY);
+                    return json.readTree(bytes);
+                });
+    }
 
     MicroTxClient(RestClient.Builder builder,
             @Value("${cloudbank.bff.microtx.base-url:}") String baseUrl,

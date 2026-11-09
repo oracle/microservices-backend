@@ -4,6 +4,7 @@ import { DemoPage, ApplicationsPage, NewApplicationPage, ReviewPage, Observabili
 import { WorkspacePage } from './workspace';
 import { ArchitecturePage } from './architecture';
 import { LiveApp } from './LiveApp';
+import { useMockStore } from './model';
 
 const nav = [
   ['Demo', '/demo'], ['Applications', '/applications'], ['Manual review', '/manual-review'],
@@ -13,6 +14,7 @@ const copyrightNotice = 'Copyright (c) 2026, Oracle and/or its affiliates.';
 
 function MockApp() {
   const path = usePath();
+  const { applications } = useMockStore();
   const [entered, setEntered] = useState(false);
   const pathname = path.split('?')[0];
   useEffect(() => { if (!entered && pathname !== '/login') go('/login'); }, [entered, pathname]);
@@ -28,7 +30,7 @@ function MockApp() {
       pathname === '/applications/new' ? <NewApplicationPage /> :
       pathname.startsWith('/applications/') ? <WorkspacePage id={decodeURIComponent(pathname.slice('/applications/'.length))} path={path} /> :
       pathname === '/manual-review' ? <ReviewPage /> :
-      pathname === '/architecture' ? <ArchitecturePage path={path} /> :
+      pathname === '/architecture' ? <ArchitecturePage path={path} mode="mock" applications={applications} /> :
       pathname === '/observability' ? <ObservabilityPage path={path} /> :
       pathname === '/admin/security' ? <SecurityPage /> : <div className="card"><h1>Page not found</h1><Link href="/demo">Back to demo →</Link></div>}
   </main><footer className="footer"><span>{copyrightNotice}</span><span>Synthetic, simulated data · No live services connected</span></footer></div>;

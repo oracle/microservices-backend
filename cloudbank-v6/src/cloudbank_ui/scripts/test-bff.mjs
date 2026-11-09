@@ -16,7 +16,8 @@ async function sourceModule(path) {
   const { outputText } = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } });
   return import(`data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`);
 }
-const { createApplication, uploadDocument, startProcessing, getHumanTasks, getHumanTask, resolveHumanTask, BffError } = await sourceModule('../src/bff.ts');
+const { createApplication, uploadDocument, startProcessing, getHumanTasks, getHumanTask, resolveHumanTask,
+  getApplicationWorkspace, getDocumentPdf, documentContentUrl, BffError } = await sourceModule('../src/bff.ts');
 const { bindDocumentFiles } = await sourceModule('../src/intake.ts');
 const { createNewApplicationDraft, createNewApplicationDocuments } = await sourceModule('../src/newApplicationDefaults.ts');
 const session = { csrfHeaderName: 'X-CSRF-TOKEN', csrfToken: 'synthetic-csrf' };
@@ -249,6 +250,89 @@ test('a stale task conflict remains visible with its safe correlation reference'
     message: 'The task state or resolution has changed.', correlationId: 'safe-reference' }, { status: 409 }));
   await assert.rejects(resolveHumanTask(humanTask, resolution, 'resolution-one', session), error =>
     error instanceof BffError && error.status === 409 && error.correlationId === 'safe-reference');
+});
+
+function workspaceFixture() {
+  const unavailable = () => ({ availability: 'UNAVAILABLE', data: null, code: 'NOT_IMPLEMENTED', message: 'Not connected yet.' });
+  return {
+    applicationId: 'APP-test', scenarioName: 'Synthetic workspace', source: 'LIVE', status: 'PROCESSING',
+    overview: { availability: 'AVAILABLE', data: { applicant: { displayName: 'Synthetic Applicant' }, loan: { requestedAmount: 5000 } } },
+    documents: { availability: 'AVAILABLE', data: { items: [{ documentId: 'DOC-test', documentType: 'LOAN_APPLICATION', fileName: 'loan.pdf',
+      status: 'VALIDATED', required: true, contentAvailable: true, mediaType: 'application/pdf', contentLengthBytes: 6 }], truncated: false } },
+    aiWorkflowTasks: unavailable(), decision: unavailable(), policyEvidence: unavailable(), riskSignals: unavailable(),
+    workflow: unavailable(), audit: unavailable(), trace: unavailable(),
+  };
+}
+
+test('workspace fetch keeps all nine sections and never fetches PDF content during the metadata read', async t => {
+  const calls = [];
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    calls.push({ url, options }); return Response.json(workspaceFixture());
+  });
+  const result = await getApplicationWorkspace('APP-test');
+  assert.equal(result.overview.data.applicant.displayName, 'Synthetic Applicant');
+  assert.equal(result.documents.data.items[0].contentAvailable, true);
+  assert.equal(result.workflow.availability, 'UNAVAILABLE');
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].url, '/bff/api/v1/applications/APP-test');
+  assert.equal(calls[0].options.headers.has('Authorization'), false);
+});
+
+test('workspace cannot silently accept mock data, another application, duplicated documents or a missing tab', async t => {
+  for (const change of [v => { v.source = 'MOCK'; }, v => { v.applicationId = 'APP-other'; },
+    v => { delete v.audit; }, v => { v.documents.data.items.push(v.documents.data.items[0]); },
+    v => { v.documents.data.items[0].contentLengthBytes = 25 * 1024 * 1024 + 1; }]) {
+    const fixture = workspaceFixture(); change(fixture);
+    t.mock.method(globalThis, 'fetch', async () => Response.json(fixture));
+    await assert.rejects(getApplicationWorkspace('APP-test'), error => error instanceof BffError);
+  }
+});
+
+test('PDF preview fetch uses the session cookie and PDF accept header with no write credentials', async t => {
+  const bytes = new Uint8Array([37, 80, 68, 70, 45, 49]);
+  const controller = new AbortController();
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    assert.equal(url, documentContentUrl('APP-test', 'DOC-test'));
+    assert.equal(options.headers.get('Accept'), 'application/pdf');
+    assert.equal(options.headers.has('Authorization'), false);
+    assert.equal(options.headers.has('X-CSRF-TOKEN'), false);
+    assert.equal(options.credentials, 'same-origin');
+    assert.equal(options.cache, 'no-store');
+    assert.ok(options.signal);
+    return new Response(bytes, { headers: { 'Content-Type': 'application/pdf', 'Content-Length': '6' } });
+  });
+  const pdf = await getDocumentPdf('APP-test', 'DOC-test', controller.signal);
+  assert.equal(pdf.type, 'application/pdf');
+  assert.deepEqual(new Uint8Array(await pdf.arrayBuffer()), bytes);
+});
+
+test('preview rejects HTML errors, empty content, partial responses and incorrect length', async t => {
+  const responses = [
+    () => new Response('untrusted proxy body', { headers: { 'Content-Type': 'text/html' } }),
+    () => new Response(null, { headers: { 'Content-Type': 'application/pdf' } }),
+    () => new Response('pdf', { status: 206, headers: { 'Content-Type': 'application/pdf' } }),
+    () => new Response('pdf', { headers: { 'Content-Type': 'application/pdf', 'Content-Length': '100' } }),
+  ];
+  for (const response of responses) {
+    t.mock.method(globalThis, 'fetch', async () => response());
+    await assert.rejects(getDocumentPdf('APP-test', 'DOC-test'), error => error instanceof BffError && error.status === 502);
+  }
+});
+
+test('preview cancels oversized content even when the server omits its length', async t => {
+  let cancelled = false;
+  const stream = new ReadableStream({ start(controller) { controller.enqueue(new Uint8Array(25 * 1024 * 1024 + 1)); },
+    cancel() { cancelled = true; } });
+  t.mock.method(globalThis, 'fetch', async () => new Response(stream, { headers: { 'Content-Type': 'application/pdf' } }));
+  await assert.rejects(getDocumentPdf('APP-test', 'DOC-test'), error => error instanceof BffError && error.status === 502);
+  assert.equal(cancelled, true);
+});
+
+test('preview preserves session expiry and authorized not-found errors', async t => {
+  for (const code of [401, 403, 404]) {
+    t.mock.method(globalThis, 'fetch', async () => Response.json({ code: 'DENIED', message: 'Document unavailable in your scope.' }, { status: code }));
+    await assert.rejects(getDocumentPdf('APP-test', 'DOC-test'), error => error instanceof BffError && error.status === code);
+  }
 });
 
 test('workflow v1 HUMAN fields and allowed outcomes agree with the browser completion contract', async () => {

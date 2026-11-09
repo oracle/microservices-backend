@@ -32,7 +32,6 @@ switcher or extra interactive user setup.
 From the repository root, with the existing protected `.env`:
 
 ```bash
-cd ./cloudbank-v6
 ./deploy/obaas/provision-lab-admin.sh --check-identity
 ./deploy/obaas/provision-lab-admin.sh
 ```
@@ -69,9 +68,8 @@ Run the shell regression tests and, against a configured lab, the Oracle
 regression tests:
 
 ```bash
-cd ./cloudbank-v6
-bash ./deploy/obaas/tests/test-lab-admin-bootstrap.sh
-bash ./deploy/obaas/tests/test-lab-admin-oracle.sh
+bash deploy/obaas/tests/test-lab-admin-bootstrap.sh
+bash deploy/obaas/tests/test-lab-admin-oracle.sh
 ```
 
 The Oracle suite checks provisioning, idempotency, inactive/revoked/expired

@@ -14,10 +14,10 @@ access tokens.
 
 1. Complete Chapter 1 of
    [`azn-server-runbook.md`](../../obaas/azn-server-runbook.md). The
-   `.env` in `cloudbank-v6` directory must contain the documented OBaaS release, namespace,
+   repository-root `.env` must contain the documented OBaaS release, namespace,
    local Console endpoint, and kubeconfig inputs.
 2. Deploy `azn-server` with
-   `./deploy/obaas/deploy-azn-server_v1.sh first-deploy`.
+   `deploy/obaas/deploy-azn-server_v1.sh first-deploy`.
 3. Install `kubectl`, Helm, `jq`, OpenSSL, and `curl` on the workstation.
 
 Do not source `.env` into the shell. It contains credentials. The security
@@ -30,7 +30,6 @@ both `first-deploy` and `redeploy`, using its deployment confirmation. For a
 standalone repair, run from the repository root:
 
 ```bash
-cd ./cloudbank-v6
 ./deploy/microtx/oke-obaas/secure-microtx-workflows.sh --enable
 ```
 
@@ -136,14 +135,13 @@ MicroTx authentication and synchronizes its OAuth Secret. When using the
 lower-level Helm helper directly, reapply this command after deployment:
 
 ```bash
-cd ./cloudbank-v6
 ./deploy/microtx/oke-obaas/secure-microtx-workflows.sh --enable
 ```
 
 An issuer migration requires a coordinated change to all JWT validators. If
 the helper reports mismatched CloudBank deployments, redeploy the services
-with `./deploy/obaas/deploy-services.sh redeploy`, then the BFF with
-`./deploy/obaas/deploy-gateway-bff.sh deploy`, before repeating this helper.
+with `deploy/obaas/deploy-services.sh redeploy`, then the BFF with
+`deploy/obaas/deploy-gateway-bff.sh deploy`, before repeating this helper.
 Both deployment scripts check the live Azn issuer against `.env`. The existing
 Console cookie Secret is preserved. Restart local Console/Azn port-forwards
 after their pods are replaced, and begin a fresh browser login.
@@ -155,7 +153,6 @@ the MicroTx Workflow API and must not be used on a shared, staging, or
 production installation.
 
 ```bash
-cd ./cloudbank-v6
 ./deploy/microtx/oke-obaas/secure-microtx-workflows.sh --disable
 ```
 
@@ -168,6 +165,5 @@ bridge, or OAuth Secrets.
 Restore protection with:
 
 ```bash
-cd ./cloudbank-v6
 ./deploy/microtx/oke-obaas/secure-microtx-workflows.sh --enable
 ```

@@ -39,7 +39,7 @@ class BffErrorHandler {
     private ResponseEntity<ErrorBody> response(int status, HttpServletRequest request) {
         boolean retryable = status == 502 || status == 503 || status == 504;
         String authorization = status == 401 ? "UNAUTHENTICATED" : status == 403 ? "DENIED" : "AUTHENTICATED";
-        boolean upload = request.getRequestURI().endsWith("/content");
+        boolean upload = "PUT".equals(request.getMethod()) && request.getRequestURI().endsWith("/content");
         boolean start = request.getRequestURI().endsWith("/workflow-start");
         boolean review = request.getRequestURI().contains("/manual-review/tasks");
         String code = switch (status) {

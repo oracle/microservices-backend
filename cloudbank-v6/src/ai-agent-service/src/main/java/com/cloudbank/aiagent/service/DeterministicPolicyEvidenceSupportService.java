@@ -10,6 +10,8 @@ import com.cloudbank.aiagent.api.AiAgentApiModels.PolicyEvidenceInput;
 import com.cloudbank.aiagent.api.AiAgentApiModels.PolicyEvidenceSupportRequest;
 import com.cloudbank.aiagent.api.AiAgentApiModels.PolicyEvidenceSupportResponse;
 import com.cloudbank.aiagent.api.AiAgentApiModels.SourceReference;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -19,6 +21,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DeterministicPolicyEvidenceSupportService {
+    private final Cache<String, PolicyEvidenceSupportResponse> results =
+            Caffeine.newBuilder().maximumSize(1000).build();
+
+    public java.util.Optional<PolicyEvidenceSupportResponse> readResult(String id) {
+        return java.util.Optional.ofNullable(results.getIfPresent(id));
+    }
     private static final String GROUNDED_SUMMARY =
             "Deterministic fixture summary: authorized policy evidence is available for deterministic decisioning and underwriting review.";
     private static final String INSUFFICIENT_SUMMARY =
@@ -36,11 +44,13 @@ public class DeterministicPolicyEvidenceSupportService {
                 : List.of("Retrieve authorized policy evidence before relying on policy support.",
                         "Route incomplete evidence according to deterministic workflow rules.");
 
-        return new PolicyEvidenceSupportResponse(policySupportId, "COMPLETED", "deterministic-fixture",
+        var response = new PolicyEvidenceSupportResponse(policySupportId, "COMPLETED", "deterministic-fixture",
                 "fixed-response-v1", request.applicationId(), request.workflowId(), request.taskReference(),
                 request.traceId(), request.reviewId(), request.documentSummaryId(), request.audience(),
                 grounded ? "GROUNDED" : "INSUFFICIENT_EVIDENCE",
                 grounded ? GROUNDED_SUMMARY : INSUFFICIENT_SUMMARY, citations, notes, sources, "PASSED");
+        results.put(policySupportId, response);
+        return response;
     }
 
     private PolicyCitation citation(PolicyEvidenceInput evidence) {

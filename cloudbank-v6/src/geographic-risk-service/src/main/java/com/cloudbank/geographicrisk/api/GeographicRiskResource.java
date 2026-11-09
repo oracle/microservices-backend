@@ -15,7 +15,9 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.logging.Logger;
 
@@ -57,5 +59,18 @@ public class GeographicRiskResource {
         } catch (RuntimeException exception) {
             throw new GeographicRiskApiException(exception);
         }
+    }
+
+    @GET
+    @Path("/internal/api/v1/workspace/applications/{applicationId}/geographic-risk/{evaluationId}")
+    public Response workspace(@PathParam("applicationId") String applicationId,
+            @PathParam("evaluationId") String evaluationId, @QueryParam("workflowId") String workflowId) {
+        if (applicationId == null || !applicationId.matches("APP-[A-Za-z0-9][A-Za-z0-9-]{0,35}")
+                || workflowId == null || !workflowId.matches("[A-Za-z0-9._:-]{1,100}")
+                || evaluationId == null || !evaluationId.matches("GEO-EVAL-[A-Za-z0-9-]{1,70}")) {
+            throw new jakarta.ws.rs.BadRequestException();
+        }
+        return Response.ok(service.workspace(applicationId, workflowId, evaluationId))
+                .header("Cache-Control", "private, no-store").build();
     }
 }

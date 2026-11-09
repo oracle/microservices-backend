@@ -3,9 +3,11 @@
 // https://oss.oracle.com/licenses/upl/.
 
 import { useCallback, useEffect, useState } from 'react';
+import { ArchitecturePage } from './architecture';
 import { BffError, getApplications, getSession, logout, type BffApplication, type BffApplicationPage, type BffCreatedApplication, type BffSession } from './bff';
 import { LiveNewApplication } from './LiveNewApplication';
 import { LiveManualReview } from './LiveManualReview';
+import { LiveWorkspace } from './LiveWorkspace';
 import { go, Link, usePath } from './navigation';
 import { Badge, Card, Empty, Fact, PageHeading } from './ui';
 
@@ -123,8 +125,9 @@ function LiveApplications({ onSessionExpired }: { onSessionExpired: () => void }
       </select></label>}>
       {error && <div className="live-error" role="alert">{error}</div>}
       {loading ? <p className="live-loading" role="status">Loading applications…</p> : !error && <>
-        <div className="table-wrap"><table><thead><tr><th>Application</th><th>Status</th><th>Amount</th><th>Term</th><th>Workflow</th><th>Updated</th></tr></thead><tbody>{rows.map(item =>
-          <tr key={item.applicationId}><td><strong>{item.scenarioName || 'Loan application'}</strong><small className="mono">{item.applicationId}{item.scenarioId ? ` · ${item.scenarioId}` : ''}</small></td><td>{statusBadge(item.status)}</td><td>{amount(item.requestedAmount)}</td><td>{item.requestedTermMonths == null ? '—' : `${item.requestedTermMonths} months`}</td><td className="mono small-text">{item.workflowId || 'Not assigned yet'}</td><td>{dateTime(item.updatedAt ?? item.createdAt)}</td></tr>
+        <div className="table-wrap"><table><thead><tr><th>Application</th><th>Status</th><th>Amount</th><th>Term</th><th>Workflow</th><th>Updated</th><th>Action</th></tr></thead><tbody>{rows.map(item =>
+          <tr key={item.applicationId}><td><strong><Link href={`/applications/${encodeURIComponent(item.applicationId)}`}>{item.scenarioName || 'Loan application'}</Link></strong><small className="mono">{item.applicationId}{item.scenarioId ? ` · ${item.scenarioId}` : ''}</small></td><td>{statusBadge(item.status)}</td><td>{amount(item.requestedAmount)}</td><td>{item.requestedTermMonths == null ? '—' : `${item.requestedTermMonths} months`}</td><td className="mono small-text">{item.workflowId || 'Not assigned yet'}</td><td>{dateTime(item.updatedAt ?? item.createdAt)}</td>
+            <td><Link href={`/applications/${encodeURIComponent(item.applicationId)}`} className="button button--small button--secondary" aria-label={`Open ${item.scenarioName || 'application'} ${item.applicationId}`}>Open →</Link></td></tr>
         )}</tbody></table></div>
         {rows.length === 0 && <Empty title="No applications">No applications are available for this account and status.</Empty>}
         <div className="pagination"><span>Page {Math.min(page + 1, totalPages)} of {totalPages}</span><div>
@@ -133,7 +136,7 @@ function LiveApplications({ onSessionExpired }: { onSessionExpired: () => void }
         </div></div>
       </>}
     </Card>
-    <div className="callout"><span className="callout-icon">i</span><p>Select New application to create a record, upload its PDFs, and start processing. Open Manual review for pending human tasks. Workspace details remain planned.</p></div>
+    <div className="callout"><span className="callout-icon">i</span><p>Open an application to explore its Overview and Documents, including PDF preview. All nine workspace tabs remain visible; sections not connected to live data show their availability.</p></div>
   </>;
 }
 
@@ -153,6 +156,7 @@ function LiveSecurity({ session }: { session: BffSession }) {
 export function LiveApp() {
   const path = usePath();
   const pathname = path.split('?')[0];
+  const applicationId = /^\/applications\/(APP-[A-Za-z0-9][A-Za-z0-9-]{0,35})$/.exec(pathname)?.[1];
   const [auth, setAuth] = useState<AuthState>({ kind: 'loading' });
   const [retry, setRetry] = useState(0);
   const [logoutError, setLogoutError] = useState('');
@@ -174,9 +178,9 @@ export function LiveApp() {
   }, [retry]);
 
   useEffect(() => {
-    if (auth.kind === 'authenticated' && pathname !== '/applications' && pathname !== '/applications/new' && pathname !== '/admin/security' && pathname !== '/manual-review') go('/applications');
+    if (auth.kind === 'authenticated' && !applicationId && pathname !== '/applications' && pathname !== '/applications/new' && pathname !== '/admin/security' && pathname !== '/manual-review' && pathname !== '/architecture') go('/applications');
     if (auth.kind === 'signedOut' && pathname !== '/login') go('/login');
-  }, [auth.kind, pathname]);
+  }, [auth.kind, pathname, applicationId]);
 
   const retryConnection = () => { setAuth({ kind: 'loading' }); setRetry(value => value + 1); };
   const endSession = async () => {
@@ -199,17 +203,19 @@ export function LiveApp() {
   const security = pathname === '/admin/security';
   const creating = pathname === '/applications/new';
   const reviewing = pathname === '/manual-review';
+  const architecture = pathname === '/architecture';
   return <div className="app-shell"><header className="topbar"><Link href="/applications" className="brand"><span className="logo-mark">CB</span><span><strong>CloudBank <b>AI</b></strong><small>OBaaS DEMO</small></span></Link>
-    <nav aria-label="Main navigation"><Link href="/applications" className={`nav-link ${!security && !reviewing ? 'nav-link--active' : ''}`}>Applications</Link><Link href="/manual-review" className={`nav-link ${reviewing ? 'nav-link--active' : ''}`}>Manual review</Link><Link href="/admin/security" className={`nav-link ${security ? 'nav-link--active' : ''}`}>Security</Link></nav>
+    <nav aria-label="Main navigation"><Link href="/applications" className={`nav-link ${!security && !reviewing && !architecture ? 'nav-link--active' : ''}`}>Applications</Link><Link href="/manual-review" className={`nav-link ${reviewing ? 'nav-link--active' : ''}`}>Manual review</Link><Link href="/architecture" className={`nav-link ${architecture ? 'nav-link--active' : ''}`} aria-current={architecture ? 'page' : undefined}>Architecture</Link><Link href="/admin/security" className={`nav-link ${security ? 'nav-link--active' : ''}`}>Security</Link></nav>
     <div className="topbar-right"><span className="mode-pill"><span className="dot dot--teal" /> LIVE BFF</span><span className="topbar-avatar" title={auth.session.user.username}>OA</span><button className="button button--small button--ghost" onClick={endSession} disabled={loggingOut}>{loggingOut ? 'Signing out…' : 'Sign out'}</button></div>
   </header><main className="main-content">{logoutError && <div className="live-error" role="alert">{logoutError}</div>}
-    {!security && !creating && !reviewing && created && <div className="callout" role="status"><span className="callout-icon">✓</span><p>
+    {!security && !creating && !reviewing && !architecture && created && <div className="callout" role="status"><span className="callout-icon">✓</span><p>
       <strong>Application created: {created.scenarioName} · {created.applicationId}.</strong> Status: {label(created.status)}.
       {' '}Workflow dispatch at the last request: {label(created.workflow.dispatchStatus)}.
     </p></div>}
-    {security ? <LiveSecurity session={auth.session} /> : reviewing
+    {architecture ? <ArchitecturePage path={path} mode="api" /> : security ? <LiveSecurity session={auth.session} /> : reviewing
       ? <LiveManualReview session={auth.session} onSessionExpired={onSessionExpired} /> : creating
       ? <LiveNewApplication session={auth.session} onCreated={setCreated} />
+      : applicationId ? <LiveWorkspace key={applicationId} applicationId={applicationId} path={path} session={auth.session} onSessionExpired={onSessionExpired} />
       : <LiveApplications onSessionExpired={onSessionExpired} />}
   </main><footer className="footer"><span>{copyrightNotice}</span><span>Live applications via CloudBank BFF</span></footer></div>;
 }

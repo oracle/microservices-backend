@@ -51,3 +51,7 @@ management:
   health:
     probes:
       enabled: true
+logging:
+  level:
+    org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor: INFO
+    org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor: INFO

@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 
 # Copyright (c) 2026, Oracle and/or its affiliates.
@@ -17,7 +16,6 @@ readonly SERVICES_DEPLOY_SCRIPT="$SCRIPT_DIR/deploy-services.sh"
 readonly WORKFLOW_DIR="$REPOSITORY_ROOT/src/workflows/cloudbank-loan-origination"
 
 DEPLOY_MODE=""
-START_FROM="azn-server"
 CONTEXT=""
 NAMESPACE=""
 OBAAS_RELEASE=""
@@ -36,14 +34,13 @@ usage() {
 Deploy CloudBank AI on an existing OBaaS OKE installation, version 2.1.0 or later.
 
 Usage:
-  ./deploy/obaas/cloudbankai_deploy.sh first-deploy [--from services|workflow]
-  ./deploy/obaas/cloudbankai_deploy.sh redeploy [--from services|workflow]
+  deploy/obaas/cloudbankai_deploy.sh first-deploy
+  deploy/obaas/cloudbankai_deploy.sh redeploy
 
 Configure the repository-root .env and OCI GenAI Workload Identity policies
 following deploy/obaas/cloudbank-v6-install.md.
-Export a new immutable NEW_IMAGE_TAG when running the azn-server step;
-the services helper generates its own immutable image tag. Use --from services
-after azn-server succeeded, or --from workflow after services succeeded.
+Export a new immutable NEW_IMAGE_TAG for azn-server before running this command;
+the services helper generates its own immutable image tag.
 
 The command runs the existing azn-server deployment (including MicroTx OIDC),
 services deployment, and version 1 workflow deployment in order. Keep their
@@ -108,12 +105,10 @@ preflight() {
         GEOGRAPHIC_RISK_LOG_GEOCODING_DETAILS; do
         required_env_value "$name" >/dev/null
     done
-    if [[ "$START_FROM" == azn-server ]]; then
-        [[ "${NEW_IMAGE_TAG:-}" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]] ||
-            die "export a new immutable NEW_IMAGE_TAG before deployment"
-        [[ "$NEW_IMAGE_TAG" != latest ]] || die "refusing mutable image tag 'latest'"
-        export NEW_IMAGE_TAG
-    fi
+    [[ "${NEW_IMAGE_TAG:-}" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]] ||
+        die "export a new immutable NEW_IMAGE_TAG before deployment"
+    [[ "$NEW_IMAGE_TAG" != latest ]] || die "refusing mutable image tag 'latest'"
+    export NEW_IMAGE_TAG
     KUBECONFIG="$(required_env_value CLOUDBANK_KUBECONFIG_PATH)"
     export KUBECONFIG
     [[ "$KUBECONFIG" == /* && "$KUBECONFIG" != / ]] ||
@@ -197,21 +192,12 @@ main() {
         usage
         return 0
     fi
-    [[ $# -ge 1 ]] || { usage >&2; exit 2; }
+    [[ $# -eq 1 ]] || { usage >&2; exit 2; }
     DEPLOY_MODE="$1"
     case "$DEPLOY_MODE" in
         first-deploy | redeploy) ;;
         *) die "mode must be 'first-deploy' or 'redeploy'" ;;
     esac
-    shift
-    START_FROM=azn-server
-    if [[ $# -gt 0 ]]; then
-        [[ $# -eq 2 && "$1" == --from ]] || { usage >&2; exit 2; }
-        case "$2" in
-            services | workflow) START_FROM="$2" ;;
-            *) die "--from must be 'services' or 'workflow'" ;;
-        esac
-    fi
     preflight
     cd "$REPOSITORY_ROOT"
     WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cloudbankai-deploy.XXXXXX")"
@@ -219,26 +205,15 @@ main() {
     trap 'exit 130' INT
     trap 'exit 143' HUP TERM
 
-    if [[ "$START_FROM" == azn-server ]]; then
-        printf '\n[1/3] Deploy azn-server and secure MicroTx\n'
-        run_step azn-server \
-            "SUCCESS: azn-server $DEPLOY_MODE completed and all verification checks passed." \
-            "$AZN_DEPLOY_SCRIPT" "$DEPLOY_MODE"
-    else
-        CONTEXT="$(kubectl config current-context)"
-        [[ -n "$CONTEXT" ]] || die "the dedicated kubeconfig has no current context"
-        kubectl --context "$CONTEXT" --namespace "$NAMESPACE" rollout status \
-            deployment/azn-server --timeout=30s >/dev/null ||
-            die "azn-server must be ready before resuming from $START_FROM"
-        printf '\nResuming from %s using the existing azn-server deployment.\n' "$START_FROM"
-    fi
+    printf '\n[1/3] Deploy azn-server and secure MicroTx\n'
+    run_step azn-server \
+        "SUCCESS: azn-server $DEPLOY_MODE completed and all verification checks passed." \
+        "$AZN_DEPLOY_SCRIPT" "$DEPLOY_MODE"
 
-    if [[ "$START_FROM" != workflow ]]; then
-        printf '\n[2/3] Deploy CloudBank services\n'
-        run_step services \
-            'CloudBank schema, lab owner access, and policy bootstrap completed; all eight application services are deployed and have ready endpoints.' \
-            "$SERVICES_DEPLOY_SCRIPT" "$DEPLOY_MODE"
-    fi
+    printf '\n[2/3] Deploy CloudBank services\n'
+    run_step services \
+        'CloudBank schema, lab owner access, and policy bootstrap completed; all eight application services are deployed and have ready endpoints.' \
+        "$SERVICES_DEPLOY_SCRIPT" "$DEPLOY_MODE"
 
     printf '\n[3/3] Deploy MicroTx task and workflow definitions\n'
     CONTEXT="$(kubectl config current-context)"
@@ -260,7 +235,7 @@ main() {
         'Workflow cloudbank-loan-origination version 1 deployed successfully.' \
         deploy_workflow
 
-    printf '\nSUCCESS: CloudBank deployment completed.\n'
+    printf '\nSUCCESS: CloudBank services, MicroTx security, and workflow deployment completed.\n'
     printf 'Complete the post-launch ADB geocoding setup in deploy/obaas/cloudbank-v6-install.md.\n'
 }
 

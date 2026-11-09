@@ -41,6 +41,14 @@ public class DocumentSummaryRepository {
         }
     }
 
+    public Optional<DocumentEvidenceSummaryResponse> readResult(String applicationId, String workflowId, String id) {
+        return jdbc.sql("SELECT result_payload FROM " + table
+                + " WHERE application_id = :applicationId AND workflow_id = :workflowId AND summary_id = :id")
+                .param("applicationId", applicationId).param("workflowId", workflowId).param("id", id)
+                .query((rs, row) -> json.readValue(rs.getString("result_payload"), DocumentEvidenceSummaryResponse.class))
+                .optional();
+    }
+
     public DocumentEvidenceSummaryResponse save(String keyHash, String requestHash,
             DocumentEvidenceSummaryResponse response) {
         try {

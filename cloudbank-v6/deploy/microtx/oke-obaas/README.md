@@ -10,11 +10,11 @@ Complete Chapter 1 of
 automatically on both first deployment and redeploy. To reapply it separately:
 
 ```bash
-cd ./cloudbank-v6
 ./deploy/microtx/oke-obaas/secure-microtx-workflows.sh --enable
 ```
 
-The script obtains its target, URLs, and generated OAuth credential from the `.env` in `cloudbank-v6` directory. It validates the live target and all Kubernetes patches,
+The script obtains its target, URLs, and generated OAuth credential from the
+repository-root `.env`. It validates the live target and all Kubernetes patches,
 shows the resolved non-sensitive deployment target, asks for confirmation, and
 then applies and verifies the configuration. It does not install or upgrade
 OBaaS and does not create or update workflow definitions.

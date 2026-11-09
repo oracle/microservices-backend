@@ -385,6 +385,10 @@ public class SecurityConfig {
                     .clientSettings(ClientSettings.builder().requireProofKey(true).build())
                     .tokenSettings(TokenSettings.builder().accessTokenTimeToLive(Duration.ofMinutes(30)).build());
             registeredClients.add(bffClient.build());
+            // The BFF owns this machine identity; it cannot execute workflow tasks.
+            // Both registrations rotate with the existing server-side BFF Secret.
+            addClientCredentialsClient(registeredClients, passwordEncoder, bffClientId + "-read",
+                    bffClientSecret, "cloudbank.workspace.read");
         }
 
         return new InMemoryRegisteredClientRepository(registeredClients);

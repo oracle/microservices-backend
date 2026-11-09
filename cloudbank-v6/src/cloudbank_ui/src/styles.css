@@ -18,3 +18,23 @@
 .live-error{border:1px solid #f1c9cf;border-radius:8px;background:#fff3f4;color:#8f3541;padding:12px 14px;margin:0 0 16px;font-size:12px;line-height:1.5}
 .live-loading{color:#718094;font-size:12px;padding:18px 14px}
 .application-form-fields { border: 0; padding: 0; margin: 0; min-width: 0; }
+.document-actions{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.document-preview-dialog{width:min(1100px,calc(100vw - 40px));height:min(86vh,900px);max-width:none;max-height:none;padding:0;border:1px solid #d8e1e8;border-radius:12px;box-shadow:0 24px 90px rgba(12,32,49,.35);color:#203047;overflow:hidden}
+.document-preview-dialog[open]{display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+.document-preview-dialog::backdrop{background:rgba(9,25,39,.68);backdrop-filter:blur(2px)}
+.document-preview-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:15px 19px;border-bottom:1px solid #e8edf1;background:#fff}
+.document-preview-header h2{max-width:min(70vw,750px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:5px 0 0;color:#23394e;font-size:15px}
+.document-preview-body{min-height:0;background:#e9edf0}
+.document-preview-frame{display:block;width:100%;height:100%;border:0;background:white}
+.document-details-body{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0}
+.document-details-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 20px;padding:0 19px 12px;background:white}
+.document-details-facts .fact{padding:8px 0}
+.document-details-preview{min-height:0;background:#e9edf0;overflow:auto}
+.document-preview-error{padding:24px;color:#8d3640}
+.document-preview-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 17px;border-top:1px solid #e8edf1;background:white;color:#8392a1;font-size:10px}
+@media(max-width:600px){.document-preview-dialog{width:calc(100vw - 16px);height:90vh}.document-preview-footer{align-items:flex-start;flex-direction:column;gap:5px}}
+/* Stored workspace evidence and execution projections. */
+.workspace-excerpt { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; }
+.workspace-policy-chunk { padding: 20px 0; border-bottom: 1px solid var(--border, #dfe7ed); }
+.workspace-policy-chunk:last-child { border-bottom: 0; }
+.workspace-task-name { text-transform: capitalize; }

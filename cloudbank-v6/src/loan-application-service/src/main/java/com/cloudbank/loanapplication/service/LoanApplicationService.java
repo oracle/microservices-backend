@@ -4,6 +4,8 @@ package com.cloudbank.loanapplication.service;
 
 import static com.cloudbank.loanapplication.api.ApplicationApiModels.ApplicationResponse;
 import static com.cloudbank.loanapplication.api.ApplicationApiModels.ApplicationPageResponse;
+import static com.cloudbank.loanapplication.api.ApplicationApiModels.AuditEvent;
+import static com.cloudbank.loanapplication.api.ApplicationApiModels.AuditResponse;
 import static com.cloudbank.loanapplication.api.ApplicationApiModels.CreateApplicationRequest;
 import static com.cloudbank.loanapplication.api.ApplicationApiModels.DocumentRequest;
 import static com.cloudbank.loanapplication.api.ApplicationApiModels.DocumentManifestResponse;
@@ -26,6 +28,9 @@ import com.cloudbank.loanapplication.persistence.PrincipalProjection;
 import com.cloudbank.loanapplication.persistence.LoanRecords.WorkflowRow;
 import com.cloudbank.loanapplication.persistence.LoanRecords.DocumentProcessingRow;
 import com.cloudbank.loanapplication.security.AuthenticatedPrincipal;
+import com.cloudbank.loanapplication.api.ApplicationApiModels.DocumentPreview;
+import com.cloudbank.loanapplication.api.ApplicationApiModels.WorkspaceDocument;
+import com.cloudbank.loanapplication.api.ApplicationApiModels.WorkspaceResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -118,6 +123,80 @@ public class LoanApplicationService {
     public ApplicationResponse get(String applicationId, AuthenticatedPrincipal principal) {
         principals.requireIdentity(principal);
         return response(authorizedApplication(applicationId, principal));
+    }
+
+    @Transactional(readOnly = true)
+    public WorkspaceResponse workspace(String applicationId, AuthenticatedPrincipal principal) {
+        requireUser(principal);
+        ApplicationRow application = authorizedApplication(applicationId, principal);
+        List<WorkspaceDocument> inventory = repository.findWorkspaceDocuments(application.applicationSk());
+        List<WorkspaceDocument> documents = inventory.stream().limit(100)
+                .map(d -> new WorkspaceDocument(d.documentId(), d.documentType(), label(d.documentType()),
+                        d.fileName(), d.status(), d.required(), d.contentAvailable(), d.mediaType(),
+                        d.contentLengthBytes(), d.contentSha256())).toList();
+        WorkflowRow workflow = repository.findWorkflow(application.applicationSk()).orElse(null);
+        WorkflowResponse safeWorkflow = workflow == null ? null : new WorkflowResponse(workflow.requestId(),
+                workflow.workflowName(), workflow.workflowVersion(), workflow.status(), workflow.engineWorkflowId(),
+                null, null);
+        return new WorkspaceResponse(application.applicationId(), application.scenarioId(), application.scenarioName(),
+                application.status(), repository.findOverview(application.applicationSk()).orElse(null), documents,
+                inventory.size() > 100, safeWorkflow, workflow == null ? null : workflow.traceId(),
+                application.createdAt(), application.updatedAt());
+    }
+
+    @Transactional(readOnly = true)
+    public AuditResponse audit(String applicationId, AuthenticatedPrincipal principal) {
+        requireUser(principal);
+        ApplicationRow application = authorizedApplication(applicationId, principal);
+        var events = repository.findAuditEvents(application.applicationSk(), principal.principalId());
+        List<AuditEvent> items = events.stream().limit(100).map(event -> {
+            String action = switch (event.action()) {
+                case "INTAKE_CREATED", "DOCUMENT_METADATA_REGISTERED", "DOCUMENT_CONTENT_UPLOADED",
+                        "DOCUMENT_STATUS_CHANGED", "APPLICATION_STATUS_CHANGED", "DECISION_RECORDED" -> event.action();
+                default -> "OTHER_EVENT";
+            };
+            String actionLabel = switch (action) {
+                case "INTAKE_CREATED" -> "Application created";
+                case "DOCUMENT_METADATA_REGISTERED" -> "Document registered";
+                case "DOCUMENT_CONTENT_UPLOADED" -> "Document uploaded";
+                case "DOCUMENT_STATUS_CHANGED" -> "Document status changed";
+                case "APPLICATION_STATUS_CHANGED" -> "Application status changed";
+                case "DECISION_RECORDED" -> "Decision recorded";
+                default -> "Recorded event";
+            };
+            String objectType = switch (event.objectType()) {
+                case "LOAN_APPLICATION", "DOCUMENT" -> event.objectType();
+                default -> "OTHER";
+            };
+            String traceId = event.traceId() != null && event.traceId().matches("[0-9a-fA-F]{32}")
+                    ? event.traceId() : null;
+            return new AuditEvent("AUDIT-" + event.auditEventSk(), event.occurredAt(), action, actionLabel,
+                    event.actorLabel(), event.outcome(), objectType, event.objectId(), traceId);
+        }).toList();
+        return new AuditResponse(application.applicationId(), items, events.size() > 100);
+    }
+
+    @Transactional(readOnly = true)
+    public DocumentPreview previewDocument(String applicationId, String documentId, AuthenticatedPrincipal principal) {
+        requireUser(principal);
+        authorizedApplication(applicationId, principal);
+        DocumentProcessingRow document = repository.findProcessingDocument(applicationId, documentId)
+                .orElseThrow(this::notFound);
+        var stored = repository.findDocumentPreviewContent(document.documentSk()).orElseThrow(this::notFound);
+        byte[] bytes = stored.content();
+        if (!"application/pdf".equalsIgnoreCase(stored.mediaType()) || bytes == null || bytes.length == 0
+                || bytes.length > MAX_DOCUMENT_BYTES || stored.contentLengthBytes() != bytes.length) {
+            throw new LoanServiceException("DOCUMENT_CONTENT_UNAVAILABLE", HttpStatus.SERVICE_UNAVAILABLE,
+                    "Document content is temporarily unavailable");
+        }
+        return new DocumentPreview(document.fileName(), bytes);
+    }
+
+    private void requireUser(AuthenticatedPrincipal principal) {
+        principals.requireIdentity(principal);
+        if (principal == null || !"user".equals(principal.tokenKind())) {
+            throw new LoanServiceException("ACCESS_DENIED", HttpStatus.FORBIDDEN, "User authorization required");
+        }
     }
 
     @Transactional(readOnly = true)

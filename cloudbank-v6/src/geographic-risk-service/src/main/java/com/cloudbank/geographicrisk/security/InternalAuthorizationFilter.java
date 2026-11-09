@@ -22,6 +22,9 @@ public class InternalAuthorizationFilter implements ContainerRequestFilter {
 
     private final InternalAuthorization authorization;
     private final JsonWebToken token;
+    @Inject
+    @ConfigProperty(name = "CLOUDBANK_WORKSPACE_READER_CLIENT_ID", defaultValue = "cloudbank-bff-client-read")
+    private String workspaceReaderClientId = "cloudbank-bff-client-read";
 
     @Inject
     public InternalAuthorizationFilter(
@@ -33,6 +36,12 @@ public class InternalAuthorizationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
+        if (requestContext.getUriInfo().getPath().startsWith("internal/api/v1/workspace/")) {
+            if (!"GET".equals(requestContext.getMethod()) || !authorization.isWorkspaceReader(token, workspaceReaderClientId)) {
+                requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
+            }
+            return;
+        }
         if (requestContext.getUriInfo().getPath().startsWith(INTERNAL_API_PREFIX)
                 && !authorization.isInternal(token)) {
             requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());

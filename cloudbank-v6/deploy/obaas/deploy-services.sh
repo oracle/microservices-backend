@@ -141,8 +141,8 @@ azn-server is not deployed by this script. It must already be healthy in the
 target namespace and provide the CloudBank application authorization Secret.
 
 Usage:
-  ./deploy/obaas/deploy-services.sh first-deploy
-  ./deploy/obaas/deploy-services.sh redeploy
+  deploy/obaas/deploy-services.sh first-deploy
+  deploy/obaas/deploy-services.sh redeploy
 
 The redeploy mode upgrades existing service releases and installs services
 added to CloudBank after the original deployment. A service must have both its

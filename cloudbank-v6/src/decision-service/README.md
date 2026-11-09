@@ -89,3 +89,14 @@ routing, underwriter finalization, idempotent replay, canonical status
 transitions, controller authorization, and internal service-token checks. The
 smoke test is non-mutating: it verifies health, anonymous rejection, and an
 authorized bounded not-found response.
+
+## Workspace decision read
+
+`GET /internal/api/v1/workspace/applications/{applicationId}/decisions?workflowId=...`
+requires the dedicated BFF reader identity and `cloudbank.workspace.read`.
+It returns stored INITIAL/MANUAL_FINAL results for exactly that application and
+workflow, plus `paymentFacts`: USD, evaluated amount, term, monthly payment and
+calculation status. These facts come from the stored decision snapshot; all
+other restricted snapshot fields stay private. The response is bounded to two
+records with a truncated flag and is private/no-store. It performs no decision
+calculation or application-state transition.

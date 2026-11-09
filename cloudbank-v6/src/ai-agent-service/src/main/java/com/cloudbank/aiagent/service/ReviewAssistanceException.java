@@ -12,13 +12,22 @@ public final class ReviewAssistanceException extends RuntimeException {
     private final String code;
     private final HttpStatus status;
     private final boolean retryable;
+    private final OutputField validationField;
+    private final OutputValidationReason validationReason;
 
     private ReviewAssistanceException(String code, String message, HttpStatus status, boolean retryable,
             Throwable cause) {
+        this(code, message, status, retryable, cause, OutputField.UNSPECIFIED, OutputValidationReason.UNSPECIFIED);
+    }
+
+    private ReviewAssistanceException(String code, String message, HttpStatus status, boolean retryable,
+            Throwable cause, OutputField validationField, OutputValidationReason validationReason) {
         super(message, cause);
         this.code = code;
         this.status = status;
         this.retryable = retryable;
+        this.validationField = validationField;
+        this.validationReason = validationReason;
     }
 
     public static ReviewAssistanceException evidenceMismatch() {
@@ -52,6 +61,21 @@ public final class ReviewAssistanceException extends RuntimeException {
                 null);
     }
 
+    public static ReviewAssistanceException unsafeModelOutput(OutputField field, OutputValidationReason reason) {
+        // Only fixed enums enter diagnostics; never include generated text or a matching substring.
+        return new ReviewAssistanceException("GENAI_OUTPUT_REJECTED",
+                "The generated review assistance did not pass output validation. Field: " + field
+                        + "; reason: " + reason + ".",
+                HttpStatus.BAD_GATEWAY, true, null, field, reason);
+    }
+
+    public enum OutputField { UNSPECIFIED, CHECKLIST, CLARIFICATION_QUESTIONS }
+
+    public enum OutputValidationReason {
+        UNSPECIFIED, MISSING_LIST, TOO_FEW_ITEMS, TOO_MANY_ITEMS, NULL_ITEM,
+        BLANK_ITEM, ITEM_TOO_LONG, DECISION_LANGUAGE, SENSITIVE_DATA, TOO_FEW_DISTINCT_ITEMS
+    }
+
     public static ReviewAssistanceException extractionsUnavailable(Throwable cause) {
         return new ReviewAssistanceException("EXTRACTION_EVIDENCE_UNAVAILABLE",
                 "Bounded extraction evidence is temporarily unavailable.", HttpStatus.BAD_GATEWAY, true, cause);
@@ -82,5 +106,13 @@ public final class ReviewAssistanceException extends RuntimeException {
 
     public boolean retryable() {
         return retryable;
+    }
+
+    public OutputField validationField() {
+        return validationField;
+    }
+
+    public OutputValidationReason validationReason() {
+        return validationReason;
     }
 }

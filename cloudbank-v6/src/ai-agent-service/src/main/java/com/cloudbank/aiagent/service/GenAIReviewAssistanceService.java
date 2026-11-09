@@ -12,6 +12,8 @@ import com.cloudbank.aiagent.api.AiAgentApiModels.SourceReference;
 import com.cloudbank.aiagent.client.DocumentReviewClient;
 import com.cloudbank.aiagent.client.DocumentReviewEvidence;
 import com.cloudbank.aiagent.config.ReviewAssistanceProperties;
+import com.cloudbank.aiagent.service.ReviewAssistanceException.OutputField;
+import com.cloudbank.aiagent.service.ReviewAssistanceException.OutputValidationReason;
 import com.cloudbank.aiagent.service.SpringAiReviewAssistanceModel.ReviewAssistanceModelOutput;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -63,6 +65,10 @@ public class GenAIReviewAssistanceService {
         return responses.get(assistanceId, ignored -> createAssistance(assistanceId, request));
     }
 
+    public java.util.Optional<ManualReviewAssistanceResponse> readResult(String id) {
+        return java.util.Optional.ofNullable(responses.getIfPresent(id));
+    }
+
     private ManualReviewAssistanceResponse createAssistance(String assistanceId,
             ManualReviewAssistanceRequest request) {
         DocumentReviewEvidence evidence = documentReviewClient.get(request.reviewId(), request.traceId());
@@ -74,31 +80,39 @@ public class GenAIReviewAssistanceService {
         try {
             output = model.generate(evidenceJson);
         } catch (ReviewAssistanceException exception) {
-            logFailedModelCall(exception.code(), modelCallStartedAt);
+            logFailedModelCall(exception.code(), request.traceId(), modelCallStartedAt);
             throw exception;
         } catch (RuntimeException exception) {
-            logFailedModelCall("GENAI_UNAVAILABLE", modelCallStartedAt);
+            logFailedModelCall("GENAI_UNAVAILABLE", request.traceId(), modelCallStartedAt);
             throw ReviewAssistanceException.modelUnavailable(exception);
         }
         List<String> checklist;
         List<String> questions;
         try {
-            checklist = validateItems(output == null ? null : output.checklist(), 1, 12);
-            questions = validateItems(output == null ? null : output.clarificationQuestions(), 1, 8);
+            checklist = validateItems(output == null ? null : output.checklist(), 1, 12, OutputField.CHECKLIST);
+            // Clear documents need not invent clarification questions. The checklist
+            // remains mandatory; actual document-review issues still require questions.
+            int minimumQuestions = "CLEAR".equals(evidence.disposition()) ? 0 : 1;
+            questions = validateItems(output == null ? null : output.clarificationQuestions(), minimumQuestions, 8,
+                    OutputField.CLARIFICATION_QUESTIONS);
         } catch (ReviewAssistanceException exception) {
             LOGGER.warn(
                     "OCI GenAI chat model call completed provider=oci-genai model={} outcome=REJECTED "
-                            + "errorCode={} checklistItemCount={} clarificationQuestionCount={} durationMs={}",
-                    properties.model(), exception.code(), itemCount(output == null ? null : output.checklist()),
+                            + "correlationId={} errorCode={} validationField={} validationReason={} checklistItemCount={} "
+                            + "clarificationQuestionCount={} durationMs={}",
+                    properties.model(), safeCorrelation(request.traceId()), exception.code(),
+                    exception.validationField(), exception.validationReason(),
+                    itemCount(output == null ? null : output.checklist()),
                     itemCount(output == null ? null : output.clarificationQuestions()),
                     elapsedMilliseconds(modelCallStartedAt));
             throw exception;
         }
         LOGGER.info(
                 "OCI GenAI chat model call completed provider=oci-genai model={} outcome=ACCEPTED "
-                        + "schemaValidated=true guardrailStatus=PASSED checklistItemCount={} "
+                        + "correlationId={} schemaValidated=true guardrailStatus=PASSED checklistItemCount={} "
                         + "clarificationQuestionCount={} durationMs={}",
-                properties.model(), checklist.size(), questions.size(), elapsedMilliseconds(modelCallStartedAt));
+                properties.model(), safeCorrelation(request.traceId()), checklist.size(), questions.size(),
+                elapsedMilliseconds(modelCallStartedAt));
 
         List<SourceReference> sources = new ArrayList<>();
         sources.add(new SourceReference("DOCUMENT_REVIEW", request.reviewId()));
@@ -115,11 +129,16 @@ public class GenAIReviewAssistanceService {
     }
 
     private static void validateCorrelation(ManualReviewAssistanceRequest request, DocumentReviewEvidence evidence) {
-        if (!Objects.equals(request.reviewId(), evidence.reviewId())
+        // The INITIAL decision owns manual-review routing. A completed CLEAR
+        // document review can still need a human for policy, risk or financial
+        // evidence; it is a valid bounded input to reviewer assistance.
+        if (evidence == null || !Objects.equals(request.reviewId(), evidence.reviewId())
                 || !Objects.equals(request.applicationId(), evidence.applicationId())
                 || !Objects.equals(request.workflowId(), evidence.workflowId())
+                || !Objects.equals(request.traceId(), evidence.traceId())
                 || !"COMPLETED".equals(evidence.reviewStatus())
-                || !"MANUAL_REVIEW".equals(evidence.disposition())) {
+                || evidence.disposition() == null
+                || !Set.of("CLEAR", "MANUAL_REVIEW").contains(evidence.disposition())) {
             throw ReviewAssistanceException.evidenceMismatch();
         }
     }
@@ -147,34 +166,51 @@ public class GenAIReviewAssistanceService {
         }
     }
 
-    private static List<String> validateItems(List<String> items, int minimum, int maximum) {
-        if (items == null || items.size() < minimum || items.size() > maximum) {
-            throw ReviewAssistanceException.unsafeModelOutput();
+    private static List<String> validateItems(List<String> items, int minimum, int maximum, OutputField field) {
+        if (items == null) {
+            throw ReviewAssistanceException.unsafeModelOutput(field, OutputValidationReason.MISSING_LIST);
+        }
+        if (items.size() < minimum) {
+            throw ReviewAssistanceException.unsafeModelOutput(field, OutputValidationReason.TOO_FEW_ITEMS);
+        }
+        if (items.size() > maximum) {
+            throw ReviewAssistanceException.unsafeModelOutput(field, OutputValidationReason.TOO_MANY_ITEMS);
         }
         Set<String> normalized = new LinkedHashSet<>();
         for (String item : items) {
             if (item == null) {
-                throw ReviewAssistanceException.unsafeModelOutput();
+                throw ReviewAssistanceException.unsafeModelOutput(field, OutputValidationReason.NULL_ITEM);
             }
             String trimmed = item.strip();
-            if (trimmed.isEmpty() || trimmed.length() > MAX_ITEM_LENGTH
-                    || FORBIDDEN_DECISION_LANGUAGE.matcher(trimmed).find()
-                    || SENSITIVE_OUTPUT.matcher(trimmed).find()) {
-                throw ReviewAssistanceException.unsafeModelOutput();
+            if (trimmed.isEmpty()) {
+                throw ReviewAssistanceException.unsafeModelOutput(field, OutputValidationReason.BLANK_ITEM);
+            }
+            if (trimmed.length() > MAX_ITEM_LENGTH) {
+                throw ReviewAssistanceException.unsafeModelOutput(field, OutputValidationReason.ITEM_TOO_LONG);
+            }
+            if (FORBIDDEN_DECISION_LANGUAGE.matcher(trimmed).find()) {
+                throw ReviewAssistanceException.unsafeModelOutput(field, OutputValidationReason.DECISION_LANGUAGE);
+            }
+            if (SENSITIVE_OUTPUT.matcher(trimmed).find()) {
+                throw ReviewAssistanceException.unsafeModelOutput(field, OutputValidationReason.SENSITIVE_DATA);
             }
             normalized.add(trimmed);
         }
         if (normalized.size() < minimum) {
-            throw ReviewAssistanceException.unsafeModelOutput();
+            throw ReviewAssistanceException.unsafeModelOutput(field, OutputValidationReason.TOO_FEW_DISTINCT_ITEMS);
         }
         return List.copyOf(normalized);
     }
 
-    private void logFailedModelCall(String errorCode, long startedAt) {
+    private void logFailedModelCall(String errorCode, String traceId, long startedAt) {
         LOGGER.warn(
-                "OCI GenAI chat model call completed provider=oci-genai model={} outcome=FAILED errorCode={} "
+                "OCI GenAI chat model call completed provider=oci-genai model={} outcome=FAILED correlationId={} errorCode={} "
                         + "durationMs={}",
-                properties.model(), errorCode, elapsedMilliseconds(startedAt));
+                properties.model(), safeCorrelation(traceId), errorCode, elapsedMilliseconds(startedAt));
+    }
+
+    private static String safeCorrelation(String traceId) {
+        return traceId != null && traceId.matches("[0-9a-fA-F]{32}") ? traceId : "UNAVAILABLE";
     }
 
     private static int itemCount(List<String> items) {

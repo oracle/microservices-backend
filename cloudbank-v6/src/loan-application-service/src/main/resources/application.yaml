@@ -84,3 +84,6 @@ logging:
   level:
     com.cloudbank.loanapplication: INFO
     org.springframework.security: INFO
+    # Authorized overview fields and PDF bodies must not be printed by HTTP body converters.
+    org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor: INFO
+    org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor: INFO

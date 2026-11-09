@@ -24,7 +24,11 @@ By default, deploy creates a unique image tag, authenticates to OCIR using
 azn-server must already have its BFF OAuth client configured.
 
 Optional: BFF_IMAGE, BFF_IMAGE_TAG, BFF_CALLBACK_URI,
-BFF_AUTHORIZATION_URI, BFF_COOKIE_SECURE, BFF_BUILD_PUSH=false.
+BFF_AUTHORIZATION_URI, BFF_COOKIE_SECURE, BFF_BUILD_PUSH=false,
+BFF_SIGNOZ_BASE_URL, BFF_SIGNOZ_PUBLIC_URL, BFF_SIGNOZ_API_KEY_SECRET_NAME,
+BFF_SIGNOZ_API_KEY_SECRET_KEY. API key values are read only from the referenced
+Kubernetes Secret. With a Secret reference, the internal SigNoz URL can be
+detected from a unique SigNoz Service in the target namespace.
 EOF
 }
 
@@ -126,6 +130,14 @@ use_env_value BFF_COOKIE_SECURE BFF_COOKIE_SECURE
 use_env_value BFF_BUILD_PUSH BFF_BUILD_PUSH
 use_env_value BFF_MICROTX_BASE_URL BFF_MICROTX_BASE_URL
 use_env_value BFF_MICROTX_CLIENT_ID BFF_MICROTX_CLIENT_ID
+use_env_value BFF_SIGNOZ_BASE_URL BFF_SIGNOZ_BASE_URL
+use_env_value BFF_SIGNOZ_PUBLIC_URL BFF_SIGNOZ_PUBLIC_URL
+use_env_value BFF_SIGNOZ_API_KEY_SECRET_NAME BFF_SIGNOZ_API_KEY_SECRET_NAME
+use_env_value BFF_SIGNOZ_API_KEY_SECRET_KEY BFF_SIGNOZ_API_KEY_SECRET_KEY
+BFF_SIGNOZ_BASE_URL="${BFF_SIGNOZ_BASE_URL:-}"
+BFF_SIGNOZ_PUBLIC_URL="${BFF_SIGNOZ_PUBLIC_URL:-}"
+BFF_SIGNOZ_API_KEY_SECRET_NAME="${BFF_SIGNOZ_API_KEY_SECRET_NAME:-}"
+BFF_SIGNOZ_API_KEY_SECRET_KEY="${BFF_SIGNOZ_API_KEY_SECRET_KEY:-}"
 command -v kubectl >/dev/null || die "kubectl is required"
 command -v helm >/dev/null || die "helm is required"
 BFF_KUBE_CONTEXT="${BFF_KUBE_CONTEXT:-$(kubectl config current-context)}"
@@ -145,6 +157,29 @@ fi
 [[ "$BFF_IMAGE_PULL_SECRET" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$ ]] || die "invalid image pull Secret name"
 [[ "$BFF_COOKIE_SECURE" == true || "$BFF_COOKIE_SECURE" == false ]] || die "BFF_COOKIE_SECURE must be true or false"
 [[ "${BFF_BUILD_PUSH:-true}" == true || "${BFF_BUILD_PUSH:-true}" == false ]] || die "BFF_BUILD_PUSH must be true or false"
+if [[ -n "$BFF_SIGNOZ_API_KEY_SECRET_NAME" || -n "$BFF_SIGNOZ_API_KEY_SECRET_KEY" ]]; then
+    [[ "$BFF_SIGNOZ_API_KEY_SECRET_NAME" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$ ]] || die "invalid SigNoz API key Secret name"
+    [[ "$BFF_SIGNOZ_API_KEY_SECRET_KEY" =~ ^[A-Za-z0-9._-]+$ ]] || die "invalid SigNoz API key Secret key"
+    kubectl --context "$BFF_KUBE_CONTEXT" -n "$BFF_NAMESPACE" get secret "$BFF_SIGNOZ_API_KEY_SECRET_NAME" -o name >/dev/null ||
+        die "configured SigNoz API key Secret was not found"
+    if [[ -z "$BFF_SIGNOZ_BASE_URL" ]]; then
+        command -v jq >/dev/null || die "jq is required to detect the SigNoz API service"
+        signoz_endpoint="$(kubectl --context "$BFF_KUBE_CONTEXT" -n "$BFF_NAMESPACE" get services -o json |
+            jq -er '[.items[] | select(.metadata.labels["app.kubernetes.io/name"] == "signoz"
+                or .metadata.name == "signoz" or (.metadata.name | endswith("-signoz")))
+                | .metadata.name as $name | .spec.ports[] | select(.port == 8080)
+                | {name: $name, port: .port}]
+                | if length == 1 then .[0] | [.name, (.port | tostring)] | @tsv
+                  else error("a unique SigNoz API service was not found") end')" ||
+            die "set BFF_SIGNOZ_BASE_URL explicitly for this target"
+        IFS=$'\t' read -r signoz_service signoz_port <<<"$signoz_endpoint"
+        BFF_SIGNOZ_BASE_URL="http://${signoz_service}.${BFF_NAMESPACE}.svc:${signoz_port}"
+    fi
+fi
+for signoz_url in "$BFF_SIGNOZ_BASE_URL" "$BFF_SIGNOZ_PUBLIC_URL"; do
+    [[ -z "$signoz_url" || "$signoz_url" =~ ^https?://[A-Za-z0-9.:-]+(/[-A-Za-z0-9_]+)*/?$ ]] ||
+        die "SigNoz URLs must be HTTP(S) endpoints without credentials, query parameters or fragments"
+done
 [[ "$BFF_CALLBACK_URI" == http://127.0.0.1:* || "$BFF_CALLBACK_URI" == https://* ]] ||
     die "callback must be HTTPS or the local 127.0.0.1 test origin"
 [[ "$BFF_CALLBACK_URI" == */bff/auth/callback ]] || die "callback path must be /bff/auth/callback"
@@ -238,6 +273,10 @@ values=(
     --set-string "loanBaseUrl=$loan_base"
     --set-string "microtxBaseUrl=$BFF_MICROTX_BASE_URL"
     --set-string "microtxClientId=$BFF_MICROTX_CLIENT_ID"
+    --set-string "signozBaseUrl=$BFF_SIGNOZ_BASE_URL"
+    --set-string "signozPublicUrl=$BFF_SIGNOZ_PUBLIC_URL"
+    --set-string "signozApiKeySecretName=$BFF_SIGNOZ_API_KEY_SECRET_NAME"
+    --set-string "signozApiKeySecretKey=$BFF_SIGNOZ_API_KEY_SECRET_KEY"
     --set-string "cookieSecure=$BFF_COOKIE_SECURE"
 )
 

@@ -112,6 +112,8 @@ export interface NewDocument { type: string; required: boolean; file: File | nul
 interface Store {
   applications: MockApplication[];
   pendingFiles: Record<string, File>;
+  uploadedFiles: Record<string, File>;
+  selectFile: (documentId: string, file: File | null) => void;
   create: (draft: Draft, documents: NewDocument[]) => string;
   upload: (applicationId: string, documentId: string, file: File) => void;
   addDocument: (applicationId: string, type: string, required: boolean, file: File | null) => void;
@@ -126,6 +128,7 @@ const now = () => new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minu
 export function MockStoreProvider({ children }: { children: ReactNode }) {
   const [applications, setApplications] = useState<MockApplication[]>(canonicalApplications);
   const [pendingFiles, setPendingFiles] = useState<Record<string, File>>({});
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, File>>({});
   const [counter, setCounter] = useState(1);
 
   const change = (id: string, fn: (app: MockApplication) => MockApplication) => {
@@ -152,12 +155,22 @@ export function MockStoreProvider({ children }: { children: ReactNode }) {
     return id;
   };
 
+  const selectFile = (documentId: string, file: File | null) => {
+    setPendingFiles(previous => {
+      const next = { ...previous };
+      if (file) next[documentId] = file;
+      else delete next[documentId];
+      return next;
+    });
+  };
+
   const upload = (applicationId: string, documentId: string, file: File) => {
     change(applicationId, app => ({ ...app,
       documents: app.documents.map(doc => doc.id === documentId ? { ...doc, status: 'RECEIVED', fileName: file.name } : doc),
       audit: [...app.audit, { at: now(), action: 'DOCUMENT_RECEIVED', detail: `${documentId}: simulated upload, file ${file.name}` }],
     }));
     setPendingFiles(previous => { const next = { ...previous }; delete next[documentId]; return next; });
+    setUploadedFiles(previous => ({ ...previous, [documentId]: file }));
   };
 
   const addDocument = (applicationId: string, type: string, required: boolean, file: File | null) => {
@@ -188,8 +201,8 @@ export function MockStoreProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  const reset = () => { setApplications(canonicalApplications); setPendingFiles({}); setCounter(1); };
-  return <StoreContext.Provider value={{ applications, pendingFiles, create, upload, addDocument, start, review, reset }}>{children}</StoreContext.Provider>;
+  const reset = () => { setApplications(canonicalApplications); setPendingFiles({}); setUploadedFiles({}); setCounter(1); };
+  return <StoreContext.Provider value={{ applications, pendingFiles, uploadedFiles, selectFile, create, upload, addDocument, start, review, reset }}>{children}</StoreContext.Provider>;
 }
 
 export function useMockStore() {

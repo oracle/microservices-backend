@@ -112,6 +112,19 @@ class BffHttpSecurityTest {
     }
 
     @Test
+    void workspaceAndPreviewRequireSessionButDoNotRequireCsrfForReads() throws Exception {
+        String workspace = "/bff/api/v1/applications/APP-test";
+        String preview = workspace + "/documents/DOC-test/content";
+        mvc.perform(get(workspace)).andExpect(status().isUnauthorized());
+        mvc.perform(get(preview)).andExpect(status().isUnauthorized());
+        when(identity.require(any(), any())).thenReturn(
+                new SessionIdentity.AuthorizedUser("obaas-admin", "synthetic-token", null));
+        // Invalid owner IDs prove the authenticated GET routes reach the controller without CSRF.
+        mvc.perform(get("/bff/api/v1/applications/invalid").with(oauth2Login())).andExpect(status().isBadRequest());
+        mvc.perform(get(workspace + "/documents/invalid/content").with(oauth2Login())).andExpect(status().isBadRequest());
+    }
+
+    @Test
     void humanTaskRoutesRequireLoginAndResolutionRequiresCsrf() throws Exception {
         mvc.perform(get("/bff/api/v1/manual-review/tasks")).andExpect(status().isUnauthorized());
         mvc.perform(get("/bff/api/v1/manual-review/tasks/task-one")).andExpect(status().isUnauthorized());

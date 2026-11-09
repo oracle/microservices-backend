@@ -100,6 +100,31 @@ public final class ApplicationApiModels {
             DocumentStatus status, boolean required) {
     }
 
+    public record OverviewResponse(ApplicantRequest applicant, LoanRequest loan) {
+    }
+
+    public record WorkspaceDocument(String documentId, String documentType, String documentLabel, String fileName,
+            DocumentStatus status, boolean required, boolean contentAvailable, String mediaType,
+            Long contentLengthBytes, String contentSha256) {
+    }
+
+    public record WorkspaceResponse(String applicationId, String scenarioId, String scenarioName,
+            ApplicationStatus status, OverviewResponse overview, List<WorkspaceDocument> documents,
+            boolean documentsTruncated, WorkflowResponse workflow, String traceId, Instant createdAt,
+            Instant updatedAt) {
+    }
+
+    public record AuditResponse(String applicationId, List<AuditEvent> items, boolean truncated) {
+    }
+
+    public record AuditEvent(String eventId, Instant occurredAt, String action, String actionLabel,
+            String actorLabel, String outcome, String objectType, String objectId, String traceId) {
+    }
+
+    // Controller returns the bytes as PDF, never serializes this internal result as JSON.
+    public record DocumentPreview(String fileName, byte[] content) {
+    }
+
     public record WorkflowResponse(String startRequestId, String workflowName, int workflowVersion,
             WorkflowDispatchStatus dispatchStatus, String workflowId, String lastErrorCode, String lastErrorMessage) {
     }

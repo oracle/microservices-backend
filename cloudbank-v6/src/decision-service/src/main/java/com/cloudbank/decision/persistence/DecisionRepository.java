@@ -10,6 +10,9 @@ import com.cloudbank.decision.domain.DecisionModels.DecisionFacts;
 import com.cloudbank.decision.domain.DecisionModels.DecisionPersistencePayload;
 import com.cloudbank.decision.domain.DecisionModels.DecisionResult;
 import com.cloudbank.decision.domain.DecisionModels.StoredDecision;
+import com.cloudbank.decision.domain.DecisionModels.WorkspaceDecision;
+import com.cloudbank.decision.domain.DecisionModels.PaymentFacts;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
@@ -99,6 +102,23 @@ public class DecisionRepository {
                 + " AND d.decision_type = :decisionType")
                 .param("applicationId", applicationId).param("decisionType", decisionType)
                 .query(Integer.class).single() > 0;
+    }
+
+    public List<WorkspaceDecision> workspace(
+            String applicationId, String workflowId) {
+        return jdbc.sql("SELECT d.decision_payload FROM " + names.table("CB_DECISION") + " d JOIN "
+                + names.table("CB_LOAN_APPLICATION") + " a ON a.application_sk = d.application_sk"
+                + " WHERE a.application_id = :applicationId AND d.workflow_id = :workflowId"
+                + " AND d.request_hash IS NOT NULL ORDER BY d.decision_sk FETCH FIRST 3 ROWS ONLY")
+                .param("applicationId", applicationId).param("workflowId", workflowId)
+                .query((rs, row) -> {
+                    var stored = json.readValue(rs.getString("decision_payload"), DecisionPersistencePayload.class);
+                    var facts = stored.facts();
+                    var payment = facts == null ? null : new PaymentFacts(
+                            "USD", facts.evaluatedAmount(), facts.paymentTermMonths(), facts.monthlyPayment(),
+                            facts.paymentCalculationStatus());
+                    return new WorkspaceDecision(stored.result(), payment);
+                }).list();
     }
 
     public void persist(DecisionResult result, DecisionFacts facts, java.math.BigDecimal evaluatedDti,

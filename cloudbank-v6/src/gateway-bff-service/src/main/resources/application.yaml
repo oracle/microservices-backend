@@ -23,14 +23,28 @@ cloudbank:
   bff:
     allowed-username: obaas-admin
     loan-base-url: ${BFF_LOAN_BASE_URL}
+    ai-base-url: ${BFF_AI_BASE_URL:http://ai-agent-service:8080}
+    decision-base-url: ${BFF_DECISION_BASE_URL:http://decision-service:8080}
+    geographic-base-url: ${BFF_GEOGRAPHIC_BASE_URL:http://geographic-risk-service:8080}
     issuer-uri: ${BFF_ISSUER_URI}
     jwk-set-uri: ${BFF_JWK_SET_URI}
     audience: cloudbank-api
+    signoz:
+      base-url: ${BFF_SIGNOZ_BASE_URL:}
+      api-key: ${BFF_SIGNOZ_API_KEY:}
+      public-url: ${BFF_SIGNOZ_PUBLIC_URL:}
     microtx:
       base-url: ${BFF_MICROTX_BASE_URL:}
       token-uri: ${BFF_MICROTX_TOKEN_URI:${BFF_TOKEN_URI:}}
       client-id: ${BFF_MICROTX_CLIENT_ID:microtx-workflow-client}
       client-secret: ${BFF_MICROTX_CLIENT_SECRET:}
+logging:
+  level:
+    # Keep authorized overview fields and PDF bytes out of HTTP body diagnostics.
+    org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor: INFO
+    org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor: INFO
+    org.springframework.web.client: INFO
+    org.springframework.http.converter: INFO
 management:
   endpoints:
     web:

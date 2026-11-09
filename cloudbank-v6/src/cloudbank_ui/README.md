@@ -80,19 +80,55 @@ for `--application-file` and the optional manual-review variant.
 
 Deploy the updated `azn-server` and BFF and sign in again to obtain
 `cloudbank.write` before using mutations. Deploy the updated loan service too
-to reconcile repeated start requests during dispatch/retry. The nine-tab
-workspace and the architecture explorer remain in the
-separate mock demo. Start that mode with:
+to reconcile repeated start requests during dispatch/retry. The live application
+list now offers Open: the nine-tab EXPLORE APPLICATION workspace reads stored
+Overview, Documents/PDF preview, three supported AI tasks, Decision, Policy
+Evidence, geographic Risk Signals, Workflow, Audit and Trace through the BFF.
+Each section reports its own availability. The **Architecture** main-navigation
+item and workspace action open the shared static architecture explorer. The
+full simulated journey remains available in the separate mock demo:
 
 ```bash
 cd src/cloudbank_ui
 VITE_DATA_MODE=mock npm run dev
 ```
 
+In the mock application workspace, open **Documents** and select **Preview**
+to view a synthetic fixture PDF in a browser dialog. A PDF selected locally can
+also be previewed from that row; selected files remain in browser memory for
+the session, and simulated uploads do not send or persist file bytes.
+Read-only preview is now a documented UI requirement in the
+[functional specification](../../docs/ui/functional-specification.md#read-only-pdf-preview).
+Stored-PDF preview in API mode uses the
+[authorized BFF content GET](../../docs/ui/minimum-bff-api.md#stored-pdf-preview).
+Both BFF and loan service must be updated for these reads; Oracle integration
+and target deployment verification remain pending.
+
 `npm test` verifies creation/upload/start adapters, safe errors, retry headers,
-and unambiguous file/document association.
+unambiguous file/document association, workspace identity/shape checks, and
+bounded PDF responses. Browser checks used an isolated synthetic HTTP harness;
+they do not establish deployed BFF/Oracle integration.
 `npm run build` checks TypeScript and builds the SPA. `npm run preview` serves
 the build locally. Neither command requires the cluster.
+
+## Static architecture in the live GUI
+
+After signing in, select **Architecture** or open an application and select
+**Architecture ↗**. The page includes the OBaaS system map, component inspector,
+workflow journey, Oracle feature map and three supported AI tasks. Decision
+Explanation Draft is excluded. The catalog in `src/architectureModel.ts`
+describes repository implementation and deployment dependencies; it does not
+query cluster health or populate live results from mock scenarios.
+
+When opened from application details, **Open application** and **Application
+Trace** return to that workspace. The mock demo uses the same catalog with a
+clearly labeled synthetic-scenario selector.
+
+This increment changes only frontend assets. With Vite running, reload the
+page; for a hosted SPA, rebuild with `npm run build` and publish `dist/` through
+the existing frontend deployment process. No BFF/service/schema change is
+needed for the static explorer. TypeScript/Vite build succeeded; automated
+tests and browser/runtime verification were not run for this increment.
 
 ## Live manual review
 

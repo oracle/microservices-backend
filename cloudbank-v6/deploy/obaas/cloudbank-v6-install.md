@@ -46,7 +46,7 @@ Helm 4), Docker with Buildx and Compose, `jq`, OpenSSL, `curl`, `patch`, and Mav
 Docker can build for the OKE node architecture, obtain the base images used
 by the root `Dockerfile`, and publish to OCIR.
 
-Create `.env` in the `cloudbank-v6` directory before running the deployment script. Add
+Create `.env` in the repository root before running the deployment script. Add
 only the following inputs:
 
 ```dotenv
@@ -172,7 +172,6 @@ You must have **Docker** configured on your laptop. Then run the first deploymen
 
 ```bash
 export NEW_IMAGE_TAG="first-$(date -u +%Y%m%d%H%M%S)"
-cd ./cloudbank-v6
 ./deploy/obaas/cloudbankai_deploy.sh first-deploy
 ```
 
@@ -187,18 +186,6 @@ Open the generated authorization URL in a new private browser window, sign in
 as `obaas-admin` or `obaas-config`, and paste only the one-time `code` value at
 the hidden terminal prompt. A `404` on the manual callback is expected. Do not
 reuse or share the callback URL.
-
-If the first deployment stops at `[2/3]` after `azn-server` completed, resume
-from the services step, from the `cloudbank-v6` directory:
-
-```bash
-./deploy/obaas/cloudbankai_deploy.sh first-deploy --from services
-```
-
-This checks that the existing `azn-server` Deployment is ready, then runs the
-services and workflow steps. It does not require a new `NEW_IMAGE_TAG` for Azn.
-If services completed and only `[3/3]` failed, use `--from workflow` instead.
-For an update of existing services, use `redeploy` with the same `--from` option.
 
 ### 2.2.2.1 Backend for Front-end API
 

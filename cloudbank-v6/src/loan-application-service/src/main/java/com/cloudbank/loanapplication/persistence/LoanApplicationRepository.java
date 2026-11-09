@@ -3,6 +3,7 @@
 package com.cloudbank.loanapplication.persistence;
 
 import static com.cloudbank.loanapplication.persistence.LoanRecords.ApplicationRow;
+import static com.cloudbank.loanapplication.persistence.LoanRecords.AuditRow;
 import static com.cloudbank.loanapplication.persistence.LoanRecords.DocumentRow;
 import static com.cloudbank.loanapplication.persistence.LoanRecords.DocumentContentRow;
 import static com.cloudbank.loanapplication.persistence.LoanRecords.DocumentProcessingRow;
@@ -10,11 +11,18 @@ import static com.cloudbank.loanapplication.persistence.LoanRecords.WorkflowRow;
 
 import com.cloudbank.loanapplication.api.ApplicationApiModels.CreateApplicationRequest;
 import com.cloudbank.loanapplication.api.ApplicationApiModels.DocumentRequest;
+import com.cloudbank.loanapplication.api.ApplicationApiModels.AddressRequest;
+import com.cloudbank.loanapplication.api.ApplicationApiModels.ApplicantRequest;
+import com.cloudbank.loanapplication.api.ApplicationApiModels.LoanRequest;
+import com.cloudbank.loanapplication.api.ApplicationApiModels.OverviewResponse;
+import com.cloudbank.loanapplication.api.ApplicationApiModels.WorkspaceDocument;
 import com.cloudbank.loanapplication.domain.ApplicationStatus;
 import com.cloudbank.loanapplication.domain.DocumentStatus;
 import com.cloudbank.loanapplication.domain.WorkflowDispatchStatus;
 import com.cloudbank.loanapplication.security.AuthenticatedPrincipal;
 import java.sql.Timestamp;
+import java.sql.SQLException;
+import java.io.IOException;
 import java.sql.Types;
 import java.time.Instant;
 import java.util.List;
@@ -236,6 +244,49 @@ public class LoanApplicationRepository {
                 .param("requestHash", requestHash).update();
     }
 
+    public Optional<OverviewResponse> findOverview(long applicationSk) {
+        return jdbc.sql("""
+                SELECT p.display_name, p.phone_token, p.email_token, p.age_band,
+                       ad.address_line, ad.locality, ad.jurisdiction_code, ad.address_token,
+                       ad.country_code, ad.postal_code, a.requested_amount,
+                       a.requested_term_months, a.purpose_code, a.policy_version
+                FROM %s a JOIN %s p ON p.applicant_sk = a.applicant_sk
+                LEFT JOIN %s ad ON ad.applicant_sk = p.applicant_sk
+                WHERE a.application_sk = :applicationSk
+                ORDER BY ad.address_sk DESC NULLS LAST FETCH FIRST 1 ROWS ONLY
+                """.formatted(names.table("CB_LOAN_APPLICATION"), names.table("CB_APPLICANT"),
+                        names.table("CB_ADDRESS"))).param("applicationSk", applicationSk)
+                .query((rs, rowNum) -> new OverviewResponse(
+                        new ApplicantRequest(rs.getString("display_name"), rs.getString("phone_token"),
+                                rs.getString("email_token"), rs.getString("age_band"),
+                                rs.getString("address_line") == null ? null : new AddressRequest(
+                                        rs.getString("address_line"), rs.getString("locality"),
+                                        rs.getString("jurisdiction_code"), rs.getString("address_token"),
+                                        rs.getString("country_code"), rs.getString("postal_code"))),
+                        new LoanRequest(rs.getBigDecimal("requested_amount"), rs.getInt("requested_term_months"),
+                                rs.getString("purpose_code"), rs.getString("policy_version"))))
+                .optional();
+    }
+
+    /** Read metadata only; content existence comes from storage, not extraction status or a filename. */
+    public List<WorkspaceDocument> findWorkspaceDocuments(long applicationSk) {
+        return jdbc.sql("""
+                SELECT d.document_id, d.document_type, d.file_name, d.document_status, d.required_flag,
+                       CASE WHEN c.document_sk IS NULL THEN 0 ELSE 1 END AS content_available,
+                       c.media_type, c.content_length_bytes, c.content_sha256
+                FROM %s d LEFT JOIN %s c ON c.document_sk = d.document_sk
+                WHERE d.application_sk = :applicationSk
+                ORDER BY d.received_at, d.document_id FETCH FIRST 101 ROWS ONLY
+                """.formatted(names.table("CB_DOCUMENT"), names.table("CB_DOCUMENT_CONTENT")))
+                .param("applicationSk", applicationSk)
+                .query((rs, rowNum) -> new WorkspaceDocument(rs.getString("document_id"),
+                        rs.getString("document_type"), null, rs.getString("file_name"),
+                        DocumentStatus.valueOf(rs.getString("document_status")),
+                        Boolean.parseBoolean(rs.getString("required_flag")), rs.getInt("content_available") == 1,
+                        rs.getString("media_type"), rs.getObject("content_length_bytes", Long.class),
+                        rs.getString("content_sha256"))).list();
+    }
+
     public List<DocumentRow> findDocuments(long applicationSk) {
         return jdbc.sql("""
                 SELECT document_id, document_type, file_name, document_status, required_flag
@@ -300,6 +351,23 @@ public class LoanApplicationRepository {
                         rs.getLong("content_length_bytes"), rs.getString("media_type"),
                         rs.getString("upload_idempotency_key"), rs.getBytes("file_content")))
                 .optional();
+    }
+
+    public Optional<DocumentContentRow> findDocumentPreviewContent(long documentSk) {
+        return jdbc.sql("""
+                SELECT content_sha256, content_length_bytes, media_type, upload_idempotency_key, file_content
+                FROM %s WHERE document_sk = :documentSk
+                """.formatted(names.table("CB_DOCUMENT_CONTENT"))).param("documentSk", documentSk)
+                .query((rs, rowNum) -> {
+                    // Bound allocation even if stored length metadata or the BLOB was modified outside intake.
+                    try (var stream = rs.getBinaryStream("file_content")) {
+                        return new DocumentContentRow(rs.getString("content_sha256"), rs.getLong("content_length_bytes"),
+                                rs.getString("media_type"), rs.getString("upload_idempotency_key"),
+                                stream == null ? null : stream.readNBytes(25 * 1024 * 1024 + 1));
+                    } catch (IOException error) {
+                        throw new SQLException("Document content is unavailable", error);
+                    }
+                }).optional();
     }
 
     public void insertDocumentContent(DocumentProcessingRow document, String contentSha256, long contentLength,
@@ -367,6 +435,35 @@ public class LoanApplicationRepository {
                 WHERE w.application_sk = :applicationSk
                 """.formatted(names.table("CB_WORKFLOW_START_REQUEST"), names.table("CB_LOAN_APPLICATION")))
                 .param("applicationSk", applicationSk).query(this::mapWorkflow).optional();
+    }
+
+    public List<AuditRow> findAuditEvents(long applicationSk, String principalId) {
+        // Select only structured fields. Free-form payloads, original event/idempotency
+        // identifiers and principal identities never enter the public projection.
+        return jdbc.sql("""
+                SELECT ae.audit_event_sk, ae.created_at, ae.event_action, ae.event_outcome,
+                       ae.object_type, ae.trace_id,
+                       CASE WHEN ae.principal_id = :principalId THEN 'Current user'
+                            WHEN ae.principal_id IS NULL THEN 'Not recorded'
+                            ELSE 'Recorded actor' END AS actor_label,
+                       CASE WHEN ae.object_type = 'LOAN_APPLICATION' AND ae.object_id = la.application_id
+                            THEN la.application_id
+                            WHEN ae.object_type = 'DOCUMENT' THEN d.document_id
+                            ELSE NULL END AS object_id
+                FROM %s ae
+                JOIN %s la ON la.application_sk = ae.application_sk
+                LEFT JOIN %s d ON ae.object_type = 'DOCUMENT' AND d.application_sk = ae.application_sk
+                             AND d.document_id = ae.object_id
+                WHERE ae.application_sk = :applicationSk AND ae.redaction_applied = 'true'
+                ORDER BY ae.created_at DESC, ae.audit_event_sk DESC
+                FETCH FIRST 101 ROWS ONLY
+                """.formatted(names.table("CB_AUDIT_EVENT"), names.table("CB_LOAN_APPLICATION"),
+                        names.table("CB_DOCUMENT")))
+                .param("applicationSk", applicationSk).param("principalId", principalId)
+                .query((rs, rowNum) -> new AuditRow(rs.getLong("audit_event_sk"),
+                        instant(rs.getTimestamp("created_at")), rs.getString("event_action"),
+                        rs.getString("actor_label"), rs.getString("event_outcome"), rs.getString("object_type"),
+                        rs.getString("object_id"), rs.getString("trace_id"))).list();
     }
 
     public void insertAudit(long applicationSk, String eventId, String principalId, String action, String outcome,

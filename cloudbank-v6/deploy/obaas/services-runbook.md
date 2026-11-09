@@ -33,7 +33,7 @@ OKE, matching `workflow-v1-obaas.json`.
 - The installed OBaaS release has a semantic `appVersion` of 2.1.0 or later,
   with an `obaas-sample-app` chart advertising the same complete `appVersion`.
 - `azn-server` was successfully installed with
-  `./cloudbank-v6/deploy/obaas/deploy-azn-server_v1.sh first-deploy` and is healthy in the
+  `./deploy/obaas/deploy-azn-server_v1.sh first-deploy` and is healthy in the
   namespace configured by `MICROTX_NAMESPACE`.
 - MicroTx authentication was enabled as documented in
   [`secure-microtx-azn.md`](secure-microtx-azn.md).
@@ -157,7 +157,6 @@ missing: eight service repositories plus `cloudbank-schema-init` and
 Run one command:
 
 ```bash
-cd ./cloudbank-v6
 ./deploy/obaas/deploy-services.sh first-deploy
 ```
 
@@ -259,7 +258,6 @@ text, or OCI configuration.
 After application changes, run:
 
 ```bash
-cd ./cloudbank-v6
 ./deploy/obaas/deploy-services.sh redeploy
 ```
 

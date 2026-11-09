@@ -18,6 +18,11 @@ public class LoanAuthorization {
         this.internalClientIds = Set.copyOf(internalClientIds);
     }
 
+    public boolean isUser(Authentication authentication) {
+        return authentication instanceof JwtAuthenticationToken token
+                && "user".equals(token.getToken().getClaimAsString("token_kind"));
+    }
+
     public boolean isInternal(Authentication authentication) {
         if (!(authentication instanceof JwtAuthenticationToken jwtAuthentication)) {
             return false;

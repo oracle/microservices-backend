@@ -92,6 +92,8 @@ class BffSecurityConfig {
                 .requestMatchers("/bff/api/v1/session", "/bff/api/v1/applications", "/bff/auth/logout")
                 .authenticated()
                 .requestMatchers(HttpMethod.PUT, "/bff/api/v1/applications/*/documents/*/content").authenticated()
+                .requestMatchers(HttpMethod.GET, "/bff/api/v1/applications/*",
+                        "/bff/api/v1/applications/*/documents/*/content").authenticated()
                 .requestMatchers(HttpMethod.POST, "/bff/api/v1/applications/*/workflow-start").authenticated()
                 .requestMatchers(HttpMethod.GET, "/bff/api/v1/manual-review/tasks",
                         "/bff/api/v1/manual-review/tasks/*").authenticated()

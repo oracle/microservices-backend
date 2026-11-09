@@ -74,7 +74,8 @@ export function LiveApplicationDocuments({ application: initial, initialFiles, s
   const uploading = Object.values(uploads).some(state => state.busy);
   return <><PageHeading eyebrow="APPLICATIONS / DOCUMENTS · LIVE BFF" title={application.scenarioName}
     description={`Application created · ${application.applicationId}. Upload the PDFs, then start processing.`}
-    action={<Link href="/applications" className="button button--ghost">← Application list</Link>} />
+    action={<><Link href={`/applications/${application.applicationId}?tab=documents`} className="button button--secondary">Open documents →</Link>
+      <Link href="/applications" className="button button--ghost">← Application list</Link></>} />
     <Card title="Application saved" subtitle="Complete document upload and start on this page">
       <div className="fact-grid"><Fact label="Application ID" value={application.applicationId} />
         <Fact label="Application status" value={label(application.status)} />

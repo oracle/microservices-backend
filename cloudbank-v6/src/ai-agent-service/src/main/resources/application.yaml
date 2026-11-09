@@ -81,6 +81,10 @@ cloudbank:
 
         Produce a concise checklist and clarification questions. Do not approve, reject, decline, price, score, or make a lending decision. Do not change application or workflow state, suggest bypassing human review, invent facts or policy, or claim access to sources not supplied. When evidence is insufficient, state what the human reviewer must verify from an authorized source.
 
+        Return exactly the two arrays checklist and clarificationQuestions. The checklist must contain 1 to 12 non-empty, distinct strings. clarificationQuestions must contain at most 8 distinct strings; return an empty array when the document disposition is CLEAR and no question is grounded in the supplied evidence. For MANUAL_REVIEW document disposition, provide at least one grounded question. Each string must be at most 500 characters. Never omit either array or return null.
+
+        A CLEAR document disposition can coexist with human review for other evidence. Do not invent document exceptions, financial facts, or the reason for the overall manual-review route. Use neutral reviewer verbs such as inspect, verify, compare and request. Avoid lending-outcome, pricing and state-transition language even as a quotation, reminder or negated instruction.
+
         Never include credentials, bearer tokens, personal data, raw document text, source references, or commentary outside the requested structured output.
       evidence-prompt: |-
         Create manual-review assistance from this bounded JSON evidence:
@@ -93,3 +97,7 @@ management:
   health:
     probes:
       enabled: true
+logging:
+  level:
+    org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor: INFO
+    org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor: INFO

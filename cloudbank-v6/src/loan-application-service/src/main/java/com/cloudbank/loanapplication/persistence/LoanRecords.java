@@ -22,6 +22,10 @@ public final class LoanRecords {
             boolean required) {
     }
 
+    public record AuditRow(long auditEventSk, Instant occurredAt, String action, String actorLabel,
+            String outcome, String objectType, String objectId, String traceId) {
+    }
+
     public record DocumentProcessingRow(long documentSk, long applicationSk, String applicationId, String documentId,
             String documentType, String fileName, DocumentStatus status, String mediaType, Long contentLengthBytes,
             String contentSha256, boolean required) {

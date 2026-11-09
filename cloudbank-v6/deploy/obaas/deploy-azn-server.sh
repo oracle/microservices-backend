@@ -72,8 +72,8 @@ usage() {
 Deploy or update CloudBank AI azn-server on an OBaaS cluster, version 2.1.0 or later.
 
 Usage:
-  ./deploy/obaas/deploy-azn-server.sh first-deploy
-  ./deploy/obaas/deploy-azn-server.sh redeploy
+  deploy/obaas/deploy-azn-server.sh first-deploy
+  deploy/obaas/deploy-azn-server.sh redeploy
 
 Modes:
   first-deploy                Install on a cluster containing OBaaS but no azn-server

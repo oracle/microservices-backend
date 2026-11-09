@@ -9,7 +9,7 @@ create an Ingress or expose `/user/api/v1*` to browsers.
 
 ## 1. Configure `.env`
 
-Create `.env` in the `cloudbank-v6` directory root before running the deployment script. Add
+Create `.env` in the repository root before running the deployment script. Add
 only the following inputs:
 
 ```dotenv
@@ -96,8 +96,7 @@ or documentation.
 During `first-deploy`, the unified script runs:
 
 ```bash
-cd ./cloudbank-v6
-run-compose.sh init --schema-profile runtime
+./run-compose.sh init --schema-profile runtime
 ```
 
 `init` requires the pre-created `.env`. It preserves only the eighteen deployment
@@ -141,7 +140,6 @@ export NEW_IMAGE_TAG="first-$(date -u +%Y%m%d%H%M%S)"
 Run the first deployment from the repository root:
 
 ```bash
-cd ./cloudbank-v6
 ./deploy/obaas/deploy-azn-server_v1.sh first-deploy
 ```
 
@@ -170,7 +168,6 @@ new tag, and run:
 
 ```bash
 export NEW_IMAGE_TAG="release-$(date -u +%Y%m%d%H%M%S)"
-cd ./cloudbank-v6
 ./deploy/obaas/deploy-azn-server_v1.sh redeploy
 ```
 

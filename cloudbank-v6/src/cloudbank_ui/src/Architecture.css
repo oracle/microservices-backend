@@ -1,0 +1,47 @@
+/* Copyright (c) 2026, Oracle and/or its affiliates. Licensed under UPL 1.0. */
+
+.architecture-explorer .heading-action { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.architecture-reference-note { color: #718497; font-size: 12px; line-height: 1.6; margin: 0 0 12px; }
+.architecture-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.architecture-explorer .architecture-layout > * { min-width: 0; }
+.architecture-explorer .architecture-map-heading { gap: 16px; flex-wrap: wrap; }
+.architecture-explorer .architecture-map-heading > .mono { overflow-wrap: anywhere; }
+.architecture-explorer .component-node { min-width: 0; }
+.architecture-explorer .component-node strong,
+.architecture-explorer .component-node small { overflow-wrap: anywhere; }
+.architecture-explorer .component-node:focus-visible { outline: 2px solid #0e928a; outline-offset: 3px; }
+.architecture-node-status { display: block; margin-top: 8px; }
+.architecture-node-status .badge { font-size: 8px; padding: 3px 5px; white-space: normal; }
+.architecture-explorer .inspector { max-height: calc(100vh - 110px); overflow-y: auto; }
+.architecture-explorer .inspector-top { flex-wrap: wrap; }
+.architecture-explorer .feature-map > div { grid-template-rows: auto auto auto; }
+.architecture-explorer .feature-symbol { grid-row: span 3; }
+.architecture-feature-status { grid-column: 2; margin-top: 8px; }
+.architecture-ai-task > div { min-width: 0; }
+.architecture-ai-task > .badge { flex-shrink: 0; }
+.architecture-ai-task small { display: block; color: #6d8396; font-size: 10px; margin-top: 6px; }
+.architecture-ai-task p { color: #8292a1; font-size: 11px; line-height: 1.6; margin: 8px 0 0; }
+.architecture-explorer .architecture-footer { gap: 20px; flex-wrap: wrap; }
+.architecture-explorer .architecture-footer p { overflow-wrap: anywhere; }
+.architecture-explorer .architecture-footer > div:last-child { flex-wrap: wrap; }
+
+@media (max-width: 1000px) {
+  .architecture-explorer .architecture-layout { grid-template-columns: minmax(0, 1fr); }
+  .architecture-explorer .inspector { position: static; max-height: none; }
+  .architecture-explorer .lane-components { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .architecture-explorer .architecture-feature-cards { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .architecture-explorer .architecture-hero { align-items: flex-start; flex-wrap: wrap; }
+  .architecture-explorer .architecture-lane { grid-template-columns: minmax(0, 1fr); }
+  .architecture-explorer .lane-components { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .architecture-explorer .architecture-journey { flex-direction: column; align-items: flex-start; gap: 18px; }
+  .architecture-explorer .architecture-journey > div { align-items: flex-start; text-align: left; }
+  .architecture-explorer .architecture-journey > div::after { display: none; }
+  .architecture-explorer .feature-map { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 420px) {
+  .architecture-explorer .lane-components { grid-template-columns: minmax(0, 1fr); }
+}

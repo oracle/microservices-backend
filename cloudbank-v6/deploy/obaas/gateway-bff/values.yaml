@@ -10,6 +10,13 @@ tokenUri: ""
 jwkSetUri: ""
 userInfoUri: ""
 loanBaseUrl: ""
+aiBaseUrl: http://ai-agent-service:8080
+decisionBaseUrl: http://decision-service:8080
+geographicBaseUrl: http://geographic-risk-service:8080
+signozBaseUrl: ""
+signozPublicUrl: ""
+signozApiKeySecretName: ""
+signozApiKeySecretKey: ""
 microtxBaseUrl: ""
 microtxClientId: microtx-workflow-client
 cookieSecure: "true"

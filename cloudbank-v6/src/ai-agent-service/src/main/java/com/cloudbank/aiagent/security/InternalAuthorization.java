@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 @Component("aiAgentAuthorization")
 public class InternalAuthorization {
     private final Set<String> clientIds;
+    @Value("${CLOUDBANK_WORKSPACE_READER_CLIENT_ID:cloudbank-bff-client-read}")
+    private String workspaceReaderClientId = "cloudbank-bff-client-read";
 
     public InternalAuthorization(
             @Value("${cloudbank.security.internal-client-ids:cloudbank-service-client}") Set<String> clientIds) {
@@ -26,5 +28,13 @@ public class InternalAuthorization {
                 && "service".equals(jwt.getToken().getClaimAsString("token_kind"))
                 && clientIds.contains(jwt.getToken().getClaimAsString("client_id")) && authentication.getAuthorities()
                         .stream().anyMatch(authority -> "SCOPE_cloudbank.internal".equals(authority.getAuthority()));
+    }
+
+    public boolean isWorkspaceReader(Authentication authentication) {
+        return authentication instanceof JwtAuthenticationToken jwt
+                && "service".equals(jwt.getToken().getClaimAsString("token_kind"))
+                && workspaceReaderClientId.equals(jwt.getToken().getClaimAsString("client_id"))
+                && authentication.getAuthorities().stream().anyMatch(authority ->
+                        "SCOPE_cloudbank.workspace.read".equals(authority.getAuthority()));
     }
 }

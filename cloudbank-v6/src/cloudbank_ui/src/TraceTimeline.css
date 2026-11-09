@@ -1,0 +1,16 @@
+.trace-span-list { display: grid; gap: 16px; }
+.trace-span { border: 1px solid #e1e9ef; border-radius: 8px; padding: 16px; }
+.trace-span-heading { display: flex; justify-content: space-between; align-items: start; gap: 16px; }
+.trace-span-heading strong, .trace-span-heading span { display: block; }
+.trace-span-heading strong { font-size: 13px; color: #29435a; }
+.trace-span-heading div > span { font-size: 12px; color: #74899e; margin-top: 5px; }
+.trace-span-track { background: #f1f6f7; height: 12px; border-radius: 4px; margin: 16px 0 10px; overflow: hidden; }
+.trace-span-bar { display: block; height: 100%; border-radius: 4px; background: #009b91; }
+.trace-span-bar--error { background: #bf5267; }
+.trace-span-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 11px; color: #74899e; }
+.trace-span-attributes { margin-top: 12px; font-size: 12px; }
+.trace-span-attributes summary { cursor: pointer; color: #007e78; }
+.trace-span-attributes dl { margin-bottom: 0; }
+.trace-span-attributes dl > div { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 5px 0; }
+.trace-span-attributes dt { min-width: 180px; color: #74899e; }
+.trace-span-attributes dd { margin: 0; overflow-wrap: anywhere; }

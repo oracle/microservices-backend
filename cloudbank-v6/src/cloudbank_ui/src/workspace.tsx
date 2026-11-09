@@ -1,22 +1,16 @@
-import { useState, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { type MockApplication, useMockStore } from './model';
 import { documentTypes } from './pages';
 import { Link, go } from './navigation';
 import { Badge, Card, Empty, Fact, FilePicker, PageHeading, StatusBadge } from './ui';
 
-const tabs = [
-  ['overview', 'Overview', '◇'], ['documents', 'Documents', '▤'],
-  ['ai-tasks', 'AI Workflow Tasks', '✧'], ['decision', 'Decision', '◉'],
-  ['policy-evidence', 'Policy Evidence', '▣'], ['risk-signals', 'Risk Signals', '◈'],
-  ['workflow', 'Workflow', '⌁'], ['audit', 'Audit', '≡'], ['trace', 'Trace', '⌕'],
-] as const;
+import { workspaceTabs as tabs } from './workspaceTabs';
 
 export function WorkspacePage({ id, path }: { id: string; path: string }) {
   const store = useMockStore();
   const app = store.applications.find(item => item.id === id);
   const requestedTab = new URLSearchParams(path.split('?')[1] ?? '').get('tab') || 'overview';
   const active = tabs.some(([key]) => key === requestedTab) ? requestedTab : 'overview';
-  const [localFiles, setLocalFiles] = useState<Record<string, File>>({});
   const [newType, setNewType] = useState('');
   const [newRequired, setNewRequired] = useState(true);
   const [newFile, setNewFile] = useState<File | null>(null);
@@ -35,7 +29,7 @@ export function WorkspacePage({ id, path }: { id: string; path: string }) {
     <div className="workspace-layout"><aside className="workspace-tabs" aria-label="Application sections"><div className="tabs-label">EXPLORE APPLICATION</div><div role="tablist" aria-orientation="vertical" aria-label="Application workspace">{tabs.map(([key, label, icon], index) => <button key={key} role="tab" id={`tab-${key}`} aria-selected={active === key} aria-controls="workspace-panel" tabIndex={active === key ? 0 : -1} className={`workspace-tab ${active === key ? 'workspace-tab--active' : ''}`} onClick={() => select(key)} onKeyDown={event => onTabKeyDown(event, index)}><span className="workspace-tab-icon" aria-hidden="true">{icon}</span><span>{label}</span><span className="workspace-tab-arrow">›</span></button>)}</div><div className="tabs-foot"><span className="dot dot--teal" /> In-memory mock state</div></aside>
     <section className="workspace-panel" id="workspace-panel" role="tabpanel" aria-labelledby={`tab-${active}`}><div className="panel-heading"><div><div className="eyebrow">{tabs.find(([key]) => key === active)?.[1].toUpperCase()}</div><h2>{tabs.find(([key]) => key === active)?.[1]}</h2></div><Badge tone="blue">Simulated data</Badge></div>
       {active === 'overview' && <Overview app={app} />}
-      {active === 'documents' && <><Card title="Document inventory" subtitle="Synthetic metadata and simulated upload for each row"><div className="table-wrap"><table><thead><tr><th>Document</th><th>File</th><th>Required</th><th>Status</th><th>Action</th></tr></thead><tbody>{app.documents.map(doc => { const file = localFiles[doc.id] ?? store.pendingFiles[doc.id]; return <tr key={doc.id}><td><strong>{doc.type.replaceAll('_', ' ')}</strong><small className="mono">{doc.id}</small></td><td>{doc.status === 'EXPECTED' ? <FilePicker label={`Select file ${doc.id}`} fileName={file?.name} onChange={next => setLocalFiles(previous => { const updated = { ...previous }; if (next) updated[doc.id] = next; else delete updated[doc.id]; return updated; })} /> : <span>{doc.fileName || 'No file'}</span>}</td><td>{doc.required ? 'Yes' : 'No'}</td><td><Badge tone={doc.status === 'VALIDATED' || doc.status === 'RECEIVED' ? 'teal' : doc.status === 'NEEDS_REVIEW' ? 'amber' : 'neutral'}>{doc.status.replaceAll('_', ' ')}</Badge></td><td>{doc.status === 'EXPECTED' && <button className="button button--small button--secondary" onClick={() => { if (file) store.upload(app.id, doc.id, file); }}>Upload</button>}</td></tr>; })}</tbody></table></div>{app.documents.length === 0 && <Empty title="No documents">Add a row below to register a synthetic document.</Empty>}<p className="helper">Simple individual upload. The mock updates metadata only; it does not retain or extract PDF bytes.</p></Card><Card title="Add document" subtitle="Register a new row, then upload the file"><div className="document-add"><label className="field"><span>Document type</span><select value={newType} onChange={e => setNewType(e.target.value)}><option value="">Select type</option>{documentTypes.map(type => <option key={type} value={type}>{type.replaceAll('_', ' ')}</option>)}</select></label><div className="field"><span>File</span><FilePicker label="New document file" fileName={newFile?.name} onChange={setNewFile} /></div><label className="checkbox-label"><input type="checkbox" checked={newRequired} onChange={e => setNewRequired(e.target.checked)} /> Required</label><button className="button button--secondary" onClick={() => { store.addDocument(app.id, newType, newRequired, newFile); setNewType(''); setNewFile(null); }}>＋ Register row</button></div></Card><Card title="Evidence and issues" subtitle="Bounded projection without raw text"><div className="evidence-list">{app.documents.filter(doc => doc.status === 'NEEDS_REVIEW').map(doc => <div key={doc.id}><Badge tone="amber">Needs review</Badge><span>{doc.type.replaceAll('_', ' ')} · quality or consistency needs review</span></div>)}{app.documents.every(doc => doc.status !== 'NEEDS_REVIEW') && <p className="muted">No document issues in this fixture. Extraction does not run in the UI.</p>}</div></Card></>}
+      {active === 'documents' && <MockDocumentsTab app={app} newType={newType} setNewType={setNewType} newRequired={newRequired} setNewRequired={setNewRequired} newFile={newFile} setNewFile={setNewFile} />}
       {active === 'ai-tasks' && <AiTasks app={app} />}
       {active === 'decision' && <Decision app={app} />}
       {active === 'policy-evidence' && <Policy app={app} />}
@@ -46,6 +40,92 @@ export function WorkspacePage({ id, path }: { id: string; path: string }) {
     </section></div></>;
 }
 
+function MockDocumentsTab({ app, newType, setNewType, newRequired, setNewRequired, newFile, setNewFile }: {
+  app: MockApplication;
+  newType: string;
+  setNewType: (value: string) => void;
+  newRequired: boolean;
+  setNewRequired: (value: boolean) => void;
+  newFile: File | null;
+  setNewFile: (value: File | null) => void;
+}) {
+  const store = useMockStore();
+  const [preview, setPreview] = useState<{ name: string; url: string; objectUrl: boolean } | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (preview && dialog && !dialog.open) dialog.showModal();
+    return () => {
+      if (dialog?.open) dialog.close();
+      if (preview?.objectUrl) URL.revokeObjectURL(preview.url);
+    };
+  }, [preview]);
+
+  const selectedFile = (documentId: string) => store.pendingFiles[documentId] ?? store.uploadedFiles[documentId];
+  const previewUrl = (doc: MockApplication['documents'][number]) => {
+    const file = selectedFile(doc.id);
+    if (file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) {
+      return { url: URL.createObjectURL(file), objectUrl: true };
+    }
+    const folder = mockDocumentFolders[app.id];
+    if (!app.canonical || !folder || !/^[\w-]+\.pdf$/i.test(doc.fileName)) return null;
+    return { url: `/mock-documents/${folder}/${encodeURIComponent(doc.fileName)}`, objectUrl: false };
+  };
+
+  const openPreview = (doc: MockApplication['documents'][number]) => {
+    const source = previewUrl(doc);
+    if (source) setPreview({ ...source, name: doc.fileName || selectedFile(doc.id)?.name || doc.type.replaceAll('_', ' ') });
+  };
+
+  return <>
+    <Card title="Document inventory" subtitle="Synthetic metadata and simulated upload for each row">
+      <div className="table-wrap"><table><thead><tr><th>Document</th><th>File</th><th>Required</th><th>Status</th><th>Action</th></tr></thead><tbody>
+        {app.documents.map(doc => {
+          const file = selectedFile(doc.id);
+          const canPreview = Boolean((file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) || (app.canonical && mockDocumentFolders[app.id] && /^[\w-]+\.pdf$/i.test(doc.fileName)));
+          return <tr key={doc.id}>
+            <td><strong>{doc.type.replaceAll('_', ' ')}</strong><small className="mono">{doc.id}</small></td>
+            <td>{doc.status === 'EXPECTED' ? <FilePicker label={`Select file ${doc.id}`} fileName={file?.name} onChange={next => store.selectFile(doc.id, next)} /> : <span>{doc.fileName || 'No file'}</span>}</td>
+            <td>{doc.required ? 'Yes' : 'No'}</td>
+            <td><Badge tone={doc.status === 'VALIDATED' || doc.status === 'RECEIVED' ? 'teal' : doc.status === 'NEEDS_REVIEW' ? 'amber' : 'neutral'}>{doc.status.replaceAll('_', ' ')}</Badge></td>
+            <td><div className="document-actions">
+              {doc.status === 'EXPECTED' && <button className="button button--small button--secondary" onClick={() => { if (file) store.upload(app.id, doc.id, file); }}>Upload</button>}
+              {canPreview && <button className="button button--small button--secondary" aria-label={`Preview ${doc.fileName || file?.name || doc.type.replaceAll('_', ' ')}`} onClick={() => openPreview(doc)}>Preview</button>}
+            </div></td>
+          </tr>;
+        })}
+      </tbody></table></div>
+      {app.documents.length === 0 && <Empty title="No documents">Add a row below to register a synthetic document.</Empty>}
+      <p className="helper">Preview canonical rows with synthetic fixture PDFs, or select a PDF to preview it here. Selected files stay in browser memory; mock upload sends and stores no file bytes.</p>
+    </Card>
+    <Card title="Add document" subtitle="Register a new row, then upload the file">
+      <div className="document-add">
+        <label className="field"><span>Document type</span><select value={newType} onChange={e => setNewType(e.target.value)}><option value="">Select type</option>{documentTypes.map(type => <option key={type} value={type}>{type.replaceAll('_', ' ')}</option>)}</select></label>
+        <div className="field"><span>File</span><FilePicker label="New document file" fileName={newFile?.name} onChange={setNewFile} /></div>
+        <label className="checkbox-label"><input type="checkbox" checked={newRequired} onChange={e => setNewRequired(e.target.checked)} /> Required</label>
+        <button className="button button--secondary" onClick={() => { store.addDocument(app.id, newType, newRequired, newFile); setNewType(''); setNewFile(null); }}>＋ Register row</button>
+      </div>
+    </Card>
+    <Card title="Evidence and issues" subtitle="Bounded projection without raw text">
+      <div className="evidence-list">{app.documents.filter(doc => doc.status === 'NEEDS_REVIEW').map(doc => <div key={doc.id}><Badge tone="amber">Needs review</Badge><span>{doc.type.replaceAll('_', ' ')} · quality or consistency needs review</span></div>)}{app.documents.every(doc => doc.status !== 'NEEDS_REVIEW') && <p className="muted">No document issues in this fixture. Extraction does not run in the UI.</p>}</div>
+    </Card>
+    <dialog ref={dialogRef} className="document-preview-dialog" aria-labelledby="document-preview-title" onClose={() => setPreview(null)}>
+      <div className="document-preview-header"><div><div className="eyebrow">SYNTHETIC DOCUMENT PREVIEW</div><h2 id="document-preview-title">{preview?.name ?? 'Document preview'}</h2></div><button className="button button--small button--secondary" onClick={() => dialogRef.current?.close()}>Close</button></div>
+      <div className="document-preview-body">{preview && <iframe className="document-preview-frame" src={preview.url} title={`PDF preview: ${preview.name}`} />}</div>
+      <div className="document-preview-footer"><span>Mock UI · preview stays in this browser session</span>{preview && <a href={preview.url} target="_blank" rel="noreferrer">Open PDF in new tab ↗</a>}</div>
+    </dialog>
+  </>;
+}
+
+const mockDocumentFolders: Record<string, string> = {
+  'APP-APR-001': 'app_apr_001_elena_parker',
+  'APP-MR-002': 'app_mr_002_maya_chen',
+  'APP-REJ-003': 'app_rej_003_daniel_rojas',
+  'APP-OPFAIL-004': 'app_opfail_004_priya_natarajan',
+  'APP-RISK-005': 'app_risk_005_jordan_brooks',
+};
+
 function Overview({ app }: { app: MockApplication }) {
   return <><div className="overview-summary"><div><span>CURRENT STATUS</span><StatusBadge status={app.status} /></div><div><span>EXPECTED FIXTURE RESULT</span><strong>{app.expected.replaceAll('_', ' ')}</strong></div><div><span>SOURCE</span><strong>{app.canonical ? 'Canonical scenario' : 'New mock application'}</strong></div></div><Card title="Applicant and request" subtitle="Summary matrix · synthetic values"><div className="fact-grid"><Fact label="Applicant name" value={app.applicant} /><Fact label="Age band" value={app.ageBand} /><Fact label="Synthetic phone" value={app.phoneToken} /><Fact label="Synthetic email" value={app.emailToken} /><Fact label="Address line" value={app.addressLine} /><Fact label="City / locality" value={app.locality} /><Fact label="Jurisdiction" value={app.jurisdiction} /><Fact label="Country" value={app.country} /><Fact label="Postal code" value={app.postalCode} /><Fact label="Address token" value={app.addressToken} /><Fact label="Requested amount" value={`USD ${app.amount || '—'}`} /><Fact label="Term" value={app.term ? `${app.term} months` : '—'} /><Fact label="Purpose" value={app.purpose.replaceAll('_', ' ')} /><Fact label="Policy version" value={app.policyVersion} /></div></Card><Card title="Current journey" subtitle="Application status, workflow execution, and lending outcome are separate"><div className="flow-steps"><div><span className="flow-dot">1</span><strong>Application received</strong><small>Metadata registered</small></div><div><span className="flow-dot">2</span><strong>Workflow</strong><small>{app.status === 'DEFERRED' ? 'Deferred start' : 'Simulated execution'}</small></div><div><span className="flow-dot">3</span><strong>Decision</strong><small>{app.status === 'RECOVERED' ? 'Unavailable' : app.decision?.outcome ?? 'Pending'}</small></div></div></Card></>;
 }
@@ -55,7 +135,6 @@ function AiTasks({ app }: { app: MockApplication }) {
     ['Document Evidence Summary', 'Spring AI / OCI GenAI', 'Implemented', 'Redacted summary of bounded document evidence.'],
     ['Policy Evidence Support', 'Deterministic adapter', 'Implemented', 'Authorized, bounded policy references.'],
     ['Manual Review Assistant', 'Spring AI / OCI GenAI', 'Implemented', 'Checklist and questions for the human reviewer.'],
-    ['Decision Explanation Draft', 'Future task', 'Planned', 'Proposed explanation, not an automated decision maker.'],
   ];
   return <><div className="task-grid">{tasks.map(([name, mode, status, description], i) => <Card key={name} className="task-card" title={name} subtitle={`0${i + 1} · ${mode}`} action={<Badge tone={status === 'Planned' ? 'neutral' : 'teal'}>{status}</Badge>}><p>{description}</p><div className="task-card-footer"><span>Source: {app.status === 'DEFERRED' ? 'Not yet executed' : 'Fixture simulation'}</span><span>Guardrails: active</span></div></Card>)}</div><div className="callout"><span className="callout-icon">i</span><p>AI does not approve or reject loans. The mock invokes no models and shows no prompts, full document text, or live output.</p></div></>;
 }

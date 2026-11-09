@@ -27,6 +27,12 @@ final class InternalAuthorization {
                 && hasInternalScope(token.getClaim("scope"));
     }
 
+    boolean isWorkspaceReader(JsonWebToken token, String readerClientId) {
+        return "service".equals(asString(token.getClaim("token_kind")))
+                && readerClientId.equals(asString(token.getClaim("client_id")))
+                && hasScope(token.getClaim("scope"), "cloudbank.workspace.read");
+    }
+
     private static String asString(Object value) {
         if (value instanceof String string) {
             return string;
@@ -38,20 +44,24 @@ final class InternalAuthorization {
     }
 
     private static boolean hasInternalScope(Object scope) {
+        return hasScope(scope, "cloudbank.internal");
+    }
+
+    private static boolean hasScope(Object scope, String required) {
         if (scope instanceof String scopes) {
             return Arrays.stream(scopes.split("\\s+"))
-                    .anyMatch("cloudbank.internal"::equals);
+                    .anyMatch(required::equals);
         }
         if (scope instanceof JsonArray scopes) {
             return scopes.stream()
                     .filter(JsonString.class::isInstance)
                     .map(JsonString.class::cast)
                     .map(JsonString::getString)
-                    .anyMatch("cloudbank.internal"::equals);
+                    .anyMatch(required::equals);
         }
         if (scope instanceof Iterable<?> scopes) {
             for (Object value : scopes) {
-                if ("cloudbank.internal".equals(value)) {
+                if (required.equals(value)) {
                     return true;
                 }
             }

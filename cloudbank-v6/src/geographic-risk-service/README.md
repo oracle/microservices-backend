@@ -603,3 +603,13 @@ curl -s http://127.0.0.1:8080/health/ready
 ```
 
 The service uses Logback Classic 1.5.38 with its standard pattern encoder to emit text logs to the console. The log pattern includes MDC fields such as application ID, workflow ID, task reference, geographic evaluation ID, and trace ID. In OBaaS, keep `OTEL_INSTRUMENTATION_LOGBACK_MDC_ENABLED=true` so logs and traces can be correlated in the observability stack.
+
+## Workspace evaluation read
+
+`GET /internal/api/v1/workspace/applications/{applicationId}/geographic-risk/{evaluationId}?workflowId=...`
+requires `cloudbank-bff-client-read` with `cloudbank.workspace.read`.
+It reads the existing immutable evaluation using the workflow idempotency key
+and verifies its application/workflow/evaluation IDs. The response contains
+only stored disposition and signals, is private/no-store, and performs no
+geocoding or spatial evaluation. Internal workflow writes retain their existing
+caller/scope restrictions.
