@@ -83,10 +83,10 @@ locals {
       managed_node_pool_configs = [for kind, id in cluster.node_pools : {
         id = id, minimum = var.standby_node_counts[kind], maximum = var.node_counts[kind]
       }]
-      load_balancer_mappings = [{
+      load_balancer_mappings = local.roles[region] == "PRIMARY" ? [{
         source_load_balancer_id      = cluster.lb_id
         destination_load_balancer_id = var.clusters[region == var.region_0 ? var.region_1 : var.region_0].lb_id
-      }]
+      }] : []
     }
     ],
     # Existing membership contains the storage IDs activated by FSDR.

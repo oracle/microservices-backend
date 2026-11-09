@@ -155,6 +155,10 @@ run "bootstrap" {
     condition     = [for member in output.regions.region_0.dr_protection_group.members : member.member_id if member.member_type == "VOLUME_GROUP"] == ["original-group"] && !output.storage_recovered
     error_message = "Bootstrap must enroll the original groups and render their reserved PVs."
   }
+  assert {
+    condition     = length(one([for member in output.regions.region_0.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).load_balancer_mappings) == 1 && length(one([for member in output.regions.region_1.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).load_balancer_mappings) == 0
+    error_message = "Only the primary OKE member may configure load-balancer recovery mappings."
+  }
 }
 
 run "initial_primary" {
@@ -213,6 +217,21 @@ run "initial_primary" {
   assert {
     condition     = [for member in output.regions.region_0.dr_protection_group.members : member.member_id if member.member_type == "VOLUME_GROUP"] == ["original-group"] && !output.storage_recovered
     error_message = "The original primary must retain its enrolled groups and PV management."
+  }
+}
+
+run "active_drill" {
+  command = plan
+  variables {
+    plan_types = ["START_DRILL", "STOP_DRILL"]
+  }
+  override_data {
+    target = data.oci_disaster_recovery_dr_protection_group.region_1[0]
+    values = { role = "STANDBY", state = "INACTIVE", lifecycle_sub_state = "DR_DRILL_IN_PROGRESS", members = [] }
+  }
+  assert {
+    condition     = toset(keys(output.regions.region_1.dr_plans)) == toset(["start_drill", "stop_drill"])
+    error_message = "An active drill must expose its stop-drill plan in the standby region."
   }
 }
 

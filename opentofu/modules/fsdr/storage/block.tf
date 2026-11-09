@@ -3,14 +3,15 @@
 # spell-checker: disable
 
 resource "oci_core_volume_group" "pvc" {
-  for_each            = local.groups
+  for_each            = local.volume_ids_by_ad
   compartment_id      = var.compartment_id
   availability_domain = each.key
   display_name        = format("%s-pvc", var.label_prefix)
   freeform_tags       = { "obaas-fsdr" = var.label_prefix }
+  volume_ids          = each.value
   source_details {
     type       = "volumeIds"
-    volume_ids = [for key in each.value : var.volumes[key].id]
+    volume_ids = each.value
   }
   volume_group_replicas_deletion = var.init_destroy
   preserve_volume_replica        = var.init_destroy ? false : null

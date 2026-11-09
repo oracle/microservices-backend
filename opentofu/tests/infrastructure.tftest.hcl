@@ -219,8 +219,8 @@ run "drill_plans" {
     fsdr_plan_verify_trigger  = 3
   }
   assert {
-    condition     = contains(keys(output.fsdr_plan_ids), "start_drill") && contains(keys(output.fsdr_plan_ids), "stop_drill") && module.fsdr["managed"].regions.region_1.dr_plans["start_drill"].refresh_trigger == 2 && module.fsdr["managed"].regions.region_1.dr_plans["stop_drill"].verify_trigger == 3
-    error_message = "Drill plans and root refresh/verify controls must reach the child modules."
+    condition     = contains(keys(output.fsdr_plan_ids), "start_drill") && !contains(keys(output.fsdr_plan_ids), "stop_drill") && module.fsdr["managed"].regions.region_1.dr_plans["start_drill"].refresh_trigger == 2 && module.fsdr["managed"].regions.region_1.dr_plans["start_drill"].verify_trigger == 3
+    error_message = "The start-drill plan and root refresh/verify controls must reach the child module before a drill starts."
   }
 }
 

@@ -133,7 +133,7 @@ resource "terraform_data" "fsdr_validation" {
       error_message = "FSDR destroy preparation requires fsdr_enabled=true."
     }
     precondition {
-      condition     = var.fsdr_enabled && trimspace(var.fsdr_region_1) != "" && var.fsdr_region_1 != var.region
+      condition     = local.fsdr_topology_selected
       error_message = "Enable FSDR and select a non-empty standby region distinct from region."
     }
     precondition {
@@ -178,7 +178,7 @@ resource "terraform_data" "fsdr_validation" {
 }
 
 module "fsdr" {
-  for_each                        = var.fsdr_enabled ? { managed = true } : {}
+  for_each                        = local.fsdr_topology_selected ? { managed = true } : {}
   source                          = "./modules/fsdr"
   tenancy_id                      = var.tenancy_ocid
   compartment_id                  = local.compartment_ocid
