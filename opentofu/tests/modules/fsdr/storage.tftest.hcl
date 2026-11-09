@@ -120,19 +120,19 @@ run "cleanup_paired_groups" {
     init_destroy = true
   }
   override_data {
-    target = data.oci_disaster_recovery_dr_protection_group.region_0[0]
+    target = data.oci_disaster_recovery_dr_protection_group.region_0
     values = { role = "PRIMARY", peer_id = "pg-1", peer_region = "uk-cardiff-1", members = [] }
   }
   override_data {
-    target = data.oci_disaster_recovery_dr_protection_group.region_1[0]
+    target = data.oci_disaster_recovery_dr_protection_group.region_1
     values = { role = "STANDBY", peer_id = "pg-0", peer_region = "uk-london-1", members = [] }
   }
   override_data {
-    target = data.oci_disaster_recovery_dr_protection_group.prepared_region_0[0]
+    target = data.oci_disaster_recovery_dr_protection_group.prepared_region_0
     values = { role = "UNCONFIGURED" }
   }
   override_data {
-    target = data.oci_disaster_recovery_dr_protection_group.prepared_region_1[0]
+    target = data.oci_disaster_recovery_dr_protection_group.prepared_region_1
     values = { role = "UNCONFIGURED" }
   }
   assert {
@@ -164,7 +164,7 @@ run "bootstrap" {
 run "initial_primary" {
   command = plan
   override_data {
-    target = data.oci_disaster_recovery_dr_protection_group.region_0[0]
+    target = data.oci_disaster_recovery_dr_protection_group.region_0
     values = {
       role = "PRIMARY"
       members = [{
@@ -226,7 +226,7 @@ run "active_drill" {
     plan_types = ["START_DRILL", "STOP_DRILL"]
   }
   override_data {
-    target = data.oci_disaster_recovery_dr_protection_group.region_1[0]
+    target = data.oci_disaster_recovery_dr_protection_group.region_1
     values = { role = "STANDBY", state = "INACTIVE", lifecycle_sub_state = "DR_DRILL_IN_PROGRESS", members = [] }
   }
   assert {
@@ -238,11 +238,11 @@ run "active_drill" {
 run "switchover" {
   command = plan
   override_data {
-    target = data.oci_disaster_recovery_dr_protection_group.region_0[0]
+    target = data.oci_disaster_recovery_dr_protection_group.region_0
     values = { role = "STANDBY", members = [] }
   }
   override_data {
-    target = data.oci_disaster_recovery_dr_protection_group.region_1[0]
+    target = data.oci_disaster_recovery_dr_protection_group.region_1
     values = {
       role = "PRIMARY"
       members = [{
@@ -301,7 +301,7 @@ run "switchover" {
 run "switchback" {
   command = plan
   override_data {
-    target = data.oci_disaster_recovery_dr_protection_group.region_0[0]
+    target = data.oci_disaster_recovery_dr_protection_group.region_0
     values = {
       role = "PRIMARY"
       members = [
@@ -401,7 +401,7 @@ run "switchback" {
     }
   }
   override_data {
-    target = data.oci_disaster_recovery_dr_protection_group.region_1[0]
+    target = data.oci_disaster_recovery_dr_protection_group.region_1
     values = { role = "STANDBY", members = [] }
   }
   assert {
@@ -421,7 +421,7 @@ run "missing_initial_group_after_recovery" {
     values = { dr_protection_group_collection = [{ items = [] }] }
   }
   override_data {
-    target = data.oci_disaster_recovery_dr_protection_group.region_1[0]
+    target = data.oci_disaster_recovery_dr_protection_group.region_1
     values = {
       role = "PRIMARY"
       members = [{

@@ -52,7 +52,7 @@ run "standard_plan_subset" {
 run "ordered_plan_execution" {
   command = plan
   override_resource {
-    target = oci_disaster_recovery_dr_plan.start_drill["start_drill"]
+    target = oci_disaster_recovery_dr_plan.start_drill
     values = { id = "ordered-start-plan" }
   }
   variables {
