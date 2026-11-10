@@ -1,6 +1,6 @@
 # CloudBankAI v6 Install Guide.
 
-## 1 OBaaS setup on OKE and test
+## 1. OBaaS setup on OKE and test
 - install OBaaS on OKE as `<CLOUDBANKAI_NAMESPACE>` following [here](https://oracle.github.io/microservices-backend/obaas/docs/setup/)
 
 - from ORM Job Output, copy the `kubeconfig_cmd` value, and run it in a terminal.
@@ -19,19 +19,7 @@ kubectl --context "$KUBE_CONTEXT" --namespace "$MICROTX_NAMESPACE" \
 
 - start rancher deskop or equivalent for docker
 
-## 2.1 Step-by-Step Deployment  
-
-- [Azn-server deploy guide](../../deploy/obaas/azn-server-runbook.md)
-
-- [MicroTx azn-server authentication setup](../../deploy/microtx/oke-obaas/secure-microtx-azn.md)
-
-- [Cloudbank AI services deployment](../../deploy/obaas/services-runbook.md)
-
-- [MicroTx cloudbank-loan-origination workflow deploy](../../src/workflows/cloudbank-loan-origination/README.md#1-obaas-oke-deployment)
-
-- [Backend for Front-end API](../../deploy/obaas/gateway-bff-runbook.md)
-
-## 2.2 One-Shot Deployment
+## 2. One-Shot Deployment
 
 ### 2.2.1 Setup pre-launch (OCI)
 
@@ -251,4 +239,16 @@ EXEC SDO_GCDR.ELOC_GRANT_ACCESS('CB_GEOGRAPHIC_RISK_APP');
 
 
   
+## APPENDIX: Step-by-Step Deployment  
+
+- [Azn-server deploy guide](../../deploy/obaas/azn-server-runbook.md)
+
+- [MicroTx azn-server authentication setup](../../deploy/microtx/oke-obaas/secure-microtx-azn.md)
+
+- [Cloudbank AI services deployment](../../deploy/obaas/services-runbook.md)
+
+- [MicroTx cloudbank-loan-origination workflow deploy](../../src/workflows/cloudbank-loan-origination/README.md#1-obaas-oke-deployment)
+
+- [Backend for Front-end API](../../deploy/obaas/gateway-bff-runbook.md)
+
 
