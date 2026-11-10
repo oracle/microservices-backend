@@ -1,0 +1,516 @@
+---
+title: Oracle Cloud Infrastructure
+description: Provision OBaaS on OCI with Resource Manager, OpenTofu, or Terraform.
+sidebar_position: 10
+---
+
+# OBaaS on Oracle Cloud Infrastructure
+
+Oracle Backend for Microservices and AI (OBaaS) includes [Infrastructure as Code (IaC) in `opentofu/`](https://github.com/oracle/microservices-backend/tree/main/opentofu), which is the quickest way to get started with OBaaS in Oracle Cloud Infrastructure (OCI).
+
+The IaC provisions an enhanced Oracle Kubernetes Engine (OKE) cluster, worker nodes, networking, a flexible load balancer, and an Autonomous Database or connections to an existing Oracle database. Configuration management installs the OBaaS Helm charts. Kafka, Coherence, [AI Optimizer and Toolkit](https://github.com/oracle/ai-optimizer), GPU workers, and [Full Stack Disaster Recovery (FSDR)](#full-stack-disaster-recovery) are optional.
+
+:::note[BYO Infrastructure]
+If you are installing OBaaS into existing infrastructure, follow the [Helm installation guide](../helm/install.md).
+:::
+
+## Prerequisites
+
+- An OCI tenancy, a target compartment, and the [IAM policies](#policies) below.
+- Quota and regional capacity for OKE, CPU workers, a flexible load balancer, and any selected database, GPU, or disaster recovery resources. The default CPU pool has three workers with 2 OCPU and 32 GB memory each.
+- For an existing database, its privileged credentials and network connectivity from the OKE worker subnet. See the [database prerequisites](../helm/prereqs.md#oracle-database).
+- For local deployment: OpenTofu or Terraform 1.5 or later, OCI CLI configured for API key authentication, Python 3, Helm, and `kubectl`. Configure OCI CLI for the same tenancy and user as the IaC provider.
+
+The Kubernetes version is pinned in [`opentofu/versions.tf`](https://github.com/oracle/microservices-backend/blob/main/opentofu/versions.tf). Check it against the selected charts' Kubernetes requirements and the versions available in your OCI region.
+
+## OCI Resource Manager
+
+Select **Deploy to Oracle Cloud** to create a Resource Manager stack:
+
+[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle/microservices-backend/releases/latest/download/obaas-iac.zip)
+
+The button uses the latest published stack package. Choose a package that matches the OBaaS version you intend to install. For this development checkout, use the [local deployment](#local-deployment) with local Helm charts.
+
+### Create the Stack
+
+1. Sign in to OCI and select the deployment region.
+2. Review and accept the terms for the stack package.
+3. Select the stack compartment and name, then continue to **Configure variables**.
+4. Choose the resource compartment and **Application Name**. Leave the name empty to generate one; supplied names are normalized to lowercase and limited to 12 characters.
+5. Configure the Kubernetes, compute, database, network, and load balancer options described below. Optional fields follow the package's [`schema.yaml`](https://github.com/oracle/microservices-backend/blob/main/opentofu/schema.yaml).
+6. Review the configuration and create the stack. Run a **Plan** job, review its resource changes and costs, then run **Apply**.
+
+Resource Manager supplies the deployment identity. Local API key fields are configured separately for [local runs](#local-deployment).
+
+## Configuration Options
+
+### Kubernetes and Compute
+
+The OKE cluster uses private worker subnets. CPU worker shapes include x86 and ARM; the Resource Manager form exposes the shapes in its bundled schema. Set `compute_cpu_ocpu` and `k8s_cpu_node_pool_size` for the required capacity. Worker memory is allocated at 16 GB per OCPU. `compute_cpu_shape` defaults to `VM.Standard.E5.Flex`; supported alternatives are `VM.Standard.E4.Flex`, `VM.Standard.A1.Flex`, and `VM.Standard.A2.Flex`.
+
+To add GPU workers, enable **Deploy GPU Node Pool?** (`k8s_node_pool_gpu_deploy`) and select the GPU shape and worker count. `compute_gpu_shape` defaults to `VM.GPU.A10.1` and `k8s_gpu_node_pool_size` defaults to `1`. Confirm GPU quota and availability-domain capacity before applying.
+
+Enable **Install the AI Optimizer and Toolkit?** (`deploy_optimizer`) for the optional AI Optimizer components. With GPU workers enabled, its generated Helm values also enable Ollama. Use `k8s_deploy_kafka` and `k8s_deploy_coherence` to enable the corresponding clusters. GPU workers, AI Optimizer, Kafka, and Coherence are disabled by default.
+
+### Kubernetes API Access
+
+**Public API Endpoint?** (`k8s_api_is_public`) controls external API access through network security group rules. **API Endpoint Access Control** (`k8s_api_endpoint_allowed_cidrs`) accepts comma-separated source CIDRs. For local automatic installation, include the public source address of the workstation or runner, typically a `/32` CIDR.
+
+```hcl
+k8s_api_is_public              = true
+k8s_api_endpoint_allowed_cidrs = "203.0.113.42/32"
+```
+
+Replace the example address with your actual source address. The default access range is `0.0.0.0/0`; restrict it to the networks that need access.
+
+With `k8s_api_is_public=false`, external ingress rules are removed while the endpoint placement remains stable. Resource Manager can use a private endpoint to reach the cluster. For a local private-access deployment, set `k8s_run_cfgmgt=false` and complete installation from a host with VCN access as described in [infrastructure-only deployment](#infrastructure-only-deployment).
+
+### Network and Application Access
+
+By default, the stack creates a VCN, public and private subnets, internet, NAT and service gateways, and network security groups. To reuse networking, select **Bring Your Own Virtual Cloud Network?** and supply the VCN and both subnet OCIDs:
+
+```hcl
+byo_vcn_ocid            = "<vcn-ocid>"
+byo_public_subnet_ocid  = "<public-subnet-ocid>"
+byo_private_subnet_ocid = "<private-subnet-ocid>"
+```
+
+Ensure the existing subnets provide the routes and connectivity required by OKE, the database, OCI services, and image registries.
+
+The load balancer uses `lb_min_shape` and `lb_max_shape` for its minimum and maximum bandwidth in Mbps. Both bandwidth settings default to 10 Mbps. Its access rules accept comma-separated CIDRs:
+
+```hcl
+client_allowed_cidrs = "203.0.113.0/24"
+server_allowed_cidrs = "203.0.113.0/24"
+lb_min_shape         = 10
+lb_max_shape         = 100
+```
+
+The form labels these controls **Application GUI** and **Application API Server**. In this configuration, `client_allowed_cidrs` permits port 80 and `server_allowed_cidrs` permits port 443. Both default to `0.0.0.0/0`.
+
+The generated APISIX ingress uses OCI Native Ingress class `native-ic` with an HTTP listener on port 80. For HTTPS, configure the hostname, certificate, and TLS listener using the [OCI Native Ingress configuration guide](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengsettingupnativeingresscontroller-configuring.htm).
+
+### Database
+
+Choose a database mode under **Database Options**:
+
+<table aria-label="OCI database deployment modes">
+  <thead>
+    <tr><th scope="col">Mode</th><th scope="col">Configuration</th><th scope="col">Credentials</th></tr>
+  </thead>
+  <tbody>
+    <tr><th scope="row">New Autonomous Database</th><td>Leave <strong>Bring Your Own Oracle Database?</strong> unselected; <code>byo_db_type</code> is empty.</td><td>The stack generates the ADMIN password.</td></tr>
+    <tr><th scope="row">Existing Autonomous Database</th><td>Select <code>ADB-S</code> and supply <code>byo_adb_ocid</code>.</td><td>Supply the ADMIN password in <code>byo_db_password</code>.</td></tr>
+    <tr><th scope="row">Existing Oracle database</th><td>Select <code>OTHER</code> and supply <code>byo_odb_host</code>, <code>byo_odb_port</code>, and <code>byo_odb_service</code>.</td><td>Supply the SYSTEM password in <code>byo_db_password</code>.</td></tr>
+  </tbody>
+</table>
+
+A new database uses Oracle Autonomous Database 26ai ATP with 2 ECPU and 20 GB storage by default. Adjust sizing and the license model for your environment. `adb_networking` selects `SECURE_ACCESS` or `PRIVATE_ENDPOINT_ACCESS`; the new-ADB example uses a private endpoint.
+
+Use **Autonomous Database Compartment** (`adb_compartment_ocid`) to place databases created by the stack, including the FSDR standby, in a separate compartment. It defaults to `compartment_ocid`. Grant the deployment identity the Autonomous Database permissions below in the selected compartment; the stack scopes database operator and FSDR database policies to that compartment.
+
+For an existing database, grant the privileged user the permissions required for OBaaS schema creation and runtime grants. The generated application values select `ADB-S` for Autonomous Database and `OTHER` for other databases.
+
+For local deployment, configure the selected mode in `terraform.tfvars`:
+
+```hcl
+# New Autonomous Database (byo_db_type is empty)
+adb_ecpu_core_count          = 2
+adb_data_storage_size_in_gb = 20
+adb_license_model           = "LICENSE_INCLUDED"  # or "BRING_YOUR_OWN_LICENSE"
+adb_networking              = "PRIVATE_ENDPOINT_ACCESS"  # or "SECURE_ACCESS"
+```
+
+For an existing Autonomous Database:
+
+```hcl
+byo_db_type     = "ADB-S"
+byo_db_password = "<admin-password>"
+byo_adb_ocid     = "<adb-ocid>"
+```
+
+For an existing non-Autonomous Oracle database:
+
+```hcl
+byo_db_type     = "OTHER"
+byo_db_password = "<system-password>"
+byo_odb_host    = "db-host.example.com"
+byo_odb_port    = 1521
+byo_odb_service = "SERVICENAME"
+```
+
+### Container Registry and Add-ons
+
+Set `k8s_byo_ocir_url` to use an existing image registry, and prepare the expected images, pull credentials, and worker network access. See the [private registry installation guidance](../helm/install.md#private-registry-configuration-values-private-registryyaml).
+
+With `k8s_use_cluster_addons=true` (the default), the stack installs OKE `CertManager`, `OracleDatabaseOperator`, and `NativeIngressController` add-ons. The generated Helm values use the managed database operator and native ingress controller. Verify cert-manager and the selected add-ons before installing workloads.
+
+If you manage the controllers yourself, set `k8s_use_cluster_addons=false`, prepare the required controllers, and adapt the generated Helm and ingress values to their ownership and configuration.
+
+### Primary Storage
+
+The primary Kubernetes deployment preallocates block volumes independently of `fsdr_enabled`. The generated manifest reserves one CSI PV for each chart claim. `cfgmgt/apply.py` applies that manifest before installing Helm. With `k8s_run_cfgmgt=false`, apply the generated manifest before installing the charts manually.
+
+The inventory covers three APISIX etcd claims, one ZooKeeper claim, one SigNoz claim and one ClickHouse claim. Enabling Kafka adds three 100 GiB volumes. OCI provisions at least 50 GiB per block volume. The `obaas-preallocated` StorageClass uses `blockvolume.csi.oraclecloud.com` so native FSDR recognizes its storage. PV claim references reserve the preallocated volumes for the chart's PVCs.
+
+After FSDR activates replica storage, native recovery owns the restored PV definitions and their volume handles. Subsequent generated manifests manage the StorageClass and chart settings while preserving those PVs, including after switching back to the initial primary region.
+
+If an earlier apply created this class with `kubernetes.io/no-provisioner`, replace the class before reapplying because its provisioner is immutable. Run from `opentofu/`:
+
+```bash
+kubectl --kubeconfig cfgmgt/stage/kubeconfig delete storageclass obaas-preallocated
+tofu apply
+```
+
+The apply regenerates and installs the corrected class. Existing PVs, PVCs and OCI volumes remain in place.
+
+## Local Deployment
+
+Run these commands from a checkout of this repository:
+
+```bash
+cd opentofu
+cp examples/k8s-new-adb.tfvars terraform.tfvars
+```
+
+Choose the example closest to your deployment:
+
+<table aria-label="OCI infrastructure examples">
+  <thead>
+    <tr><th scope="col">Example</th><th scope="col">Scenario</th></tr>
+  </thead>
+  <tbody>
+    <tr><th scope="row"><code>k8s-new-adb.tfvars</code></th><td>OKE with a new Autonomous Database using a private endpoint.</td></tr>
+    <tr><th scope="row"><code>k8s-byo-other-db.tfvars</code></th><td>OKE with an existing Oracle database.</td></tr>
+    <tr><th scope="row"><code>k8s-fsdr.tfvars</code></th><td>OKE with Autonomous Database and cross-region disaster recovery.</td></tr>
+  </tbody>
+</table>
+
+Edit `terraform.tfvars` with your OCI identity, target compartment, region, and access ranges:
+
+```hcl
+tenancy_ocid     = "<tenancy-ocid>"
+compartment_ocid = "<compartment-ocid>"
+user_ocid        = "<user-ocid>"
+fingerprint      = "<api-key-fingerprint>"
+private_key_path = "/absolute/path/to/oci_api_key.pem"
+region           = "<oci-region>"
+label_prefix     = "obaasdev"
+
+k8s_api_endpoint_allowed_cidrs = "<your-public-ip>/32"
+client_allowed_cidrs           = "<client-network-cidr>"
+server_allowed_cidrs           = "<client-network-cidr>"
+k8s_use_local_charts           = true
+```
+
+Replace all example OCI and database values before deploying. Store credentials, state, saved plans, and `cfgmgt/stage/` in protected storage; staged manifests contain database credentials and private keys.
+
+### Prepare Helm Charts
+
+For this checkout's OBaaS version, use its local charts. From `opentofu/`, prepare their dependencies:
+
+```bash
+helm dependency build ../helm/infra-charts/obaas-prereqs
+helm dependency build ../helm/infra-charts/obaas
+```
+
+Keep `k8s_use_local_charts=true` when installing or testing these charts. For a published deployment, select a stack package or charts matching the intended OBaaS version. The remote chart version used by direct IaC runs is configured in `cfgmgt/apply.py`.
+
+### Initialize, Plan, and Apply
+
+```bash
+tofu init
+tofu validate
+tofu plan -out=obaas.tfplan
+```
+
+Review the resource changes, then apply the saved plan:
+
+```bash
+tofu apply obaas.tfplan
+```
+
+Terraform users can replace `tofu` with `terraform` for these deployment commands.
+
+By default, `k8s_run_cfgmgt=true` runs `cfgmgt/apply.py` during apply. It applies the generated Kubernetes manifest, prepares the database operator, and installs `obaas-prereqs` in `obaas-system`, followed by `obaas` in the namespace returned by `app_name`. Reapplying reruns configuration management.
+
+### Infrastructure-only Deployment
+
+Set `k8s_run_cfgmgt=false` to provision OCI resources and generate configuration for a separate installation step:
+
+```hcl
+k8s_run_cfgmgt = false
+```
+
+Apply the infrastructure, then use a host that can reach the cluster API. Transfer the generated `cfgmgt/stage/` files securely to that host, review the manifest and chart values, and reconcile add-on ownership. Use the [Helm installation guide](../helm/install.md) with `obaas-prereqs-values.yaml` and `obaas-values.yaml`.
+
+When using this checkout's configuration-management script on that host, keep the repository and chart directory layout. Set `APP_NAMESPACE` to the recorded `app_name` output, then run from `opentofu/`:
+
+```bash
+APP_NAMESPACE="<app-name>"
+python3 cfgmgt/apply.py "$APP_NAMESPACE" --local-charts
+```
+
+The script uses `cfgmgt/stage/kubeconfig`, applies the manifest, prepares the operator, and installs both charts.
+
+## Full Stack Disaster Recovery
+
+FSDR requires a subscribed standby region and Autonomous Database. In Resource Manager, enable **Full Stack Disaster Recovery** and select the standby region. For local deployment:
+
+```hcl
+fsdr_enabled         = true
+fsdr_region_1        = "uk-london-1"
+k8s_use_local_charts  = true
+```
+
+The `fsdr_regional_application_urls` output provides each region's load balancer URL. After recovery, direct clients to the active region's URL. To create an application DNS record initially pointing to the primary, supply both _optional_ inputs for an existing OCI public DNS zone:
+
+```hcl
+fsdr_dns_zone_ocid = "<oci-public-dns-zone-ocid>"
+fsdr_dns_name      = "obaas.example.com"
+```
+
+The deployment provisions:
+
+- Standby networking, OKE, Native Ingress, and a private Autonomous Data Guard endpoint.
+- Regional protection groups, backup and log buckets, and IAM policies for FSDR and its runtime container instances.
+- OKE namespace backups and OCI persistent-storage replication.
+- Native switchover and failover plans for the database, storage and OKE workloads.
+
+Run apply from a host with access to the primary cluster API and OCI CLI authentication:
+
+```bash
+tofu plan -out=fsdr.tfplan
+tofu apply fsdr.tfplan
+```
+
+FSDR groups the [primary volumes](#primary-storage) by availability domain and enables standby-region replication. The source Autonomous Database must report `PRIMARY` before disabling FSDR; Terraform blocks teardown while it reports `STANDBY` to preserve a database promoted during recovery. Setting `fsdr_enabled=false` removes the recovery volume groups while preserving primary volumes, PV definitions and chart storage settings. Additional workload namespaces require their backing storage to be configured for DR separately.
+
+Prepare local chart dependencies when selecting local charts. Native FSDR protects the application and `obaas-system` namespaces. The standby starts with one CPU worker for OKE add-ons; recovery scales workers to the primary's configured capacity. The default backup schedule is hourly with 10 retained backups. Private OCIR images are replicated with the OKE backups. Wait for initial replication and a successful OKE backup before recovery prechecks. Increment the plan refresh and verification triggers after changing protected resources.
+
+FSDR performs OKE operations through [runtime container instances](https://docs.oracle.com/en-us/iaas/disaster-recovery/doc/add-oke-cluster-protection-group.html). Native recovery restores protected Kubernetes resources and transitions the database and storage. Apply chart upgrades on the active cluster through `cfgmgt/apply.py`; recovery uses the protected resources captured in a subsequent successful backup. Verify recovery of chart CRDs, cluster-scoped RBAC and admission webhooks in a DR drill. Configure the recovered OBaaS database references, connection settings and wallets, verify application health, then direct clients to the active region. The operator maintains DNS routing. Terraform preserves the runtime DR roles, storage members, worker counts and DNS target.
+
+For drills, add `START_DRILL` and `STOP_DRILL` to `fsdr_plan_types`. The initial apply creates Start Drill. After executing it successfully, clear `fsdr_plan_executions` and apply with `k8s_run_cfgmgt=false` to create Stop Drill. OCI requires the standby group to be `INACTIVE` with sub-state `DR_DRILL_IN_PROGRESS` for Stop Drill creation. After executing Stop Drill, clear the execution input and apply to remove the consumed Stop Drill plan. Drills use an ADB snapshot standby and the standby region's load balancer URL. Validate drill database connections and wallets, run prechecks and verify a drill before enabling automatic recovery.
+
+After recovery, clear explicit execution inputs and review an apply once both regions are available. The provider reads current DR roles and creates plans on the current standby. Increment the refresh and verification triggers before recovery prechecks. New storage in the recovered region requires enrollment there before failback. Review replication health and run the new standby's recovery prechecks.
+
+### FSDR Configuration Reference
+
+<table aria-label="FSDR configuration options">
+  <thead>
+    <tr><th scope="col">Variable</th><th scope="col">Purpose</th><th scope="col">Default</th></tr>
+  </thead>
+  <tbody>
+    <tr><th scope="row"><code>fsdr_init_destroy</code></th><td>Prepare recovery resources for deletion on apply, then destroy</td><td><code>false</code></td></tr>
+    <tr><th scope="row"><code>fsdr_plan_types</code></th><td><code>SWITCHOVER</code>, <code>FAILOVER</code>, <code>START_DRILL</code>, <code>STOP_DRILL</code> plans</td><td>Switchover and failover</td></tr>
+    <tr><th scope="row"><code>fsdr_plan_refresh_trigger</code></th><td>Increment to refresh plans after group changes</td><td><code>null</code></td></tr>
+    <tr><th scope="row"><code>fsdr_plan_verify_trigger</code></th><td>Increment to verify plans</td><td><code>null</code></td></tr>
+    <tr><th scope="row"><code>fsdr_adb_drill_standby_type</code></th><td>ADB drill mechanism</td><td><code>SNAPSHOT_STANDBY</code></td></tr>
+    <tr><th scope="row"><code>fsdr_timeouts</code></th><td>Group, plan, and Automatic DR create/update/delete timeouts</td><td><code>20m</code> each</td></tr>
+    <tr><th scope="row"><code>fsdr_automatic_dr</code></th><td>ADB events that trigger standby-group DR plans</td><td><code>null</code></td></tr>
+    <tr><th scope="row"><code>fsdr_plan_executions</code></th><td>Explicit executions keyed by lowercase plan type</td><td><code>&#123;&#125;</code></td></tr>
+    <tr><th scope="row"><code>fsdr_dns_zone_ocid</code></th><td>Public DNS zone for the initial application record; supply with <code>fsdr_dns_name</code></td><td>Empty</td></tr>
+    <tr><th scope="row"><code>fsdr_dns_name</code></th><td>Hostname initially pointing to the primary; supply with <code>fsdr_dns_zone_ocid</code></td><td>Empty</td></tr>
+    <tr><th scope="row"><code>fsdr_standby_network</code></th><td>Existing standby network object: <code>vcn_id</code>, <code>public_subnet_id</code>, <code>private_subnet_id</code></td><td>Managed network</td></tr>
+    <tr><th scope="row"><code>fsdr_standby_vcn_cidr</code></th><td>Managed standby VCN CIDRs</td><td><code>[&quot;10.43.0.0/16&quot;]</code></td></tr>
+    <tr><th scope="row"><code>fsdr_standby_cpu_node_pool_size</code></th><td>Warm CPU workers for OKE add-ons</td><td><code>1</code></td></tr>
+    <tr><th scope="row"><code>fsdr_backup_schedule</code></th><td>RFC 5545 OKE backup recurrence, in UTC</td><td><code>FREQ=HOURLY;INTERVAL=1</code></td></tr>
+    <tr><th scope="row"><code>fsdr_backup_retention</code></th><td>Retained OKE backups, whole number from 1 to 20</td><td><code>10</code></td></tr>
+    <tr><th scope="row"><code>fsdr_additional_namespaces</code></th><td>Workload namespaces using the OBaaS database</td><td><code>[]</code></td></tr>
+  </tbody>
+</table>
+
+### Automatic DR and Explicit Executions
+
+Grant the deployment identity [FSDR permissions](#fsdr-policies), verify recovery readiness, and opt into database-event-driven recovery:
+
+```hcl
+fsdr_automatic_dr = {
+  is_auto_switchover_enabled = true
+  is_auto_failover_enabled   = true
+}
+```
+
+[Automatic DR](https://docs.oracle.com/en-us/iaas/disaster-recovery/doc/configure-automaticdr.html) requires an active standby protection group and the corresponding active plan for each enabled event. After a role transition, prepare plans and Automatic DR on the new standby group and review the association before reapplying.
+
+To submit an explicit precheck, configure one execution and apply:
+
+```hcl
+fsdr_plan_executions = {
+  switchover = { plan_execution_type = "SWITCHOVER_PRECHECK" }
+}
+```
+
+Applying an execution entry submits the specified operation. Submit one execution per apply, keyed by its lowercase plan type. The supported types are `SWITCHOVER`, `FAILOVER`, `START_DRILL`, `STOP_DRILL`, and their `_PRECHECK` variants. Prechecks are enabled and warnings are retained by default. Executions are stateful resources; review planned replacements before changing execution inputs. See the [FSDR configuration reference](#fsdr-configuration-reference) for timeouts and additional controls.
+
+## Verify the Deployment
+
+After configuration management or manual Helm installation, check the generated kubeconfig and releases:
+
+```bash
+tofu output
+export KUBECONFIG="$PWD/cfgmgt/stage/kubeconfig"
+APP_NAMESPACE="$(tofu output -raw app_name)"
+kubectl get nodes
+helm status obaas-prereqs -n obaas-system
+helm status obaas -n "$APP_NAMESPACE"
+kubectl get pods,ingress -n "$APP_NAMESPACE"
+```
+
+For Resource Manager, record `app_name` and `kubeconfig_cmd` from the stack outputs. Use the kubeconfig command to configure access from a host with the appropriate network access and OCI identity.
+
+Both Helm releases should report `deployed`, and the application pods should become ready. Initial image pulls and application startup can continue after the infrastructure apply finishes. Use the APISIX ingress address for application routes. When AI Optimizer is enabled, `optimizer_client_url` and `optimizer_server_url` provide its UI and API documentation URLs.
+
+<table aria-label="OCI deployment outputs">
+  <thead>
+    <tr><th scope="col">Output</th><th scope="col">Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><th scope="row"><code>app_name</code></th><td>Application label/namespace</td></tr>
+    <tr><th scope="row"><code>app_version</code></th><td>Deployed application version</td></tr>
+    <tr><th scope="row"><code>optimizer_client_url</code></th><td>AI Optimizer web UI URL</td></tr>
+    <tr><th scope="row"><code>optimizer_server_url</code></th><td>AI Optimizer API URL</td></tr>
+    <tr><th scope="row"><code>kubeconfig_cmd</code></th><td>Command to generate kubeconfig</td></tr>
+  </tbody>
+</table>
+
+For FSDR deployments, inspect `fsdr_protection_group_ids`, `fsdr_plan_ids`, `fsdr_plan_execution_ids`, and `fsdr_automatic_dr_configuration_id`, then verify readiness in OCI before a recovery operation.
+
+## Clean Up
+
+For FSDR deployments, set `fsdr_init_destroy=true` and apply destroy preparation. Preparation requires an existing protection group in both regions and confirms both have role `UNCONFIGURED` before reporting success. Repeated preparation accepts an already disassociated pair. The Terraform runner needs Python 3 and the OCI CLI; preparation inherits the runner's OCI CLI authentication and configuration. Keep the flag and deployed FSDR settings unchanged until destruction completes:
+
+```hcl
+fsdr_init_destroy = true
+```
+
+For local deployments, update `opentofu/terraform.tfvars` and run from `opentofu/`:
+
+```bash
+tofu apply
+```
+
+For Resource Manager, enable **Prepare for Destroy?** and run an **Apply** job. The preparation apply disassociates FSDR groups, clears their membership, disables group and member-volume replication, and removes DR plans, execution records and Automatic DR configuration. It skips chart installation and keeps the groups and primary volumes for the subsequent destroy. Wait for any active recovery execution to finish before preparation.
+
+Review the preparation plan before applying it. The DR protection groups must remain in place and update in place; stop if either group is planned for replacement or deletion.
+
+Complete preparation before starting destroy. A regular apply after a partial destroy can recreate missing infrastructure. Keep `fsdr_init_destroy=true` until destruction completes.
+
+After disassociation completes, retire retained OKE backups and empty the regional backup and log buckets.
+
+For Resource Manager, run a **Destroy** job on the stack and review the result before deleting the stack.
+
+For a local deployment, run from `opentofu/` and review the destroy plan:
+
+```bash
+tofu plan -destroy -out=destroy.tfplan
+tofu apply destroy.tfplan
+```
+
+This removes resources managed by the stack; existing databases and networking referenced through the BYO options retain their independent ownership.
+
+## Policies
+
+Grant the deployment group these permissions before creating the stack. For existing resources, include their compartments in the policy scope.
+
+:::tip[Use names or OCIDs]
+You can use OCIDs instead of names by replacing the `<group-name>` or `<compartment-name>` with the word `id` followed by the OCID.  Use of OCIDs may be required for some kinds of identity domains.
+:::
+
+### Identity and Access Management
+
+```text
+Allow group <group-name> to read compartments in tenancy
+Allow group <group-name> to read domains in tenancy
+Allow group <group-name> to inspect all-resources in tenancy
+Allow group <group-name> to inspect resource-availability in tenancy
+Allow group <group-name> to read limits in tenancy
+Allow group <group-name> to manage dynamic-groups in tenancy
+Allow group <group-name> to manage policies in tenancy
+```
+
+### Oracle Container Engine for Kubernetes
+
+```text
+Allow group <group-name> to manage cluster-family in compartment <compartment-name>
+Allow group <group-name> to manage cluster-node-pools in compartment <compartment-name>
+Allow group <group-name> to manage clusters in compartment <compartment-name>
+Allow group <group-name> to manage instance-family in compartment <compartment-name>
+Allow group <group-name> to manage public-ips in compartment <compartment-name>
+```
+
+### VCN
+
+```text
+Allow group <group-name> to manage vcns in compartment <compartment-name>
+Allow group <group-name> to manage virtual-network-family in compartment <compartment-name>
+Allow group <group-name> to use private-ips in compartment <compartment-name>
+Allow group <group-name> to use subnets in compartment <compartment-name>
+Allow group <group-name> to use vnics in compartment <compartment-name>
+Allow group <group-name> to manage route-tables in compartment <compartment-name>
+Allow group <group-name> to manage security-lists in compartment <compartment-name>
+Allow group <group-name> to manage dhcp-options in compartment <compartment-name>
+Allow group <group-name> to manage nat-gateways in compartment <compartment-name>
+Allow group <group-name> to manage service-gateways in compartment <compartment-name>
+Allow group <group-name> to manage network-security-groups in compartment <compartment-name>
+Allow group <group-name> to manage subnets in compartment <compartment-name>
+Allow group <group-name> to manage load-balancers in compartment <compartment-name>
+```
+
+### Container Registry
+
+```text
+Allow group <group-name> to manage repos in compartment <compartment-name>
+```
+
+### Object Storage
+
+```text
+Allow group <group-name> to read objectstorage-namespaces in tenancy
+Allow group <group-name> to manage objects in compartment <compartment-name>
+Allow group <group-name> to inspect buckets in compartment <compartment-name>
+```
+
+See the [Object Storage policy reference](https://docs.oracle.com/en-us/iaas/Content/Identity/Reference/objectstoragepolicyreference.htm) for the permissions used by namespace, object, and bucket operations.
+
+### Autonomous Database
+
+```text
+Allow group <group-name> to manage autonomous-database-family in compartment <compartment-name>
+```
+
+### Oracle Resource Manager
+
+```text
+Allow group <group-name> to manage orm-family in compartment <compartment-name>
+Allow group <group-name> to manage orm-config-source-providers in compartment <compartment-name>
+Allow group <group-name> to manage orm-stacks in compartment <compartment-name>
+Allow group <group-name> to manage orm-jobs in compartment <compartment-name>
+Allow group <group-name> to manage orm-private-endpoints in compartment <compartment-name>
+Allow group <group-name> to manage orm-template in compartment <compartment-name>
+Allow group <group-name> to manage orm-work-requests in compartment <compartment-name>
+Allow group <group-name> to use cloud-shell-public-network in tenancy
+Allow group <group-name> to use cloud-shell in tenancy
+```
+
+### FSDR Policies
+
+When FSDR is enabled, grant the deployment group permission to manage disaster recovery resources and create the regional log buckets:
+
+```text
+Allow group <group-name> to manage disaster-recovery-family in compartment <compartment-name>
+Allow group <group-name> to manage buckets in compartment <compartment-name>
+Allow group <group-name> to manage compute-container-family in compartment <compartment-name>
+Allow group <group-name> to manage volume-family in compartment <compartment-name>
+Allow group <group-name> to manage file-family in compartment <compartment-name>
+Allow group <group-name> to use virtual-network-family in compartment <compartment-name>
+Allow group <group-name> to read repos in tenancy
+```
+
+To provision the optional application DNS record, grant access to the selected zone:
+
+```text
+Allow group <group-name> to use dns-records in tenancy where target.dns-zone.id = '<dns-zone-ocid>'
+```
+
+Scope database and log-storage access to their resource compartments. See Oracle's [FSDR IAM policy examples](https://docs.oracle.com/en-us/iaas/disaster-recovery/doc/iam-policy-examples-for-dr.html) for operator permissions. The deployment creates protection-group and runtime-container dynamic groups and [Resource Principal policies](https://docs.oracle.com/en-us/iaas/disaster-recovery/doc/resource-principal.html). Protection-group membership matches the compartment and the deployment principal's existing `Oracle-Tags.CreatedBy` value, read from the regional log bucket before group creation. Groups created by that principal in the same compartment share this access. Keep the [automatic tag defaults](https://docs.oracle.com/en-us/iaas/Content/Tagging/Concepts/understandingautomaticdefaulttags.htm) enabled and use the same deployment principal for the buckets and protection groups. See [OKE policies](https://docs.oracle.com/en-us/iaas/disaster-recovery/doc/oke-policies.html) for native execution permissions.

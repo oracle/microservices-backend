@@ -1,253 +1,108 @@
-# Oracle Backend for Microservices and AI - Terraform for OCI
+# OBaaS Infrastructure Source for OCI
 
-This directory contains Terraform configuration to deploy Oracle Backend for Microservices and AI (OBaaS) on Oracle Cloud Infrastructure (OCI).
+This directory contains the OpenTofu/Terraform configuration, OCI Resource Manager schema, and configuration-management scripts for Oracle Backend for Microservices and AI (OBaaS).
 
-## Prerequisites
+For prerequisites, configuration choices, deployment, verification, disaster recovery, and cleanup, use the [OCI deployment guide](../docs-source/site/docs/setup/cloud/oci.mdx). This README covers developing and administering the source.
 
-- [Terraform](https://www.terraform.io/) (>= 1.5)
-- [OCI CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm) configured with API key authentication
-- OCI tenancy with sufficient quotas for:
-  - OKE (Oracle Kubernetes Engine) cluster
-  - Flexible compute shapes (VM.Standard.E4/E5.Flex or VM.Standard.A1/A2.Flex)
-  - Autonomous Database (unless using BYO database)
-  - Load Balancer (flexible shape)
+## Source Map
 
-## Quick Start
+| Path | Responsibility |
+|------|----------------|
+| `main.tf`, `locals.tf`, `data.tf`, `nsgs.tf` | Root resources, derived settings, discovery, and network security |
+| `variables.tf`, `provider.tf`, `output.tf` | Root inputs, provider configuration, and outputs |
+| `versions.tf` | Release-managed application, OS, and Kubernetes versions |
+| `module_network.tf`, `module_kubernetes.tf`, `module_fsdr.tf` | Module wiring and deployment-specific inputs and outputs |
+| `schema.yaml` | Resource Manager form layout |
+| `modules/network/` | VCN, subnets, and gateways |
+| `modules/kubernetes/` | OKE clusters, workers, add-ons, and generated configuration |
+| `modules/kubernetes/storage/` | Primary volume inventory and PV configuration |
+| `modules/fsdr/` | Regional recovery coordination, buckets, and IAM |
+| `modules/fsdr/storage/` | Volume groups and replication for supplied primary volumes |
+| `modules/fsdr/region/` | Protection groups, plans, executions, and Automatic DR |
+| `cfgmgt/` | Installation scripts and generated files under `stage/` |
+| `examples/` | Deployment inputs |
+| `tests/` | Root and module suites, live configuration validation, and schema validation |
 
-1. **Initialize the configuration:**
-   ```bash
-   terraform init
-   ```
+Keep root inputs, the Resource Manager schema, examples, and the deployment guide aligned when changing configuration. Leave the `app_version` placeholder in `versions.tf` at `0.0.0` outside the release workflow.
 
-2. **Copy an example configuration:**
-   ```bash
-   cp examples/k8s-new-adb.tfvars terraform.tfvars
-   ```
+## Packaging IaC Stack
 
-3. **Configure OCI credentials** in `terraform.tfvars`:
-   ```hcl
-   tenancy_ocid     = "ocid1.tenancy.oc1..aaa..."
-   compartment_ocid = "ocid1.compartment.oc1..aaa..."
-   user_ocid        = "ocid1.user.oc1..aaa..."
-   fingerprint      = "xx:xx:xx:..."
-   private_key_path = "~/.oci/oci_api_key.pem"
-   region           = "us-phoenix-1"
-   ```
+The IaC is packaged and attached to each release using GitHub Actions. Below is the manual procedure:
 
-4. **Review and apply:**
-   ```bash
-   terraform plan
-   terraform apply
-   ```
+1. Zip the IaC with Archives
+    ```bash
+    zip -r obaas-iac.zip . \
+      -x "terraform*" ".terraform*" "*/terraform*" "*/.terraform*" "tests/*" \
+      -x "cfgmgt/stage/*.*" "*.tfplan*" "examples/*" "*.md" ".gitignore" "*pycache*"
+    ```
 
-5. **Configure kubectl access** (after apply completes):
-   ```bash
-   # Use the kubeconfig_cmd output
-   oci ce cluster create-kubeconfig --cluster-id <cluster_ocid> --region <region>
-   ```
+## Local Helm Chart Development
 
-## Configuration Options
-
-### General Settings
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `tenancy_ocid` | OCI Tenancy OCID | Required |
-| `compartment_ocid` | Compartment for resources | Required |
-| `region` | OCI Region | Required |
-| `label_prefix` | Prefix for resource names (max 12 chars) | Auto-generated |
-
-### Database Options
-
-The deployment supports three database configurations:
-
-#### Option 1: New Autonomous Database (Default)
-```hcl
-# Leave byo_db_type empty (default)
-adb_ecpu_core_count         = 2
-adb_data_storage_size_in_gb = 20
-adb_license_model           = "LICENSE_INCLUDED"  # or "BRING_YOUR_OWN_LICENSE"
-adb_networking              = "PRIVATE_ENDPOINT_ACCESS"  # or "SECURE_ACCESS"
-```
-
-#### Option 2: Bring Your Own Autonomous Database (ADB-S)
-```hcl
-byo_db_type    = "ADB-S"
-byo_db_password = "your_admin_password"
-byo_adb_ocid   = "ocid1.autonomousdatabase.oc1..."
-```
-
-#### Option 3: Bring Your Own Other Database
-```hcl
-byo_db_type     = "OTHER"
-byo_db_password = "your_system_password"
-byo_odb_host    = "db-host.example.com"
-byo_odb_port    = 1521
-byo_odb_service = "SERVICENAME"
-```
-
-### Kubernetes Options
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `k8s_cpu_node_pool_size` | Number of CPU worker nodes | 3 |
-| `k8s_api_is_public` | Expose K8s API publicly | true |
-| `k8s_api_endpoint_allowed_cidrs` | CIDRs allowed to access K8s API | "0.0.0.0/0" |
-| `k8s_node_pool_gpu_deploy` | Deploy GPU node pool | false |
-| `k8s_gpu_node_pool_size` | Number of GPU worker nodes | 1 |
-| `k8s_deploy_kafka` | Deploy a Kafka cluster using the Strimzi operator | false |
-| `k8s_deploy_coherence` | Deploy a Coherence cluster using the Coherence Operator | false |
-| `k8s_run_cfgmgt` | Run configuration management | true |
-| `k8s_use_cluster_addons` | Install OKE cluster add-ons | true |
-| `k8s_use_local_charts` | Use local Helm charts from `helm/` instead of the remote Helm repository | false |
-| `k8s_byo_ocir_url` | BYO Oracle Container Registry URL | "" |
-
-### Local Helm Chart Development
-
-By default, the OCI Resource Manager build vendors the published Helm charts into the stack package. For local Terraform development, you can test charts from a local checkout without rebuilding the ZIP.
-
-`apply.py` looks for local charts under the sibling `helm` directory:
-
-```text
-../helm/infra-charts/obaas-prereqs
-../helm/infra-charts/obaas
-```
-
-Verify the charts are visible:
+`cfgmgt/apply.py` resolves local charts from the sibling `helm/infra-charts/` directory. From `opentofu/`, verify the paths:
 
 ```bash
-ls ../helm/infra-charts/obaas/Chart.yaml
-ls ../helm/infra-charts/obaas-prereqs/Chart.yaml
+ls ../helm/infra-charts/obaas-prereqs/Chart.yaml ../helm/infra-charts/obaas/Chart.yaml
 ```
 
-If the charts have dependencies, update them in the chart repo before applying:
+[Prepare the chart dependencies](../docs-source/site/docs/setup/cloud/oci.mdx#prepare-helm-charts) and set `k8s_use_local_charts=true` in the run's variable file when developing or testing with this checkout. Follow [Local Deployment](../docs-source/site/docs/setup/cloud/oci.mdx#local-deployment) for initialization, planning, and apply, and [Clean Up](../docs-source/site/docs/setup/cloud/oci.mdx#clean-up) for teardown.
+
+For direct IaC runs, `k8s_use_local_charts=false` selects the published chart version configured in `cfgmgt/apply.py`. The Resource Manager build vendors charts into the stack package; preserve the sibling chart layout when packaging or moving configuration management to another host.
+
+## Storage and Recovery Internals
+
+`modules/kubernetes/storage` owns the inventory shared by OCI volume provisioning, generated PVs, and chart storage settings. Update it when changing chart replica counts or storage requests. `cfgmgt/apply.py` applies the generated manifest before Helm installation. See [Primary Storage](../docs-source/site/docs/setup/cloud/oci.mdx#primary-storage) for storage behavior and migration instructions.
+
+Root configuration supplies OKE, database, and network details to `modules/fsdr`. Auto-generated application labels use a separate persisted protection-group prefix available during planning; existing deployments retain their recorded group names.
+
+Standard FSDR plan keys run in order: `failover`, `switchover`, `start_drill`, then `stop_drill`. Their dependencies serialize shared OKE backup setup while other stack resources run in parallel. State moves preserve existing standard plans. Custom regional-module plan keys retain their original addresses and run in the initial stage; use the standard keys when ordering is required.
+
+The regional submodule supports:
+
+- `plans[key].source_plan_id` for plan cloning.
+- `executions[key].plan_id` to select an existing plan; otherwise the execution selects the plan with the same key.
+- OKE `resource_modifier_mappings` for ConfigMaps describing destination resource changes.
+- `block_volume_attach_and_mount_operations` for non-movable compute storage.
+
+Resource outputs expose provider-computed plan groups, execution progress, and automatic execution details. The protection-group resource output is sensitive because it includes secret references; `dr_protection_group_id` exposes its identifier separately.
+
+Use [Full Stack Disaster Recovery](../docs-source/site/docs/setup/cloud/oci.mdx#full-stack-disaster-recovery) for configuration, drills, recovery, and failback procedures.
+
+## Running Tests
+
+Use OpenTofu 1.12.6 to match the [IaC workflow](../.github/workflows/opentofu.yml).
+
+Run the regression suites from `opentofu/` with Python 3 and OpenSSL installed:
 
 ```bash
-cd ../helm/infra-charts
-helm dependency update obaas-prereqs
-helm dependency update obaas
+tofu init -backend=false
+python3 tests/run-mocked-plans.py
+python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-Then run Terraform with local charts enabled:
+Root suites live directly in `tests/`; child-module suites mirror their source paths under `tests/modules/`. The runner places each suite in its module's temporary `tests/` directory. The IaC workflow runs these commands and discovers every suite. Tests run in temporary copies with isolated inputs and state, using the initialized provider versions. Kubernetes image tests use a targeted mocked cluster setup, and generated-label tests persist a local random value; all assertions run as plans. OCI providers are mocked, and the suites execute no OCI operations or provisioners.
 
-```bash
-cd opentofu
-terraform plan -var='k8s_use_local_charts=true'
-terraform apply -var='k8s_use_local_charts=true'
-```
+Python regression tests also inspect FSDR plan dependencies and state migrations using the initialized OCI provider, synthetic state, generated test keys, and refresh-disabled plans.
 
-You can also set this in `terraform.tfvars`:
+| Suite | Coverage |
+|-------|----------|
+| Root | Database modes, networking, load balancer access, Marketplace, configuration management, FSDR wiring |
+| Network | Public/private subnet separation, CIDR allocation, gateway routes, default ingress |
+| Kubernetes | CPU/ARM/GPU workers, image selection, add-ons, API access, IAM, generated Helm values and credentials |
+| FSDR | Protection groups, plans, executions, Automatic DR |
 
-```hcl
-k8s_use_local_charts = true
-```
+To run one module, use `python3 tests/run-mocked-plans.py --module modules/kubernetes` (or `--module .` for the root).
 
-To return to published charts for direct Terraform runs, remove that variable or set it to `false`.
-
-### Compute Options
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `compute_cpu_shape` | CPU compute shape | VM.Standard.E5.Flex |
-| `compute_cpu_ocpu` | OCPUs per CPU worker | 2 |
-| `compute_gpu_shape` | GPU compute shape | VM.GPU.A10.1 |
-
-### Network Options
-
-By default, a new VCN with public and private subnets is created. To use existing networking:
-
-```hcl
-byo_vcn_ocid            = "ocid1.vcn.oc1..."
-byo_public_subnet_ocid  = "ocid1.subnet.oc1..."
-byo_private_subnet_ocid = "ocid1.subnet.oc1..."
-```
-
-### Load Balancer Options
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `lb_min_shape` | Minimum bandwidth (Mbps) | 10 |
-| `lb_max_shape` | Maximum bandwidth (Mbps) | 10 |
-| `client_allowed_cidrs` | CIDRs allowed for client access | "0.0.0.0/0" |
-| `server_allowed_cidrs` | CIDRs allowed for server API access | "0.0.0.0/0" |
-
-### AI Optimizer
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `deploy_optimizer` | Deploy AI Optimizer and Toolkit | false |
-
-## Examples
-
-See the [examples/](examples/) directory for complete configuration examples:
-
-| File | Description |
-|------|-------------|
-| `k8s-new-adb.tfvars` | Kubernetes deployment with new Autonomous Database |
-| `k8s-byo-other-db.tfvars` | Kubernetes deployment with bring-your-own database |
-
-### Running Tests
-
-The `examples/manual-test.sh` script validates configurations using your OCI credentials:
+The `tests/manual-test.sh` script validates configurations using your OCI credentials:
 
 ```bash
 # Uses ~/.oci/config [DEFAULT] profile
-./examples/manual-test.sh
+./tests/manual-test.sh
 
 # Use a specific profile
-./examples/manual-test.sh MYPROFILE
+./tests/manual-test.sh MYPROFILE
 ```
 
-## Outputs
-
-After successful deployment:
-
-| Output | Description |
-|--------|-------------|
-| `app_name` | Application label/namespace |
-| `app_version` | Deployed application version |
-| `optimizer_client_url` | AI Optimizer web UI URL |
-| `optimizer_server_url` | AI Optimizer API URL |
-| `kubeconfig_cmd` | Command to generate kubeconfig |
-
-## OCI Resource Manager (ORM)
-
-This configuration is compatible with OCI Resource Manager for deployment via the OCI Console. The `schema.yaml` file defines the ORM form layout.
-
-## Directory Structure
-
-```
-.
-├── README.md                 # This file
-├── main.tf                   # Core resources (LB, ADB)
-├── variables.tf              # Root-level variables
-├── output.tf                 # Root-level outputs
-├── locals.tf                 # Local values
-├── provider.tf               # Provider configuration
-├── versions.tf               # Version constraints
-├── data.tf                   # Data sources
-├── nsgs.tf                   # Network Security Groups
-├── module_network.tf         # Network module invocation
-├── module_kubernetes.tf      # Kubernetes module invocation
-├── schema.yaml               # OCI ORM schema
-├── examples/                 # Example tfvars files
-│   ├── README.md
-│   ├── k8s-new-adb.tfvars
-│   ├── k8s-byo-other-db.tfvars
-│   └── manual-test.sh
-├── modules/
-│   ├── kubernetes/           # OKE cluster and configuration
-│   └── network/              # VCN, subnets, gateways
-└── cfgmgt/                   # Configuration management scripts
-```
-
-## Cleanup
-
-To destroy all resources:
-
-```bash
-terraform destroy
-```
+For live provisioning coverage and evidence requirements, use [TEST-AGENT.md](../TEST-AGENT.md) with the [OCI deployment guide](../docs-source/site/docs/setup/cloud/oci.mdx).
 
 ## License
 

@@ -13,6 +13,11 @@ gateway-helm:
 # Deploy Kafka cluster
 kafka:
   enabled: ${deploy_kafka}
+%{ if contains(keys(storage), "kafka") ~}
+  replicas: ${storage.kafka.replicas}
+  storageSize: ${storage.kafka.size_in_gbs}Gi
+  storageClass: ${storage.kafka.storage_class}
+%{ endif ~}
 
 coherence:
   enabled: ${deploy_coherence}
@@ -22,6 +27,12 @@ signoz:
   auth:
     existingSecret: "${label}-signoz"
   signoz:
+%{ if contains(keys(storage), "signoz") ~}
+    replicaCount: ${storage.signoz.replicas}
+    persistence:
+      storageClass: ${storage.signoz.storage_class}
+      size: ${storage.signoz.size_in_gbs}Gi
+%{ endif ~}
     env:
       SIGNOZ_USER_ROOT_PASSWORD:
         valueFrom:
@@ -39,6 +50,12 @@ signoz:
             name: "${label}-signoz"
             key: password
 %{ if byo_ocir_url != "" ~}
+    image:
+      registry: ${byo_ocir_url}
+    initContainers:
+      init:
+        image:
+          registry: ${byo_ocir_url}
   global:
     imageRegistry: ${byo_ocir_url}
   utilities:
@@ -51,13 +68,6 @@ signoz:
     kubectl:
       image:
         registry: ${byo_ocir_url}
-  signoz:
-    image:
-      registry: ${byo_ocir_url}
-    initContainers:
-      init:
-        image:
-          registry: ${byo_ocir_url}
   schemaMigrator:
     image:
       registry: ${byo_ocir_url}
@@ -74,12 +84,34 @@ signoz:
   otelCollector:
     image:
       registry: ${byo_ocir_url}
+%{ endif ~}
+%{ if contains(keys(storage), "clickhouse") || byo_ocir_url != "" ~}
   clickhouse:
-    image:
-      registry: ${byo_ocir_url}
+%{ if contains(keys(storage), "clickhouse") ~}
+    cluster: cluster
+    layout:
+      shardsCount: 1
+      replicasCount: ${storage.clickhouse.replicas}
+    persistence:
+      storageClass: ${storage.clickhouse.storage_class}
+      size: ${storage.clickhouse.size_in_gbs}Gi
+%{ endif ~}
+%{ if contains(keys(storage), "zookeeper") || byo_ocir_url != "" ~}
     zookeeper:
+%{ if contains(keys(storage), "zookeeper") ~}
+      replicaCount: ${storage.zookeeper.replicas}
+      persistence:
+        storageClass: ${storage.zookeeper.storage_class}
+        size: ${storage.zookeeper.size_in_gbs}Gi
+%{ endif ~}
+%{ if byo_ocir_url != "" ~}
       image:
         registry: ${byo_ocir_url}
+%{ endif ~}
+%{ endif ~}
+%{ if byo_ocir_url != "" ~}
+    image:
+      registry: ${byo_ocir_url}
     initContainers:
       udf:
         image:
@@ -90,6 +122,7 @@ signoz:
       metricsExporter:
         image:
           registry: ${byo_ocir_url}
+%{ endif ~}
 %{ endif ~}
 
 %{ if byo_ocir_url != "" ~}
@@ -108,8 +141,6 @@ conductor-server:
 otmm:
   image:
     repository: ${byo_ocir_url}/database/otmm
-
-otmm:
   coordinator:
     image:
       repository: ${byo_ocir_url}/database/microtx-coordinator
@@ -143,13 +174,23 @@ apisix:
     repository: ${byo_ocir_url}/apache/apisix
   initContainer:
     image: ${byo_ocir_url}/busybox
-  etcd:
-    image:
-      registry: ${byo_ocir_url}
   ingress-controller:
     enabled: false
     image:
       repository: ${byo_ocir_url}/apache/apisix-ingress-controller
+%{ endif ~}
+%{ if contains(keys(storage), "etcd") || byo_ocir_url != "" ~}
+  etcd:
+%{ if contains(keys(storage), "etcd") ~}
+    replicaCount: ${storage.etcd.replicas}
+    persistence:
+      storageClass: ${storage.etcd.storage_class}
+      size: ${storage.etcd.size_in_gbs}Gi
+%{ endif ~}
+%{ if byo_ocir_url != "" ~}
+    image:
+      registry: ${byo_ocir_url}
+%{ endif ~}
 %{ endif ~}
   service:
     type: NodePort

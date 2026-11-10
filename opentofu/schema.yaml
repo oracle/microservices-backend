@@ -34,6 +34,19 @@ variableGroups:
       - k8s_run_cfgmgt
       - k8s_use_cluster_addons
       - k8s_use_local_charts
+      - fsdr_plan_types
+      - fsdr_plan_refresh_trigger
+      - fsdr_plan_verify_trigger
+      - fsdr_adb_drill_standby_type
+      - fsdr_timeouts
+      - fsdr_automatic_dr
+      - fsdr_plan_executions
+      - fsdr_standby_network
+      - fsdr_standby_vcn_cidr
+      - fsdr_standby_cpu_node_pool_size
+      - fsdr_backup_schedule
+      - fsdr_backup_retention
+      - fsdr_additional_namespaces
     visible: false
 
   #########################################################################
@@ -45,6 +58,17 @@ variableGroups:
       - label_prefix
       - deploy_optimizer
     visible: true
+
+  #########################################################################
+  # Full Stack Disaster Recovery
+  #########################################################################
+  - title: "Full Stack Disaster Recovery"
+    variables:
+      - fsdr_enabled
+      - fsdr_init_destroy
+      - fsdr_region_1
+      - fsdr_dns_zone_ocid
+      - fsdr_dns_name
 
   #########################################################################
   # Infrastructure - Kubernetes
@@ -102,6 +126,7 @@ variableGroups:
     variables:
       - byo_db
       - byo_db_type
+      - adb_compartment_ocid
       - adb_license_model
       - adb_edition
       - adb_networking
@@ -131,11 +156,44 @@ variables:
     pattern: "^$|^[a-zA-Z0-9]{1,12}$"
     required: false
 
+  fsdr_init_destroy:
+    type: boolean
+    title: "Prepare for Destroy?"
+    description: "Prepare an existing FSDR deployment for destroy. Run Apply before Destroy."
+    default: false
+
   deploy_optimizer:
     type: boolean
     title: "Install the AI Optimizer and Toolkit?"
     description: "It is recommended to 'Deploy GPU Node Pool' when installing the Optimizer."
     required: true
+
+  #########################################################################
+  fsdr_enabled:
+    type: boolean
+    title: "Enable Full Stack Disaster Recovery?"
+    default: false
+
+  fsdr_region_1:
+    type: oci:identity:region:name
+    title: "Standby OCI Region"
+    description: "Subscribed region distinct from the primary region."
+    required: true
+    visible: fsdr_enabled
+
+  fsdr_dns_zone_ocid:
+    type: string
+    title: "Application OCI Public DNS Zone OCID"
+    description: "Supply with the application hostname to create its initial DNS record."
+    required: false
+    visible: fsdr_enabled
+
+  fsdr_dns_name:
+    type: string
+    title: "Application DNS Hostname"
+    description: "Supply with the public DNS zone OCID to create an A record pointing to the primary."
+    required: false
+    visible: fsdr_enabled
 
   #########################################################################
   k8s_api_is_public:
@@ -349,6 +407,14 @@ variables:
     visible: byo_db
 
   ### Provision New ADB ###
+  adb_compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "Autonomous Database Compartment"
+    description: "Compartment for databases created by the stack, including the FSDR standby."
+    required: true
+    default: compartment_ocid
+    visible: true
+
   adb_license_model:
     type: enum
     title: "Autonomous Database License Model"

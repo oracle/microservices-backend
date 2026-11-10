@@ -4,12 +4,12 @@
 
 locals {
   obaas_prereqs_values = templatefile("${path.module}/templates/obaas-prereqs-values.yaml", {
-    label        = var.label_prefix
+    label        = local.app_namespace
     byo_ocir_url = var.byo_ocir_url
   })
 
   obaas_values = templatefile("${path.module}/templates/obaas-values.yaml", {
-    label                = var.label_prefix
+    label                = local.app_namespace
     oci_region           = var.region
     db_type              = var.db_conn.db_type
     db_ocid              = var.db_ocid
@@ -23,17 +23,18 @@ locals {
     byo_ocir_url         = var.byo_ocir_url
     deploy_kafka         = var.deploy_kafka
     deploy_coherence     = var.deploy_coherence
+    storage              = var.persistent_storage == null ? {} : var.persistent_storage.chart
   })
 }
 
 resource "local_sensitive_file" "obaas_prereqs_values" {
   content         = local.obaas_prereqs_values
-  filename        = "${path.root}/cfgmgt/stage/obaas-prereqs-values.yaml"
+  filename        = format("%s/obaas-prereqs-values.yaml", local.stage_directory)
   file_permission = 0600
 }
 
 resource "local_sensitive_file" "obaas_values" {
   content         = local.obaas_values
-  filename        = "${path.root}/cfgmgt/stage/obaas-values.yaml"
+  filename        = format("%s/obaas-values.yaml", local.stage_directory)
   file_permission = 0600
 }

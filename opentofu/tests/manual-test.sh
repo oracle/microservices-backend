@@ -1,6 +1,6 @@
 #!/bin/bash
 # Test script to validate OpenTofu infrastructure with real OCI credentials
-# Usage: examples/test.sh [profile_name]
+# Usage: tests/manual-test.sh [profile_name]
 
 set -euo pipefail
 

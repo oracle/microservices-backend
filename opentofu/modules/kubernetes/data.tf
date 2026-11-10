@@ -74,4 +74,4 @@ data "oci_resourcemanager_private_endpoint_reachable_ip" "orm_pe_reachable_ip" {
   count               = local.create_orm_pe ? 1 : 0
   private_endpoint_id = oci_resourcemanager_private_endpoint.orm_pe[0].id
   private_ip          = split(":", oci_containerengine_cluster.default_cluster.endpoints[0].private_endpoint)[0]
-} 
+}

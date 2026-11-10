@@ -1,6 +1,9 @@
 ## Copyright (c) 2024, 2026, Oracle and/or its affiliates.
 ## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
 {{- if $.Values.kafka.enabled }}
+{{- $replicas := int .Values.kafka.replicas }}
+{{- $replicationFactor := min 3 $replicas }}
+{{- $minInsyncReplicas := min 2 $replicas }}
 ---
 apiVersion: kafka.strimzi.io/v1
 kind: KafkaNodePool
@@ -9,7 +12,7 @@ metadata:
   labels:
     strimzi.io/cluster: {{ .Release.Name }}-kafka-cluster
 spec:
-  replicas: 3
+  replicas: {{ .Values.kafka.replicas }}
   roles:
     - controller
     - broker
@@ -18,7 +21,10 @@ spec:
     volumes:
       - id: 0
         type: persistent-claim
-        size: 100Gi
+        size: {{ .Values.kafka.storageSize }}
+        {{- with .Values.kafka.storageClass }}
+        class: {{ . | quote }}
+        {{- end }}
         kraftMetadata: shared
 ---
 apiVersion: kafka.strimzi.io/v1
@@ -35,11 +41,11 @@ spec:
         type: internal
         tls: false
     config:
-      offsets.topic.replication.factor: 3
-      transaction.state.log.replication.factor: 3
-      transaction.state.log.min.isr: 2
-      default.replication.factor: 3
-      min.insync.replicas: 2
+      offsets.topic.replication.factor: {{ $replicationFactor }}
+      transaction.state.log.replication.factor: {{ $replicationFactor }}
+      transaction.state.log.min.isr: {{ $minInsyncReplicas }}
+      default.replication.factor: {{ $replicationFactor }}
+      min.insync.replicas: {{ $minInsyncReplicas }}
 {{- if .Values.kafka.metricsEnabled }}
     metricsConfig:
       type: strimziMetricsReporter

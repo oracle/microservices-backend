@@ -1081,6 +1081,10 @@ k8s-infra:
 
 kafka:
   enabled: false
+  # Replication settings scale with replicas, which must be at least one.
+  replicas: 3
+  storageSize: 100Gi
+  storageClass: ""
   version: 4.3.1
   metadataVersion: 4.3-IV0
 

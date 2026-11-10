@@ -1,6 +1,6 @@
 # Example: Kubernetes deployment with new Autonomous Database
 
-# Run: ./examples/manual-test.sh
+# Run: ./tests/manual-test.sh
 
 # Deployment Configuration
 label_prefix = "CITEST"

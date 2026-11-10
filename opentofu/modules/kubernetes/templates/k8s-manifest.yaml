@@ -106,7 +106,6 @@ spec:
   compartmentId: ${compartment_ocid}
   subnetId: ${lb_subnet_ocid}
   loadBalancerName: "${label}-lb"
-  reservedPublicAddressId: ${lb_ip_ocid}
   isPrivate: false
   maxBandwidthMbps: ${lb_max_shape}
   minBandwidthMbps: ${lb_min_shape}

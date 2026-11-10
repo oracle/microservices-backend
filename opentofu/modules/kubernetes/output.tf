@@ -2,6 +2,42 @@
 # All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 # spell-checker: disable
 
+output "cluster_id" {
+  value = oci_containerengine_cluster.default_cluster.id
+}
+
+output "orm_private_endpoint_ip" {
+  value = local.orm_pe
+}
+
+output "workers_dynamic_group_name" {
+  value = oci_identity_dynamic_group.workers_dynamic_group.name
+}
+
+output "node_pool_ids" {
+  value = merge(
+    { cpu = oci_containerengine_node_pool.cpu_node_pool_details.id },
+    var.node_pool_gpu_deploy ? { gpu = oci_containerengine_node_pool.gpu_node_pool_details[0].id } : {}
+  )
+}
+
+output "configuration_files" {
+  value = {
+    kubeconfig = local_sensitive_file.kubeconfig.filename
+    manifest   = local_sensitive_file.k8s_manifest.filename
+    prereqs    = local_sensitive_file.obaas_prereqs_values.filename
+    app        = local_sensitive_file.obaas_values.filename
+  }
+}
+
+output "configuration_ready_id" {
+  value = var.run_cfgmgt ? null_resource.apply[0].id : oci_containerengine_cluster.default_cluster.id
+}
+
+output "repository_host" {
+  value = local.repository_host
+}
+
 output "kubeconfig_cmd" {
   description = "Command to generate kubeconfig file"
   value = format(

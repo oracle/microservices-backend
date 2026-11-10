@@ -14,8 +14,7 @@ If your environment does not meet the prerequisites, the installation may not su
 
 ### Oracle OCI
 
-If you are installing into Oracle OCI you need the right [OCI IAM policies](../oci_policies.md) in place.  Please review and ensure you have the required policies and permissions before installing.
-
+If you are installing into Oracle OCI you need the right [OCI IAM policies](../cloud/oci.mdx#policies) in place.  Please review and ensure you have the required policies and permissions before installing.
 ### Kubernetes Cluster
 
 A CNCF-compliant Kubernetes cluster with the following specifications:

@@ -6,6 +6,16 @@ data "oci_identity_availability_domains" "all" {
   compartment_id = var.tenancy_ocid
 }
 
+data "oci_identity_availability_domains" "fsdr_region_1" {
+  count          = var.fsdr_enabled ? 1 : 0
+  compartment_id = var.tenancy_ocid
+  provider       = oci.fsdr_region_1
+}
+
+data "oci_objectstorage_namespace" "objectstorage_namespace" {
+  compartment_id = var.tenancy_ocid
+}
+
 data "oci_core_services" "core_services" {
   filter {
     name   = "name"

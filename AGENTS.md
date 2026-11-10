@@ -85,7 +85,7 @@ Confirm which storage class supports RWX before choosing SigNoz, ClickHouse, and
 
 If installing on Oracle Cloud Infrastructure, confirm the required OCI IAM policies and permissions from the `next` setup docs before starting. This matters especially for:
 
-- The policy reference is `docs-source/site/docs/setup/oci_policies.md`.
+- The policy reference is `docs-source/site/docs/setup/cloud/oci.mdx`.
 - Identity and access management permissions to read compartments, domains, limits, and inspect resources.
 - Dynamic group and policy management when the install flow creates or updates IAM resources.
 - OKE permissions for cluster-family, clusters, cluster node pools, instance-family resources, and public IPs.
@@ -102,7 +102,7 @@ If installing on Oracle Cloud Infrastructure, confirm the required OCI IAM polic
 
 OCI API keys and OKE Workload Identity are both supported authentication patterns for Autonomous Database-related automation. Use Workload Identity on OKE when the cluster and IAM policies are prepared for it; otherwise use OCI API key resources created from the OCI config helper.
 
-For strict OCI policy auditing, do not rely only on the summary above. Read `docs-source/site/docs/setup/oci_policies.md` directly and compare the tenancy policies against the exact `Allow group ... to read/inspect/manage/use ...` statements listed there.
+For strict OCI policy auditing, do not rely only on the summary above. Read `docs-source/site/docs/setup/cloud/oci.mdx` directly and compare the tenancy policies against the exact `Allow group ... to read/inspect/manage/use ...` statements listed there.
 
 ### Oracle Database
 

@@ -4,8 +4,9 @@
 
 // Housekeeping
 locals {
-  compartment_ocid = var.compartment_ocid != "" ? var.compartment_ocid : var.tenancy_ocid
-  label_prefix     = var.label_prefix != "" ? substr(lower(var.label_prefix), 0, 12) : substr(lower(random_pet.label.id), 0, 12)
+  compartment_ocid     = var.compartment_ocid != "" ? var.compartment_ocid : var.tenancy_ocid
+  adb_compartment_ocid = trimspace(var.adb_compartment_ocid) != "" ? trimspace(var.adb_compartment_ocid) : local.compartment_ocid
+  label_prefix         = var.label_prefix != "" ? substr(lower(var.label_prefix), 0, 12) : substr(lower(random_pet.label.id), 0, 12)
 }
 
 
@@ -38,6 +39,9 @@ locals {
 
 // Database
 locals {
+  db_role = var.byo_db_type == "" ? oci_database_autonomous_database.default_adb["managed"].role : (
+    var.byo_db_type == "ADB-S" ? data.oci_database_autonomous_database.byo_adb["byo"].role : "PRIMARY"
+  )
   db_ocid = (
     var.byo_db_type == "" ? oci_database_autonomous_database.default_adb["managed"].id :
     var.byo_db_type == "ADB-S" ? data.oci_database_autonomous_database.byo_adb["byo"].id :
@@ -79,4 +83,35 @@ locals {
 locals {
   lb_http_port  = 80
   lb_https_port = 443
+}
+
+// Full Stack Disaster Recovery
+locals {
+  fsdr_label_prefix       = format("%s-fsdr", local.label_prefix)
+  fsdr_group_label_prefix = try(random_pet.label.keepers.fsdr_group_prefix, local.fsdr_label_prefix)
+  fsdr_topology_selected  = var.fsdr_enabled && trimspace(var.fsdr_region_1) != "" && var.fsdr_region_1 != var.region
+  fsdr_include_adb        = var.fsdr_enabled ? var.byo_db_type != "OTHER" : false
+  fsdr_external_databases = var.fsdr_enabled && var.byo_db_type == "ADB-S" ? {
+    (var.byo_adb_ocid) = data.oci_database_autonomous_database.byo_adb["byo"].compartment_id
+  } : {}
+  fsdr_clusters = local.fsdr_topology_selected ? {
+    (var.region) = {
+      cluster_id             = module.kubernetes["managed"].cluster_id
+      configuration_ready_id = module.kubernetes["managed"].configuration_ready_id
+      workers_group          = module.kubernetes["managed"].workers_dynamic_group_name
+      database_id            = local.db_ocid
+      node_pools             = module.kubernetes["managed"].node_pool_ids
+      lb_id                  = oci_load_balancer_load_balancer.lb.id
+      lb_ip                  = oci_load_balancer_load_balancer.lb.ip_address_details[0].ip_address
+    }
+    (var.fsdr_region_1) = {
+      cluster_id             = module.fsdr_kubernetes["standby"].cluster_id
+      configuration_ready_id = module.fsdr_kubernetes["standby"].configuration_ready_id
+      workers_group          = module.fsdr_kubernetes["standby"].workers_dynamic_group_name
+      database_id            = try(oci_database_autonomous_database.dr_adb_standby["fsdr_region_1"].id, "")
+      node_pools             = module.fsdr_kubernetes["standby"].node_pool_ids
+      lb_id                  = oci_load_balancer_load_balancer.fsdr_standby[0].id
+      lb_ip                  = oci_load_balancer_load_balancer.fsdr_standby[0].ip_address_details[0].ip_address
+    }
+  } : {}
 }

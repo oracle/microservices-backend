@@ -1,8 +1,7 @@
 # Workflow for validating Infrastructure as Code
 #
-# This workflow validates syntax, formatting, schema, and security.
-# It does NOT validate infrastructure logic or resource creation.
-# Manual testing with real OCI credentials is REQUIRED before merging.
+# This workflow validates syntax, formatting, mocked IaC plans, schema, and security.
+# Live infrastructure validation with OCI credentials is REQUIRED before merging.
 # See opentofu/README.md for instructions.
 
 name: Validate Infrastructure as Code
@@ -76,12 +75,18 @@ jobs:
         working-directory: ./opentofu
         run: tofu fmt -recursive -check
 
-      # Schema validation
       - name: Install Python and Dependencies
         run: |
-          apk add --no-cache python3 py3-pip
+          apk add --no-cache python3 py3-pip kubectl openssl
           pip3 install --break-system-packages pyyaml jsonschema referencing
 
+      - name: Test IaC Mocked Plans
+        working-directory: ./opentofu
+        run: |
+          python3 tests/run-mocked-plans.py
+          python3 -m unittest discover -s tests -p 'test_*.py'
+
+      # Schema validation
       - name: Validate Oracle Resource Manager Schema
         working-directory: ./opentofu/tests
         run: python3 validate_omr_schema.py OMRMetaSchema.yaml ../schema.yaml
@@ -124,6 +129,5 @@ jobs:
     steps:
       - name: All Validations Passed
         run: |
-          echo "✅ Syntax, formatting, schema, security validated"
-          echo "⚠️  Does NOT validate infrastructure logic"
+          echo "✅ Syntax, formatting, IaC mocked plans, schema, security validated"
           echo "📖 See opentofu/README.md for manual testing requirements"

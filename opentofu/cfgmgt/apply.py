@@ -336,7 +336,10 @@ if __name__ == "__main__":
         default=False,
         help="Use local Helm charts instead of the remote repository",
     )
+    parser.add_argument("--stage-directory", default=STAGE_PATH, help="Generated configuration directory")
     args = parser.parse_args()
+    STAGE_PATH = os.path.abspath(args.stage_directory)
+    os.environ["KUBECONFIG"] = os.path.join(STAGE_PATH, "kubeconfig")
 
     mod_kubeconfig(args.private_endpoint)
     apply_manifest(args.namespace)

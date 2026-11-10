@@ -4,9 +4,11 @@
 
 // Oracle Resource Manager
 locals {
-  create_orm_pe = var.orm_install ? contains(local.api_endpoint_allowed_cidrs, "0.0.0.0/0") ? false : true : false
-  orm_pe        = local.create_orm_pe ? data.oci_resourcemanager_private_endpoint_reachable_ip.orm_pe_reachable_ip[0].ip_address : ""
-  db_name       = replace(lower(split(".", var.db_name)[0]), "_", "-")
+  app_namespace   = coalesce(var.app_namespace, var.label_prefix)
+  stage_directory = var.stage_directory != null ? var.stage_directory : format("%s/cfgmgt/stage", path.root)
+  create_orm_pe   = var.orm_install ? contains(local.api_endpoint_allowed_cidrs, "0.0.0.0/0") ? false : true : false
+  orm_pe          = local.create_orm_pe ? data.oci_resourcemanager_private_endpoint_reachable_ip.orm_pe_reachable_ip[0].ip_address : ""
+  db_name         = replace(lower(split(".", var.db_name)[0]), "_", "-")
 }
 
 // Configuration Management Validation
@@ -62,7 +64,7 @@ locals {
   region_map      = { for r in data.oci_identity_regions.identity_regions.regions : r.name => r.key }
   image_region    = lookup(local.region_map, var.region)
   repository_host = lower(format("%s.ocir.io", local.image_region))
-  repository_base = var.byo_ocir_url != "" ? var.byo_ocir_url : lower(format("%s/%s/%s", local.repository_host, data.oci_objectstorage_namespace.objectstorage_namespace.namespace, var.label_prefix))
+  repository_base = var.byo_ocir_url != "" ? var.byo_ocir_url : lower(format("%s/%s/%s", local.repository_host, data.oci_objectstorage_namespace.objectstorage_namespace.namespace, local.app_namespace))
 }
 
 // Cluster Details

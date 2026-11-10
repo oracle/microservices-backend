@@ -10,6 +10,12 @@ variable "compartment_id" {
   type = string
 }
 
+variable "adb_compartment_id" {
+  description = "Compartment for managed Autonomous Databases; defaults to compartment_id."
+  type        = string
+  default     = null
+}
+
 variable "vcn_id" {
   type = string
 }
@@ -59,6 +65,18 @@ variable "availability_domains" {
 
 variable "label_prefix" {
   type = string
+}
+
+variable "app_namespace" {
+  description = "Application namespace shared by the primary and recovery clusters."
+  type        = string
+  default     = null
+}
+
+variable "stage_directory" {
+  description = "Directory for this cluster's generated configuration."
+  type        = string
+  default     = null
 }
 
 variable "db_ocid" {
@@ -124,6 +142,39 @@ variable "api_endpoint_allowed_cidrs" {
 
 variable "run_cfgmgt" {
   type = bool
+}
+
+variable "apply_cfgmgt" {
+  description = "Apply the staged application configuration when configuration management runs."
+  type        = bool
+  default     = true
+}
+
+variable "persistent_storage" {
+  description = "Preallocated OCI volumes and the chart settings for their reserved PVs."
+  type = object({
+    chart = map(object({ replicas = number, size_in_gbs = number, storage_class = string }))
+    volumes = map(object({
+      id                  = string
+      claim_name          = string
+      namespace           = string
+      size_in_gbs         = number
+      availability_domain = string
+    }))
+  })
+  default = null
+}
+
+variable "manage_persistent_volumes" {
+  description = "Render bootstrap PV definitions while the original storage is active."
+  type        = bool
+  default     = true
+}
+
+variable "recovery_external_databases" {
+  description = "Database OCIDs and compartments accessible to the database operator during recovery."
+  type        = map(string)
+  default     = {}
 }
 variable "use_cluster_addons" {
   type    = bool

@@ -7,7 +7,7 @@ This directory contains example `.tfvars` files for different deployment scenari
 ```bash
 # Load credentials from ~/.oci/config and run all tests
 cd /path/to/terraform/
-./examples/manual-test.sh
+./tests/manual-test.sh
 ```
 
 The test script automatically loads credentials from `~/.oci/config`, sets compartment to your tenancy root, and runs `tofu plan` on all testable examples.
@@ -18,6 +18,7 @@ The test script automatically loads credentials from `~/.oci/config`, sets compa
 |------|-------------|----------|
 | `k8s-new-adb.tfvars` | Kubernetes deployment with new Autonomous Database | New ADB |
 | `k8s-byo-other-db.tfvars` | Kubernetes deployment with bring-your-own database | BYO OTHER |
+| `k8s-fsdr.tfvars` | Kubernetes deployment with Full Stack Disaster Recovery | New ADB with cross-region standby |
 
 ### k8s-new-adb.tfvars
 
@@ -32,6 +33,14 @@ Creates a new OKE cluster using an existing external database:
 - Requires `byo_odb_host`, `byo_odb_port`, `byo_odb_service`, and `byo_db_password`
 - A1.Flex (ARM) compute shape with 4 OCPUs
 - Flexible load balancer (10-50 Mbps)
+
+### k8s-fsdr.tfvars
+
+Creates a new OKE cluster with Autonomous Database and Full Stack Disaster Recovery:
+
+- Cross-region Autonomous Data Guard standby
+- Switchover, failover, and drill plans
+- Optional Automatic DR and explicit plan executions
 
 ## Manual Setup (Without Helper Script)
 

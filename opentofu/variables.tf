@@ -112,6 +112,13 @@ variable "byo_odb_service" {
   default     = ""
 }
 
+variable "adb_compartment_ocid" {
+  description = "Compartment for databases created by the stack, including the FSDR standby. Defaults to compartment_ocid."
+  type        = string
+  default     = ""
+  nullable    = false
+}
+
 variable "adb_version" {
   description = "Autonomous Database Version"
   type        = string
