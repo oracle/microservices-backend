@@ -6,7 +6,7 @@ terraform {
   required_providers {
     oci = {
       source  = "oracle/oci"
-      version = "~> 9.8" // Last evaluated 6-Oct-26
+      version = "~> 9.12.1" // Last evaluated 9-Nov-26
     }
   }
   required_version = ">= 1.5"

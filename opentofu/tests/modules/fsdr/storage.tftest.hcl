@@ -187,6 +187,7 @@ run "initial_primary" {
         destination_load_balancer_id                         = ""
         destination_network_load_balancer_id                 = ""
         destination_snapshot_policy_id                       = ""
+        dr_drill_properties                                  = []
         export_mappings                                      = []
         file_system_operations                               = []
         gtid_reconciliation_timeout                          = 0
@@ -265,6 +266,7 @@ run "switchover" {
         destination_load_balancer_id                         = ""
         destination_network_load_balancer_id                 = ""
         destination_snapshot_policy_id                       = ""
+        dr_drill_properties                                  = []
         export_mappings                                      = []
         file_system_operations                               = []
         gtid_reconciliation_timeout                          = 0
@@ -324,6 +326,7 @@ run "switchback" {
           destination_load_balancer_id                         = ""
           destination_network_load_balancer_id                 = ""
           destination_snapshot_policy_id                       = ""
+          dr_drill_properties                                  = []
           export_mappings                                      = []
           file_system_operations                               = []
           gtid_reconciliation_timeout                          = 0
@@ -394,6 +397,7 @@ run "switchback" {
           member_id                      = "recovered-filesystem"
           member_type                    = "FILE_SYSTEM"
           destination_snapshot_policy_id = "snapshot-policy"
+          dr_drill_properties            = []
           destination_encryption_key     = [{ encryption_key_id = "fs-key", vault_id = "fs-vault" }]
           export_mappings                = [{ export_id = "fs-export", destination_mount_target_id = "fs-mount" }]
         }
@@ -444,6 +448,7 @@ run "missing_initial_group_after_recovery" {
         destination_load_balancer_id                         = ""
         destination_network_load_balancer_id                 = ""
         destination_snapshot_policy_id                       = ""
+        dr_drill_properties                                  = []
         export_mappings                                      = []
         file_system_operations                               = []
         gtid_reconciliation_timeout                          = 0
