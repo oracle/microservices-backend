@@ -21,8 +21,9 @@ https://oss.oracle.com/licenses/upl/  -->
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <helidon.version>4.4.0</helidon.version>
-        <logback.version>1.5.38</logback.version>
+        <helidon.version>4.5.6</helidon.version>
+        <!-- EclipseLink 5 requires a separate Jakarta Persistence migration. -->
+        <eclipselink.version>4.0.9</eclipselink.version>
         <mainClass>com.cloudbank.geographicrisk.Main</mainClass>
         <image.tag>${project.version}</image.tag>
         <jkube.generator.name>${image.registry}/${project.artifactId}:${image.tag}</jkube.generator.name>
@@ -30,6 +31,46 @@ https://oss.oracle.com/licenses/upl/  -->
 
     <dependencyManagement>
         <dependencies>
+            <!-- Helidon MP/Jersey 3 use Jakarta EE 10 APIs; isolate Boot's EE 11 defaults. -->
+            <dependency>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+                <version>3.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.persistence</groupId>
+                <artifactId>jakarta.persistence-api</artifactId>
+                <version>3.1.0</version>
+            </dependency>
+            <!-- Keep shared instrumentation and test families aligned with the root. -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-bom</artifactId>
+                <version>${mockito.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-bom</artifactId>
+                <version>${micrometer.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson-2-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>io.helidon</groupId>
                 <artifactId>helidon-dependencies</artifactId>
@@ -74,11 +115,13 @@ https://oss.oracle.com/licenses/upl/  -->
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.jpa</artifactId>
+            <version>${eclipselink.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.core</artifactId>
+            <version>${eclipselink.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -89,12 +132,12 @@ https://oss.oracle.com/licenses/upl/  -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.9</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-            <version>2.0.9</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -125,7 +168,7 @@ https://oss.oracle.com/licenses/upl/  -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <compilerArgs>
                         <arg>-parameters</arg>
@@ -147,7 +190,7 @@ https://oss.oracle.com/licenses/upl/  -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.2</version>
+                <version>${maven-jar-plugin.version}</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -161,7 +204,7 @@ https://oss.oracle.com/licenses/upl/  -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>${maven-dependency-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>copy-runtime-dependencies</id>
@@ -179,7 +222,7 @@ https://oss.oracle.com/licenses/upl/  -->
             <plugin>
                 <groupId>io.smallrye</groupId>
                 <artifactId>jandex-maven-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.6.1</version>
                 <executions>
                     <execution>
                         <id>make-index</id>
@@ -192,7 +235,7 @@ https://oss.oracle.com/licenses/upl/  -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.4.2</version>
+                <version>${maven-assembly-plugin.version}</version>
                 <configuration>
                     <descriptors>
                         <descriptor>src/assembly/jib-ready.xml</descriptor>

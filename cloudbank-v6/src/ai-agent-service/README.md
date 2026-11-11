@@ -101,8 +101,14 @@ AI_OCI_GENAI_REGION=<oci-region>
 AI_OCI_GENAI_CHAT_MODEL=<on-demand-chat-model-id>
 OKE_CLUSTER_COMPARTMENT_ID=<oke-cluster-compartment-ocid>
 AZN_AUTHORIZATION_SERVER_AI_AGENT_CLIENT_SECRET=<generated-secret>
+POLICY_OCI_GENAI_EMBEDDING_MODEL=<on-demand-embedding-model-id>
 ```
 
+- `AI_OCI_GENAI_CHAT_MODEL`: use an on-demand chat model available in
+  `OCI_REGION`. For example: **google.gemini-2.5-flash** available on-demand in `us-ashburn-1` or `eu-frankfurt-1` region.
+- `POLICY_OCI_GENAI_EMBEDDING_MODEL`: use an on-demand embedding model available in
+  `OCI_REGION`. For example: **cohere.embed-v4.0** available on-demand in `us-ashburn-1` or `eu-frankfurt-1` region
+  
 `run-compose.sh init` creates missing keys without overwriting existing
 values. Set the empty OCI values before starting the stack. File-based OCI
 authentication, config files, profiles, and private-key mounts are not used by

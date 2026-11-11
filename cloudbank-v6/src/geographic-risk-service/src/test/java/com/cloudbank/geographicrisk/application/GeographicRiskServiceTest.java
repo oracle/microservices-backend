@@ -287,8 +287,8 @@ class GeographicRiskServiceTest {
                 .thenReturn(Optional.of(existing));
 
         assertThatThrownBy(() -> service.evaluate(REQUEST, "idem-key-007"))
-                .isInstanceOf(WebApplicationException.class)
-                .satisfies(exception -> assertThat(((WebApplicationException) exception).getResponse().getStatus())
+                .isInstanceOfSatisfying(WebApplicationException.class,
+                        exception -> assertThat(exception.getResponse().getStatus())
                         .isEqualTo(409));
     }
 
@@ -405,8 +405,8 @@ class GeographicRiskServiceTest {
         when(evaluationRepository.insert(any())).thenThrow(collision("CB_GEO_RISK_EVAL_IDEM_UK"));
 
         assertThatThrownBy(() -> service.evaluate(REQUEST, "idem-collision"))
-                .isInstanceOf(WebApplicationException.class)
-                .satisfies(error -> assertThat(((WebApplicationException) error).getResponse().getStatus())
+                .isInstanceOfSatisfying(WebApplicationException.class,
+                        error -> assertThat(error.getResponse().getStatus())
                         .isEqualTo(409));
         verify(signalRepository, never()).insert(any());
     }
@@ -419,8 +419,8 @@ class GeographicRiskServiceTest {
         when(evaluationRepository.insert(any())).thenThrow(collision("CB_GEO_RISK_EVAL_IDEM_UK"));
 
         assertThatThrownBy(() -> service.evaluate(REQUEST, "idem-collision"))
-                .isInstanceOf(WebApplicationException.class)
-                .satisfies(error -> assertThat(((WebApplicationException) error).getResponse().getStatus())
+                .isInstanceOfSatisfying(WebApplicationException.class,
+                        error -> assertThat(error.getResponse().getStatus())
                         .isEqualTo(503));
     }
 

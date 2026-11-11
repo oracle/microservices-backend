@@ -9,7 +9,7 @@ https://oss.oracle.com/licenses/upl/  -->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.8</version>
+		<version>4.1.2</version>
 		<relativePath/>
 	</parent>
 
@@ -22,17 +22,33 @@ https://oss.oracle.com/licenses/upl/  -->
 
 	<properties>
 		<java.version>25</java.version>
-		<springai.version>2.0.1</springai.version>
-		<oci-java-sdk.version>3.95.0</oci-java-sdk.version>
-		<spring-cloud.version>2025.1.2</spring-cloud.version>
-		<spring-cloud-starter-config.version>5.0.5</spring-cloud-starter-config.version>
-		<org.springdoc-version>3.0.3</org.springdoc-version>
-		<bouncycastle.version>1.84</bouncycastle.version>
-		<oracle-springboot-starter.version>26.2.1</oracle-springboot-starter.version>
-		<liquibase.version>5.0.3</liquibase.version>
-		<pdfbox.version>3.0.7</pdfbox.version>
-		<jkube.version>1.19.0</jkube.version>
+		<springai.version>2.0.2</springai.version>
+		<oci-java-sdk.version>3.101.0</oci-java-sdk.version>
+		<spring-cloud.version>2025.1.4</spring-cloud.version>
+		<org.springdoc-version>3.2.0</org.springdoc-version>
+		<bouncycastle.version>1.86</bouncycastle.version>
+		<oracle-springboot-starter.version>26.3.0</oracle-springboot-starter.version>
+		<liquibase.version>5.0.4</liquibase.version>
+		<pdfbox.version>3.0.8</pdfbox.version>
+		<jkube.version>1.20.0</jkube.version>
 		<image.registry>localhost</image.registry>
+		<!-- Oracle's provider and Spring AI have independent release schedules. -->
+		<oracle-spring-ai.version>2.0.1</oracle-spring-ai.version>
+		<jackson-bom.version>3.3.0</jackson-bom.version>
+		<jackson-2-bom.version>2.23.0</jackson-2-bom.version>
+		<logback.version>1.6.6</logback.version>
+		<slf4j.version>2.0.20</slf4j.version>
+		<caffeine.version>3.3.1</caffeine.version>
+		<commons-lang3.version>3.21.0</commons-lang3.version>
+		<mockito.version>5.24.0</mockito.version>
+		<junit-jupiter.version>6.1.3</junit-jupiter.version>
+		<testng.version>7.12.0</testng.version>
+		<httpclient4.version>4.5.14</httpclient4.version>
+		<maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
+		<maven-dependency-plugin.version>3.11.0</maven-dependency-plugin.version>
+		<maven-surefire-plugin.version>3.6.1</maven-surefire-plugin.version>
+		<maven-failsafe-plugin.version>3.6.1</maven-failsafe-plugin.version>
+		<native-build-tools-plugin.version>1.1.18</native-build-tools-plugin.version>
 		<argLine/>
 	</properties>
 
@@ -53,11 +69,18 @@ https://oss.oracle.com/licenses/upl/  -->
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- Override only the starter; the release-train BOM keeps the Config client at 5.0.4. -->
 			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-starter-config</artifactId>
-				<version>${spring-cloud-starter-config.version}</version>
+			    <groupId>org.springframework.ai</groupId>
+			    <artifactId>spring-ai-bom</artifactId>
+			    <version>${springai.version}</version>
+			    <type>pom</type>
+			    <scope>import</scope>
+			</dependency>
+			<!-- Eureka still brings the legacy HTTP client; keep its security fixes. -->
+			<dependency>
+			    <groupId>org.apache.httpcomponents</groupId>
+			    <artifactId>httpclient</artifactId>
+			    <version>${httpclient4.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>

@@ -65,7 +65,7 @@
         <dependency>
             <groupId>com.oracle.spring.ai</groupId>
             <artifactId>spring-ai-starter-model-oracle</artifactId>
-            <version>${springai.version}</version>
+            <version>${oracle-spring-ai.version}</version>
         </dependency>
         <!-- Keep the OCI runtime aligned with policy-embedding-support and provide
              the concrete HTTP transport required by OKE Workload Identity. -->

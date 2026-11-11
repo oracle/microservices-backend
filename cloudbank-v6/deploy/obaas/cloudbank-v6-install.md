@@ -97,10 +97,10 @@ Use these sources for the values:
   ServiceAccount names referenced by the OCI Workload Identity policies. Keep
   the documented defaults unless the corresponding IAM policy uses different
   names.
-- `POLICY_OCI_GENAI_EMBEDDING_MODEL`: use an on-demand embedding model available
-  in `OCI_REGION`.
 - `AI_OCI_GENAI_CHAT_MODEL`: use an on-demand chat model available in
-  `OCI_REGION`.
+  `OCI_REGION`. For example: **google.gemini-2.5-flash** available on-demand in `us-ashburn-1` or `eu-frankfurt-1` region.
+- `POLICY_OCI_GENAI_EMBEDDING_MODEL`: use an on-demand embedding model available in
+  `OCI_REGION`. For example: **cohere.embed-v4.0** available on-demand in `us-ashburn-1` or `eu-frankfurt-1` region
 - `OKE_CLUSTER_COMPARTMENT_ID`: use the compartment OCID shown on the OKE
   cluster details page. This is the authorization scope used by both OCI GenAI
   Workload Identity policies; it is not necessarily `OCI_COMPARTMENT_OCID`,

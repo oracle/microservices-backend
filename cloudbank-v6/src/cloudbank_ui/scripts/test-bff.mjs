@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import ts from 'typescript';
+import { transformWithEsbuild } from 'vite';
 
 async function sourceModule(path) {
   const moduleUrl = new URL(path, import.meta.url);
@@ -13,8 +13,10 @@ async function sourceModule(path) {
     const value = JSON.parse(await readFile(new URL(file, moduleUrl), 'utf8'));
     source = source.replace(statement, `const ${name} = ${JSON.stringify(value)};`);
   }
-  const { outputText } = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } });
-  return import(`data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`);
+  const { code } = await transformWithEsbuild(source, moduleUrl.pathname, {
+    loader: 'ts', target: 'es2022', format: 'esm',
+  });
+  return import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
 }
 const { createApplication, uploadDocument, startProcessing, getHumanTasks, getHumanTask, resolveHumanTask,
   getApplicationWorkspace, getDocumentPdf, documentContentUrl, BffError } = await sourceModule('../src/bff.ts');
