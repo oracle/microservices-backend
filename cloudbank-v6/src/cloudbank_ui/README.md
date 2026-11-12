@@ -8,7 +8,7 @@ cookie; it does not read or persist OAuth tokens, client secrets, or passwords.
 
 ## Run with the OKE BFF
 
-Node.js 20.19+ or 22.12+ is recommended for Vite 7. Deploy the BFF first with
+Vite 8.3.8 requires Node.js `^20.19.0 || >=22.12.0`. Deploy the BFF first with
 the [OKE runbook](../../deploy/obaas/gateway-bff-runbook.md). From the repository
 root, keep these processes running in separate terminals:
 
@@ -160,9 +160,22 @@ uncertain request with the same fields; the logical operation key is retained.
 
 ## Licenses
 
-Direct and indirect external libraries are limited to **MIT** or
-**Apache-2.0**. Run `npm run check:licenses` after updating the lockfile.
+Direct and indirect external libraries are limited to **MIT**, **Apache-2.0**,
+or **MPL-2.0**. MPL-2.0 is accepted for Lightning CSS and its native platform
+packages used by Vite 8. Preserve the upstream license and copyright notices
+when redistributing these packages. See the
+[Mozilla MPL-2.0 FAQ](https://www.mozilla.org/en-US/MPL/2.0/FAQ/) for source
+availability requirements when distributing MPL-covered code.
+Run `npm run check:licenses` after updating the lockfile.
 `picocolors` and `source-map-js`, indirect PostCSS dependencies with other
 licenses, are replaced by small original CloudBank modules under `vendor/`,
 licensed **UPL-1.0** with the application. The source-map replacement disables
 CSS source maps, which this GUI does not use.
+
+Vite is pinned to `8.3.8` in `package.json` and `package-lock.json`; use `npm ci`
+to reproduce the dependency set. The JSX configuration and the Node test runner
+use Vite's Oxc transform. TypeScript `tsc --noEmit` still performs type checking.
+An npm override pins Vite's Rolldown dependency to `1.2.18`, within Vite's
+supported `~1.2.18` range. Rolldown `1.2.19` adds an optional WASM dependency
+branch containing `tslib` under 0BSD, which is outside the accepted license
+policy. Recheck the complete lockfile before changing this override.

@@ -86,7 +86,7 @@ export function LiveNewApplication({ session, onCreated }: {
             </tr>)}</tbody></table></div>
           <p className="helper">Ready-to-upload loan_application.pdf and pay_statement_novereign_systems.pdf are in synthetic_data/customer_packets/demo_geocoded_loan/. Choose them now or after creation, then upload each PDF on the next page. Application IDs are assigned by the backend; no PDF generation is required. The backend accepts 1 byte to 25 MiB.</p>
         </Card>
-        <div className="form-footer"><span><strong>Deferred processing</strong><small>Next: upload documents and start processing.</small></span>
+        <div className="form-footer"><span><strong>Deferred processing</strong><small>Next: create application and upload documents.</small></span>
           <button className="button button--primary" type="submit">{submitting ? 'Creating application…' : 'Create application →'}</button>
         </div>
       </fieldset>

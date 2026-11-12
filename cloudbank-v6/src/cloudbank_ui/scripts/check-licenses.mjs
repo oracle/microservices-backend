@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const project = fileURLToPath(new URL('..', import.meta.url));
 const lock = JSON.parse(await readFile(join(project, 'package-lock.json'), 'utf8'));
-const allowedDependencies = new Set(['MIT', 'Apache-2.0']);
+const allowedDependencies = new Set(['MIT', 'Apache-2.0', 'MPL-2.0']);
 const localLicense = 'UPL-1.0';
 const localPackages = new Set(['picocolors', 'source-map-js']);
 const rejected = [];
@@ -31,8 +31,8 @@ for (const name of localPackages) {
 }
 
 if (rejected.length) {
-  console.error('Licenze non conformi (dipendenze MIT / Apache-2.0, moduli locali UPL-1.0):\n' + rejected.join('\n'));
+  console.error('Licenze non conformi (dipendenze MIT / Apache-2.0 / MPL-2.0, moduli locali UPL-1.0):\n' + rejected.join('\n'));
   process.exitCode = 1;
 } else {
-  console.log(`${checked} dipendenze MIT o Apache-2.0; due moduli locali UPL-1.0.`);
+  console.log(`${checked} dipendenze MIT, Apache-2.0 o MPL-2.0; due moduli locali UPL-1.0.`);
 }

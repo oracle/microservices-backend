@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { transformWithEsbuild } from 'vite';
+import { transformWithOxc } from 'vite';
 
 async function sourceModule(path) {
   const moduleUrl = new URL(path, import.meta.url);
@@ -13,8 +13,8 @@ async function sourceModule(path) {
     const value = JSON.parse(await readFile(new URL(file, moduleUrl), 'utf8'));
     source = source.replace(statement, `const ${name} = ${JSON.stringify(value)};`);
   }
-  const { code } = await transformWithEsbuild(source, moduleUrl.pathname, {
-    loader: 'ts', target: 'es2022', format: 'esm',
+  const { code } = await transformWithOxc(source, moduleUrl.pathname, {
+    lang: 'ts', target: 'es2022', sourcemap: false,
   });
   return import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
 }
