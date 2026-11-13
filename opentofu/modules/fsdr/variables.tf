@@ -68,11 +68,6 @@ variable "external_databases" {
   default     = {}
 }
 
-variable "namespaces" {
-  description = "Application namespaces protected by OKE backups."
-  type        = list(string)
-}
-
 variable "node_counts" {
   type = object({ cpu = number, gpu = number })
 }

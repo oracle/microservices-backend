@@ -68,10 +68,10 @@ variable "members" {
     })), [])
     backup_config = optional(object({
       backup_schedule                   = optional(string, null)
-      exclude_namespaces                = optional(list(string), [])
+      exclude_namespaces                = optional(list(string), null)
       image_replication_vault_secret_id = optional(string, null)
       max_number_of_backups_retained    = optional(number, null)
-      namespaces                        = optional(list(string), [])
+      namespaces                        = optional(list(string), null)
       replicate_images                  = optional(string, null)
     }), null)
     backup_location = optional(object({
