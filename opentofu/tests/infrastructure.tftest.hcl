@@ -463,8 +463,8 @@ run "full_stack_membership" {
     error_message = "Provider-managed groups must contain the database and OKE members."
   }
   assert {
-    condition     = local.fsdr_clusters["uk-london-1"].cluster_id == "primary-cluster" && local.fsdr_clusters["uk-cardiff-1"].cluster_id == "standby-cluster" && one([for member in module.fsdr["managed"].regions.region_0.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).managed_node_pool_configs[0].maximum == 3 && toset(one(one([for member in module.fsdr["managed"].regions.region_0.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).backup_config).namespaces) == toset(["iactest", "obaas-system"])
-    error_message = "Full-stack preparation must cover both OKE peers, application namespaces, and recovery capacity."
+    condition     = local.fsdr_clusters["uk-london-1"].cluster_id == "primary-cluster" && local.fsdr_clusters["uk-cardiff-1"].cluster_id == "standby-cluster" && one([for member in module.fsdr["managed"].regions.region_0.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).managed_node_pool_configs[0].maximum == 3 && length(one(one([for member in module.fsdr["managed"].regions.region_0.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).backup_config).namespaces) == 0 && length(one(one([for member in module.fsdr["managed"].regions.region_0.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).backup_config).exclude_namespaces) == 0
+    error_message = "Full-stack preparation must cover both OKE peers, all namespaces, and recovery capacity."
   }
   assert {
     condition     = oci_database_autonomous_database.dr_adb_standby["fsdr_region_1"].subnet_id == "standby-private-subnet" && oci_database_autonomous_database.dr_adb_standby["fsdr_region_1"].is_mtls_connection_required

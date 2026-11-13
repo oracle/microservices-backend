@@ -87,7 +87,6 @@ variables {
   region_0                        = "uk-london-1"
   region_1                        = "uk-cardiff-1"
   objectstorage_namespace         = "test-namespace"
-  namespaces                      = ["obaas"]
   destination_availability_domain = "TEST:CWL-AD-1"
   volumes                         = { etcd = { id = "original-volume", availability_domain = "TEST:LHR-AD-1" } }
   node_counts                     = { cpu = 3, gpu = 0 }
@@ -158,6 +157,14 @@ run "bootstrap" {
   assert {
     condition     = length(one([for member in output.regions.region_0.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).load_balancer_mappings) == 1 && length(one([for member in output.regions.region_1.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).load_balancer_mappings) == 0
     error_message = "Only the primary OKE member may configure load-balancer recovery mappings."
+  }
+  assert {
+    condition     = one(one([for member in output.regions.region_0.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).backup_location).bucket == "storagetest-backup-uk-cardiff-1" && one(one([for member in output.regions.region_1.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).backup_location).bucket == "storagetest-backup-uk-london-1"
+    error_message = "Each OKE member must use the peer-region backup bucket."
+  }
+  assert {
+    condition     = length(one(one([for member in output.regions.region_0.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).backup_config).namespaces) == 0 && length(one(one([for member in output.regions.region_0.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).backup_config).exclude_namespaces) == 0
+    error_message = "OKE backups must use OCI's all-namespaces default."
   }
 }
 
@@ -297,6 +304,10 @@ run "switchover" {
   assert {
     condition     = length([for member in output.regions.region_0.dr_protection_group.members : member if member.member_type == "VOLUME_GROUP"]) == 0 && [for member in output.regions.region_1.dr_protection_group.members : member.member_id if member.member_type == "VOLUME_GROUP"] == ["activated-group-1"] && output.storage_recovered
     error_message = "Switchover must preserve the activated groups and native PV ownership."
+  }
+  assert {
+    condition     = one(one([for member in output.regions.region_1.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).backup_location).bucket == "storagetest-backup-uk-london-1" && length(one([for member in output.regions.region_1.dr_protection_group.members : member if member.member_type == "OKE_CLUSTER"]).backup_config) == 1
+    error_message = "The new primary must back up to the new standby region."
   }
 }
 

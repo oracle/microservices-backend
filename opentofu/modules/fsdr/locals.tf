@@ -9,6 +9,10 @@ locals {
     (var.region_0) = oci_objectstorage_bucket.fsdr_backup_primary.name
     (var.region_1) = oci_objectstorage_bucket.fsdr_backup_standby.name
   }
+  peer_regions = {
+    (var.region_0) = var.region_1
+    (var.region_1) = var.region_0
+  }
   group_summaries = { for region, discovery in {
     (var.region_0) = data.oci_disaster_recovery_dr_protection_groups.region_0.dr_protection_group_collection
     (var.region_1) = data.oci_disaster_recovery_dr_protection_groups.region_1.dr_protection_group_collection
@@ -73,9 +77,8 @@ locals {
       member_id       = cluster.cluster_id
       member_type     = "OKE_CLUSTER"
       peer_cluster_id = var.clusters[region == var.region_0 ? var.region_1 : var.region_0].cluster_id
-      backup_location = { bucket = local.backup_buckets[region], namespace = var.objectstorage_namespace }
+      backup_location = { bucket = local.backup_buckets[local.peer_regions[region]], namespace = var.objectstorage_namespace }
       backup_config = local.roles[region] == "PRIMARY" ? {
-        namespaces                     = concat(var.namespaces, ["obaas-system"])
         backup_schedule                = var.backup_schedule
         replicate_images               = "ENABLE"
         max_number_of_backups_retained = var.backup_retention
