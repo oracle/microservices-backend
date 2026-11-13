@@ -22,7 +22,7 @@ resource "oci_identity_policy" "workers_policies" {
   description    = format("%s - K8s Workers", var.label_prefix)
   statements = concat([
     # Workload Principles specific to oracle-database-operator-system Namespace
-    format("allow any-user to manage autonomous-database-family in compartment id %s where all {request.principal.type = 'workload', request.principal.namespace = 'oracle-database-operator-system', request.principal.service_account = 'default', request.principal.cluster_id = '%s'}", coalesce(var.adb_compartment_id, var.compartment_id), oci_containerengine_cluster.default_cluster.id),
+    format("allow any-user to manage autonomous-database-family in compartment id %s where all {request.principal.type = 'workload', request.principal.namespace = 'oracle-database-operator-system', request.principal.service_account = 'oracle-database-operator-controller-manager', request.principal.cluster_id = '%s'}", coalesce(var.adb_compartment_id, var.compartment_id), oci_containerengine_cluster.default_cluster.id),
     # Workload Principles specific to native-ingress-controller-system Namespace
     format("allow any-user to manage load-balancers in compartment id %s where all {request.principal.type = 'workload', request.principal.namespace = 'native-ingress-controller-system', request.principal.service_account = 'oci-native-ingress-controller', request.principal.cluster_id = '%s'}", var.compartment_id, oci_containerengine_cluster.default_cluster.id),
     format("allow any-user to use virtual-network-family in compartment id %s where all {request.principal.type = 'workload', request.principal.namespace = 'native-ingress-controller-system', request.principal.service_account = 'oci-native-ingress-controller', request.principal.cluster_id = '%s'}", var.compartment_id, oci_containerengine_cluster.default_cluster.id),
@@ -50,7 +50,7 @@ resource "oci_identity_policy" "workers_policies" {
     format("allow dynamic-group %s to manage repos in compartment id %s", oci_identity_dynamic_group.workers_dynamic_group.name, var.compartment_id),
     #format("allow dynamic-group %s to manage repos in tenancy", oci_identity_dynamic_group.workers_dynamic_group.name),
     ], [for database_id, compartment_id in var.recovery_external_databases :
-    format("Allow any-user to manage autonomous-databases in compartment id %s where all {target.database.id = '%s', request.principal.type = 'workload', request.principal.namespace = 'oracle-database-operator-system', request.principal.service_account = 'default', request.principal.cluster_id = '%s'}", compartment_id, database_id, oci_containerengine_cluster.default_cluster.id)
+    format("Allow any-user to manage autonomous-databases in compartment id %s where all {target.database.id = '%s', request.principal.type = 'workload', request.principal.namespace = 'oracle-database-operator-system', request.principal.service_account = 'oracle-database-operator-controller-manager', request.principal.cluster_id = '%s'}", compartment_id, database_id, oci_containerengine_cluster.default_cluster.id)
   ])
   provider = oci.home_region
 }
