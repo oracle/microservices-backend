@@ -1,0 +1,64 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "signoz-dashboards.jobName" . }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "20"
+    helm.sh/hook-delete-policy: before-hook-creation
+  labels:
+    app.kubernetes.io/name: signoz-dashboards
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  backoffLimit: {{ .Values.job.backoffLimit }}
+  activeDeadlineSeconds: {{ .Values.job.activeDeadlineSeconds }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: signoz-dashboards
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      automountServiceAccountToken: false
+      restartPolicy: OnFailure
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: signoz-setup
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: [python3, -u, /scripts/import-dashboards.py]
+          env:
+            - name: SIGNOZ_URL
+              value: {{ include "signoz-dashboards.url" . | quote }}
+          resources:
+            {{- toYaml .Values.job.resources | nindent 12 }}
+          volumeMounts:
+            - name: importer
+              mountPath: /scripts
+              readOnly: true
+            - name: dashboards
+              mountPath: /dashboards
+              readOnly: true
+            - name: signoz-authn
+              mountPath: /signoz-authn
+              readOnly: true
+      volumes:
+        - name: importer
+          configMap:
+            name: {{ include "signoz-dashboards.scriptName" . }}
+        - name: dashboards
+          projected:
+            sources:
+              {{- range $path, $_ := .Files.Glob "dashboards/*.json" }}
+              - configMap:
+                  name: {{ include "signoz-dashboards.configMapName" $path }}
+                  items:
+                    - key: dashboard.json
+                      path: {{ base $path | quote }}
+              {{- end }}
+        - name: signoz-authn
+          secret:
+            secretName: {{ required "signoz.auth.existingSecret is required" .Values.signoz.auth.existingSecret }}

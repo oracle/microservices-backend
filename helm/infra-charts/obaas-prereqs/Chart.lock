@@ -1,24 +1,24 @@
 dependencies:
 - name: external-secrets
   repository: https://charts.external-secrets.io
-  version: 2.8.0
+  version: 2.10.0
 - name: metrics-server
   repository: https://kubernetes-sigs.github.io/metrics-server/
-  version: 3.13.1
+  version: 3.14.0
 - name: kube-state-metrics
   repository: https://prometheus-community.github.io/helm-charts
-  version: 6.4.1
+  version: 8.4.2
 - name: strimzi-kafka-operator
   repository: https://strimzi.io/charts/
-  version: 1.1.0
+  version: 1.2.0
 - name: coherence-operator
   repository: https://oracle.github.io/coherence-operator/charts
-  version: 3.5.14
+  version: 3.5.17
 - name: opentelemetry-operator
   repository: https://open-telemetry.github.io/opentelemetry-helm-charts
-  version: 0.119.0
+  version: 0.122.0
 - name: oracle-database-operator
   repository: file://charts/oracle-database-operator
   version: 0.2.0
-digest: sha256:f4c4169af0b6436739e2b11e118697d8f54036d73cdf8c2746a8675f8ffdfa48
-generated: "2026-07-27T10:36:56.176704-05:00"
+digest: sha256:077f81335627b91c562fb4c18872a91b850cdd146895e940d2a2d72b14fa7391
+generated: "2026-09-14T13:42:00.062527-05:00"

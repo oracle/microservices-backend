@@ -14,8 +14,7 @@ If your environment does not meet the prerequisites, the installation may not su
 
 ### Oracle OCI
 
-If you are installing into Oracle OCI you need the right [OCI IAM policies](../oci_policies.md) in place.  Please review and ensure you have the required policies and permissions before installing.
-
+If you are installing into Oracle OCI you need the right [OCI IAM policies](../cloud/oci.mdx#policies) in place.  Please review and ensure you have the required policies and permissions before installing.
 ### Kubernetes Cluster
 
 A CNCF-compliant Kubernetes cluster with the following specifications:
@@ -64,9 +63,20 @@ You must have access to an Oracle Database instance (19c or later). The followin
 
 **Version requirements:**
 
-| Minimum | Recommended |
-|---------|-------------|
-| Oracle Database 19c | Oracle Autonomous Database 26ai ATP |
+<table aria-label="Oracle Database table">
+  <thead>
+    <tr>
+      <th scope="col">Minimum</th>
+      <th scope="col">Recommended</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Oracle Database 19c</th>
+      <td>Oracle Autonomous Database 26ai ATP</td>
+    </tr>
+  </tbody>
+</table>
 
 :::info[AI Features]
 To use OBaaS AI capabilities, you must use Oracle Database 26ai or later. Earlier versions do not support AI features.

@@ -1,0 +1,35 @@
+# =============================================================================
+# Universal Extension: Kafka Metrics for SigNoz
+# =============================================================================
+# This file provides "Opt-in" Kafka observability.
+# It enables the 'kafkametrics' scraper in the SigNoz OpenTelemetry collector.
+#
+# USAGE:
+#   Include this file in your helm upgrade command using '-f':
+#   helm upgrade obaas ./helm/infra-charts/obaas -f extensions/kafka-metrics.yaml ...
+#
+# SCENARIOS:
+#   1. Manual Kafka (Docs): Default works out of the box (basic-kafka-...).
+#   2. Platform Kafka: Change 'brokers' to 'obaas-kafka-cluster-kafka-bootstrap:9092'.
+# =============================================================================
+
+signoz:
+  otelCollector:
+    config:
+      receivers:
+        kafkametrics:
+          brokers:
+            - "kafka-bootstrap:9092"
+          protocol_version: "2.0.0"
+          scrapers:
+            - brokers
+            - topics
+            - consumers
+
+      service:
+        pipelines:
+          metrics:
+            receivers:
+              - otlp
+              - prometheus
+              - kafkametrics

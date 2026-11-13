@@ -1,0 +1,21 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+# Kubernetes manifest, NOT Helm values. Apply in the OBaaS release namespace.
+# One independently managed claim per single-collector release. Change this
+# name and the values overlay's claimName together if needed.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: signoz-collector-queue
+spec:
+  # Requires a CSI driver supporting ReadWriteOncePod. This fences concurrent
+  # pod access, including pods on the same node. Do not substitute ReadWriteMany.
+  accessModes:
+    - ReadWriteOncePod
+  # Uses the default StorageClass. Select a durable CSI class with working
+  # fsGroup permissions and file locking; avoid node-local ephemeral storage.
+  # storageClassName: <queue-storage-class>
+  resources:
+    requests:
+      # Illustrative capacity for all exporter queues plus compaction headroom.
+      storage: 20Gi

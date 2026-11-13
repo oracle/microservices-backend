@@ -24,6 +24,10 @@ OBAAS_RELEASE=""
 DB_NAME=""
 GATEWAY_URL=""
 LOCAL_PORT="9080"
+DISCOVERY_LOCAL_PORT="9081"
+DISCOVERY_TOKEN=""
+DISCOVERY_PORT_FORWARD_PID=""
+TMP_DIR=""
 KEEP_PORT_FORWARD=false
 READ_ONLY=false
 FROM_ACCOUNT_ID=""
@@ -44,6 +48,14 @@ FAILURES=0
 parse_args() {
     while [[ $# -gt 0 ]]; do
         case $1 in
+            -n|--namespace|-o|--obaas-release|-d|--database|--gateway-url|--local-port|--discovery-local-port|--from-account|--to-account)
+                if [[ $# -lt 2 || -z "$2" || "$2" == -* ]]; then
+                    print_error "Option $1 requires a value"
+                    exit 1
+                fi
+                ;;
+        esac
+        case $1 in
             -n|--namespace)
                 NAMESPACE="$2"
                 shift 2
@@ -62,6 +74,10 @@ parse_args() {
                 ;;
             --local-port)
                 LOCAL_PORT="$2"
+                shift 2
+                ;;
+            --discovery-local-port)
+                DISCOVERY_LOCAL_PORT="$2"
                 shift 2
                 ;;
             --from-account)
@@ -108,16 +124,26 @@ Options:
   -d, --database DBNAME          OBaaS database name/prefix for azn-server auth secret
   --gateway-url URL              Existing APISIX gateway URL, for example http://example.com
   --local-port PORT              Local port for APISIX port-forward (default: 9080)
+  --discovery-local-port PORT    Local account discovery port (default: 9081)
   --from-account ACCOUNT_ID      Source account for transfer test
   --to-account ACCOUNT_ID        Destination account for deposit/transfer tests
   --read-only                    Skip mutating deposit and transfer tests
   --keep-port-forward            Leave the temporary port-forward running
   -h, --help                     Show this help message
 
-Examples:
-  ./6-smoke_test_secure_services.sh -n obaas-dev -o obaas -d obaas
-  ./6-smoke_test_secure_services.sh -n obaas-dev -d obaas --read-only
-  ./6-smoke_test_secure_services.sh -n obaas-dev -d obaas --gateway-url http://localhost:9080
+Examples (replace placeholders with your configuration):
+  ./6-smoke_test_secure_services.sh -n <namespace> -o <obaas-release> -d <dbname>
+  ./6-smoke_test_secure_services.sh -n <namespace> -d <dbname> --read-only
+  ./6-smoke_test_secure_services.sh -n <namespace> -d <dbname> --gateway-url <gateway-url>
+  ./6-smoke_test_secure_services.sh -n <namespace> -d <dbname> --discovery-local-port <local-port>
+  ./6-smoke_test_secure_services.sh -n <namespace> -d <dbname> --from-account <source-account-id> --to-account <destination-account-id>
+
+Automatic discovery reads service-client-secret from <dbname>-azn-server-auth
+and uses cloudbank.internal through a temporary direct account-service
+port-forward. No user password is required. Discovery needs two accounts,
+including one with a balance greater than 1. Supplying both account IDs bypasses
+discovery; IDs must be positive, distinct integers belonging to existing accounts.
+The full test publishes a test deposit. Use --read-only to skip workflow checks.
 EOF
 }
 
@@ -150,6 +176,13 @@ prompt_value() {
 }
 
 cleanup() {
+    if [[ -n "$DISCOVERY_PORT_FORWARD_PID" ]]; then
+        kill "$DISCOVERY_PORT_FORWARD_PID" 2>/dev/null || true
+        wait "$DISCOVERY_PORT_FORWARD_PID" 2>/dev/null || true
+    fi
+    if [[ -n "$TMP_DIR" && -d "$TMP_DIR" ]]; then
+        rm -rf -- "$TMP_DIR"
+    fi
     if [[ -n "$PORT_FORWARD_PID" && "$KEEP_PORT_FORWARD" != true ]]; then
         print_step "Stopping APISIX gateway port-forward..."
         kill "$PORT_FORWARD_PID" 2>/dev/null || true
@@ -161,6 +194,8 @@ cleanup() {
 }
 
 trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 check_prerequisites() {
     print_step "Checking prerequisites..."
@@ -245,7 +280,7 @@ get_token() {
         -d "scope=${scope}" | jq -r '.access_token // empty')
 
     if [[ -z "$token" ]]; then
-        print_error "Could not get token for scope: $scope"
+        print_error "Could not get token for scope: $scope" >&2
         return 1
     fi
 
@@ -258,6 +293,43 @@ get_tokens() {
     TEST_TOKEN=$(get_token "cloudbank.test" "$TEST_CLIENT_ID" "$TEST_CLIENT_SECRET")
     TRANSFER_TOKEN=$(get_token "cloudbank.transfer")
     print_success "Scoped OAuth tokens issued"
+}
+
+# Service credentials are used only to discover IDs directly from account.
+start_account_discovery() {
+    local auth_secret_name="${DB_NAME}-azn-server-auth"
+    local service_secret attempt
+    local discovery_base="http://127.0.0.1:${DISCOVERY_LOCAL_PORT}"
+
+    print_step "Reading service-client credentials for automatic account discovery..."
+    service_secret=$(kubectl get secret "$auth_secret_name" -n "$NAMESPACE" \
+        -o jsonpath='{.data.service-client-secret}' 2>/dev/null | base64 -d)
+    if [[ -z "$service_secret" ]]; then
+        print_error "Could not read service-client-secret from $auth_secret_name; provide both account IDs to bypass discovery"
+        return 1
+    fi
+    if ! DISCOVERY_TOKEN=$(get_token "cloudbank.internal" "cloudbank-service-client" "$service_secret"); then
+        return 1
+    fi
+
+    print_step "Starting account-service port-forward for discovery on localhost:$DISCOVERY_LOCAL_PORT..."
+    kubectl port-forward -n "$NAMESPACE" svc/account "${DISCOVERY_LOCAL_PORT}:8080" \
+        >"$TMP_DIR/discovery-port-forward.log" 2>&1 &
+    DISCOVERY_PORT_FORWARD_PID=$!
+    for ((attempt=0; attempt<60; attempt++)); do
+        if ! kill -0 "$DISCOVERY_PORT_FORWARD_PID" 2>/dev/null; then
+            print_error "Account discovery port-forward exited; check svc/account and local port $DISCOVERY_LOCAL_PORT"
+            return 1
+        fi
+        if grep -Fq "Forwarding from 127.0.0.1:${DISCOVERY_LOCAL_PORT} ->" "$TMP_DIR/discovery-port-forward.log" && \
+            curl --noproxy '*' -fsS --max-time 2 "$discovery_base/actuator/health" >/dev/null 2>&1 && \
+            kill -0 "$DISCOVERY_PORT_FORWARD_PID" 2>/dev/null; then
+            return 0
+        fi
+        sleep 1
+    done
+    print_error "Account discovery port-forward did not become ready"
+    return 1
 }
 
 # =============================================================================
@@ -288,30 +360,62 @@ discover_account_ids() {
         return 0
     fi
 
+    if ! start_account_discovery; then
+        print_error "Account discovery failed: service authentication or port-forward unavailable"
+        ((++FAILURES))
+        return 1
+    fi
     print_step "Discovering valid account IDs..."
     local status_code
-    status_code=$(request_status /tmp/cloudbank-smoke-accounts.json \
-        -H "Authorization: Bearer ${READ_TOKEN}" \
-        "${GATEWAY_URL}/api/v1/accounts")
-    record_result "Account list with read token" "200" "$status_code"
+    local accounts_file="$TMP_DIR/accounts.json"
+    status_code=$(request_status "$accounts_file" \
+        -H "Authorization: Bearer ${DISCOVERY_TOKEN}" \
+        "http://127.0.0.1:${DISCOVERY_LOCAL_PORT}/api/v1/accounts") || status_code="000"
+    record_result "Direct account list with internal token" "200" "$status_code"
 
     if [[ "$status_code" != "200" ]]; then
         return 1
     fi
 
+    if ! jq -e 'type == "array" and all(.[];
+        (.accountId | type == "number" and . > 0 and . == floor) and
+        (.accountBalance | type == "number"))' "$accounts_file" >/dev/null 2>&1; then
+        print_error "Account discovery failed: expected an array of accounts with numeric IDs and balances"
+        ((++FAILURES))
+        return 1
+    fi
+    if [[ $(jq 'length' "$accounts_file") -lt 2 ]]; then
+        print_error "Account discovery needs at least two existing accounts; verify account data"
+        ((++FAILURES))
+        return 1
+    fi
+    if [[ -n "$FROM_ACCOUNT_ID" ]] && ! jq -e --argjson id "$FROM_ACCOUNT_ID" \
+        'any(.[]; .accountId == $id and .accountBalance > 1)' "$accounts_file" >/dev/null; then
+        print_error "Source account $FROM_ACCOUNT_ID is not available in the account service or its balance is not greater than 1"
+        ((++FAILURES))
+        return 1
+    fi
+    if [[ -n "$TO_ACCOUNT_ID" ]] && ! jq -e --argjson id "$TO_ACCOUNT_ID" \
+        'any(.[]; .accountId == $id)' "$accounts_file" >/dev/null; then
+        print_error "Destination account $TO_ACCOUNT_ID is not available in the account service"
+        ((++FAILURES))
+        return 1
+    fi
+
     if [[ -z "$FROM_ACCOUNT_ID" ]]; then
-        FROM_ACCOUNT_ID=$(jq -r '[.[] | select((.accountBalance // 0) > 1) | .accountId][0] // empty' \
-            /tmp/cloudbank-smoke-accounts.json)
+        FROM_ACCOUNT_ID=$(jq -r --argjson to "${TO_ACCOUNT_ID:-0}" \
+            '[.[] | select(.accountBalance > 1 and .accountId != $to) | .accountId][0] // empty' \
+            "$accounts_file")
     fi
 
     if [[ -z "$TO_ACCOUNT_ID" ]]; then
         TO_ACCOUNT_ID=$(jq -r --argjson from "${FROM_ACCOUNT_ID:-0}" \
             '[.[] | select(.accountId != $from) | .accountId][0] // empty' \
-            /tmp/cloudbank-smoke-accounts.json)
+            "$accounts_file")
     fi
 
     if [[ -z "$FROM_ACCOUNT_ID" || -z "$TO_ACCOUNT_ID" ]]; then
-        print_error "Could not discover two valid account IDs"
+        print_error "Could not discover two distinct accounts, including a source with balance greater than 1"
         ((++FAILURES))
         return 1
     fi
@@ -324,16 +428,16 @@ run_smoke_tests() {
 
     local status_code
 
-    status_code=$(request_status /tmp/cloudbank-smoke-metadata.json \
+    status_code=$(request_status "$TMP_DIR/metadata.json" \
         "${GATEWAY_URL}/.well-known/oauth-authorization-server")
     record_result "Authorization metadata without token" "200" "$status_code"
 
-    status_code=$(request_status /tmp/cloudbank-smoke-jwks.json \
+    status_code=$(request_status "$TMP_DIR/jwks.json" \
         "${GATEWAY_URL}/oauth2/jwks")
     record_result "Authorization JWK set without token" "200" "$status_code"
     if [[ "$status_code" == "200" ]]; then
         local signing_key_id
-        signing_key_id=$(jq -r '.keys[0].kid // empty' /tmp/cloudbank-smoke-jwks.json)
+        signing_key_id=$(jq -r '.keys[0].kid // empty' "$TMP_DIR/jwks.json")
         if [[ -n "$signing_key_id" ]]; then
             print_success "Authorization JWK set exposes a signing key id"
         else
@@ -342,20 +446,20 @@ run_smoke_tests() {
         fi
     fi
 
-    status_code=$(request_status /tmp/cloudbank-smoke-creditscore-anon.json \
+    status_code=$(request_status "$TMP_DIR/creditscore-anon.json" \
         "${GATEWAY_URL}/api/v1/creditscore")
     record_result "Creditscore without token" "401" "$status_code"
 
-    status_code=$(request_status /tmp/cloudbank-smoke-creditscore-read.json \
+    status_code=$(request_status "$TMP_DIR/creditscore-read.json" \
         -H "Authorization: Bearer ${READ_TOKEN}" \
         "${GATEWAY_URL}/api/v1/creditscore")
     record_result "Creditscore with read token" "200" "$status_code"
 
-    status_code=$(request_status /tmp/cloudbank-smoke-user-api.json \
+    status_code=$(request_status "$TMP_DIR/user-api.json" \
         "${GATEWAY_URL}/user/api/v1/ping")
     record_result "Azn-server user API not externally routed" "404" "$status_code"
 
-    status_code=$(request_status /tmp/cloudbank-smoke-internal-journal.json \
+    status_code=$(request_status "$TMP_DIR/internal-journal.json" \
         -X POST \
         -H "Authorization: Bearer ${READ_TOKEN}" \
         -H "Content-Type: application/json" \
@@ -363,14 +467,22 @@ run_smoke_tests() {
         "${GATEWAY_URL}/api/v1/account/journal")
     record_result "Internal account journal route with read token" "403" "$status_code"
 
-    discover_account_ids || true
+    status_code=$(request_status "$TMP_DIR/accounts-public.json" \
+        -H "Authorization: Bearer ${READ_TOKEN}" \
+        "${GATEWAY_URL}/api/v1/accounts") || status_code="000"
+    record_result "Public account list with read token" "200" "$status_code"
+
+    if ! discover_account_ids; then
+        print_warning "Skipping deposit and transfer checks: valid account IDs unavailable"
+        return 0
+    fi
 
     if [[ "$READ_ONLY" == true ]]; then
         print_warning "Read-only mode: skipping deposit and transfer workflow tests"
         return 0
     fi
 
-    status_code=$(request_status /tmp/cloudbank-smoke-deposit-read.json \
+    status_code=$(request_status "$TMP_DIR/deposit-read.json" \
         -X POST \
         -H "Authorization: Bearer ${READ_TOKEN}" \
         -H "Content-Type: application/json" \
@@ -378,7 +490,7 @@ run_smoke_tests() {
         "${GATEWAY_URL}/api/v1/testrunner/deposit")
     record_result "Testrunner deposit with read token" "403" "$status_code"
 
-    status_code=$(request_status /tmp/cloudbank-smoke-deposit-test.json \
+    status_code=$(request_status "$TMP_DIR/deposit-test.json" \
         -X POST \
         -H "Authorization: Bearer ${TEST_TOKEN}" \
         -H "Content-Type: application/json" \
@@ -386,7 +498,7 @@ run_smoke_tests() {
         "${GATEWAY_URL}/api/v1/testrunner/deposit")
     record_result "Testrunner deposit with test token" "201" "$status_code"
 
-    status_code=$(request_status /tmp/cloudbank-smoke-transfer.json \
+    status_code=$(request_status "$TMP_DIR/transfer.json" \
         -X POST \
         -H "Authorization: Bearer ${TRANSFER_TOKEN}" \
         "${GATEWAY_URL}/transfer?fromAccount=${FROM_ACCOUNT_ID}&toAccount=${TO_ACCOUNT_ID}&amount=1")
@@ -400,6 +512,30 @@ main() {
     print_header "CloudBank v5 Secure Services Smoke Test"
 
     parse_args "$@"
+
+    local account_id
+    for account_id in "$FROM_ACCOUNT_ID" "$TO_ACCOUNT_ID"; do
+        if [[ -n "$account_id" && ! "$account_id" =~ ^[1-9][0-9]*$ ]]; then
+            print_error "Account IDs must be positive integers"
+            exit 1
+        fi
+    done
+    if [[ -n "$FROM_ACCOUNT_ID" && "$FROM_ACCOUNT_ID" == "$TO_ACCOUNT_ID" ]]; then
+        print_error "Source and destination account IDs must be distinct"
+        exit 1
+    fi
+    if [[ -z "$FROM_ACCOUNT_ID" || -z "$TO_ACCOUNT_ID" ]]; then
+        if [[ ! "$DISCOVERY_LOCAL_PORT" =~ ^[1-9][0-9]{0,4}$ ]] || \
+            ((DISCOVERY_LOCAL_PORT > 65535)); then
+            print_error "Account discovery local port must be between 1 and 65535"
+            exit 1
+        fi
+        if [[ -z "$GATEWAY_URL" && "$DISCOVERY_LOCAL_PORT" == "$LOCAL_PORT" ]]; then
+            print_error "Gateway and account discovery local ports must be different"
+            exit 1
+        fi
+    fi
+    TMP_DIR=$(umask 077; mktemp -d "${TMPDIR:-/tmp}/cloudbank-smoke.XXXXXX")
 
     if [[ -z "$NAMESPACE" || -z "$DB_NAME" ]]; then
         echo "Please provide the following configuration values."

@@ -19,6 +19,8 @@ Use these local sources for CloudBank v5 deployment and testing truth:
 - `cloudbank-v5/5-apisix_create_routes.sh`
 - `cloudbank-v5/6-smoke_test_secure_services.sh`
 - `cloudbank-v5/7-test_all_services.sh`
+- `cloudbank-v5/8-smoke_test_microtx_jwt.sh`
+- `cloudbank-v5/tests/test_secure_services_smoke.py` for mocked smoke-test regression coverage.
 - `cloudbank-v5/*/values.yaml`
 - `helm/app-charts/obaas-sample-app`
 - `docs-source/site/docs/setup/helm`
@@ -313,11 +315,46 @@ Expected smoke-test coverage:
 - protected creditscore API returns `200` with a read token
 - `/user/api/v1*` is not externally routed
 - internal account journal route is blocked through APISIX
+- the public account list returns `200` with a read token; ownership filtering may return an empty list
 - account IDs can be discovered
 - testrunner deposit rejects a read token
 - testrunner deposit accepts a test token, unless `--read-only` is used
 - the transfer route rejects a non-owner client-credentials token with `403`, unless `--read-only` is used
 - successful owner-scoped transfer workflow validation is performed by `7-test_all_services.sh`
+
+Automatic account discovery reads `service-client-secret` from `<dbname>-azn-server-auth`, requests a `cloudbank.internal` token for `cloudbank-service-client`, and lists accounts through a temporary direct `svc/account` port-forward. The internal token is used only for direct lookup; the public APISIX account-list check uses the read token. No user password is required for discovery.
+
+Discovery requires at least two accounts, including a source with a balance greater than 1. Its local port defaults to `9081`; use `--discovery-local-port <local-port>` to change it. When the script also creates a gateway port-forward, the two local ports must differ. Read-only runs still perform discovery unless both account IDs are supplied.
+
+Supply both `--from-account <source-account-id>` and `--to-account <destination-account-id>` to bypass discovery. IDs must be positive, distinct integers belonging to existing accounts; this bypass does not verify account existence or balance during discovery. When only one ID is supplied, discovery validates that it exists, and a supplied source must have a balance greater than 1. Discovery failures count as test failures and skip deposit and transfer requests. The default test publishes a deposit; use `--read-only` to skip workflow checks. Discovery port-forwards and private temporary files are always removed on exit; `--keep-port-forward` preserves only the gateway port-forward.
+
+### MicroTx Workflow API JWT Check
+
+When the workflow server is enabled and configured to validate azn-server JWTs, run:
+
+```bash
+cd cloudbank-v5
+./8-smoke_test_microtx_jwt.sh -n <namespace> --secret-name <dbname>-azn-server-auth
+```
+
+This check requires `kubectl`, `curl`, `jq`, `base64`, and `awk`, healthy `svc/azn-server` and `svc/obaas-otmm-workflow-server`, and an existing OAuth secret containing `microtx-client-secret`. The service names and client ID `microtx-workflow-client` are fixed in the script. If `--secret-name` is omitted, the secret defaults to `obaas-azn-server-auth`. Configure workflow-server security through the platform owner before this check: `otmm.commonConfiguration.security.enabled` defaults to `false`, and the identity-provider settings must match the azn-server issuer, JWKS, audience, scopes, and role policy. This script does not configure the platform or create secrets.
+
+Temporary port-forwards default to `18080` for azn-server and `19010` for the workflow server; override them with `--azn-port` and `--workflow-port`. The script requests the `microtx.workflow` scope and expects `/workflow-server/api/metadata/workflow` to return `401` without a JWT and `200` with the azn-server JWT. Preserve the script output and exit status. It prints selected claims and signing-key IDs without printing client secrets or bearer tokens, and removes private response files and both port-forwards on exit. Failures identify the stage; startup failures include port-forward logs.
+
+Successful JWKS access-log entries show that JWKS requests succeeded. They do not conclusively identify a workflow-server callback because the script also requests JWKS directly. Correlate workflow-server logs or request-source evidence when callback attribution is required. If the workflow server is disabled or azn-server JWT integration is outside the selected configuration, record this check as `Not Applicable` with values evidence. If integration is required but not ready, mark the check `Blocked` and identify the failed prerequisite.
+
+### Mocked Smoke Regression Coverage
+
+For changes to the secured smoke script, run the existing regression suite:
+
+```bash
+cd cloudbank-v5
+python3 tests/test_secure_services_smoke.py -v
+```
+
+It requires Python's standard library, Bash, and `jq`; it runs the shell script with mocked `curl` and `kubectl` and needs no cluster or network. Coverage includes internal-token isolation, discovery failures, explicit and partial IDs, invalid arguments, read-only behavior, private temporary files, credential concealment, and port-forward cleanup. Live authorization, database, and deposit behavior still require cluster verification.
+
+### Full All-Services Validation
 
 Run the full all-services test after the smoke test. This is the authoritative end-to-end CloudBank validation:
 
@@ -687,7 +724,7 @@ spec:
   restartPolicy: Never
   containers:
   - name: cloudbank-db-cleanup
-    image: container-registry.oracle.com/database/sqlcl:26.2.0
+    image: container-registry.oracle.com/database/sqlcl:26.2.1
     command: ["/bin/sh", "-c"]
     args:
     - |

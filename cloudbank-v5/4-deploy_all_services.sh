@@ -497,11 +497,11 @@ deploy_service() {
     fi
     print_success "Image verified"
 
-    print_info "Running: $helm_command --wait --timeout 5m"
+    print_info "Running: $helm_command"
 
     # Suppress NOTES.txt output unless this is the last service
     if [[ "$is_last_service" == true ]]; then
-        if $helm_command --wait --timeout 5m; then
+        if $helm_command; then
             print_success "$service_name deployed successfully"
             return 0
         else
@@ -511,7 +511,7 @@ deploy_service() {
             return 1
         fi
     else
-        if $helm_command --wait --timeout 5m > /dev/null; then
+        if $helm_command > /dev/null; then
             print_success "$service_name deployed successfully"
             return 0
         else

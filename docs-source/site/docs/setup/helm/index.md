@@ -9,12 +9,37 @@ This guide outlines the steps to deploy Oracle Backend for Microservices and AI 
 
 ### Installation Steps
 
-| Step | Description | Details |
-|------|-------------|---------|
-| 1 | **Verify prerequisites** | Confirm your Kubernetes cluster, database, and tooling meet the requirements. |
-| 2 | **Install prerequisites chart** | Install the cluster-scoped operators and CRDs (once per cluster). |
-| 3 | **Install OBaaS chart** | Install the OBaaS application chart into one or more namespaces. |
-| 4 | **Verify installation** | Confirm all pods are running and services are accessible. |
+<table aria-label="OBaaS Helm installation steps">
+  <thead>
+    <tr>
+      <th scope="col">Step</th>
+      <th scope="col">Description</th>
+      <th scope="col">Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td><strong>Verify prerequisites</strong></td>
+      <td>Confirm your Kubernetes cluster, database, and tooling meet the requirements.</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td><strong>Install prerequisites chart</strong></td>
+      <td>Install the cluster-scoped operators and CRDs (once per cluster).</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td><strong>Install OBaaS chart</strong></td>
+      <td>Install the OBaaS application chart into one or more namespaces.</td>
+    </tr>
+    <tr>
+      <th scope="row">4</th>
+      <td><strong>Verify installation</strong></td>
+      <td>Confirm all pods are running and services are accessible.</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Detailed Guides
 

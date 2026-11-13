@@ -25,6 +25,7 @@ For comprehensive testing procedures, see **[cloudbank-test-doc.md](cloudbank-te
 This guide covers:
 - Getting OAuth2 access tokens from `azn-server`
 - Running the automated secured smoke test with `6-smoke_test_secure_services.sh`
+- Checking MicroTx Workflow API JWT authentication with `8-smoke_test_microtx_jwt.sh`
 - Testing individual microservices with bearer tokens (account, customer, creditscore etc.)
 - Check deposit and clearance workflow
 - LRA distributed transaction testing (transfer service)

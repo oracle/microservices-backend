@@ -1,0 +1,205 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+#
+# Draft SigNoz medium profile: Custom single-shard deployment; larger vertical allocations.
+# Starting allocations only: no certified ingestion rate or loss guarantee.
+# Fresh installations only. Review migration/recovery before applying to an
+# existing release; never use a profile to implicitly change stored-data topology.
+# Layer ONE profile after environment values. See
+# https://oracle.github.io/microservices-backend/obaas/docs/observability/signoz-profiles for usage, PostgreSQL
+# credentials, storage planning, and validation boundaries.
+
+signoz:
+  enabled: true
+  signoz:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: "500m"
+        memory: 1Gi
+      limits:
+        cpu: "2"
+        memory: 2Gi
+    persistence:
+      enabled: true
+      size: 10Gi
+  clickhouse:
+    layout:
+      shardsCount: 1
+      replicasCount: 1
+    # Resources and PVC capacity are per ClickHouse instance. Storage sizes
+    # are illustrative; choose StorageClasses and capacities in a final overlay.
+    resources:
+      requests:
+        cpu: "4"
+        memory: 16Gi
+      limits:
+        cpu: "8"
+        memory: 32Gi
+    persistence:
+      enabled: true
+      size: 500Gi
+    zookeeper:
+      replicaCount: 1
+      # MiB; leave room for JVM native memory and filesystem cache.
+      heapSize: 1024
+      resources:
+        requests:
+          cpu: "250m"
+          memory: 2Gi
+        limits:
+          cpu: "1"
+          memory: 4Gi
+      persistence:
+        enabled: true
+        size: 20Gi
+    clickhouseOperator:
+      resources:
+        requests:
+          cpu: "100m"
+          memory: 256Mi
+        limits:
+          cpu: "500m"
+          memory: 512Mi
+      metricsExporter:
+        resources:
+          requests:
+            cpu: "100m"
+            memory: 128Mi
+          limits:
+            cpu: "500m"
+            memory: 256Mi
+      # These TTLs cover diagnostic history, not application telemetry.
+      zookeeperLog:
+        ttl: 3
+      queryLog:
+        ttl: 7
+      partLog:
+        ttl: 7
+      traceLog:
+        ttl: 3
+      asynchronousInsertLog:
+        ttl: 3
+      asynchronousMetricLog:
+        ttl: 3
+      metricLog:
+        ttl: 3
+      queryThreadLog:
+        ttl: 3
+      queryViewsLog:
+        ttl: 3
+      processorsProfileLog:
+        ttl: 3
+      sessionLog:
+        ttl: 7
+      blobStorageLog:
+        ttl: 3
+      backupLog:
+        ttl: 3
+      crashLog:
+        ttl: 7
+  telemetryStoreMigrator:
+    # Keep the bundled chart's replication behavior; this is its current value
+    # name, rather than schemaMigrator from older upstream examples.
+    enableReplication: true
+    resources:
+      requests:
+        cpu: "250m"
+        memory: 512Mi
+      limits:
+        cpu: "2"
+        memory: 2Gi
+  otelCollector:
+    replicaCount: 1
+    autoscaling:
+      enabled: false
+    resources:
+      requests:
+        cpu: "1"
+        memory: 2Gi
+      limits:
+        cpu: "2"
+        memory: 4Gi
+    additionalEnvs:
+      GOMEMLIMIT: 2400MiB
+    config:
+      processors:
+        memory_limiter:
+          check_interval: 1s
+          limit_mib: 3072
+          spike_limit_mib: 512
+        batch:
+          send_batch_size: 2048
+          send_batch_max_size: 4096
+          timeout: 1s
+        batch/meter:
+          send_batch_size: 2048
+          send_batch_max_size: 4096
+          timeout: 1s
+      # Preserve inherited receivers/exporters and add the limiter first.
+      # Queues/retries remain inherited and are NOT persistent storage.
+      service:
+        pipelines:
+          traces:
+            processors: [memory_limiter, signozspanmetrics/delta, batch]
+          metrics:
+            processors: [memory_limiter, batch]
+          logs:
+            processors: [memory_limiter, batch]
+          metrics/meter:
+            processors: [memory_limiter, batch/meter]
+
+k8s-infra:
+  # Presets prepend metadata enrichment ahead of memory_limiter. Preserve those
+  # processors; see the profile guide for ordering and custom-pipeline caveats.
+  otelAgent:
+    additionalEnvs:
+      GOMEMLIMIT: 600MiB
+    config:
+      processors:
+        memory_limiter:
+          check_interval: 1s
+          limit_mib: 768
+          spike_limit_mib: 128
+      service:
+        pipelines:
+          traces:
+            processors: [memory_limiter, batch]
+          metrics:
+            processors: [memory_limiter, batch]
+          logs:
+            processors: [memory_limiter, batch]
+    # Per scheduled worker node, in addition to the central components above.
+    resources:
+      requests:
+        cpu: "250m"
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+  otelDeployment:
+    additionalEnvs:
+      GOMEMLIMIT: 1200MiB
+    config:
+      processors:
+        memory_limiter:
+          check_interval: 1s
+          limit_mib: 1536
+          spike_limit_mib: 256
+      service:
+        pipelines:
+          metrics/internal:
+            processors: [memory_limiter, batch]
+          metrics/scraper:
+            processors: [memory_limiter, batch]
+          logs:
+            processors: [memory_limiter, batch]
+    replicaCount: 1
+    # Singleton cluster-wide collection; do not scale pull receivers blindly.
+    resources:
+      requests:
+        cpu: "500m"
+        memory: 1Gi
+      limits:
+        cpu: "2"
+        memory: 2Gi

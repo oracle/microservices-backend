@@ -57,25 +57,25 @@ kubectl apply -f your-sqlcl-pod.yaml -n obaas
 
 Check the pod output to confirm it was successful, using a command like this:
 
+The example output below was captured with the SQLcl `26.2.2` container image against an Oracle Database Free test schema; your database version, user, and timestamps will differ.
+
 ```bash
 kubectl -n obaas logs sqlcl
 
-SQLcl: Release 25.4 Production on Mon Mar 23 16:51:50 2026
+SQLcl: Release 26.2 Production on Mon Sep 28 20:11:05 2026
 
 Copyright (c) 1982, 2026, Oracle.  All rights reserved.
 
-Connected to:
-Oracle AI Database 26ai Free Release 23.26.1.0.0 - Develop, Learn, and Run for Free
-Version 23.26.1.0.0
+Connected.
 
 
-   ID APPLICATION    PROFILE    LABEL     PROP_KEY        VALUE     CREATED_ON                         CREATED_BY    UPDATED_ON    UPDATED_BY
-_____ ______________ __________ _________ _______________ _________ __________________________________ _____________ _____________ _____________
-    1 billing        default    latest    apikey          abc123    23-MAR-26 04.49.53.000000000 PM    OBAAS_USER
-    2 billing        default    latest    subscription    xyz456    23-MAR-26 04.49.53.000000000 PM    OBAAS_USER
+   ID APPLICATION    PROFILE    LABEL     PROP_KEY        VALUE     CREATED_ON                         CREATED_BY        UPDATED_ON    UPDATED_BY
+_____ ______________ __________ _________ _______________ _________ __________________________________ _________________ _____________ _____________
+    1 billing        default    latest    apikey          abc123    28-SEP-26 08.10.32.118082000 PM    SQLCL_DOC_TEST
+    2 billing        default    latest    subscription    xyz456    28-SEP-26 08.10.32.118082000 PM    SQLCL_DOC_TEST
 
-Disconnected from Oracle AI Database 26ai Free Release 23.26.1.0.0 - Develop, Learn, and Run for Free
-Version 23.26.1.0.0
+Disconnected from Oracle AI Database 26ai Free Release 23.26.3.0.0 - Develop, Learn, and Run for Free
+Version 23.26.3.0.0
 ```
 
 Remember to remove your pod when you are finished, using a command like this:

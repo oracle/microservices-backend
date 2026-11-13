@@ -45,11 +45,32 @@ unset ORDS_RUNTIME_PASSWORD
 
 Use the connection settings that match the OBaaS database type.
 
-| OBaaS database type | ORDS connection type | Required connection details |
-| --- | --- | --- |
-| `ADB-S` | `tns` | ADB wallet Secret and TNS alias |
-| `SIDB-FREE` | `basic` | In-cluster database service, port `1521`, service `FREEPDB1` |
-| `OTHER` | `basic` or `customurl` | External host, port, service name, or JDBC URL |
+<table aria-label="Database connection settings table">
+  <thead>
+    <tr>
+      <th scope="col">OBaaS database type</th>
+      <th scope="col">ORDS connection type</th>
+      <th scope="col">Required connection details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><code>ADB-S</code></th>
+      <td><code>tns</code></td>
+      <td>ADB wallet Secret and TNS alias</td>
+    </tr>
+    <tr>
+      <th scope="row"><code>SIDB-FREE</code></th>
+      <td><code>basic</code></td>
+      <td>In-cluster database service, port <code>1521</code>, service <code>FREEPDB1</code></td>
+    </tr>
+    <tr>
+      <th scope="row"><code>OTHER</code></th>
+      <td><code>basic</code> or <code>customurl</code></td>
+      <td>External host, port, service name, or JDBC URL</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Create the ORDS resource
 
@@ -165,12 +186,32 @@ If your APISIX gateway is exposed outside the cluster, this route can make ORDS 
 
 The examples below use these service name patterns:
 
-| Service | Name |
-| --- | --- |
-| APISIX admin API | `<app-release>-apisix-admin` |
-| APISIX gateway | `<app-release>-apisix-gateway` |
-| ORDS | `<ords-resource-name>` |
-| SigNoz OpenTelemetry collector alias | `signoz-otel-collector` |
+<table aria-label="Optional: Route ORDS through APISIX table">
+  <thead>
+    <tr>
+      <th scope="col">Service</th>
+      <th scope="col">Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">APISIX admin API</th>
+      <td><code>&lt;app-release&gt;-apisix-admin</code></td>
+    </tr>
+    <tr>
+      <th scope="row">APISIX gateway</th>
+      <td><code>&lt;app-release&gt;-apisix-gateway</code></td>
+    </tr>
+    <tr>
+      <th scope="row">ORDS</th>
+      <td><code>&lt;ords-resource-name&gt;</code></td>
+    </tr>
+    <tr>
+      <th scope="row">SigNoz OpenTelemetry collector alias</th>
+      <td><code>signoz-otel-collector</code></td>
+    </tr>
+  </tbody>
+</table>
 
 Confirm the services exist:
 
