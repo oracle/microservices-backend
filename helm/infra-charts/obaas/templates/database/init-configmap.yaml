@@ -150,5 +150,5 @@ data:
       STARTUP FORCE;
       ALTER SYSTEM REGISTER;
     {{- end }}
-      EOF
+    EOF
 {{- end }}

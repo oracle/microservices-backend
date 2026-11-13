@@ -67,6 +67,30 @@ locals {
     )
   }
 
+  db_data_guard_status = var.byo_db_type == "" ? {
+    local_enabled  = oci_database_autonomous_database.default_adb["managed"].is_local_data_guard_enabled
+    remote_enabled = oci_database_autonomous_database.default_adb["managed"].is_remote_data_guard_enabled
+    peer_ids       = oci_database_autonomous_database.default_adb["managed"].peer_db_ids
+    } : var.byo_db_type == "ADB-S" ? {
+    local_enabled  = data.oci_database_autonomous_database.byo_adb["byo"].is_local_data_guard_enabled
+    remote_enabled = data.oci_database_autonomous_database.byo_adb["byo"].is_remote_data_guard_enabled
+    peer_ids       = data.oci_database_autonomous_database.byo_adb["byo"].peer_db_ids
+    } : {
+    local_enabled  = null
+    remote_enabled = null
+    peer_ids       = null
+  }
+
+  db_has_no_data_guard = (
+    local.db_data_guard_status.local_enabled == false &&
+    local.db_data_guard_status.remote_enabled == false &&
+    (
+      local.db_data_guard_status.peer_ids == null
+      ? false
+      : length(local.db_data_guard_status.peer_ids) == 0
+    )
+  )
+
   adb_whitelist_cidrs = (
     var.adb_networking == "PRIVATE_ENDPOINT_ACCESS" ? null :
     concat(

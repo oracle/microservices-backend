@@ -51,7 +51,7 @@ resource "oci_identity_policy" "workers_policies" {
     format("allow dynamic-group %s to manage repos in compartment id %s", oci_identity_dynamic_group.workers_dynamic_group.name, var.compartment_id),
     #format("allow dynamic-group %s to manage repos in tenancy", oci_identity_dynamic_group.workers_dynamic_group.name),
     ], [for database_id, compartment_id in var.recovery_external_databases :
-    format("Allow any-user to manage autonomous-databases in compartment id %s where all {target.database.id = '%s', request.principal.type = 'workload', request.principal.namespace = 'oracle-database-operator-system', request.principal.service_account = 'default', request.principal.cluster_id = '%s'}", compartment_id, database_id, oci_containerengine_cluster.default_cluster.id)
+    format("Allow any-user to manage autonomous-databases in compartment id %s where all {target.database.id = '%s', request.principal.type = 'workload', request.principal.namespace = 'oracle-database-operator-system', request.principal.service_account = 'oracle-database-operator-controller-manager', request.principal.cluster_id = '%s'}", compartment_id, database_id, oci_containerengine_cluster.default_cluster.id)
   ])
   provider = oci.home_region
 }
