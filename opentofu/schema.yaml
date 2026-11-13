@@ -46,7 +46,6 @@ variableGroups:
       - fsdr_standby_cpu_node_pool_size
       - fsdr_backup_schedule
       - fsdr_backup_retention
-      - fsdr_additional_namespaces
     visible: false
 
   #########################################################################

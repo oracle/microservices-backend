@@ -101,16 +101,6 @@ variable "fsdr_backup_retention" {
   default     = 10
 }
 
-variable "fsdr_additional_namespaces" {
-  description = "Application namespaces to recover alongside OBaaS."
-  type        = list(string)
-  default     = []
-  validation {
-    condition     = alltrue([for namespace in var.fsdr_additional_namespaces : !contains(["obaas-system", "kube-system", "brie"], namespace)])
-    error_message = "Additional recovery namespaces must contain application workloads; cluster control namespaces are reserved."
-  }
-}
-
 resource "terraform_data" "fsdr_database_role_guard" {
   input = {
     fsdr_enabled  = var.fsdr_enabled
@@ -197,7 +187,6 @@ module "fsdr" {
   objectstorage_namespace         = data.oci_objectstorage_namespace.objectstorage_namespace.namespace
   clusters                        = local.fsdr_clusters
   external_databases              = local.fsdr_external_databases
-  namespaces                      = concat([local.label_prefix], var.fsdr_additional_namespaces)
   volumes                         = module.kubernetes_storage.persistent_storage.volumes
   destination_availability_domain = data.oci_identity_availability_domains.fsdr_region_1[0].availability_domains[0].name
   node_counts                     = { cpu = var.k8s_cpu_node_pool_size, gpu = var.k8s_gpu_node_pool_size }
