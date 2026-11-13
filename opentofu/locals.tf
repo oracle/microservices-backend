@@ -71,11 +71,11 @@ locals {
     local_enabled  = oci_database_autonomous_database.default_adb["managed"].is_local_data_guard_enabled
     remote_enabled = oci_database_autonomous_database.default_adb["managed"].is_remote_data_guard_enabled
     peer_ids       = oci_database_autonomous_database.default_adb["managed"].peer_db_ids
-  } : var.byo_db_type == "ADB-S" ? {
+    } : var.byo_db_type == "ADB-S" ? {
     local_enabled  = data.oci_database_autonomous_database.byo_adb["byo"].is_local_data_guard_enabled
     remote_enabled = data.oci_database_autonomous_database.byo_adb["byo"].is_remote_data_guard_enabled
     peer_ids       = data.oci_database_autonomous_database.byo_adb["byo"].peer_db_ids
-  } : {
+    } : {
     local_enabled  = null
     remote_enabled = null
     peer_ids       = null
