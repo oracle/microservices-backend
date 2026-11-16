@@ -109,7 +109,14 @@ resource "terraform_data" "fsdr_database_role_guard" {
 
   lifecycle {
     precondition {
-      condition     = var.fsdr_enabled || coalesce(local.db_role, "UNKNOWN") == "PRIMARY"
+      condition = (
+        var.fsdr_enabled ||
+        coalesce(local.db_role, "UNKNOWN") == "PRIMARY" ||
+        (
+          coalesce(local.db_role, "UNKNOWN") == "UNKNOWN" &&
+          local.db_has_no_data_guard
+        )
+      )
       error_message = "The source Autonomous Database is STANDBY. Switch it back to PRIMARY before disabling FSDR to preserve the promoted database."
     }
   }
