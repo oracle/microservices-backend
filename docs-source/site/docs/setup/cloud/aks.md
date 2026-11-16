@@ -1,6 +1,7 @@
 ---
 title: Azure Kubernetes Service (AKS)
-sidebar_position: 3
+description: Deploy OBaaS in Azure Kubernetes Service (AKS).
+sidebar_position: 20
 ---
 
 # OBaaS on Azure Kubernetes Service (AKS)

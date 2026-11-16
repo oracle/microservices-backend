@@ -7,34 +7,99 @@ Oracle Backend for Microservices and AI includes a set of pre-integrated platfor
 
 ## API Gateway & Networking
 
-| Service | Description |
-|---------|-------------|
-| [Apache APISIX](./apacheapisix.md) | Cloud-native API gateway for routing, traffic management, and rate limiting |
-| [Spring Boot Eureka Server](./eureka.md) | Service registry for automatic discovery between microservices |
-| [Envoy Gateway](./envoygateway.md) | CNCF graduated implementation of the Kubernetes Gateway API |
+<table aria-label="API Gateway &amp; Networking table">
+  <thead>
+    <tr>
+      <th scope="col">Service</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><a href="./apacheapisix">Apache APISIX</a></th>
+      <td>Cloud-native API gateway for routing, traffic management, and rate limiting</td>
+    </tr>
+    <tr>
+      <th scope="row"><a href="./eureka">Spring Boot Eureka Server</a></th>
+      <td>Service registry for automatic discovery between microservices</td>
+    </tr>
+    <tr>
+      <th scope="row"><a href="./envoygateway">Envoy Gateway</a></th>
+      <td>CNCF graduated implementation of the Kubernetes Gateway API</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Messaging & Event Streaming
 
-| Service | Description |
-|---------|-------------|
-| [Strimzi Kafka Operator](./strimzi_operator.md) | Kubernetes operator for deploying and managing Apache Kafka clusters |
+<table aria-label="Messaging &amp; Event Streaming table">
+  <thead>
+    <tr>
+      <th scope="col">Service</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><a href="./strimzi_operator">Strimzi Kafka Operator</a></th>
+      <td>Kubernetes operator for deploying and managing Apache Kafka clusters</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Data & Transactions
 
-| Service | Description |
-|---------|-------------|
-| [Oracle Transaction Manager for Microservices](./otmm.md) | Distributed transaction coordinator supporting XA, LRA, and TCC consistency models |
-| [Oracle Database Operator](./dboperator.md) | Kubernetes operator for provisioning and managing Oracle Database instances |
-| [Coherence Operator](./coherence.md) | In-memory data grid for caching, data distribution, and compute |
+<table aria-label="Data &amp; Transactions table">
+  <thead>
+    <tr>
+      <th scope="col">Service</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><a href="./otmm">Oracle Transaction Manager for Microservices</a></th>
+      <td>Distributed transaction coordinator supporting XA, LRA, and TCC consistency models</td>
+    </tr>
+    <tr>
+      <th scope="row"><a href="./dboperator">Oracle Database Operator</a></th>
+      <td>Kubernetes operator for provisioning and managing Oracle Database instances</td>
+    </tr>
+    <tr>
+      <th scope="row"><a href="./coherence">Coherence Operator</a></th>
+      <td>In-memory data grid for caching, data distribution, and compute</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Operations & Security
 
-| Service | Description |
-|---------|-------------|
-| [Oracle Database Metrics Exporter](./dbexporter.md) | Exposes Oracle Database metrics for monitoring and alerting |
-| [External Secrets Operator](./esooperator.md) | Syncs secrets from external stores (OCI Vault, AWS, HashiCorp Vault) into Kubernetes |
-| [Spring Boot Admin Server](./sbadminserver.md) | Web dashboard for monitoring and managing Spring Boot applications |
-| [MicroTx Workflow Orchestration](./conductor.md) | Workflow orchestration engine for multi-step service choreography |
+<table aria-label="Operations &amp; Security table">
+  <thead>
+    <tr>
+      <th scope="col">Service</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><a href="./dbexporter">Oracle Database Metrics Exporter</a></th>
+      <td>Exposes Oracle Database metrics for monitoring and alerting</td>
+    </tr>
+    <tr>
+      <th scope="row"><a href="./esooperator">External Secrets Operator</a></th>
+      <td>Syncs secrets from external stores (OCI Vault, AWS, HashiCorp Vault) into Kubernetes</td>
+    </tr>
+    <tr>
+      <th scope="row"><a href="./sbadminserver">Spring Boot Admin Server</a></th>
+      <td>Web dashboard for monitoring and managing Spring Boot applications</td>
+    </tr>
+    <tr>
+      <th scope="row"><a href="./conductor">MicroTx Workflow Orchestration</a></th>
+      <td>Workflow orchestration engine for multi-step service choreography</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Architecture
 
