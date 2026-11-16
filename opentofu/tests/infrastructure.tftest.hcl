@@ -107,10 +107,18 @@ override_module {
 variables {
   tenancy_ocid         = "test-tenancy"
   compartment_ocid     = "test-compartment"
+  user_ocid            = ""
+  current_user_ocid    = ""
   region               = "uk-london-1"
   label_prefix         = "iactest"
   k8s_use_local_charts = true
   k8s_run_cfgmgt       = false
+  adb_networking       = "SECURE_ACCESS"
+  adb_whitelist_cidrs  = ""
+  fsdr_enabled         = false
+  fsdr_region_1        = ""
+  fsdr_plan_types      = ["SWITCHOVER", "FAILOVER"]
+  fsdr_timeouts        = {}
 }
 
 run "adb_compartment_default" {
@@ -151,6 +159,51 @@ run "adb_compartment_without_fsdr" {
     condition     = oci_database_autonomous_database.default_adb["managed"].compartment_id == "database-compartment" && length(oci_database_autonomous_database.dr_adb_standby) == 0
     error_message = "The ADB compartment must also work without FSDR."
   }
+}
+
+run "empty_database_role_without_fsdr" {
+  command = plan
+  override_resource {
+    target = oci_database_autonomous_database.default_adb
+    values = {
+      role                         = ""
+      is_local_data_guard_enabled  = false
+      is_remote_data_guard_enabled = false
+      peer_db_ids                  = []
+    }
+  }
+  assert {
+    condition     = length(output.fsdr_protection_group_ids) == 0
+    error_message = "An unavailable database role must not enable or block FSDR."
+  }
+}
+
+run "empty_database_role_with_data_guard_blocks_fsdr_disable" {
+  command = plan
+  override_resource {
+    target = oci_database_autonomous_database.default_adb
+    values = {
+      role                         = ""
+      is_local_data_guard_enabled  = false
+      is_remote_data_guard_enabled = true
+      peer_db_ids                  = ["standby-adb"]
+    }
+  }
+  expect_failures = [terraform_data.fsdr_database_role_guard]
+}
+
+run "standby_database_blocks_fsdr_disable" {
+  command = plan
+  variables {
+    byo_db_type     = "ADB-S"
+    byo_adb_ocid    = "byo-adb"
+    byo_db_password = "test-password"
+  }
+  override_data {
+    target = data.oci_database_autonomous_database.byo_adb
+    values = { role = "STANDBY" }
+  }
+  expect_failures = [terraform_data.fsdr_database_role_guard]
 }
 
 run "adb_compartment_tenancy_fallback" {
