@@ -6,6 +6,49 @@ sidebar_position: 5
 More details can be found in the [SigNoz Documentation](https://signoz.io/docs/introduction/).
 :::
 
+:::warning[SigNoz dashboard migration]
+SigNoz v0.135.0 deprecates the Dashboards V1 schema and retires the V1 dashboard API endpoints. User-supplied dashboards that use the V1 format must be migrated to the Dashboards V2/Perses-compatible schema before upgrading. Dashboards managed only through the SigNoz UI are migrated automatically, but verify that none remain marked `Legacy`. See the [SigNoz v0.135.0 upgrade guide](https://signoz.io/docs/operate/migration/upgrade-0-135/) for migration details.
+:::
+
+To install your own dashboards with Helm, see [Custom dashboards](./custom-dashboards.md).
+
+## Dashboard setup Job
+
+The OBaaS chart runs `<app-release>-signoz-setup` after installation and upgrade
+when `signoz.setup.enabled` is `true` (the default). The Job runs Python 3 on
+`container-registry.oracle.com/os/oraclelinux:9`, using a script mounted from a
+ConfigMap. It waits for SigNoz to become healthy, then signs in with the `email`
+and `password` from the Secret selected by `signoz.auth.existingSecret`, or
+`signoz-authn` when no existing Secret is configured.
+
+The Job discovers the organization through `/api/v2/sessions/context`. If the
+account belongs to multiple organizations, add an `orgID` key containing the
+selected organization's UUID to the credential Secret. A non-empty `orgID` takes
+precedence over discovery. This setup uses the SigNoz API and does not mount the
+SigNoz metadata database PVC, so it also works with PostgreSQL metadata storage.
+
+On each run, the Job deletes existing dashboards whose names exactly match the
+bundled system dashboards, including matching legacy records, then recreates
+them through the V2 API. Their IDs change and edits to these system dashboards
+are replaced. Dashboards with other names are left alone. Save customized copies
+under distinct names. Bundled V1 payloads are skipped; imported system dashboards
+use the V2/Perses `schemaVersion: v6` format.
+
+Check completion and logs with:
+
+```bash
+kubectl -n <application-namespace> wait --for=condition=complete \
+  job/<app-release>-signoz-setup --timeout=5m
+kubectl -n <application-namespace> logs job/<app-release>-signoz-setup \
+  -c signoz-setup
+```
+
+Successful logs end with `SigNoz setup complete`. For private registries, override
+`signoz.setup.image.registry`, `signoz.setup.image.repository`, and
+`signoz.setup.image.tag`; see the [private registry configuration](../setup/helm/install.md#private-registry-configuration-values-private-registryyaml).
+
+## Included dashboards
+
 There are several dashboards that are pre-installed in SigNoz, for example:
 
 - [Spring Boot Observability](#spring-boot-observability)

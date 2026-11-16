@@ -28,3 +28,8 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+.theme-doc-markdown a:not(.hash-link) {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
