@@ -109,12 +109,12 @@ coherence-operator:
   image:
     registry: "container-registry.oracle.com/middleware"
     name: "coherence-operator"
-    tag: "3.5.17"
+    tag: "3.6.0"
   # Default Coherence image for applications
   defaultCoherenceImage:
     registry: "container-registry.oracle.com/middleware"
     name: "coherence-ce"
-    tag: "22.06.13"
+    tag: "25.03.2"
   # One operator replica is sufficient for evaluation/development clusters.
   # Increase to 3 for highly available operator reconciliation.
   replicas: 1
