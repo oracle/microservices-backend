@@ -2,7 +2,7 @@
 # Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
 apiVersion: v2
 name: signoz-dashboards
-description: Sample chart for installing user dashboards into an existing OBaaS SigNoz instance
+description: Sample chart for installing user dashboards and alert rules into an existing OBaaS SigNoz instance
 type: application
-version: 0.1.2
+version: 0.1.3
 appVersion: "2.1.2"

@@ -10,7 +10,11 @@
 {{- end -}}
 
 {{- define "signoz-dashboards.configMapName" -}}
+{{- if hasPrefix "alerts/" . -}}
+{{- include "signoz-dashboards.safeName" (printf "alert-%s" (base . | trimSuffix ".json")) -}}
+{{- else -}}
 {{- include "signoz-dashboards.safeName" (base . | trimSuffix ".json") -}}
+{{- end -}}
 {{- end -}}
 
 {{- define "signoz-dashboards.jobName" -}}
