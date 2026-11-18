@@ -34,7 +34,7 @@ dependencies:
     repository: https://strimzi.io/charts/
     condition: strimzi-kafka-operator.enabled
   - name: coherence-operator
-    version: "3.5.14"
+    version: 3.5.17
     repository: https://oracle.github.io/coherence-operator/charts
     condition: coherence-operator.enabled
   # Installs the OpenTelemetry Operator to enable auto-instrumentation via custom resources
