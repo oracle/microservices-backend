@@ -1,0 +1,48 @@
+{
+  "alert": "Example application container restarts",
+  "description": "Customize namespace and workload selectors before enabling.",
+  "alertType": "METRIC_BASED_ALERT",
+  "ruleType": "promql_rule",
+  "version": "v5",
+  "schemaVersion": "v2alpha1",
+  "disabled": true,
+  "condition": {
+    "compositeQuery": {
+      "queryType": "promql",
+      "panelType": "graph",
+      "queries": [
+        {
+          "type": "promql",
+          "spec": {
+            "name": "A",
+            "query": "increase(kube_pod_container_status_restarts_total{namespace=\"my-application\",pod=~\"my-service-.*\"}[10m])",
+            "legend": "{{pod}} / {{container}}"
+          }
+        }
+      ]
+    },
+    "selectedQueryName": "A",
+    "thresholds": {
+      "kind": "basic",
+      "spec": [
+        {
+          "name": "warning",
+          "op": "above",
+          "matchType": "at_least_once",
+          "target": 2,
+          "channels": []
+        }
+      ]
+    }
+  },
+  "evaluation": {
+    "kind": "rolling",
+    "spec": {"evalWindow": "5m", "frequency": "1m"}
+  },
+  "labels": {"severity": "warning"},
+  "notificationSettings": {
+    "groupBy": [],
+    "renotify": {"enabled": false},
+    "usePolicy": true
+  }
+}

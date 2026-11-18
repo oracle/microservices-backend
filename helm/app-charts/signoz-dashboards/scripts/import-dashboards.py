@@ -1,9 +1,10 @@
 # Copyright (c) 2026, Oracle and/or its affiliates.
 # Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
-"""Reconcile dashboard titles through the deployed SigNoz dashboard API."""
+"""Install bundled dashboards and alert rules through the SigNoz API."""
 
 import json
 import os
+import re
 from pathlib import Path
 import sys
 import time
@@ -80,9 +81,123 @@ def load_dashboards(directory):
         if title in dashboards:
             raise ValueError(f"Duplicate dashboard title: {title}")
         dashboards[title] = dashboard
-    if not dashboards:
-        raise ValueError("No dashboard JSON files found")
     return dashboards
+
+
+ALERT_OWNER_LABEL = "obaas_helm_owner"
+
+
+def inventory_rule(entry):
+    """Convert the supported schemaVersion 1 PromQL inventory into a v2 rule."""
+    condition = entry["condition"]
+    evaluation = entry["evaluation"]
+    notification = entry["notification"]
+    # These inventory settings lack the extra parameters required by the API
+    # when enabled. Reject them rather than silently choose new alert behavior.
+    if (entry["queryType"] != "promql" or condition["windowType"] != "Rolling"
+            or condition["operator"] != "ABOVE" or condition["occurrence"] != "AT LEAST ONCE"
+            or evaluation["unit"] != "Minutes"
+            or evaluation["alertOnNoData"] is not False
+            or evaluation["minimumDataRequired"] is not False
+            or notification["repeat"] is not False):
+        raise ValueError("Unsupported inventory settings; use a native SigNoz API rule for this alert")
+    window = re.fullmatch(r"Last ([1-9][0-9]*) minutes?", condition["window"], re.IGNORECASE)
+    if (not window or type(evaluation["every"]) is not int or evaluation["every"] <= 0
+            or type(entry["enabled"]) is not bool
+            or not isinstance(entry["query"], str) or not entry["query"].strip()
+            or not isinstance(condition["query"], str) or not condition["query"].strip()
+            or not isinstance(condition["thresholdName"], str) or not condition["thresholdName"].strip()
+            or type(condition["thresholdValue"]) not in (int, float)
+            or not isinstance(notification["channel"], str) or not notification["channel"].strip()
+            or not isinstance(notification["message"], str)
+            or not isinstance(notification["groupBy"], list)
+            or not all(isinstance(label, str) for label in notification["groupBy"])):
+        raise ValueError("Invalid inventory query, threshold, timing, enabled state, or notification settings")
+    return {
+        "alert": entry["name"], "disabled": not entry["enabled"],
+        "schemaVersion": "v2alpha1", "version": "v5",
+        "alertType": "METRIC_BASED_ALERT", "ruleType": "promql_rule",
+        "labels": entry.get("labels", {}),
+        "annotations": {"description": notification["message"]},
+        "condition": {
+            "compositeQuery": {
+                "queryType": "promql", "panelType": "graph",
+                "queries": [{"type": "promql", "spec": {
+                    "name": condition["query"], "query": entry["query"],
+                }}],
+            },
+            "selectedQueryName": condition["query"],
+            "alertOnAbsent": False, "requireMinPoints": False,
+            "thresholds": {"kind": "basic", "spec": [{
+                "name": condition["thresholdName"], "op": "above",
+                "matchType": "at_least_once", "target": condition["thresholdValue"],
+                "channels": [notification["channel"]],
+            }]},
+        },
+        "evaluation": {"kind": "rolling", "spec": {
+            "evalWindow": f"{window[1]}m", "frequency": f"{evaluation['every']}m",
+        }},
+        "notificationSettings": {
+            "groupBy": notification["groupBy"], "renotify": {"enabled": False}, "usePolicy": False,
+        },
+    }
+
+
+def load_alerts(directory, owner):
+    alerts = {}
+    for path in sorted(directory.glob("*.json")):
+        document = json.loads(path.read_text())
+        if not isinstance(document, dict):
+            raise ValueError(f"{path.name}: expected a SigNoz rule or schemaVersion 1 inventory")
+        if "alerts" in document:
+            if type(document.get("schemaVersion")) is not int or document["schemaVersion"] != 1:
+                raise ValueError(f"{path.name}: unsupported inventory schemaVersion")
+            entries = document["alerts"]
+            if not isinstance(entries, list) or not entries or not all(isinstance(e, dict) for e in entries):
+                raise ValueError(f"{path.name}: alerts must be a non-empty array of objects")
+            try:
+                rules = [inventory_rule(entry) for entry in entries]
+            except (KeyError, TypeError, ValueError) as error:
+                raise ValueError(f"{path.name}: invalid or unsupported alert inventory: {error}") from error
+        else:
+            rules = [document]
+        for rule in rules:
+            name = rule.get("alert")
+            if not isinstance(name, str) or not name.strip() or not isinstance(rule.get("condition"), dict):
+                raise ValueError(f"{path.name}: expected a SigNoz rule with alert and condition fields")
+            if name in alerts:
+                raise ValueError(f"Duplicate alert name: {name}")
+            labels = rule.setdefault("labels", {})
+            if not isinstance(labels, dict):
+                raise ValueError(f"{path.name}: labels must be an object")
+            if labels.get(ALERT_OWNER_LABEL, owner) != owner:
+                raise ValueError(f"{path.name}: reserved ownership label conflicts with this release")
+            labels[ALERT_OWNER_LABEL] = owner
+            # API read responses include server-managed fields that are not write input.
+            for field in ("id", "state", "createdAt", "updatedAt", "createdBy", "updatedBy"):
+                rule.pop(field, None)
+            alerts[name] = rule
+    return alerts
+
+
+def reconcile_alerts(url, token, alerts, owner):
+    existing = request(f"{url}/api/v2/rules", token=token)["data"]
+    if not isinstance(existing, list):
+        raise ValueError("Invalid alert rule list response; expected SigNoz v0.142.1 API")
+    matches = {}
+    # Check every match before changing any rule. Never adopt an unrelated rule.
+    for rule in existing:
+        name = rule["alert"]
+        if name not in alerts:
+            continue
+        if name in matches or rule.get("labels", {}).get(ALERT_OWNER_LABEL) != owner:
+            raise ValueError(f"Ambiguous or unmanaged existing alert: {name}")
+        matches[name] = quote(rule["id"], safe="")
+    for name, rule in alerts.items():
+        rule_id = matches.get(name)
+        endpoint = f"{url}/api/v2/rules" + (f"/{rule_id}" if rule_id else "")
+        print(f"{'Updating' if rule_id else 'Creating'} alert: {name}", flush=True)
+        request(endpoint, method="PUT" if rule_id else "POST", payload=rule, token=token)
 
 
 def list_dashboards(url, token):
@@ -139,12 +254,19 @@ def reconcile(url, token, dashboards):
 
 
 def main():
-    # Validate every local file before deleting any existing dashboards.
+    # Validate every local file before changing anything in SigNoz.
     dashboards = load_dashboards(Path("/dashboards"))
+    owner = os.environ["SIGNOZ_IMPORT_OWNER"]
+    alerts = load_alerts(Path("/alerts"), owner)
+    if not dashboards and not alerts:
+        raise ValueError("No dashboard or alert JSON files found")
     url = os.environ["SIGNOZ_URL"].rstrip("/")
     wait_until_ready(url)
     token = login(url, Path("/signoz-authn"))
-    reconcile(url, token, dashboards)
+    if alerts:
+        reconcile_alerts(url, token, alerts, owner)
+    if dashboards:
+        reconcile(url, token, dashboards)
 
 
 if __name__ == "__main__":
@@ -155,6 +277,10 @@ if __name__ == "__main__":
         print(f"SigNoz API request failed: HTTP {error.code}", file=sys.stderr)
         sys.exit(1)
 
-    except (ValueError, KeyError, TypeError, OSError, DashboardAPIUnavailable):
+    except ValueError as error:
+        print(f"SigNoz setup failed: {error}", file=sys.stderr)
+        sys.exit(1)
+
+    except (KeyError, TypeError, OSError, DashboardAPIUnavailable):
         print("SigNoz setup failed: invalid setup input, API response, or connection", file=sys.stderr)
         sys.exit(1)
