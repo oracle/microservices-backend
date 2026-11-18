@@ -1,0 +1,210 @@
+---
+title: Upgrade
+sidebar_position: 0
+---
+
+export const OBAAS_VERSION = '2.1.2';
+
+Upgrade OBaaS 2.0.0 or later to {OBAAS_VERSION} in this order:
+prepare values → update prerequisite CRDs → upgrade prerequisites → update
+Envoy CRDs → upgrade the application.
+
+:::warning[Observability data]
+The two-step procedure below is for installations where data loss is acceptable.
+It does not create backups or intentionally erase data. For backup and preservation,
+follow [SigNoZ's ClickHouse upgrade guidance](https://signoz.io/docs/operate/migration/upgrade-0-131/)
+and validate your recovery point first. Do not use `destructive-replace` for this
+in-place upgrade or downgrade ClickHouse against upgraded data volumes.
+:::
+
+## 1. Prepare charts and values
+
+Run the commands from the repository root with chart dependencies prepared.
+Use the local charts for in-development releases; published charts must have an
+`appVersion` matching the target release.
+
+Keep the existing release names, namespaces, database secrets, enabled components,
+and registry settings. Use complete values files for both charts. Export the
+saved overrides if needed, and protect the files because they may contain secrets:
+
+```bash
+umask 077
+helm get values <prereqs-release> -n <platform-system-namespace> -o yaml > prereqs-values.yaml
+helm get values <app-release> -n <application-namespace> -o yaml > app-values.yaml
+```
+
+## 2. Update prerequisite CRDs
+
+Apply only the enabled operators' CRDs. These changes require cluster-admin
+access and affect the whole cluster. Preserve stored API versions; resolve
+ownership conflicts without deleting CRDs or using `--force-conflicts`.
+
+### Strimzi
+
+Check every Strimzi CRD's `status.storedVersions`. If any still contains
+`v1beta2`, back up its resources and complete the Java 21
+[Strimzi v1 API migration](https://strimzi.io/docs/operators/1.2.0/deploying.html#assembly-upgrade-str)
+before applying the 1.2.0 bundle. Continue only when all store `v1`.
+
+```bash
+kubectl apply \
+  -f https://github.com/strimzi/strimzi-kafka-operator/releases/download/1.2.0/strimzi-crds-1.2.0.yaml
+
+kubectl wait --for=condition=Established --timeout=5m \
+  crd/kafkas.kafka.strimzi.io \
+  crd/kafkaconnects.kafka.strimzi.io \
+  crd/strimzipodsets.core.strimzi.io \
+  crd/kafkatopics.kafka.strimzi.io \
+  crd/kafkausers.kafka.strimzi.io \
+  crd/kafkanodepools.kafka.strimzi.io \
+  crd/kafkabridges.kafka.strimzi.io \
+  crd/kafkaconnectors.kafka.strimzi.io \
+  crd/kafkamirrormaker2s.kafka.strimzi.io \
+  crd/kafkarebalances.kafka.strimzi.io
+```
+
+### Oracle Database Operator
+
+:::warning[Older release-managed CRDs]
+Inspect `helm get manifest <prereqs-release> -n <platform-system-namespace>`.
+If it contains Oracle CRDs, back up their definitions and resources, then use a
+transition chart to add `helm.sh/resource-policy: keep` to the old CRD templates.
+Verify retention in the saved release manifest before upgrading. Annotating only
+the live CRDs is insufficient. Follow `CRD-MIGRATION.md` in the operator archive
+below. Recreating a deleted CRD does not restore its custom resources.
+:::
+
+Extract the target CRDs and replace the bundled namespace with the namespace
+hosting the operator and its certificate:
+
+```bash
+OBAAS_CRD_WORKDIR=$(mktemp -d)
+tar -xzf helm/infra-charts/obaas-prereqs/charts/oracle-database-operator-0.2.0.tgz \
+  -C "$OBAAS_CRD_WORKDIR" \
+  oracle-database-operator/crds oracle-database-operator/CRD-MIGRATION.md
+
+# Replace the bundled namespace with the actual operator namespace.
+for crd_file in "$OBAAS_CRD_WORKDIR"/oracle-database-operator/crds/*.yaml; do
+  sed 's/oracle-database-operator-system/<platform-system-namespace>/g' \
+    "$crd_file" > "$crd_file.tmp"
+  mv "$crd_file.tmp" "$crd_file"
+done
+
+kubectl apply --server-side --field-manager=helm \
+  -f "$OBAAS_CRD_WORKDIR/oracle-database-operator/crds"
+kubectl wait --for=condition=Established --timeout=5m \
+  -f "$OBAAS_CRD_WORKDIR/oracle-database-operator/crds"
+```
+
+## 3. Upgrade prerequisites
+
+```bash
+helm upgrade <prereqs-release> helm/infra-charts/obaas-prereqs \
+  -n <platform-system-namespace> \
+  -f <prereqs-values-file> \
+  --wait --timeout 30m
+```
+
+Continue when Helm reports `deployed`, the operators are ready, and the database
+operator CRD configuration Job completed.
+
+## 4. Update Envoy Gateway CRDs
+
+When Envoy Gateway is enabled and this installation manages its CRDs, apply the
+bundled Envoy and Gateway API definitions (Gateway API `v1.6.1`, experimental):
+
+```bash
+kubectl apply --server-side --field-manager=helm -R \
+  -f helm/infra-charts/obaas/charts/gateway-helm/charts/crds/crds
+kubectl wait --for=condition=Established --timeout=5m \
+  -R -f helm/infra-charts/obaas/charts/gateway-helm/charts/crds/crds
+```
+
+If the provider or another installation owns these CRDs, coordinate the update
+with that owner and keep `gateway-helm.crds.enabled=false`.
+
+## 5. Upgrade the application
+
+### Upgrade SigNoZ and ClickHouse in two steps
+
+Skip the first pass if ClickHouse already runs `25.12.5`. If SigNoZ is disabled,
+use the normal Helm upgrade at the end of this section.
+
+**First pass: upgrade ClickHouse with migration and dashboard reconciliation disabled.** The migration is a
+`pre-upgrade` hook, so it otherwise runs against the old ClickHouse server.
+Keep the current SigNoZ and collector tags; these example tags match OBaaS 2.1.0:
+
+```bash
+helm upgrade <app-release> helm/infra-charts/obaas \
+  -n <application-namespace> \
+  -f <customer-values-file> \
+  --set signoz.telemetryStoreMigrator.enabled=false \
+  --set signoz.setup.enabled=false \
+  --set signoz.clickhouse.image.tag=25.12.5 \
+  --set signoz.signoz.image.tag=v0.113.0 \
+  --set signoz.otelCollector.image.tag=v0.144.1 \
+  --wait --timeout 30m
+```
+
+Use your currently running tags for other starting versions. This pass also
+applies other application-chart changes. Keep the same complete values file,
+release, and namespace for both passes.
+
+`signoz.setup.enabled=false` skips the OBaaS setup hook, including dashboard
+reconciliation. The current hook uses the V2 dashboard API, which the retained
+older SigNoZ version does not support. Keep it disabled only for the first pass;
+other Helm hooks remain enabled.
+
+Verify ClickHouse is healthy and the running server reports `25.12.5` before
+continuing (configure client authentication if required):
+
+```bash
+kubectl get pods -n <application-namespace> \
+  -l clickhouse.altinity.com/chi=<app-release>-clickhouse
+kubectl exec -n <application-namespace> <clickhouse-pod> -c clickhouse -- \
+  clickhouse-client --query 'SELECT version()'
+```
+
+**Second pass: upgrade SigNoZ and the collector with migration enabled.**
+
+```bash
+helm upgrade <app-release> helm/infra-charts/obaas \
+  -n <application-namespace> \
+  -f <customer-values-file> \
+  --set signoz.telemetryStoreMigrator.enabled=true \
+  --set signoz.setup.enabled=true \
+  --set signoz.telemetryStoreMigrator.upgradeHelmHooks=true \
+  --set signoz.clickhouse.image.tag=25.12.5 \
+  --set signoz.signoz.image.tag=v0.142.1 \
+  --set signoz.otelCollector.image.tag=v0.144.10 \
+  --wait --timeout 30m
+```
+
+Do not leave the migrator or setup hook disabled. The second pass re-enables
+dashboard reconciliation against the upgraded SigNoZ API. Setting only `upgradeHelmHooks=false` still
+runs a migration Job and does not provide this ordering.
+
+**Without SigNoZ**, use:
+
+```bash
+helm upgrade <app-release> helm/infra-charts/obaas \
+  -n <application-namespace> \
+  -f <customer-values-file> \
+  --wait --timeout 30m
+```
+
+## 6. Verify
+
+```bash
+helm status <app-release> -n <application-namespace>
+kubectl get pods,jobs,pvc -n <application-namespace>
+```
+
+Confirm Helm reports `deployed`, pods are ready, PVCs are bound, database
+initialization completed, and the enabled application endpoints work. With
+SigNoZ enabled, confirm migration/setup Jobs completed and new telemetry appears.
+
+## Versions before OBaaS 2.0.0
+
+In-place upgrades are unsupported. Install a new environment and migrate your
+application data, database secrets, configuration, dashboards, and custom resources.

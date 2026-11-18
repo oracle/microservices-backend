@@ -1,0 +1,307 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+#
+# Draft SigNoz distributed profile: Upstream resource reference; two shards without replica redundancy.
+# Starting allocations only: no certified ingestion rate or loss guarantee.
+# Fresh installations only. Review migration/recovery before applying to an
+# existing release; never use a profile to implicitly change stored-data topology.
+# Layer ONE profile after environment values. See
+# https://oracle.github.io/microservices-backend/obaas/docs/observability/signoz-profiles for usage, PostgreSQL
+# credentials, storage planning, and validation boundaries.
+
+signoz:
+  enabled: true
+  signoz:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: "4"
+        memory: 8Gi
+      limits:
+        cpu: "4"
+        memory: 8Gi
+    persistence:
+      enabled: true
+      size: 10Gi
+  clickhouse:
+    layout:
+      shardsCount: 2
+      replicasCount: 1
+    podDistribution:
+      - type: ClickHouseAntiAffinity
+        topologyKey: kubernetes.io/hostname
+    # Resources and PVC capacity are per ClickHouse instance. Storage sizes
+    # are illustrative; choose StorageClasses and capacities in a final overlay.
+    resources:
+      requests:
+        cpu: "16"
+        memory: 32Gi
+      limits:
+        cpu: "16"
+        memory: 32Gi
+    persistence:
+      enabled: true
+      size: 1Ti
+    zookeeper:
+      replicaCount: 3
+      # MiB; leave room for JVM native memory and filesystem cache.
+      heapSize: 4096
+      podAntiAffinityPreset: hard
+      resources:
+        requests:
+          cpu: "2"
+          memory: 8Gi
+        limits:
+          cpu: "2"
+          memory: 8Gi
+      persistence:
+        enabled: true
+        size: 20Gi
+    clickhouseOperator:
+      resources:
+        requests:
+          cpu: "100m"
+          memory: 256Mi
+        limits:
+          cpu: "500m"
+          memory: 512Mi
+      metricsExporter:
+        resources:
+          requests:
+            cpu: "100m"
+            memory: 128Mi
+          limits:
+            cpu: "500m"
+            memory: 256Mi
+      # These TTLs cover diagnostic history, not application telemetry.
+      zookeeperLog:
+        ttl: 3
+      queryLog:
+        ttl: 7
+      partLog:
+        ttl: 7
+      traceLog:
+        ttl: 3
+      asynchronousInsertLog:
+        ttl: 3
+      asynchronousMetricLog:
+        ttl: 3
+      metricLog:
+        ttl: 3
+      queryThreadLog:
+        ttl: 3
+      queryViewsLog:
+        ttl: 3
+      processorsProfileLog:
+        ttl: 3
+      sessionLog:
+        ttl: 7
+      blobStorageLog:
+        ttl: 3
+      backupLog:
+        ttl: 3
+      crashLog:
+        ttl: 7
+  telemetryStoreMigrator:
+    # Keep the bundled chart's replication behavior; this is its current value
+    # name, rather than schemaMigrator from older upstream examples.
+    enableReplication: true
+    resources:
+      requests:
+        cpu: "250m"
+        memory: 512Mi
+      limits:
+        cpu: "2"
+        memory: 2Gi
+  otelCollector:
+    replicaCount: 3
+    autoscaling:
+      enabled: false
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/component: otel-collector
+    resources:
+      requests:
+        cpu: "4"
+        memory: 16Gi
+      limits:
+        cpu: "4"
+        memory: 16Gi
+    additionalEnvs:
+      GOMEMLIMIT: 9600MiB
+    config:
+      processors:
+        memory_limiter:
+          check_interval: 1s
+          limit_mib: 12288
+          spike_limit_mib: 2048
+        batch:
+          send_batch_size: 2048
+          send_batch_max_size: 4096
+          timeout: 1s
+        batch/meter:
+          send_batch_size: 2048
+          send_batch_max_size: 4096
+          timeout: 1s
+      # Preserve inherited receivers/exporters and add the limiter first.
+      # Queues/retries remain inherited and are NOT persistent storage.
+      service:
+        pipelines:
+          traces:
+            processors: [memory_limiter, signozspanmetrics/delta, batch]
+          metrics:
+            # Inherited pull receiver definitions remain unused. Only the
+            # singleton k8s-infra collector activates them in its pipelines.
+            receivers: [otlp]
+            processors: [memory_limiter, batch]
+          logs:
+            receivers: [otlp, httplogreceiver/heroku, httplogreceiver/json]
+            processors: [memory_limiter, batch]
+          metrics/meter:
+            processors: [memory_limiter, batch/meter]
+
+k8s-infra:
+  # Presets prepend metadata enrichment ahead of memory_limiter. Preserve those
+  # processors; see the profile guide for ordering and custom-pipeline caveats.
+  otelAgent:
+    additionalEnvs:
+      GOMEMLIMIT: 600MiB
+    config:
+      processors:
+        memory_limiter:
+          check_interval: 1s
+          limit_mib: 768
+          spike_limit_mib: 128
+      service:
+        pipelines:
+          traces:
+            processors: [memory_limiter, batch]
+          metrics:
+            processors: [memory_limiter, batch]
+          logs:
+            processors: [memory_limiter, batch]
+    # Per scheduled worker node, in addition to the central components above.
+    resources:
+      requests:
+        cpu: "250m"
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+  otelDeployment:
+    replicaCount: 1
+    # Singleton cluster-wide collection; do not scale pull receivers blindly.
+    resources:
+      requests:
+        cpu: "1"
+        memory: 2Gi
+      limits:
+        cpu: "2"
+        memory: 4Gi
+    clusterRole:
+      # Preserve the bundled deployment permissions and add discovery access.
+      rules:
+        - apiGroups: [""]
+          resources: [events, namespaces, namespaces/status, nodes, nodes/spec, nodes/status, pods, pods/status, replicationcontrollers, replicationcontrollers/status, resourcequotas, services, endpoints]
+          verbs: [get, list, watch]
+        - apiGroups: [apps]
+          resources: [daemonsets, deployments, replicasets, statefulsets]
+          verbs: [get, list, watch]
+        - apiGroups: [extensions]
+          resources: [replicasets]
+          verbs: [get, list, watch]
+        - apiGroups: [batch]
+          resources: [jobs, cronjobs]
+          verbs: [get, list, watch]
+        - apiGroups: [autoscaling]
+          resources: [horizontalpodautoscalers]
+          verbs: [get, list, watch]
+        - apiGroups: [discovery.k8s.io]
+          resources: [endpointslices]
+          verbs: [get, list, watch]
+    additionalEnvs:
+      GOMEMLIMIT: 2400MiB
+    config:
+      processors:
+        memory_limiter:
+          check_interval: 1s
+          limit_mib: 3072
+          spike_limit_mib: 512
+      receivers:
+        k8s_events:
+          auth_type: serviceAccount
+        prometheus:
+          config:
+            global:
+              scrape_interval: 30s
+              scrape_timeout: 10s
+            scrape_configs:
+              - job_name: kube-state-metrics
+                kubernetes_sd_configs:
+                  - role: endpointslice
+                relabel_configs:
+                  - source_labels: [__meta_kubernetes_service_name]
+                    action: keep
+                    regex: .*kube-state-metrics
+                  - source_labels: [__meta_kubernetes_endpointslice_port_name]
+                    action: keep
+                    regex: http
+              - job_name: apisix
+                kubernetes_sd_configs:
+                  - role: pod
+                relabel_configs:
+                  - source_labels:
+                      [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+                    action: keep
+                    regex: apisix
+                  - source_labels: [__meta_kubernetes_pod_ip]
+                    target_label: __address__
+                    # Escape capture groups through Collector config expansion.
+                    replacement: $$1:9091
+              # scrape all the pods with the signoz annotations on them
+              - job_name: "signoz-annotated-pods"
+                kubernetes_sd_configs:
+                  - role: pod
+                relabel_configs:
+                  - source_labels:
+                      [__meta_kubernetes_pod_annotation_signoz_io_scrape]
+                    action: keep
+                    regex: true
+                  - source_labels:
+                      [__meta_kubernetes_pod_annotation_signoz_io_path]
+                    action: replace
+                    target_label: __metrics_path__
+                    regex: (.+)
+                  - source_labels:
+                      [
+                        __meta_kubernetes_pod_ip,
+                        __meta_kubernetes_pod_annotation_signoz_io_port,
+                      ]
+                    action: replace
+                    regex: ([^;]+);([^;]+)
+                    replacement: $$1:$$2
+                    target_label: __address__
+                  - source_labels: [__meta_kubernetes_namespace]
+                    action: replace
+                    target_label: kubernetes_namespace
+                  - source_labels: [__meta_kubernetes_pod_name]
+                    action: replace
+                    target_label: kubernetes_pod_name
+                  - source_labels:
+                      [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+                    action: replace
+                    target_label: app
+      service:
+        pipelines:
+          metrics/internal:
+            processors: [memory_limiter, batch]
+          metrics/scraper:
+            processors: [memory_limiter, batch]
+            receivers: [prometheus]
+          logs:
+            processors: [memory_limiter, batch]
+            receivers: [k8s_events]

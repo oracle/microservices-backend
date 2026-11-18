@@ -50,12 +50,12 @@ database:
   sqlcl:
     image:
       repository: container-registry.oracle.com/database/sqlcl
-      tag: "26.2.0"
+      tag: "26.2.2"
 
   # For SIDB-FREE/ADB-FREE: container image configuration (exclude for ADB-S)
   image:
     repository: "container-registry.oracle.com/database/free"
-    tag: "23.26.2.0"
+    tag: "23.26.3.0"
 
   # For OTHER: External database connectivity
   # Either provide 'dsn' OR all of (host, port, service_name)
