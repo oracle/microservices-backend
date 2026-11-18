@@ -1,6 +1,6 @@
 oracledb==2.3.0
 pandas==2.2.0
-numpy==1.26.4
+numpy==2.5.3
 faker==24.0.0
 networkx==3.3
 python-louvain==0.16
