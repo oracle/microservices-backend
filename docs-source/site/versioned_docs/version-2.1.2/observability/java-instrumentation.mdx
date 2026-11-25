@@ -1,0 +1,93 @@
+---
+title: Customizing Java Instrumentation
+sidebar_position: 7
+---
+
+import Admonition from '@theme/Admonition';
+
+Oracle Backend for Microservices and AI lets you pass custom environment variables to the OpenTelemetry Java agent through the `obaas` Helm chart. This makes it possible to tune logging, protocol settings, and agent behavior without modifying the core chart templates.
+
+## Before you start
+
+- This guide applies to Java applications that use OpenTelemetry auto-instrumentation in OBaaS.
+- Your application must be deployed with `otel.enabled: true` for the OpenTelemetry Operator to inject the Java agent and its environment variables.
+
+## Method 1: Using values.yaml (Recommended)
+
+This approach is best when you want a persistent configuration that is easy to review and reuse across deployments.
+
+Add the `env` list to your custom values file:
+
+```yaml
+signoz:
+  instrumentation:
+    java:
+      env:
+        - name: "OTEL_LOGS_EXPORTER"
+          value: "otlp"
+        - name: "OTEL_EXPORTER_OTLP_LOGS_PROTOCOL"
+          value: "grpc"
+        - name: "OTEL_METRIC_EXPORT_INTERVAL"
+          value: "15000"
+```
+
+In this example:
+
+- `OTEL_LOGS_EXPORTER=otlp` enables exporting application logs through OTLP.
+- `OTEL_EXPORTER_OTLP_LOGS_PROTOCOL=grpc` configures the OTLP logs exporter to use gRPC.
+- `OTEL_METRIC_EXPORT_INTERVAL=15000` changes the metrics export interval to 15 seconds.
+
+Deploy the updated configuration:
+
+```bash
+helm upgrade --install <app-release> obaas/obaas \
+  -f my-values.yaml \
+  -n <application-namespace> \
+  --create-namespace [--debug]
+```
+
+## Method 2: Using Helm CLI (--set-json)
+
+This method works well for quick testing or one-off overrides. `--set-json` is easier to read and maintain than a long `--set` expression when passing lists of objects.
+
+```bash
+helm upgrade --install <app-release> obaas/obaas \
+  -n <application-namespace> \
+  --create-namespace \
+  --set-json 'signoz.instrumentation.java.env=[{"name":"OTEL_METRIC_EXPORT_INTERVAL","value":"15000"}]' \
+  [--debug]
+```
+
+## How to Verify Changes
+
+### Check the Instrumentation resource
+
+Verify that the Instrumentation custom resource picked up your environment variables:
+
+```bash
+kubectl get instrumentation traces-instrumentation -n <application-namespace> -o yaml
+```
+
+In the output, look for your configured entries under the Java instrumentation environment list. You should see values such as `OTEL_LOGS_EXPORTER`, `OTEL_EXPORTER_OTLP_LOGS_PROTOCOL`, or `OTEL_METRIC_EXPORT_INTERVAL` in the resource definition.
+
+If the change was applied successfully, the instrumentation resource should show your configured variables and the restarted pod should use the same values.
+
+### Restart application pods
+
+<Admonition type="warning" title="Important">
+  The OpenTelemetry Operator injects environment variables only when pods are created. If your application pods are already running, restart them so the new settings are applied.
+</Admonition>
+
+```bash
+kubectl rollout restart deployment -n <application-namespace>
+```
+
+### Check the pod environment
+
+After the new pods are running, inspect the environment inside one of the application pods:
+
+```bash
+kubectl exec <pod-name> -n <application-namespace> -- env | grep OTEL_
+```
+
+If you set a custom variable that does not start with `OTEL_`, such as `CUSTOM_JAVA_SETTING`, adjust the `grep` expression to match that variable name as well.

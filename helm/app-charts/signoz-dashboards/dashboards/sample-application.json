@@ -1,0 +1,12 @@
+{
+  "version": "v5",
+  "image": "/assets/Icons/eight-ball",
+  "title": "Sample Application Dashboard",
+  "description": "Replace this empty sample with a dashboard exported from your SigNoz instance.",
+  "uploadedGrafana": false,
+  "tags": [],
+  "variables": {},
+  "layout": [],
+  "panelMap": {},
+  "widgets": []
+}

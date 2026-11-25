@@ -1,5 +1,17 @@
 # Workflows
 
+## dependency-checks
+
+Validates PRs touching `docs-source/site/` or `data-refactoring-advisor/`, including
+Dependabot updates. Each project runs only when its files change; changes to the
+workflow itself and manual runs validate both projects.
+
+The docs job uses Node 22 for a locked install, typecheck, and production build.
+The advisor job uses Python 3.12 to install requirements, check dependency
+compatibility, compile source, and run unit tests covering SQL parsing, community
+detection, configuration loading, and the Streamlit landing page. Database and
+LLM integration require separate testing with live services.
+
 ## obaas-base-image
 
 This workflow takes the GraalVM image from Oracle Container Registry, scans for vulnerabilities, applies the latest OS patches, and stages the new image in ghcr.io for use with the OBaaS Platform.

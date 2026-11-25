@@ -1,2926 +1,1614 @@
 {
-    "description": "MicroService API Gateway Apache APISIX",
-    "image": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE0Ljk0OTQgMTMuOTQyQzE2LjIzMTggMTIuNDI1OCAxNy4zMjY4IDkuNzAyMiAxNi4xOTU2IDYuNTc0ODdDMTUuNjQ0MyA1LjA1MjQ1IDE1LjAyMTkgNC4yMDI0OSAxNC4yOTY5IDMuNjYyNTJDMTMuODU1NyAzLjMzMzc5IDEyLjA5MzMgMi41MDYzMyA5Ljc1OTY1IDIuODY3NTZDOC4wNTM0OSAzLjEzMjU1IDUuNzc0ODcgNC4yMDg3NCA0LjI5MzY5IDUuOTU5OUMyLjg1NzUyIDcuNjYxMDYgMS43NDg4MyA5LjAwNDc0IDEuNjk3NTggMTAuMzA5N0MxLjYzMTMzIDExLjk4ODMgMi44OTYyNyAxMy40MzA4IDMuMDUwMDEgMTMuNjY0NUMzLjMyMzc0IDE0LjA3OTUgNS4xOTExNSAxNi40NTE4IDguNjk5NzEgMTYuNTczMUMxMS43OTcgMTYuNjc5MyAxMy44MTQ0IDE1LjI4NDQgMTQuOTQ5NCAxMy45NDJaIiBmaWxsPSIjNDAzRDNFIi8+CjxwYXRoIGQ9Ik00LjU1MzYzIDIuNzM3NDdDMi45Mzc0NiAzLjg5MTE2IDEuMTIxMzEgNi4yNTEwMyAxLjQ0NzU0IDkuNTYwODZDMS42MDYyOCAxMS4xNzIgMi4wMDI1MSAxMi4xNDk1IDIuNTcxMjMgMTIuODUwN0MyLjkxNzQ2IDEzLjI3ODIgNC40MTk4OCAxNC41NDkzIDYuNzczNTEgMTQuNzM2OEM5LjE0NTg4IDE0LjkyNTYgMTAuOTQ5NSAxNC4zOTQ0IDEyLjgzMzIgMTMuMDg0NEMxNi42NjE3IDEwLjQyMDggMTYuMDk4IDYuMzkzNTMgMTUuOTM0MyA1LjkyNDhDMTUuNzcwNSA1LjQ1NjA3IDE0LjU0NDQgMi42OTYyMiAxMS4xNzMzIDEuNzE1MDJDOC4xOTg0NCAwLjg1MDA2OCA1Ljk4MzU1IDEuNzE1MDIgNC41NTM2MyAyLjczNzQ3WiIgZmlsbD0iIzVFNjM2NyIvPgo8cGF0aCBkPSJNNy4zOTM1MyAyLjk2MTA5QzUuNjE3MzcgMi44OTczNCAzLjkxOTk2IDQuMjg4NTIgMy43NTYyMiA2LjAwNTkzQzMuNTkyNDggNy43MjIwOSA0LjY1NDkyIDkuMDI5NTIgNi4zMDk4MyA5LjI5NTc2QzcuOTY0NzUgOS41NjA3NCA5Ljg3ODM5IDguNTU1OCAxMC4yNjM0IDYuNDUwOTFDMTAuNjYwOSA0LjI4MjI3IDkuMDg5NjkgMy4wMjIzNCA3LjM5MzUzIDIuOTYxMDlaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNNy45NDIxNyA1LjkwMTE1QzcuOTQyMTcgNS45MDExNSA4LjM2OTY1IDUuODEyNCA4LjQ1NDY1IDUuMTgyNDRDOC41MzgzOSA0LjU2MjQ3IDguMjMwOTEgNC4wMzM3NSA3LjUxMzQ1IDMuODQzNzZDNi43MzM0OSAzLjYzNzUyIDYuMjA0NzcgNC4wNjYyNSA2LjA2NzI3IDQuNTE3NDdDNS44NzYwMyA1LjE0NDk0IDYuMTU4NTIgNS40NDM2NyA2LjE1ODUyIDUuNDQzNjdDNi4xNTg1MiA1LjQ0MzY3IDUuMzkzNTYgNS42Mjc0MSA1LjMzMjMxIDYuNTI5ODdDNS4yNzQ4MSA3LjM4MTA3IDUuODU2MDMgNy44Mzg1NSA2LjQzOTc1IDcuOTc4NTRDNy4xNjA5NiA4LjE1MjI4IDcuOTc4NDIgNy45NTQ3OSA4LjE3ODQxIDcuMDM0ODRDOC4zNDQ2NSA2LjI3NzM4IDcuOTQyMTcgNS45MDExNSA3Ljk0MjE3IDUuOTAxMTVaIiBmaWxsPSIjMzAzMDMwIi8+CjxwYXRoIGQ9Ik02LjczOTgzIDQuNzUzNjJDNi42NzEwOSA1LjAxMjM1IDYuODA4NTggNS4yNjIzNCA3LjA3ODU3IDUuMzMxMDlDNy4zNjk4IDUuNDA0ODMgNy42MzQ3OSA1LjMwODU5IDcuNzA2MDMgNS4wMTExQzcuNzY4NTMgNC43NDczNyA3LjY0MzU0IDQuNTE0ODggNy4zMzYwNSA0LjQzOTg4QzcuMDgzNTcgNC4zNzczOSA2LjgxNDgzIDQuNDcxMTMgNi43Mzk4MyA0Ljc1MzYyWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTYuOTU5NzggNi4wMzk3NEM2LjYzMjMgNS45Mzg0OSA2LjE5OTgyIDYuMDY0NzMgNi4xMzEwNyA2LjUwNDcxQzYuMDYyMzMgNi45NDQ2OSA2LjMyNjA2IDcuMTY5NjggNi42NzEwNCA3LjIzMjE3QzcuMDE2MDMgNy4yOTQ2NyA3LjM0MjI2IDcuMTEzNDMgNy40MDYwMSA2Ljc2MDk1QzcuNDY4NSA2LjQwOTcyIDcuMjg2MDEgNi4xMzk3MyA2Ljk1OTc4IDYuMDM5NzRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K",
-    "layout": [
-        {
-            "h": 1,
-            "i": "2488460f-94df-47f4-903f-b2c8a92778a0",
-            "maxH": 1,
-            "minH": 1,
-            "minW": 12,
-            "moved": false,
-            "static": false,
-            "w": 12,
-            "x": 0,
-            "y": 0
-        },
-        {
-            "h": 8,
-            "i": "51d09349-b65e-42e6-8871-488e98a5cab5",
-            "moved": false,
-            "static": false,
-            "w": 2,
-            "x": 0,
-            "y": 1
-        },
-        {
-            "h": 8,
-            "i": "7becb23c-250a-4bb4-aefd-a3e7f4908d9f",
-            "moved": false,
-            "static": false,
-            "w": 2,
-            "x": 2,
-            "y": 1
-        },
-        {
-            "h": 8,
-            "i": "7d6a6e7d-1a17-4f49-9aad-6c0c81a8c0ce",
-            "moved": false,
-            "static": false,
-            "w": 2,
-            "x": 4,
-            "y": 1
-        },
-        {
-            "h": 8,
-            "i": "8e49aded-11b2-45b4-918d-2659e2fe15c8",
-            "moved": false,
-            "static": false,
-            "w": 6,
-            "x": 6,
-            "y": 1
-        },
-        {
-            "h": 1,
-            "i": "93c65502-cc44-4cac-9f78-752153b45b76",
-            "maxH": 1,
-            "minH": 1,
-            "minW": 12,
-            "moved": false,
-            "static": false,
-            "w": 12,
-            "x": 0,
-            "y": 9
-        },
-        {
-            "h": 8,
-            "i": "a8d0d914-2f47-4db4-b0ce-a1e166e62d6c",
-            "moved": false,
-            "static": false,
-            "w": 12,
-            "x": 0,
-            "y": 10
-        },
-        {
-            "h": 8,
-            "i": "052e360a-4099-4610-ac9d-421188eceafd",
-            "moved": false,
-            "static": false,
-            "w": 6,
-            "x": 0,
-            "y": 18
-        },
-        {
-            "h": 8,
-            "i": "af0924a0-17a2-4e53-84e5-3741320a05ab",
-            "moved": false,
-            "static": false,
-            "w": 6,
-            "x": 6,
-            "y": 18
-        },
-        {
-            "h": 1,
-            "i": "6efdc9e3-cd59-4b41-b124-4f8767186f9e",
-            "maxH": 1,
-            "minH": 1,
-            "minW": 12,
-            "moved": false,
-            "static": false,
-            "w": 12,
-            "x": 0,
-            "y": 26
-        },
-        {
-            "h": 8,
-            "i": "072d5f2a-191c-40f4-8d58-351ab8058513",
-            "moved": false,
-            "static": false,
-            "w": 12,
-            "x": 0,
-            "y": 27
-        },
-        {
-            "h": 8,
-            "i": "753f44e6-473f-48da-9c37-11bfda3517d9",
-            "moved": false,
-            "static": false,
-            "w": 12,
-            "x": 0,
-            "y": 35
-        },
-        {
-            "h": 8,
-            "i": "d3a7e234-83fe-499b-8846-243e8d8718fc",
-            "moved": false,
-            "static": false,
-            "w": 4,
-            "x": 0,
-            "y": 43
-        },
-        {
-            "h": 8,
-            "i": "f55874f1-8979-46e1-b787-f74cee23d509",
-            "moved": false,
-            "static": false,
-            "w": 4,
-            "x": 4,
-            "y": 43
-        },
-        {
-            "h": 8,
-            "i": "46cdbcad-8d52-4f63-9130-bc03230b77ab",
-            "moved": false,
-            "static": false,
-            "w": 4,
-            "x": 8,
-            "y": 43
-        },
-        {
-            "h": 1,
-            "i": "5939d2eb-42ea-42b4-ad43-b149abc6f17d",
-            "maxH": 1,
-            "minH": 1,
-            "minW": 12,
-            "moved": false,
-            "static": false,
-            "w": 12,
-            "x": 0,
-            "y": 51
-        },
-        {
-            "h": 9,
-            "i": "7e254b81-e050-4650-8aad-7e2691b5cb16",
-            "moved": false,
-            "static": false,
-            "w": 6,
-            "x": 0,
-            "y": 52
-        },
-        {
-            "h": 9,
-            "i": "73017c8b-29c6-4493-b274-6a8a2cfd6b32",
-            "moved": false,
-            "static": false,
-            "w": 3,
-            "x": 6,
-            "y": 52
-        },
-        {
-            "h": 9,
-            "i": "19ba4ab0-a2fd-4135-be0b-070de0ea6dc2",
-            "moved": false,
-            "static": false,
-            "w": 3,
-            "x": 9,
-            "y": 52
-        }
-    ],
-    "panelMap": {
-        "2488460f-94df-47f4-903f-b2c8a92778a0": {
-            "collapsed": false,
-            "widgets": [
-                {
-                    "h": 8,
-                    "i": "51d09349-b65e-42e6-8871-488e98a5cab5",
-                    "moved": false,
-                    "static": false,
-                    "w": 2,
-                    "x": 0,
-                    "y": 1
-                },
-                {
-                    "h": 8,
-                    "i": "7becb23c-250a-4bb4-aefd-a3e7f4908d9f",
-                    "moved": false,
-                    "static": false,
-                    "w": 2,
-                    "x": 2,
-                    "y": 1
-                },
-                {
-                    "h": 8,
-                    "i": "7d6a6e7d-1a17-4f49-9aad-6c0c81a8c0ce",
-                    "moved": false,
-                    "static": false,
-                    "w": 2,
-                    "x": 4,
-                    "y": 1
-                },
-                {
-                    "h": 8,
-                    "i": "8e49aded-11b2-45b4-918d-2659e2fe15c8",
-                    "moved": false,
-                    "static": false,
-                    "w": 6,
-                    "x": 6,
-                    "y": 1
-                }
-            ]
-        },
-        "5939d2eb-42ea-42b4-ad43-b149abc6f17d": {
-            "collapsed": false,
-            "widgets": [
-                {
-                    "h": 8,
-                    "i": "7e254b81-e050-4650-8aad-7e2691b5cb16",
-                    "moved": false,
-                    "static": false,
-                    "w": 6,
-                    "x": 0,
-                    "y": 287
-                },
-                {
-                    "h": 9,
-                    "i": "73017c8b-29c6-4493-b274-6a8a2cfd6b32",
-                    "moved": false,
-                    "static": false,
-                    "w": 3,
-                    "x": 6,
-                    "y": 287
-                },
-                {
-                    "h": 9,
-                    "i": "19ba4ab0-a2fd-4135-be0b-070de0ea6dc2",
-                    "moved": false,
-                    "static": false,
-                    "w": 3,
-                    "x": 9,
-                    "y": 287
-                }
-            ]
-        },
-        "6efdc9e3-cd59-4b41-b124-4f8767186f9e": {
-            "collapsed": false,
-            "widgets": [
-                {
-                    "h": 8,
-                    "i": "072d5f2a-191c-40f4-8d58-351ab8058513",
-                    "moved": false,
-                    "static": false,
-                    "w": 12,
-                    "x": 0,
-                    "y": 107
-                },
-                {
-                    "h": 8,
-                    "i": "753f44e6-473f-48da-9c37-11bfda3517d9",
-                    "moved": false,
-                    "static": false,
-                    "w": 12,
-                    "x": 0,
-                    "y": 115
-                },
-                {
-                    "h": 8,
-                    "i": "d3a7e234-83fe-499b-8846-243e8d8718fc",
-                    "moved": false,
-                    "static": false,
-                    "w": 4,
-                    "x": 0,
-                    "y": 123
-                },
-                {
-                    "h": 8,
-                    "i": "f55874f1-8979-46e1-b787-f74cee23d509",
-                    "moved": false,
-                    "static": false,
-                    "w": 4,
-                    "x": 4,
-                    "y": 123
-                },
-                {
-                    "h": 8,
-                    "i": "227a0ce2-2ed5-4a53-90d1-74a907313b97",
-                    "moved": false,
-                    "static": false,
-                    "w": 4,
-                    "x": 8,
-                    "y": 123
-                }
-            ]
-        },
-        "93c65502-cc44-4cac-9f78-752153b45b76": {
-            "collapsed": false,
-            "widgets": [
-                {
-                    "h": 8,
-                    "i": "a8d0d914-2f47-4db4-b0ce-a1e166e62d6c",
-                    "moved": false,
-                    "static": false,
-                    "w": 12,
-                    "x": 0,
-                    "y": 26
-                },
-                {
-                    "h": 8,
-                    "i": "052e360a-4099-4610-ac9d-421188eceafd",
-                    "moved": false,
-                    "static": false,
-                    "w": 6,
-                    "x": 0,
-                    "y": 34
-                },
-                {
-                    "h": 8,
-                    "i": "af0924a0-17a2-4e53-84e5-3741320a05ab",
-                    "moved": false,
-                    "static": false,
-                    "w": 6,
-                    "x": 6,
-                    "y": 34
-                }
-            ]
-        }
+  "schemaVersion": "v6",
+  "image": "/assets/Icons/eight-ball",
+  "name": "",
+  "generateName": true,
+  "tags": [],
+  "spec": {
+    "display": {
+      "name": "Apache APISIX",
+      "description": "MicroService API Gateway Apache APISIX"
     },
-    "tags": [],
-    "title": "Apache APISIX",
-    "uploadedGrafana": false,
-    "uuid": "01997ae1-3264-7d4c-ae07-f29969f14fdf",
-    "variables": {
-        "08e2079f-4fe6-4625-b920-d17689985de3": {
-            "allSelected": true,
-            "customValue": "",
-            "defaultValue": "",
-            "description": "",
-            "id": "08e2079f-4fe6-4625-b920-d17689985de3",
-            "key": "08e2079f-4fe6-4625-b920-d17689985de3",
-            "modificationUUID": "0a0cde8f-0ff1-4ac2-9d56-41b73f17c7a2",
-            "multiSelect": true,
+    "variables": [
+      {
+        "kind": "ListVariable",
+        "spec": {
+          "display": {
             "name": "apisix_instance",
-            "order": 0,
-            "queryValue": "SELECT distinct JSONExtractString(labels, 'hostname')\nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'apisix_http_status')",
-            "showALLOption": true,
-            "sort": "ASC",
-            "textboxValue": "",
-            "type": "QUERY"
-        },
-        "183c6709-cbdc-4af1-8413-2dc26d0458d8": {
-            "allSelected": true,
-            "customValue": "",
-            "defaultValue": "",
-            "description": "",
-            "id": "183c6709-cbdc-4af1-8413-2dc26d0458d8",
-            "modificationUUID": "0f7e5c98-14fe-45ce-af54-961d012fb5a6",
-            "multiSelect": true,
-            "name": "uri",
-            "order": 2,
-            "queryValue": "SELECT distinct JSONExtractString(labels, 'uri')\nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'apisix_http_status')\nand (JSONExtractString(labels, 'uri') != '')\nand (JSONExtractString(labels, 'hostname') in {{.apisix_instance}})\nand (JSONExtractString(labels, 'http_host') in {{.gateway_ip_port}})\n\n",
-            "showALLOption": true,
-            "sort": "ASC",
-            "textboxValue": "",
-            "type": "QUERY"
-        },
-        "40bbb6c8-b187-4757-b436-40a25da3073c": {
-            "allSelected": true,
-            "customValue": "",
-            "defaultValue": "",
-            "description": "",
-            "id": "40bbb6c8-b187-4757-b436-40a25da3073c",
-            "key": "40bbb6c8-b187-4757-b436-40a25da3073c",
-            "modificationUUID": "b4d5c37a-0c76-4718-a27b-194534b83535",
-            "multiSelect": true,
+            "description": ""
+          },
+          "allowAllValue": true,
+          "allowMultiple": true,
+          "customAllValue": "",
+          "capturingRegexp": "",
+          "sort": "alphabetical-asc",
+          "plugin": {
+            "kind": "signoz/QueryVariable",
+            "spec": {
+              "queryValue": "SELECT distinct JSONExtractString(labels, 'hostname')\nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'apisix_http_status')"
+            }
+          },
+          "name": "apisix_instance"
+        }
+      },
+      {
+        "kind": "ListVariable",
+        "spec": {
+          "display": {
             "name": "gateway_ip_port",
-            "order": 1,
-            "queryValue": "SELECT distinct JSONExtractString(labels, 'http_host')\nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'apisix_http_status')\nand (JSONExtractString(labels, 'hostname') in {{.apisix_instance}})",
-            "showALLOption": true,
-            "sort": "ASC",
-            "textboxValue": "",
-            "type": "QUERY"
-        },
-        "87107f68-fdbb-489f-9bd7-bbed6db26e03": {
-            "allSelected": true,
-            "customValue": "",
-            "description": "",
-            "id": "87107f68-fdbb-489f-9bd7-bbed6db26e03",
-            "key": "87107f68-fdbb-489f-9bd7-bbed6db26e03",
-            "modificationUUID": "d6694a09-3d29-46f9-bcc5-1b85ec35ff82",
-            "multiSelect": true,
-            "name": "target_pod_ip_port",
-            "order": 4,
-            "queryValue": "SELECT distinct JSONExtractString(labels, 'upstream_addr')\nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'apisix_http_status')\nand (JSONExtractString(labels, 'uri') in {{.uri}})\nand (JSONExtractString(labels, 'route') in {{.route_id}})",
-            "showALLOption": true,
-            "sort": "ASC",
-            "textboxValue": "",
-            "type": "QUERY"
-        },
-        "c6fa20bb-6d5b-43f4-a76d-1a66b18a6a5f": {
-            "allSelected": true,
-            "customValue": "",
-            "description": "",
-            "id": "c6fa20bb-6d5b-43f4-a76d-1a66b18a6a5f",
-            "key": "c6fa20bb-6d5b-43f4-a76d-1a66b18a6a5f",
-            "modificationUUID": "5eb854de-5f09-4537-b4fb-6b4215d352a9",
-            "multiSelect": true,
+            "description": ""
+          },
+          "allowAllValue": true,
+          "allowMultiple": true,
+          "customAllValue": "",
+          "capturingRegexp": "",
+          "sort": "alphabetical-asc",
+          "plugin": {
+            "kind": "signoz/QueryVariable",
+            "spec": {
+              "queryValue": "SELECT distinct JSONExtractString(labels, 'http_host')\nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'apisix_http_status')\nand (JSONExtractString(labels, 'hostname') in {{.apisix_instance}})"
+            }
+          },
+          "name": "gateway_ip_port"
+        }
+      },
+      {
+        "kind": "ListVariable",
+        "spec": {
+          "display": {
+            "name": "uri",
+            "description": ""
+          },
+          "allowAllValue": true,
+          "allowMultiple": true,
+          "customAllValue": "",
+          "capturingRegexp": "",
+          "sort": "alphabetical-asc",
+          "plugin": {
+            "kind": "signoz/QueryVariable",
+            "spec": {
+              "queryValue": "SELECT distinct JSONExtractString(labels, 'uri')\nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'apisix_http_status')\nand (JSONExtractString(labels, 'uri') != '')\nand (JSONExtractString(labels, 'hostname') in {{.apisix_instance}})\nand (JSONExtractString(labels, 'http_host') in {{.gateway_ip_port}})\n\n"
+            }
+          },
+          "name": "uri"
+        }
+      },
+      {
+        "kind": "ListVariable",
+        "spec": {
+          "display": {
             "name": "route_id",
-            "order": 3,
-            "queryValue": "SELECT distinct JSONExtractString(labels, 'route')\nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'apisix_http_status')\nand (JSONExtractString(labels, 'uri') != '')\nand (JSONExtractString(labels, 'route') != '')\n\n",
-            "showALLOption": true,
-            "sort": "ASC",
-            "textboxValue": "",
-            "type": "QUERY"
+            "description": ""
+          },
+          "allowAllValue": true,
+          "allowMultiple": true,
+          "customAllValue": "",
+          "capturingRegexp": "",
+          "sort": "alphabetical-asc",
+          "plugin": {
+            "kind": "signoz/QueryVariable",
+            "spec": {
+              "queryValue": "SELECT distinct JSONExtractString(labels, 'route')\nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'apisix_http_status')\nand (JSONExtractString(labels, 'uri') != '')\nand (JSONExtractString(labels, 'route') != '')\n\n"
+            }
+          },
+          "name": "route_id"
         }
+      },
+      {
+        "kind": "ListVariable",
+        "spec": {
+          "display": {
+            "name": "target_pod_ip_port",
+            "description": ""
+          },
+          "allowAllValue": true,
+          "allowMultiple": true,
+          "customAllValue": "",
+          "capturingRegexp": "",
+          "sort": "alphabetical-asc",
+          "plugin": {
+            "kind": "signoz/QueryVariable",
+            "spec": {
+              "queryValue": "SELECT distinct JSONExtractString(labels, 'upstream_addr')\nFROM signoz_metrics.distributed_time_series_v4\nWHERE (metric_name = 'apisix_http_status')\nand (JSONExtractString(labels, 'uri') in {{.uri}})\nand (JSONExtractString(labels, 'route') in {{.route_id}})"
+            }
+          },
+          "name": "target_pod_ip_port"
+        }
+      }
+    ],
+    "panels": {
+      "052e360a-4099-4610-ac9d-421188eceafd": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Ingress per uri",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": true
+              },
+              "formatting": {
+                "unit": "decbytes",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "apisix_bandwidth",
+                        "temporality": "",
+                        "timeAggregation": "rate",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "avg"
+                      }
+                    ],
+                    "disabled": false,
+                    "filter": {
+                      "expression": "(uri = '.uri' AND route = '.route_id' AND hostname = '.apisix_instance' AND type = 'ingress')"
+                    },
+                    "groupBy": [
+                      {
+                        "name": "uri",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      }
+                    ],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": "{{uri}}"
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "072d5f2a-191c-40f4-8d58-351ab8058513": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Requests per second (RPS) by status code",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": true
+              },
+              "formatting": {
+                "unit": "reqps",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "apisix_http_status",
+                        "temporality": "",
+                        "timeAggregation": "rate",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "avg"
+                      }
+                    ],
+                    "disabled": false,
+                    "filter": {
+                      "expression": "(uri = '.uri' AND route = '.route_id' AND hostname = '.apisix_instance')"
+                    },
+                    "groupBy": [
+                      {
+                        "name": "code",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      }
+                    ],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": "{{code}}"
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "19ba4ab0-a2fd-4135-be0b-070de0ea6dc2": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Nginx metric errors",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/NumberPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time"
+              },
+              "formatting": {
+                "unit": "none",
+                "decimalPrecision": "2"
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "scalar",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "apisix_nginx_metric_errors_total",
+                        "temporality": "",
+                        "timeAggregation": "rate",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "last"
+                      }
+                    ],
+                    "disabled": false,
+                    "groupBy": [],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": ""
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "46cdbcad-8d52-4f63-9130-bc03230b77ab": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Upstream Latency",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/HistogramPanel",
+            "spec": {
+              "histogramBuckets": {
+                "bucketCount": 100,
+                "bucketWidth": 0,
+                "mergeAllActiveQueries": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/CompositeQuery",
+                  "spec": {
+                    "queries": [
+                      {
+                        "type": "builder_query",
+                        "spec": {
+                          "name": "A",
+                          "signal": "metrics",
+                          "source": "",
+                          "aggregations": [
+                            {
+                              "metricName": "apisix_http_latency.bucket",
+                              "temporality": "",
+                              "timeAggregation": "rate",
+                              "spaceAggregation": "p90",
+                              "reduceTo": "avg"
+                            }
+                          ],
+                          "disabled": false,
+                          "filter": {
+                            "expression": "type IN ['upstream'] AND hostname IN ['.apisix_instance'] AND uri IN ['.uri']"
+                          },
+                          "groupBy": [],
+                          "order": [],
+                          "having": {
+                            "expression": ""
+                          },
+                          "functions": [],
+                          "legend": "p90"
+                        }
+                      },
+                      {
+                        "type": "builder_query",
+                        "spec": {
+                          "name": "B",
+                          "signal": "metrics",
+                          "source": "",
+                          "aggregations": [
+                            {
+                              "metricName": "apisix_http_latency.bucket",
+                              "temporality": "",
+                              "timeAggregation": "rate",
+                              "spaceAggregation": "p95",
+                              "reduceTo": "avg"
+                            }
+                          ],
+                          "disabled": false,
+                          "filter": {
+                            "expression": "type IN ['upstream'] AND hostname IN ['.apisix_instance'] AND uri IN ['.uri']"
+                          },
+                          "groupBy": [],
+                          "order": [],
+                          "having": {
+                            "expression": ""
+                          },
+                          "functions": [],
+                          "legend": "p95"
+                        }
+                      },
+                      {
+                        "type": "builder_query",
+                        "spec": {
+                          "name": "C",
+                          "signal": "metrics",
+                          "source": "",
+                          "aggregations": [
+                            {
+                              "metricName": "apisix_http_latency.bucket",
+                              "temporality": "",
+                              "timeAggregation": "rate",
+                              "spaceAggregation": "p99",
+                              "reduceTo": "avg"
+                            }
+                          ],
+                          "disabled": false,
+                          "filter": {
+                            "expression": "type IN ['upstream'] AND hostname IN ['.apisix_instance'] AND uri IN ['.uri']"
+                          },
+                          "groupBy": [],
+                          "order": [],
+                          "having": {
+                            "expression": ""
+                          },
+                          "functions": [],
+                          "legend": "p95"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "51d09349-b65e-42e6-8871-488e98a5cab5": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Total Requests",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/NumberPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time"
+              },
+              "formatting": {
+                "unit": "none",
+                "decimalPrecision": "2"
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "scalar",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "apisix_http_requests_total",
+                        "temporality": "",
+                        "timeAggregation": "latest",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "last"
+                      }
+                    ],
+                    "disabled": false,
+                    "filter": {
+                      "expression": ""
+                    },
+                    "groupBy": [],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": ""
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "73017c8b-29c6-4493-b274-6a8a2cfd6b32": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Etcd reachable",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/NumberPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time"
+              },
+              "formatting": {
+                "unit": "bool_yes_no",
+                "decimalPrecision": "2"
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "scalar",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "apisix_etcd_reachable",
+                        "temporality": "",
+                        "timeAggregation": "latest",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "last"
+                      }
+                    ],
+                    "disabled": false,
+                    "groupBy": [],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": ""
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "753f44e6-473f-48da-9c37-11bfda3517d9": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Requests per second (RPS) by uri",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": false
+              },
+              "formatting": {
+                "unit": "reqps",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "apisix_http_status",
+                        "temporality": "",
+                        "timeAggregation": "rate",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "avg"
+                      }
+                    ],
+                    "disabled": false,
+                    "filter": {
+                      "expression": "(uri = '.uri' AND route = '.route_id' AND hostname = '.apisix_instance')"
+                    },
+                    "groupBy": [
+                      {
+                        "name": "uri",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      }
+                    ],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": "{{uri}}"
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "7becb23c-250a-4bb4-aefd-a3e7f4908d9f": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Accepted Connections",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/NumberPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time"
+              },
+              "formatting": {
+                "unit": "none",
+                "decimalPrecision": "2"
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "scalar",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "apisix_nginx_http_current_connections",
+                        "temporality": "",
+                        "timeAggregation": "latest",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "last"
+                      }
+                    ],
+                    "disabled": false,
+                    "filter": {
+                      "expression": "state = 'accepted'"
+                    },
+                    "groupBy": [],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": ""
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "7d6a6e7d-1a17-4f49-9aad-6c0c81a8c0ce": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Handled Connections",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/NumberPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time"
+              },
+              "formatting": {
+                "unit": "none",
+                "decimalPrecision": "2"
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "scalar",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "apisix_nginx_http_current_connections",
+                        "temporality": "",
+                        "timeAggregation": "latest",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "last"
+                      }
+                    ],
+                    "disabled": false,
+                    "filter": {
+                      "expression": "state = 'handled'"
+                    },
+                    "groupBy": [],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": ""
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "7e254b81-e050-4650-8aad-7e2691b5cb16": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Etcd modify indexes",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": true
+              },
+              "formatting": {
+                "unit": "none",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "apisix_etcd_modify_indexes",
+                        "temporality": "",
+                        "timeAggregation": "sum",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "avg"
+                      }
+                    ],
+                    "disabled": false,
+                    "groupBy": [
+                      {
+                        "name": "key",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      }
+                    ],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": "{{key}}"
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "8e49aded-11b2-45b4-918d-2659e2fe15c8": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Nginx connection state",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": true
+              },
+              "formatting": {
+                "unit": "none",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "apisix_nginx_http_current_connections",
+                        "temporality": "",
+                        "timeAggregation": "latest",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "avg"
+                      }
+                    ],
+                    "disabled": false,
+                    "filter": {
+                      "expression": ""
+                    },
+                    "groupBy": [
+                      {
+                        "name": "state",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      }
+                    ],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": "{{state}}"
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "a8d0d914-2f47-4db4-b0ce-a1e166e62d6c": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Total Bandwidth",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": true
+              },
+              "formatting": {
+                "unit": "decbytes",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "apisix_bandwidth",
+                        "temporality": "",
+                        "timeAggregation": "rate",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "avg"
+                      }
+                    ],
+                    "disabled": false,
+                    "filter": {
+                      "expression": "(uri = '.uri' AND route = '.route_id' AND hostname = '.apisix_instance')"
+                    },
+                    "groupBy": [
+                      {
+                        "name": "type",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      }
+                    ],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": "{{type}}"
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "af0924a0-17a2-4e53-84e5-3741320a05ab": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Egress per uri",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "timePreference": "global_time",
+                "fillSpans": true
+              },
+              "formatting": {
+                "unit": "decbytes",
+                "decimalPrecision": "2"
+              },
+              "chartAppearance": {
+                "lineInterpolation": "spline",
+                "showPoints": false,
+                "lineStyle": "solid",
+                "fillMode": "none",
+                "spanGaps": {
+                  "fillOnlyBelow": false,
+                  "fillLessThan": ""
+                }
+              },
+              "axes": {
+                "softMin": 0,
+                "softMax": 0,
+                "isLogScale": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              },
+              "thresholds": null
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "name": "A",
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "stepInterval": 60,
+                    "signal": "metrics",
+                    "source": "",
+                    "aggregations": [
+                      {
+                        "metricName": "apisix_bandwidth",
+                        "temporality": "",
+                        "timeAggregation": "rate",
+                        "spaceAggregation": "sum",
+                        "reduceTo": "avg"
+                      }
+                    ],
+                    "disabled": false,
+                    "filter": {
+                      "expression": "(uri = '.uri' AND route = '.route_id' AND hostname = '.apisix_instance' AND type = 'egress')"
+                    },
+                    "groupBy": [
+                      {
+                        "name": "uri",
+                        "signal": "",
+                        "fieldContext": "attribute",
+                        "fieldDataType": "string"
+                      }
+                    ],
+                    "order": [],
+                    "having": {
+                      "expression": ""
+                    },
+                    "functions": [],
+                    "legend": "{{uri}}"
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "d3a7e234-83fe-499b-8846-243e8d8718fc": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Request Latency",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/HistogramPanel",
+            "spec": {
+              "histogramBuckets": {
+                "bucketCount": 100,
+                "bucketWidth": 0,
+                "mergeAllActiveQueries": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/CompositeQuery",
+                  "spec": {
+                    "queries": [
+                      {
+                        "type": "builder_query",
+                        "spec": {
+                          "name": "A",
+                          "stepInterval": 60,
+                          "signal": "metrics",
+                          "source": "",
+                          "aggregations": [
+                            {
+                              "metricName": "apisix_http_latency.bucket",
+                              "temporality": "",
+                              "timeAggregation": "rate",
+                              "spaceAggregation": "p90",
+                              "reduceTo": "avg"
+                            }
+                          ],
+                          "disabled": false,
+                          "filter": {
+                            "expression": "uri in ['.uri'] AND hostname in ['.apisix_instance'] AND type IN ['request']"
+                          },
+                          "groupBy": [
+                            {
+                              "name": "le",
+                              "signal": "",
+                              "fieldContext": "attribute",
+                              "fieldDataType": "string"
+                            }
+                          ],
+                          "order": [],
+                          "having": {
+                            "expression": ""
+                          },
+                          "functions": [],
+                          "legend": "p90"
+                        }
+                      },
+                      {
+                        "type": "builder_query",
+                        "spec": {
+                          "name": "B",
+                          "stepInterval": 60,
+                          "signal": "metrics",
+                          "source": "",
+                          "aggregations": [
+                            {
+                              "metricName": "apisix_http_latency.bucket",
+                              "temporality": "",
+                              "timeAggregation": "rate",
+                              "spaceAggregation": "p95",
+                              "reduceTo": "avg"
+                            }
+                          ],
+                          "disabled": false,
+                          "filter": {
+                            "expression": "uri in ['.uri'] AND hostname in ['.apisix_instance'] AND type IN ['request']"
+                          },
+                          "groupBy": [
+                            {
+                              "name": "le",
+                              "signal": "",
+                              "fieldContext": "attribute",
+                              "fieldDataType": "string"
+                            }
+                          ],
+                          "order": [],
+                          "having": {
+                            "expression": ""
+                          },
+                          "functions": [],
+                          "legend": "p95"
+                        }
+                      },
+                      {
+                        "type": "builder_query",
+                        "spec": {
+                          "name": "C",
+                          "stepInterval": 60,
+                          "signal": "metrics",
+                          "source": "",
+                          "aggregations": [
+                            {
+                              "metricName": "apisix_http_latency.bucket",
+                              "temporality": "",
+                              "timeAggregation": "rate",
+                              "spaceAggregation": "p99",
+                              "reduceTo": "avg"
+                            }
+                          ],
+                          "disabled": false,
+                          "filter": {
+                            "expression": "uri in ['.uri'] AND hostname in ['.apisix_instance'] AND type IN ['request']"
+                          },
+                          "groupBy": [
+                            {
+                              "name": "le",
+                              "signal": "",
+                              "fieldContext": "attribute",
+                              "fieldDataType": "string"
+                            }
+                          ],
+                          "order": [],
+                          "having": {
+                            "expression": ""
+                          },
+                          "functions": [],
+                          "legend": "p99"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      },
+      "f55874f1-8979-46e1-b787-f74cee23d509": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "APISIX Latency",
+            "description": ""
+          },
+          "plugin": {
+            "kind": "signoz/HistogramPanel",
+            "spec": {
+              "histogramBuckets": {
+                "bucketCount": 100,
+                "bucketWidth": 0,
+                "mergeAllActiveQueries": false
+              },
+              "legend": {
+                "position": "bottom",
+                "mode": "list",
+                "customColors": null
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/CompositeQuery",
+                  "spec": {
+                    "queries": [
+                      {
+                        "type": "builder_query",
+                        "spec": {
+                          "name": "A",
+                          "signal": "metrics",
+                          "source": "",
+                          "aggregations": [
+                            {
+                              "metricName": "apisix_http_latency.bucket",
+                              "temporality": "",
+                              "timeAggregation": "rate",
+                              "spaceAggregation": "p90",
+                              "reduceTo": "avg"
+                            }
+                          ],
+                          "disabled": false,
+                          "filter": {
+                            "expression": "type IN ['apisix'] AND hostname IN ['.apisix_instance'] AND uri IN ['.uri']"
+                          },
+                          "groupBy": [],
+                          "order": [],
+                          "having": {
+                            "expression": ""
+                          },
+                          "functions": [],
+                          "legend": "p90"
+                        }
+                      },
+                      {
+                        "type": "builder_query",
+                        "spec": {
+                          "name": "B",
+                          "signal": "metrics",
+                          "source": "",
+                          "aggregations": [
+                            {
+                              "metricName": "apisix_http_latency.bucket",
+                              "temporality": "",
+                              "timeAggregation": "rate",
+                              "spaceAggregation": "p95",
+                              "reduceTo": "avg"
+                            }
+                          ],
+                          "disabled": false,
+                          "filter": {
+                            "expression": "type IN ['apisix'] AND hostname IN ['.apisix_instance'] AND uri IN ['.uri']"
+                          },
+                          "groupBy": [],
+                          "order": [],
+                          "having": {
+                            "expression": ""
+                          },
+                          "functions": [],
+                          "legend": "p95"
+                        }
+                      },
+                      {
+                        "type": "builder_query",
+                        "spec": {
+                          "name": "C",
+                          "signal": "metrics",
+                          "source": "",
+                          "aggregations": [
+                            {
+                              "metricName": "apisix_http_latency.bucket",
+                              "temporality": "",
+                              "timeAggregation": "rate",
+                              "spaceAggregation": "p99",
+                              "reduceTo": "avg"
+                            }
+                          ],
+                          "disabled": false,
+                          "filter": {
+                            "expression": "type IN ['apisix'] AND hostname IN ['.apisix_instance'] AND uri IN ['.uri']"
+                          },
+                          "groupBy": [],
+                          "order": [],
+                          "having": {
+                            "expression": ""
+                          },
+                          "functions": [],
+                          "legend": "p95"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "links": []
+        }
+      }
     },
-    "version": "v4",
-    "widgets": [
-        {
-            "bucketCount": 30,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "contextLinks": {
-                "linksData": []
+    "layouts": [
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Nginx",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 2,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/51d09349-b65e-42e6-8871-488e98a5cab5"
+              }
             },
-            "customLegendColors": {},
-            "description": "",
-            "fillSpans": false,
-            "id": "51d09349-b65e-42e6-8871-488e98a5cab5",
-            "isLogScale": false,
-            "isStacked": false,
-            "legendPosition": "bottom",
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "value",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_http_requests_total",
-                                    "reduceTo": "last",
-                                    "spaceAggregation": "sum",
-                                    "timeAggregation": "latest"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filter": {
-                                "expression": ""
-                            },
-                            "functions": [],
-                            "groupBy": [],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "source": "",
-                            "stepInterval": 60
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "c02b27cc-0290-433b-8555-6271a8e282ae",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
+            {
+              "x": 2,
+              "y": 0,
+              "width": 2,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/7becb23c-250a-4bb4-aefd-a3e7f4908d9f"
+              }
             },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Total Requests",
-            "yAxisUnit": "none"
-        },
-        {
-            "bucketCount": 30,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "contextLinks": {
-                "linksData": []
+            {
+              "x": 4,
+              "y": 0,
+              "width": 2,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/7d6a6e7d-1a17-4f49-9aad-6c0c81a8c0ce"
+              }
             },
-            "customLegendColors": {},
-            "description": "",
-            "fillSpans": false,
-            "id": "7becb23c-250a-4bb4-aefd-a3e7f4908d9f",
-            "isLogScale": false,
-            "isStacked": false,
-            "legendPosition": "bottom",
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "value",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_nginx_http_current_connections",
-                                    "reduceTo": "last",
-                                    "spaceAggregation": "sum",
-                                    "timeAggregation": "latest"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filter": {
-                                "expression": "state = 'accepted'"
-                            },
-                            "functions": [],
-                            "groupBy": [],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "source": "",
-                            "stepInterval": 60
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "a4f372f0-57c1-40da-80c8-adb925989eea",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Accepted Connections",
-            "yAxisUnit": "none"
-        },
-        {
-            "bucketCount": 30,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "contextLinks": {
-                "linksData": []
-            },
-            "customLegendColors": {},
-            "description": "",
-            "fillSpans": false,
-            "id": "7d6a6e7d-1a17-4f49-9aad-6c0c81a8c0ce",
-            "isLogScale": false,
-            "isStacked": false,
-            "legendPosition": "bottom",
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "value",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_nginx_http_current_connections",
-                                    "reduceTo": "last",
-                                    "spaceAggregation": "sum",
-                                    "timeAggregation": "latest"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filter": {
-                                "expression": "state = 'handled'"
-                            },
-                            "functions": [],
-                            "groupBy": [],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "source": "",
-                            "stepInterval": 60
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "8fea6d57-7e73-42a4-9716-6cd7e4972eaa",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Handled Connections",
-            "yAxisUnit": "none"
-        },
-        {
-            "bucketCount": 30,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "contextLinks": {
-                "linksData": []
-            },
-            "customLegendColors": {},
-            "description": "",
-            "fillSpans": true,
-            "id": "8e49aded-11b2-45b4-918d-2659e2fe15c8",
-            "isLogScale": false,
-            "isStacked": false,
-            "legendPosition": "bottom",
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "graph",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_nginx_http_current_connections",
-                                    "reduceTo": "avg",
-                                    "spaceAggregation": "sum",
-                                    "timeAggregation": "latest"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filter": {
-                                "expression": ""
-                            },
-                            "functions": [],
-                            "groupBy": [
-                                {
-                                    "dataType": "string",
-                                    "id": "state--string--tag",
-                                    "isColumn": false,
-                                    "isJSON": false,
-                                    "key": "state",
-                                    "type": "tag"
-                                }
-                            ],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "{{state}}",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "source": "",
-                            "stepInterval": 60
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "a324041f-b39d-45b2-8ca3-13890724a876",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Nginx connection state",
-            "yAxisUnit": "none"
-        },
-        {
-            "description": "",
-            "id": "2488460f-94df-47f4-903f-b2c8a92778a0",
-            "panelTypes": "row",
-            "title": "Nginx"
-        },
-        {
-            "bucketCount": 30,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "description": "",
-            "fillSpans": true,
-            "id": "a8d0d914-2f47-4db4-b0ce-a1e166e62d6c",
-            "isStacked": false,
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "graph",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregateAttribute": {
-                                "dataType": "float64",
-                                "id": "apisix_bandwidth--float64--Sum--true",
-                                "isColumn": true,
-                                "isJSON": false,
-                                "key": "apisix_bandwidth",
-                                "type": "Sum"
-                            },
-                            "aggregateOperator": "rate",
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filters": {
-                                "items": [
-                                    {
-                                        "id": "c0afff11",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "uri--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "uri",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".uri"
-                                        ]
-                                    },
-                                    {
-                                        "id": "b79e3e7c",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "route--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "route",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".route_id"
-                                        ]
-                                    },
-                                    {
-                                        "id": "b687186d",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "hostname--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "hostname",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".apisix_instance"
-                                        ]
-                                    }
-                                ],
-                                "op": "AND"
-                            },
-                            "functions": [],
-                            "groupBy": [
-                                {
-                                    "dataType": "string",
-                                    "id": "type--string--tag--false",
-                                    "isColumn": false,
-                                    "isJSON": false,
-                                    "key": "type",
-                                    "type": "tag"
-                                }
-                            ],
-                            "having": [],
-                            "legend": "{{type}}",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "reduceTo": "avg",
-                            "spaceAggregation": "sum",
-                            "stepInterval": 60,
-                            "timeAggregation": "rate"
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "1411e1de-7936-4fb6-b573-81df5daee785",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Total Bandwidth",
-            "yAxisUnit": "decbytes"
-        },
-        {
-            "description": "",
-            "id": "93c65502-cc44-4cac-9f78-752153b45b76",
-            "panelTypes": "row",
-            "title": "Bandwidth"
-        },
-        {
-            "bucketCount": 30,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "description": "",
-            "fillSpans": true,
-            "id": "052e360a-4099-4610-ac9d-421188eceafd",
-            "isStacked": false,
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "graph",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregateAttribute": {
-                                "dataType": "float64",
-                                "id": "apisix_bandwidth--float64--Sum--true",
-                                "isColumn": true,
-                                "isJSON": false,
-                                "key": "apisix_bandwidth",
-                                "type": "Sum"
-                            },
-                            "aggregateOperator": "rate",
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filters": {
-                                "items": [
-                                    {
-                                        "id": "a3a298bb",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "uri--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "uri",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".uri"
-                                        ]
-                                    },
-                                    {
-                                        "id": "a497951b",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "route--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "route",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".route_id"
-                                        ]
-                                    },
-                                    {
-                                        "id": "caa65f7a",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "hostname--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "hostname",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".apisix_instance"
-                                        ]
-                                    },
-                                    {
-                                        "id": "1ef71685",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "type--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "type",
-                                            "type": "tag"
-                                        },
-                                        "op": "=",
-                                        "value": "ingress"
-                                    }
-                                ],
-                                "op": "AND"
-                            },
-                            "functions": [],
-                            "groupBy": [
-                                {
-                                    "dataType": "string",
-                                    "id": "uri--string--tag--false",
-                                    "isColumn": false,
-                                    "isJSON": false,
-                                    "key": "uri",
-                                    "type": "tag"
-                                }
-                            ],
-                            "having": [],
-                            "legend": "{{uri}}",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "reduceTo": "avg",
-                            "spaceAggregation": "sum",
-                            "stepInterval": 60,
-                            "timeAggregation": "rate"
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "127ed4e8-d307-4776-8990-056a9905cc0a",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Ingress per uri",
-            "yAxisUnit": "decbytes"
-        },
-        {
-            "bucketCount": 30,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "description": "",
-            "fillSpans": true,
-            "id": "af0924a0-17a2-4e53-84e5-3741320a05ab",
-            "isStacked": false,
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "graph",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregateAttribute": {
-                                "dataType": "float64",
-                                "id": "apisix_bandwidth--float64--Sum--true",
-                                "isColumn": true,
-                                "isJSON": false,
-                                "key": "apisix_bandwidth",
-                                "type": "Sum"
-                            },
-                            "aggregateOperator": "rate",
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filters": {
-                                "items": [
-                                    {
-                                        "id": "8f33e907",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "uri--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "uri",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".uri"
-                                        ]
-                                    },
-                                    {
-                                        "id": "98b5df67",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "route--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "route",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".route_id"
-                                        ]
-                                    },
-                                    {
-                                        "id": "58522b29",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "hostname--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "hostname",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".apisix_instance"
-                                        ]
-                                    },
-                                    {
-                                        "id": "6abd32ae",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "type--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "type",
-                                            "type": "tag"
-                                        },
-                                        "op": "=",
-                                        "value": "egress"
-                                    }
-                                ],
-                                "op": "AND"
-                            },
-                            "functions": [],
-                            "groupBy": [
-                                {
-                                    "dataType": "string",
-                                    "id": "uri--string--tag--false",
-                                    "isColumn": false,
-                                    "isJSON": false,
-                                    "key": "uri",
-                                    "type": "tag"
-                                }
-                            ],
-                            "having": [],
-                            "legend": "{{uri}}",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "reduceTo": "avg",
-                            "spaceAggregation": "sum",
-                            "stepInterval": 60,
-                            "timeAggregation": "rate"
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "87db93d9-9a8f-44f9-9fc5-4cbcc8d331c0",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Egress per uri",
-            "yAxisUnit": "decbytes"
-        },
-        {
-            "bucketCount": 30,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "description": "",
-            "fillSpans": true,
-            "id": "072d5f2a-191c-40f4-8d58-351ab8058513",
-            "isStacked": false,
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "graph",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregateAttribute": {
-                                "dataType": "float64",
-                                "id": "apisix_http_status--float64--Sum--true",
-                                "isColumn": true,
-                                "isJSON": false,
-                                "key": "apisix_http_status",
-                                "type": "Sum"
-                            },
-                            "aggregateOperator": "rate",
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filters": {
-                                "items": [
-                                    {
-                                        "id": "78c425e2",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "uri--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "uri",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".uri"
-                                        ]
-                                    },
-                                    {
-                                        "id": "adc9f3d1",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "route--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "route",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".route_id"
-                                        ]
-                                    },
-                                    {
-                                        "id": "69d66b58",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "hostname--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "hostname",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".apisix_instance"
-                                        ]
-                                    }
-                                ],
-                                "op": "AND"
-                            },
-                            "functions": [],
-                            "groupBy": [
-                                {
-                                    "dataType": "string",
-                                    "id": "code--string--tag--false",
-                                    "isColumn": false,
-                                    "isJSON": false,
-                                    "key": "code",
-                                    "type": "tag"
-                                }
-                            ],
-                            "having": [],
-                            "legend": "{{code}}",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "reduceTo": "avg",
-                            "spaceAggregation": "sum",
-                            "stepInterval": 60,
-                            "timeAggregation": "rate"
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "aec29f0c-5338-49f6-9e8f-fae1f79acddc",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Requests per second (RPS) by status code",
-            "yAxisUnit": "reqps"
-        },
-        {
-            "description": "",
-            "id": "6efdc9e3-cd59-4b41-b124-4f8767186f9e",
-            "panelTypes": "row",
-            "title": "HTTP"
-        },
-        {
-            "bucketCount": 30,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "description": "",
-            "fillSpans": false,
-            "id": "753f44e6-473f-48da-9c37-11bfda3517d9",
-            "isStacked": false,
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "graph",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregateAttribute": {
-                                "dataType": "float64",
-                                "id": "apisix_http_status--float64--Sum--true",
-                                "isColumn": true,
-                                "isJSON": false,
-                                "key": "apisix_http_status",
-                                "type": "Sum"
-                            },
-                            "aggregateOperator": "rate",
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filters": {
-                                "items": [
-                                    {
-                                        "id": "b23335c5",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "uri--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "uri",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".uri"
-                                        ]
-                                    },
-                                    {
-                                        "id": "1be3c31f",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "route--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "route",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".route_id"
-                                        ]
-                                    },
-                                    {
-                                        "id": "47d1ce0b",
-                                        "key": {
-                                            "dataType": "string",
-                                            "id": "hostname--string--tag--false",
-                                            "isColumn": false,
-                                            "isJSON": false,
-                                            "key": "hostname",
-                                            "type": "tag"
-                                        },
-                                        "op": "in",
-                                        "value": [
-                                            ".apisix_instance"
-                                        ]
-                                    }
-                                ],
-                                "op": "AND"
-                            },
-                            "functions": [],
-                            "groupBy": [
-                                {
-                                    "dataType": "string",
-                                    "id": "uri--string--tag--false",
-                                    "isColumn": false,
-                                    "isJSON": false,
-                                    "key": "uri",
-                                    "type": "tag"
-                                }
-                            ],
-                            "having": [],
-                            "legend": "{{uri}}",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "reduceTo": "avg",
-                            "spaceAggregation": "sum",
-                            "stepInterval": 60,
-                            "timeAggregation": "rate"
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "0a69c7a6-2ad9-48b3-895f-ce43a15dfe54",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Requests per second (RPS) by uri",
-            "yAxisUnit": "reqps"
-        },
-        {
-            "bucketCount": 100,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "contextLinks": {
-                "linksData": []
-            },
-            "customLegendColors": {},
-            "description": "",
-            "fillSpans": false,
-            "id": "d3a7e234-83fe-499b-8846-243e8d8718fc",
-            "isLogScale": false,
-            "isStacked": false,
-            "legendPosition": "bottom",
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "histogram",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_http_latency.bucket",
-                                    "reduceTo": "avg",
-                                    "spaceAggregation": "p90",
-                                    "temporality": "",
-                                    "timeAggregation": "rate"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filter": {
-                                "expression": "uri in ['.uri'] AND hostname in ['.apisix_instance'] AND type IN ['request']"
-                            },
-                            "functions": [],
-                            "groupBy": [
-                                {
-                                    "dataType": "string",
-                                    "id": "le--string--tag",
-                                    "isColumn": false,
-                                    "isJSON": false,
-                                    "key": "le",
-                                    "type": "tag"
-                                }
-                            ],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "p90",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "source": "",
-                            "stepInterval": 60
-                        },
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_http_latency.bucket",
-                                    "reduceTo": "avg",
-                                    "spaceAggregation": "p95",
-                                    "temporality": "",
-                                    "timeAggregation": "rate"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "B",
-                            "filter": {
-                                "expression": "uri in ['.uri'] AND hostname in ['.apisix_instance'] AND type IN ['request']"
-                            },
-                            "functions": [],
-                            "groupBy": [
-                                {
-                                    "dataType": "string",
-                                    "id": "le--string--tag",
-                                    "isColumn": false,
-                                    "isJSON": false,
-                                    "key": "le",
-                                    "type": "tag"
-                                }
-                            ],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "p95",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "B",
-                            "source": "",
-                            "stepInterval": 60
-                        },
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_http_latency.bucket",
-                                    "reduceTo": "avg",
-                                    "spaceAggregation": "p99",
-                                    "temporality": "",
-                                    "timeAggregation": "rate"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "C",
-                            "filter": {
-                                "expression": "uri in ['.uri'] AND hostname in ['.apisix_instance'] AND type IN ['request']"
-                            },
-                            "functions": [],
-                            "groupBy": [
-                                {
-                                    "dataType": "string",
-                                    "id": "le--string--tag",
-                                    "isColumn": false,
-                                    "isJSON": false,
-                                    "key": "le",
-                                    "type": "tag"
-                                }
-                            ],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "p99",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "C",
-                            "source": "",
-                            "stepInterval": 60
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "61244c97-367d-4389-b0f8-1f5f098f8bce",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Request Latency",
-            "yAxisUnit": "ms"
-        },
-        {
-            "bucketCount": 100,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "contextLinks": {
-                "linksData": []
-            },
-            "customLegendColors": {},
-            "description": "",
-            "fillSpans": false,
-            "id": "f55874f1-8979-46e1-b787-f74cee23d509",
-            "isLogScale": false,
-            "isStacked": false,
-            "legendPosition": "bottom",
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "histogram",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_http_latency.bucket",
-                                    "reduceTo": "avg",
-                                    "spaceAggregation": "p90",
-                                    "temporality": "",
-                                    "timeAggregation": "rate"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filter": {
-                                "expression": "type IN ['apisix'] AND hostname IN ['.apisix_instance'] AND uri IN ['.uri']"
-                            },
-                            "functions": [],
-                            "groupBy": [],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "p90",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "source": "",
-                            "stepInterval": null
-                        },
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_http_latency.bucket",
-                                    "reduceTo": "avg",
-                                    "spaceAggregation": "p95",
-                                    "temporality": "",
-                                    "timeAggregation": "rate"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "B",
-                            "filter": {
-                                "expression": "type IN ['apisix'] AND hostname IN ['.apisix_instance'] AND uri IN ['.uri']"
-                            },
-                            "functions": [],
-                            "groupBy": [],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "p95",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "B",
-                            "source": "",
-                            "stepInterval": null
-                        },
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_http_latency.bucket",
-                                    "reduceTo": "avg",
-                                    "spaceAggregation": "p99",
-                                    "temporality": "",
-                                    "timeAggregation": "rate"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "C",
-                            "filter": {
-                                "expression": "type IN ['apisix'] AND hostname IN ['.apisix_instance'] AND uri IN ['.uri']"
-                            },
-                            "functions": [],
-                            "groupBy": [],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "p95",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "C",
-                            "source": "",
-                            "stepInterval": null
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "b6a31a91-ed33-458f-a111-581bb98d37ea",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "APISIX Latency",
-            "yAxisUnit": "ms"
-        },
-        {
-            "bucketCount": 30,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "description": "",
-            "fillSpans": true,
-            "id": "7e254b81-e050-4650-8aad-7e2691b5cb16",
-            "isStacked": false,
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "graph",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregateAttribute": {
-                                "dataType": "float64",
-                                "id": "apisix_etcd_modify_indexes--float64--Gauge--true",
-                                "isColumn": true,
-                                "isJSON": false,
-                                "key": "apisix_etcd_modify_indexes",
-                                "type": "Gauge"
-                            },
-                            "aggregateOperator": "sum",
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filters": {
-                                "items": [],
-                                "op": "AND"
-                            },
-                            "functions": [],
-                            "groupBy": [
-                                {
-                                    "dataType": "string",
-                                    "id": "key--string--tag--false",
-                                    "isColumn": false,
-                                    "isJSON": false,
-                                    "key": "key",
-                                    "type": "tag"
-                                }
-                            ],
-                            "having": [],
-                            "legend": "{{key}}",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "reduceTo": "avg",
-                            "spaceAggregation": "sum",
-                            "stepInterval": 60,
-                            "timeAggregation": "sum"
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "27c619eb-38b0-4023-90dd-41ce2123d956",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Etcd modify indexes",
-            "yAxisUnit": "none"
-        },
-        {
-            "description": "",
-            "id": "5939d2eb-42ea-42b4-ad43-b149abc6f17d",
-            "panelTypes": "row",
-            "title": "Misc."
-        },
-        {
-            "bucketCount": 30,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "description": "",
-            "fillSpans": true,
-            "id": "73017c8b-29c6-4493-b274-6a8a2cfd6b32",
-            "isStacked": false,
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "value",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregateAttribute": {
-                                "dataType": "float64",
-                                "id": "apisix_etcd_reachable--float64--Gauge--true",
-                                "isColumn": true,
-                                "isJSON": false,
-                                "key": "apisix_etcd_reachable",
-                                "type": "Gauge"
-                            },
-                            "aggregateOperator": "latest",
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filters": {
-                                "items": [],
-                                "op": "AND"
-                            },
-                            "functions": [],
-                            "groupBy": [],
-                            "having": [],
-                            "legend": "",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "reduceTo": "last",
-                            "spaceAggregation": "sum",
-                            "stepInterval": 60,
-                            "timeAggregation": "latest"
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "b7d8829c-4bef-4b2c-bbc8-8f5a05d3002b",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Etcd reachable",
-            "yAxisUnit": "bool_yes_no"
-        },
-        {
-            "bucketCount": 30,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "description": "",
-            "fillSpans": true,
-            "id": "19ba4ab0-a2fd-4135-be0b-070de0ea6dc2",
-            "isStacked": false,
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "value",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregateAttribute": {
-                                "dataType": "float64",
-                                "id": "apisix_nginx_metric_errors_total--float64--Sum--true",
-                                "isColumn": true,
-                                "isJSON": false,
-                                "key": "apisix_nginx_metric_errors_total",
-                                "type": "Sum"
-                            },
-                            "aggregateOperator": "rate",
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filters": {
-                                "items": [],
-                                "op": "AND"
-                            },
-                            "functions": [],
-                            "groupBy": [],
-                            "having": [],
-                            "legend": "",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "reduceTo": "last",
-                            "spaceAggregation": "sum",
-                            "stepInterval": 60,
-                            "timeAggregation": "rate"
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "9a6c4af3-9301-422c-9c92-40ae366a885c",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Nginx metric errors",
-            "yAxisUnit": "none"
-        },
-        {
-            "bucketCount": 100,
-            "bucketWidth": 0,
-            "columnUnits": {},
-            "contextLinks": {
-                "linksData": []
-            },
-            "customLegendColors": {},
-            "description": "",
-            "fillSpans": false,
-            "id": "46cdbcad-8d52-4f63-9130-bc03230b77ab",
-            "isLogScale": false,
-            "isStacked": false,
-            "legendPosition": "bottom",
-            "mergeAllActiveQueries": false,
-            "nullZeroValues": "zero",
-            "opacity": "1",
-            "panelTypes": "histogram",
-            "query": {
-                "builder": {
-                    "queryData": [
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_http_latency.bucket",
-                                    "reduceTo": "avg",
-                                    "spaceAggregation": "p90",
-                                    "temporality": "",
-                                    "timeAggregation": "rate"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "A",
-                            "filter": {
-                                "expression": "type IN ['upstream'] AND hostname IN ['.apisix_instance'] AND uri IN ['.uri']"
-                            },
-                            "functions": [],
-                            "groupBy": [],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "p90",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "A",
-                            "source": "",
-                            "stepInterval": null
-                        },
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_http_latency.bucket",
-                                    "reduceTo": "avg",
-                                    "spaceAggregation": "p95",
-                                    "temporality": "",
-                                    "timeAggregation": "rate"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "B",
-                            "filter": {
-                                "expression": "type IN ['upstream'] AND hostname IN ['.apisix_instance'] AND uri IN ['.uri']"
-                            },
-                            "functions": [],
-                            "groupBy": [],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "p95",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "B",
-                            "source": "",
-                            "stepInterval": null
-                        },
-                        {
-                            "aggregations": [
-                                {
-                                    "metricName": "apisix_http_latency.bucket",
-                                    "reduceTo": "avg",
-                                    "spaceAggregation": "p99",
-                                    "temporality": "",
-                                    "timeAggregation": "rate"
-                                }
-                            ],
-                            "dataSource": "metrics",
-                            "disabled": false,
-                            "expression": "C",
-                            "filter": {
-                                "expression": "type IN ['upstream'] AND hostname IN ['.apisix_instance'] AND uri IN ['.uri']"
-                            },
-                            "functions": [],
-                            "groupBy": [],
-                            "having": {
-                                "expression": ""
-                            },
-                            "legend": "p95",
-                            "limit": null,
-                            "orderBy": [],
-                            "queryName": "C",
-                            "source": "",
-                            "stepInterval": null
-                        }
-                    ],
-                    "queryFormulas": []
-                },
-                "clickhouse_sql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "id": "7cdcdc4b-35cd-4210-9540-8ab366fd7455",
-                "promql": [
-                    {
-                        "disabled": false,
-                        "legend": "",
-                        "name": "A",
-                        "query": ""
-                    }
-                ],
-                "queryType": "builder"
-            },
-            "selectedLogFields": [
-                {
-                    "dataType": "string",
-                    "name": "body",
-                    "type": ""
-                },
-                {
-                    "dataType": "string",
-                    "name": "timestamp",
-                    "type": ""
-                }
-            ],
-            "selectedTracesFields": [
-                {
-                    "dataType": "string",
-                    "id": "serviceName--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "serviceName",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "name--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "name",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "float64",
-                    "id": "durationNano--float64--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "durationNano",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "httpMethod--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "httpMethod",
-                    "type": "tag"
-                },
-                {
-                    "dataType": "string",
-                    "id": "responseStatusCode--string--tag--true",
-                    "isColumn": true,
-                    "isJSON": false,
-                    "key": "responseStatusCode",
-                    "type": "tag"
-                }
-            ],
-            "softMax": 0,
-            "softMin": 0,
-            "stackedBarChart": false,
-            "thresholds": [],
-            "timePreferance": "GLOBAL_TIME",
-            "title": "Upstream Latency",
-            "yAxisUnit": "ms"
+            {
+              "x": 6,
+              "y": 0,
+              "width": 6,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/8e49aded-11b2-45b4-918d-2659e2fe15c8"
+              }
+            }
+          ]
         }
-    ]
+      },
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Bandwidth",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/a8d0d914-2f47-4db4-b0ce-a1e166e62d6c"
+              }
+            },
+            {
+              "x": 0,
+              "y": 8,
+              "width": 6,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/052e360a-4099-4610-ac9d-421188eceafd"
+              }
+            },
+            {
+              "x": 6,
+              "y": 8,
+              "width": 6,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/af0924a0-17a2-4e53-84e5-3741320a05ab"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "HTTP",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/072d5f2a-191c-40f4-8d58-351ab8058513"
+              }
+            },
+            {
+              "x": 0,
+              "y": 8,
+              "width": 12,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/753f44e6-473f-48da-9c37-11bfda3517d9"
+              }
+            },
+            {
+              "x": 0,
+              "y": 16,
+              "width": 4,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/d3a7e234-83fe-499b-8846-243e8d8718fc"
+              }
+            },
+            {
+              "x": 4,
+              "y": 16,
+              "width": 4,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/f55874f1-8979-46e1-b787-f74cee23d509"
+              }
+            },
+            {
+              "x": 8,
+              "y": 16,
+              "width": 4,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/46cdbcad-8d52-4f63-9130-bc03230b77ab"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Misc.",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 6,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/7e254b81-e050-4650-8aad-7e2691b5cb16"
+              }
+            },
+            {
+              "x": 6,
+              "y": 0,
+              "width": 3,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/73017c8b-29c6-4493-b274-6a8a2cfd6b32"
+              }
+            },
+            {
+              "x": 9,
+              "y": 0,
+              "width": 3,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/19ba4ab0-a2fd-4135-be0b-070de0ea6dc2"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "duration": "",
+    "refreshInterval": "",
+    "links": []
+  }
 }

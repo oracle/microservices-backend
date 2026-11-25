@@ -1,0 +1,69 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+#
+# Example: SigNoz metadata in the bundled PostgreSQL database.
+# PostgreSQL stores users, dashboards, alerts, and configuration; ClickHouse
+# remains the telemetry store. This overlay does not change ingestion capacity.
+#
+# Intended for a fresh installation. Enabling PostgreSQL does not copy an
+# existing SQLite database. For an existing installation, back up metadata and
+# validate a separate migration and restore procedure before switching stores.
+#
+# Create the credential secret in the release namespace before installation.
+# Supply a password file containing only the password, without a trailing newline:
+# Use a URL-safe password (for example, random hexadecimal characters): the
+# bundled chart interpolates it into a PostgreSQL URI without percent-encoding.
+#
+#   kubectl -n obaas create secret generic signoz-postgres-auth \
+#     --from-file=password=/secure/path/postgres-password
+#
+# From the repository root, layer this after your normal environment values:
+#
+#   helm upgrade --install obaas helm/infra-charts/obaas \
+#     -n obaas --create-namespace \
+#     -f <environment-values.yaml> \
+#     -f helm/infra-charts/obaas/examples/values-signoz-postgres.yaml
+#
+# The namespace must already exist when creating the secret. Resource and
+# storage sizes below are starting allocations, not measured capacity ratings.
+# The bundled chart does not configure PostgreSQL replication or failover;
+# keep replicaCount at 1. Plan backups and test restoration separately.
+# See https://signoz.io/docs/manage/administrator-guide/configuration/relational-database/
+
+signoz:
+  enabled: true
+  # The parent chart configures the SigNoz SQL store provider, DSN, and
+  # credential environment from these values.
+  postgresql:
+    enabled: true
+    replicaCount: 1
+
+    # Use the bundled chart's PostgreSQL 15 image with a fresh chart-owned PVC.
+    image:
+      repository: docker.io/library/postgres
+      tag: "15"
+
+    auth:
+      username: signoz
+      database: signoz
+      # User-supplied password secret. This secret must be created, or
+      # auth.password configured.
+      existingSecret: signoz-postgres-auth
+      secretKeys:
+        userPasswordKey: password
+
+    # Sample sizing
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 2Gi
+
+    persistence:
+      enabled: true
+      # OCI Block Volume CSI example; replace with a suitable StorageClass
+      # available in your cluster. The chart requests ReadWriteOnce storage.
+      storageClass: oci-bv
+      size: 50Gi

@@ -1,0 +1,27 @@
+## Copyright (c) 2026, Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v1.0 as shown at http://oss.oracle.com/licenses/upl.
+{{- include "obaas.otmm.validateStorage" . }}
+{{- $persistence := .Values.otmm.workflowServer.config.storage.fileSystem.persistence }}
+{{- if and .Values.otmm.workflowServer.enabled $persistence.enabled (not $persistence.existingClaim) }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "obaas.otmm.workflowClaim" . }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "obaas.labels" $ | nindent 4 }}
+  {{- if $persistence.retain }}
+  annotations:
+    helm.sh/resource-policy: keep
+  {{- end }}
+spec:
+  accessModes:
+    {{- toYaml $persistence.accessModes | nindent 4 }}
+  {{- if $persistence.storageClass }}
+  storageClassName: {{ $persistence.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $persistence.size | quote }}
+{{- end }}
