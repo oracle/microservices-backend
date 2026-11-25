@@ -110,14 +110,17 @@ external-secrets:
   # Uncomment to override the default image repository
   image:
     repository: "myregistry.example.com/external-secrets/external-secrets"
+    tag: "v2.10.0"
   webhook:
     image:
       repository: myregistry.example.com/external-secrets/external-secrets
+      tag: "v2.10.0"
       pullPolicy: IfNotPresent
     imagePullSecrets: *imagePullSecrets
   certController:
     image:
       repository: myregistry.example.com/external-secrets/external-secrets
+      tag: "v2.10.0"
       pullPolicy: IfNotPresent
     imagePullSecrets: *imagePullSecrets
 
@@ -135,6 +138,7 @@ metrics-server:
   # Uncomment to override the default image repository
   image:
     repository: "myregistry.example.com/metrics-server/metrics-server"
+    tag: "v0.9.0"
 
 # =============================================================================
 # kube-state-metrics
@@ -151,6 +155,7 @@ kube-state-metrics:
   image:
     registry: "myregistry.example.com"  # Default: registry.k8s.io
     repository: "kube-state-metrics/kube-state-metrics"
+    tag: "v2.20.0"
   # Control which namespaces it monitors
   # releaseNamespace: false  # Set to true to only watch release namespace
   # namespaces: ""  # Comma-separated list or yaml list of namespaces to watch
